@@ -114,33 +114,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Accent Color Selection */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  <Palette className="text-gray-600 dark:text-gray-300" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">Accent Color</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    Choose your preferred accent color
-                  </p>
-                </div>
-              </div>
-              <div className="flex space-x-2">
-                {accentColors.map((color) => (
-                  <button
-                    key={color.value}
-                    onClick={() => handleAccentColorChange(color.value as any)}
-                    className={`w-8 h-8 rounded-full ${color.class} border-2 ${
-                      settings.accentColor === color.value
-                        ? 'border-gray-800 dark:border-white ring-2 ring-offset-2 ring-gray-300 dark:ring-gray-700'
-                        : 'border-transparent'
-                    }`}
-                    title={color.name}
-                  />
-                ))}
-              </div>
-            </div>
+         
           </div>
         </div>
 

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import {
   LayoutDashboard,
   Building2,
@@ -10,7 +11,9 @@ import {
   Layers,
   Database,
   Megaphone,
-  Settings
+  Settings,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 const menuItems = [
@@ -25,53 +28,88 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   return (
-    <motion.div
-      initial={{ x: -100, opacity: 0 }}
+    <motion.aside
+      initial={{ x: -60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="w-64 bg-white dark:bg-gray-900 shadow-lg min-h-screen p-6 transition-colors duration-300"
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className={`${
+        collapsed ? 'w-20' : 'w-64'
+      } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 min-h-screen shadow-lg flex flex-col justify-between transition-all duration-500`}
     >
-      {/* Header */}
-      <div className="mb-10 flex justify-between items-center">
-        {/* Desktop view */}
-        <div className="hidden sm:block">
-          <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">
-            Portfolio Handler
-          </h1>
-          <p className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-            Admin Portal
-          </p>
+      {/* ==== Top Section ==== */}
+      <div className="p-4 flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          {!collapsed ? (
+            <div>
+              <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text tracking-tight">
+                Portfolio Handler
+              </h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                Admin Portal
+              </p>
+            </div>
+          ) : (
+            <div className="flex justify-center w-full">
+              <span className="text-2xl text-cyan-400 font-bold">P</span>
+            </div>
+          )}
+
+          {/* Collapse button */}
+          <button
+            onClick={toggleSidebar}
+            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
         </div>
 
-        {/* Mobile view */}
-        <div className="block sm:hidden ml-auto">
-          <p className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400 font-semibold text-lg">
-            Admin Portal
-          </p>
-        </div>
+        {/* Navigation */}
+        <nav className="flex flex-col gap-1">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`group flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-500/10 to-cyan-400/10 text-blue-600 dark:text-cyan-300 border-l-4 border-cyan-400'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-cyan-300'
+                }`}
+              >
+                <item.icon
+                  size={20}
+                  className={`transition-transform duration-300 ${
+                    isActive ? 'scale-110 text-cyan-400' : 'group-hover:scale-110'
+                  }`}
+                />
+
+                {/* Animated label hide/show */}
+                <AnimatePresence initial={false}>
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Navigation */}
-      <nav className="space-y-2">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                isActive
-                  ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-500'
-                  : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
-              }`}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-    </motion.div>
+     
+    </motion.aside>
   );
 }

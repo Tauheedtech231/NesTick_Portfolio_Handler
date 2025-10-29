@@ -738,17 +738,17 @@ export default function LandingPage() {
 
     {/* Enhanced Footer */}
 <footer className="bg-gray-900 text-white py-16 px-4 sm:px-6 relative overflow-hidden">
-  {/* Footer background pattern */}
+  {/* Soft background glow */}
   <div className="absolute inset-0 opacity-5">
     <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500 rounded-full blur-3xl"></div>
     <div className="absolute bottom-0 right-0 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
   </div>
 
   <div className="container mx-auto max-w-6xl relative z-10">
-    {/* Responsive grid: 2 columns on very small, 3 on medium, 4 on large */}
+    {/* Grid layout */}
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
       
-      {/* Brand */}
+      {/* Brand Section */}
       <div className="col-span-2 md:col-span-1 lg:col-span-2">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
@@ -759,7 +759,7 @@ export default function LandingPage() {
           </span>
         </div>
         <p className="text-gray-400 text-lg leading-relaxed max-w-md">
-          Simplifying college portfolio management with cutting-edge technology and beautiful design.
+          Simplifying college portfolio management with cutting-edge technology and elegant design.
         </p>
       </div>
 
@@ -779,35 +779,65 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Contact */}
+      {/* Contact Section */}
       <div>
         <h3 className="text-lg font-semibold mb-6 text-white">Contact</h3>
-        <div className="space-y-4 text-gray-400 break-words">
-          <p className="truncate sm:whitespace-normal">support@portfoliohandler.com</p>
-          <p>+1 (555) 123-4567</p>
-          <p>Mon-Fri 9:00AM - 6:00PM</p>
+        <div className="space-y-3 text-gray-400">
+          <p>support@portfoliohandler.com</p>
+          <p>+92 319 3236529</p>
+          <p>Mon - Fri | 9:00 AM - 6:00 PM</p>
         </div>
       </div>
     </div>
 
-    {/* Bottom Section */}
+    {/* Footer Bottom */}
     <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
       <div className="text-gray-400 text-center md:text-left">
         © 2025 College Portfolio Handler System. All rights reserved.
       </div>
+
+      {/* Social Links */}
       <div className="flex space-x-4">
-        {['Twitter', 'Facebook', 'LinkedIn', 'GitHub'].map((social) => (
-          <div
-            key={social}
-            className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-gray-700 transition-all duration-300 ease-in-out cursor-pointer transform hover:scale-110 hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600"
-          >
-            <span className="text-xs font-semibold">{social.charAt(0)}</span>
-          </div>
-        ))}
+        <a
+          href="https://x.com/nesticktech"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-110"
+        >
+          <span className="text-sm font-semibold">X</span>
+        </a>
+
+        <a
+          href="https://web.facebook.com/people/Nestick-Tech/61567617353923/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-br hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-110"
+        >
+          <span className="text-sm font-semibold">f</span>
+        </a>
+
+        <a
+          href="https://www.instagram.com/nesticktech/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-br hover:from-pink-500 hover:to-yellow-500 transition-all duration-300 transform hover:scale-110"
+        >
+          <span className="text-sm font-semibold">I</span>
+        </a>
+
+        <a
+          href="https://www.linkedin.com/in/abdullah-amin005"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-gradient-to-br hover:from-blue-600 hover:to-blue-400 transition-all duration-300 transform hover:scale-110"
+        >
+          <span className="text-sm font-semibold">in</span>
+        </a>
       </div>
     </div>
   </div>
 </footer>
+
 
     </div>
   );

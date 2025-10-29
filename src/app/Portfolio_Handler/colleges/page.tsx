@@ -1,60 +1,61 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Search } from 'lucide-react';
+
 import { MainLayout } from '../components/layout/main-layout';
 import { CollegeTable } from '../components/colleges/college-table';
 import { AddCollegeModal } from '../components/colleges/add-college-modal';
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
 import { College } from '@/app/types';
-import { Plus, Search } from 'lucide-react';
 
 export default function CollegesPage() {
   const [colleges, setColleges] = useState<College[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [showAddModal, setShowAddModal] = useState(false);
 
+  // Load stored colleges once
   useEffect(() => {
-    const storedColleges = localStorage.getItem('colleges');
-    if (storedColleges) {
-      setColleges(JSON.parse(storedColleges));
-    }
+    const saved = localStorage.getItem('colleges');
+    if (saved) setColleges(JSON.parse(saved));
   }, []);
 
-  const filteredColleges = colleges.filter((college) => {
-    const matchesSearch =
-      college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      college.representativeName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || college.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  // Filter logic for search + status
+  const filtered = colleges.filter(c => {
+    const bySearch =
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.representativeName.toLowerCase().includes(search.toLowerCase());
+    const byStatus = status === 'all' || c.status === status;
+    return bySearch && byStatus;
   });
 
-  const handleAddCollege = (collegeData: Omit<College, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAdd = (data: Omit<College, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newCollege: College = {
-      ...collegeData,
+      ...data,
       id: Date.now().toString(),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    const updatedColleges = [...colleges, newCollege];
-    setColleges(updatedColleges);
-    localStorage.setItem('colleges', JSON.stringify(updatedColleges));
-    setIsAddModalOpen(false);
+    const updated = [...colleges, newCollege];
+    setColleges(updated);
+    localStorage.setItem('colleges', JSON.stringify(updated));
+    setShowAddModal(false);
   };
 
-  const handleEditCollege = (id: string, collegeData: Partial<College>) => {
-    const updatedColleges = colleges.map((college) =>
-      college.id === id ? { ...college, ...collegeData, updatedAt: new Date() } : college
+  const handleEdit = (id: string, changes: Partial<College>) => {
+    const updated = colleges.map(c =>
+      c.id === id ? { ...c, ...changes, updatedAt: new Date() } : c
     );
-    setColleges(updatedColleges);
-    localStorage.setItem('colleges', JSON.stringify(updatedColleges));
+    setColleges(updated);
+    localStorage.setItem('colleges', JSON.stringify(updated));
   };
 
-  const handleDeleteCollege = (id: string) => {
-    const updatedColleges = colleges.filter((college) => college.id !== id);
-    setColleges(updatedColleges);
-    localStorage.setItem('colleges', JSON.stringify(updatedColleges));
+  const handleDelete = (id: string) => {
+    const updated = colleges.filter(c => c.id !== id);
+    setColleges(updated);
+    localStorage.setItem('colleges', JSON.stringify(updated));
   };
 
   return (
@@ -62,59 +63,59 @@ export default function CollegesPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         className="space-y-6 transition-colors duration-500"
       >
         {/* Header */}
-     {/* Header */}
-<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-  <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">
-    College Management
-  </h1>
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+            College Management
+          </h1>
 
-  <motion.button
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.97 }}
-    onClick={() => setIsAddModalOpen(true)}
-    className="px-4 py-2 rounded-lg font-semibold text-white 
-               bg-gradient-to-r from-blue-600 to-indigo-600 
-               hover:from-indigo-600 hover:to-blue-700 
-               shadow-md transition-all duration-300 flex items-center 
-               justify-center space-x-2 mx-auto sm:mx-0"
-  >
-    <Plus size={18} />
-    <span>Add College</span>
-  </motion.button>
-</div>
-
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg 
+                       font-semibold text-white shadow-md 
+                       bg-gradient-to-r from-blue-600 to-indigo-600 
+                       hover:from-indigo-600 hover:to-blue-700 
+                       transition-all duration-300"
+          >
+            <Plus size={18} />
+            <span>Add College</span>
+          </motion.button>
+        </header>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
+        <section className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search input */}
-            <div className="flex-1 relative">
+            {/* Search */}
+            <div className="relative flex-1">
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 size={20}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
                 type="text"
                 placeholder="Search colleges..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 
-                           rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 
-                           placeholder-gray-400 dark:placeholder-gray-500 transition-colors duration-300"
+                           placeholder-gray-400 dark:placeholder-gray-500
+                           focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                           transition-colors duration-300"
               />
             </div>
 
-            {/* Status filter */}
+            {/* Status Filter */}
             <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg 
-                         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                         bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 
+              value={status}
+              onChange={e => setStatus(e.target.value as 'all' | 'active' | 'inactive')}
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
+                         bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100
+                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
                          transition-colors duration-300"
             >
               <option value="all">All Status</option>
@@ -122,20 +123,20 @@ export default function CollegesPage() {
               <option value="inactive">Inactive</option>
             </select>
           </div>
-        </div>
+        </section>
 
-        {/* College Table */}
+        {/* Table */}
         <CollegeTable
-          colleges={filteredColleges}
-          onEdit={handleEditCollege}
-          onDelete={handleDeleteCollege}
+          colleges={filtered}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
 
-        {/* Add College Modal */}
+        {/* Modal */}
         <AddCollegeModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onSave={handleAddCollege}
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSave={handleAdd}
         />
       </motion.div>
     </MainLayout>
