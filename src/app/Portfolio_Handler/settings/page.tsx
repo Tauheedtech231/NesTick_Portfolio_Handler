@@ -73,76 +73,79 @@ export default function SettingsPage() {
   ];
 
   return (
-    <MainLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Settings</h1>
+   <MainLayout>
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="space-y-6 transition-colors duration-300"
+  >
+    {/* Header */}
+    <div className="flex justify-between items-center">
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+        Settings
+      </h1>
+    </div>
+
+    {/* Appearance Section */}
+    <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-md overflow-hidden transition-colors duration-500">
+      <div className="bg-gray-100 dark:bg-neutral-900 px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-sm">
+          Customize the portal appearance
+        </p>
+      </div>
+
+      <div className="p-6 space-y-8">
+        {/* Dark Mode Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-gray-200 dark:bg-neutral-800 rounded-lg">
+              {settings.darkMode ? (
+                <Moon className="text-white" size={24} />
+              ) : (
+                <Sun className="text-black" size={24} />
+              )}
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Dark Mode</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Switch between light and dark modes
+              </p>
+            </div>
+          </div>
+          <ToggleSwitch enabled={settings.darkMode} onChange={handleDarkModeToggle} />
         </div>
 
-        {/* Appearance Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-colors duration-500">
-          <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Appearance</h2>
+     
+      </div>
+    </div>
+
+    {/* Reset Preferences */}
+    <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-gray-100 dark:bg-neutral-800 rounded-lg">
+            <RefreshCw className="text-gray-800 dark:text-gray-300" size={24} />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Reset Preferences</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Customize the look and feel of the portal
+              Reset all settings to their default values
             </p>
           </div>
-
-          <div className="p-6 space-y-8">
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  {settings.darkMode ? (
-                    <Moon className="text-gray-200" size={24} />
-                  ) : (
-                    <Sun className="text-yellow-500" size={24} />
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">Dark Mode</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    Switch between light and dark themes
-                  </p>
-                </div>
-              </div>
-              <ToggleSwitch enabled={settings.darkMode} onChange={handleDarkModeToggle} />
-            </div>
-
-            {/* Accent Color Selection */}
-         
-          </div>
         </div>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={resetPreferences}
+          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg border border-gray-700 dark:border-gray-300 transition-colors hover:opacity-80"
+        >
+          Reset
+        </motion.button>
+      </div>
+    </div>
+  </motion.div>
+</MainLayout>
 
-        {/* Reset Preferences */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-lg">
-                <RefreshCw className="text-red-600 dark:text-red-400" size={24} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100">Reset Preferences</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Reset all settings to their default values
-                </p>
-              </div>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={resetPreferences}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Reset Settings
-            </motion.button>
-          </div>
-        </div>
-      </motion.div>
-    </MainLayout>
   );
 }

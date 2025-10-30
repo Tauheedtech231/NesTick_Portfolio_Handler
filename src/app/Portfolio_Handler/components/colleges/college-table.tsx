@@ -21,16 +21,16 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-gray-700">
         {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+            <thead className="bg-gray-100 dark:bg-gray-800">
               <tr>
                 {['College', 'Representative', 'Status', 'Created', 'Actions'].map((header) => (
                   <th
                     key={header}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
                   >
                     {header}
                   </th>
@@ -52,7 +52,7 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                         <img
                           src={college.logo}
                           alt={college.name}
-                          className="h-8 w-8 rounded-full object-cover mr-3"
+                          className="h-8 w-8 rounded-full object-cover mr-3 border border-gray-300 dark:border-gray-600"
                         />
                       )}
                       <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -61,17 +61,17 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     {college.representativeName}
                   </td>
 
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleStatusToggle(college.id, college.status)}
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition ${
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition border ${
                         college.status === 'active'
-                          ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200'
-                          : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200'
+                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
                       }`}
                     >
                       {college.status === 'active' ? (
@@ -83,20 +83,22 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                     </button>
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     {new Date(college.createdAt).toLocaleDateString()}
                   </td>
 
-                  <td className="px-6 py-4 text-sm font-medium space-x-3">
+                  <td className="px-6 py-4 text-sm font-medium space-x-3 flex items-center">
                     <button
                       onClick={() => setEditingCollege(college)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition"
+                      className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                      title="Edit"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => onDelete(college.id)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition"
+                      className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                      title="Delete"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -122,14 +124,14 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                   <img
                     src={college.logo}
                     alt={college.name}
-                    className="h-10 w-10 rounded-full object-cover"
+                    className="h-10 w-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
                   />
                 )}
                 <div>
                   <p className="text-base font-semibold text-gray-900 dark:text-white">
                     {college.name}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {college.representativeName}
                   </p>
                 </div>
@@ -137,15 +139,15 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
 
               <div className="flex justify-between text-sm mb-3">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
                     college.status === 'active'
-                      ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200'
-                      : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
                   }`}
                 >
-                  {college.status === 'active' ? 'Active' : 'Inactive'}
+                  {college.status}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-600 dark:text-gray-400">
                   {new Date(college.createdAt).toLocaleDateString()}
                 </span>
               </div>
@@ -153,13 +155,13 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setEditingCollege(college)}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition"
+                  className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
                   onClick={() => onDelete(college.id)}
-                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition"
+                  className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
                 >
                   <Trash2 size={16} />
                 </button>

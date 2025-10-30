@@ -29,7 +29,6 @@ const menuItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   return (
@@ -39,7 +38,7 @@ export function Sidebar() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={`${
         collapsed ? 'w-20' : 'w-64'
-      } bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 min-h-screen shadow-lg flex flex-col justify-between transition-all duration-500`}
+      } bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 min-h-screen shadow-md flex flex-col justify-between transition-all duration-500`}
     >
       {/* ==== Top Section ==== */}
       <div className="p-4 flex flex-col h-full">
@@ -47,7 +46,7 @@ export function Sidebar() {
         <div className="flex items-center justify-between mb-8">
           {!collapsed ? (
             <div>
-              <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 text-transparent bg-clip-text tracking-tight">
+              <h1 className="text-xl font-extrabold text-black dark:text-white tracking-tight">
                 Portfolio Handler
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -56,14 +55,14 @@ export function Sidebar() {
             </div>
           ) : (
             <div className="flex justify-center w-full">
-              <span className="text-2xl text-cyan-400 font-bold">P</span>
+              <span className="text-2xl text-black dark:text-white font-bold">P</span>
             </div>
           )}
 
           {/* Collapse button */}
           <button
             onClick={toggleSidebar}
-            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-lg transition-colors"
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
@@ -79,18 +78,18 @@ export function Sidebar() {
                 href={item.href}
                 className={`group flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-500/10 to-cyan-400/10 text-blue-600 dark:text-cyan-300 border-l-4 border-cyan-400'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-cyan-300'
+                    ? 'bg-gray-100 dark:bg-gray-900 text-black dark:text-white border-l-4 border-gray-800 dark:border-white'
+                    : 'text-gray-700 hover:text-black hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
                 }`}
               >
                 <item.icon
                   size={20}
                   className={`transition-transform duration-300 ${
-                    isActive ? 'scale-110 text-cyan-400' : 'group-hover:scale-110'
+                    isActive
+                      ? 'scale-110 text-black dark:text-white'
+                      : 'group-hover:scale-110 text-gray-600 dark:text-gray-300'
                   }`}
                 />
-
-                {/* Animated label hide/show */}
                 <AnimatePresence initial={false}>
                   {!collapsed && (
                     <motion.span
@@ -108,8 +107,6 @@ export function Sidebar() {
           })}
         </nav>
       </div>
-
-     
     </motion.aside>
   );
 }

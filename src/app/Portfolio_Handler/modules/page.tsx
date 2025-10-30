@@ -108,22 +108,22 @@ export default function ModulesPage() {
       >
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 transition-colors">
             Module Control
           </h1>
         </div>
 
         {/* College selector */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Select College
           </label>
           <select
             value={selectedCollegeId}
             onChange={(e) => setSelectedCollegeId(e.target.value)}
-            className="w-full md:w-96 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                       bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200
-                       focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            className="w-full md:w-96 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg
+                       bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200
+                       focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-300"
           >
             <option value="">Select a college</option>
             {colleges.map((col) => (
@@ -135,9 +135,9 @@ export default function ModulesPage() {
         </div>
 
         {/* Custom module section */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <Plus className="text-blue-500" /> Add Custom Module
+            <Plus className="text-gray-600 dark:text-gray-400" /> Add Custom Module
           </h3>
 
           <div className="flex flex-col md:flex-row gap-4">
@@ -146,9 +146,9 @@ export default function ModulesPage() {
               placeholder="Module Name"
               value={newModuleName}
               onChange={(e) => setNewModuleName(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 
-                         focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg 
+                         bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 
+                         focus:ring-2 focus:ring-gray-500 transition-all duration-300"
             />
 
             <input
@@ -156,15 +156,15 @@ export default function ModulesPage() {
               placeholder="Description (optional)"
               value={newModuleDescription}
               onChange={(e) => setNewModuleDescription(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 
-                         focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg 
+                         bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 
+                         focus:ring-2 focus:ring-gray-500 transition-all duration-300"
             />
 
             <button
               onClick={handleAddCustom}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg 
-                         transition-all duration-300 transform hover:scale-105"
+              className="px-4 py-2 bg-gray-900 hover:bg-gray-700 text-white font-medium rounded-lg 
+                         transition-all duration-300 transform hover:scale-105 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300"
             >
               Add Module
             </button>
@@ -174,9 +174,9 @@ export default function ModulesPage() {
         {/* Module toggles or empty state */}
         {selectedCollege ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                   {selectedCollege.name} - Module Settings
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -195,11 +195,11 @@ export default function ModulesPage() {
                                hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-300"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                        <mod.icon className="text-blue-600 dark:text-blue-400" size={24} />
+                      <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                        <mod.icon className="text-gray-700 dark:text-gray-300" size={24} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                           {mod.label}
                         </h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -221,10 +221,10 @@ export default function ModulesPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md text-center border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-sm text-center border border-gray-200 dark:border-gray-700"
           >
             <Building2 size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               No College Selected
             </h3>
             <p className="text-gray-600 dark:text-gray-400">

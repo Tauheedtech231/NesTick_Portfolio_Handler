@@ -15,13 +15,11 @@ export default function CollegesPage() {
   const [status, setStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // Load stored colleges once
   useEffect(() => {
     const saved = localStorage.getItem('colleges');
     if (saved) setColleges(JSON.parse(saved));
   }, []);
 
-  // Filter logic for search + status
   const filtered = colleges.filter(c => {
     const bySearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,7 +66,7 @@ export default function CollegesPage() {
       >
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             College Management
           </h1>
 
@@ -76,11 +74,9 @@ export default function CollegesPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg 
-                       font-semibold text-white shadow-md 
-                       bg-gradient-to-r from-blue-600 to-indigo-600 
-                       hover:from-indigo-600 hover:to-blue-700 
-                       transition-all duration-300"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl 
+                       bg-gray-900 dark:bg-gray-100 text-white dark:text-black 
+                       shadow-sm hover:opacity-90 active:scale-95 transition-all duration-300"
           >
             <Plus size={18} />
             <span>Add College</span>
@@ -88,7 +84,7 @@ export default function CollegesPage() {
         </header>
 
         {/* Filters */}
-        <section className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
+        <section className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors duration-500">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
@@ -104,7 +100,7 @@ export default function CollegesPage() {
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 
                            placeholder-gray-400 dark:placeholder-gray-500
-                           focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                           focus:ring-1 focus:ring-gray-500 focus:border-transparent 
                            transition-colors duration-300"
               />
             </div>
@@ -115,7 +111,7 @@ export default function CollegesPage() {
               onChange={e => setStatus(e.target.value as 'all' | 'active' | 'inactive')}
               className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
                          bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100
-                         focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                         focus:ring-1 focus:ring-gray-500 focus:border-transparent
                          transition-colors duration-300"
             >
               <option value="all">All Status</option>

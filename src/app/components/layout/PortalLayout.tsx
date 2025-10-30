@@ -13,7 +13,7 @@ import {
   FiPhoneCall,
   FiEye,
 } from 'react-icons/fi';
-import { SectionType } from '@/app/lib/gsap'; // ✅ Import your section type
+import { SectionType } from '@/app/lib/gsap';
 
 interface PortalLayoutProps {
   collegeName: string;
@@ -32,19 +32,17 @@ export function PortalLayout({
 }: PortalLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // ✅ All available sections
-const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
-  { id: 'about', label: 'About', icon: <FiUser /> },
-  { id: 'faculty', label: 'Faculty', icon: <FiUsers /> },
-  { id: 'courses', label: 'Courses', icon: <FiBookOpen /> },
-  { id: 'events', label: 'Events', icon: <FiCalendar /> },
-  { id: 'gallery', label: 'Gallery', icon: <FiCamera /> },
-  { id: 'contact', label: 'Contact', icon: <FiPhoneCall /> },
-];
-
+  const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
+    { id: 'about', label: 'About', icon: <FiUser /> },
+    { id: 'faculty', label: 'Faculty', icon: <FiUsers /> },
+    { id: 'courses', label: 'Courses', icon: <FiBookOpen /> },
+    { id: 'events', label: 'Events', icon: <FiCalendar /> },
+    { id: 'gallery', label: 'Gallery', icon: <FiCamera /> },
+    { id: 'contact', label: 'Contact', icon: <FiPhoneCall /> },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex flex-col">
       {/* Header */}
       <Header collegeName={collegeName} />
 
@@ -76,7 +74,7 @@ const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[
           {/* Mobile Menu Button */}
           <button
             onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="sm:hidden mb-4 p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 shadow-md"
+            className="sm:hidden mb-4 p-2 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center gap-2 shadow-md hover:opacity-90 transition-all duration-300"
           >
             <FiMenu className="w-5 h-5" />
             Menu
@@ -94,8 +92,8 @@ const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[
               key={item.id}
               className={`flex flex-col items-center text-sm cursor-pointer transition-colors ${
                 activeSection === item.id
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400'
+                  ? 'text-black dark:text-white font-semibold'
+                  : 'text-gray-700 dark:text-gray-400'
               }`}
               onClick={() => onSectionChange(item.id)}
             >
@@ -107,7 +105,7 @@ const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[
           {/* Preview Button */}
           <li
             onClick={onPreview}
-            className="flex flex-col items-center text-sm cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="flex flex-col items-center text-sm cursor-pointer text-gray-800 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
           >
             <FiEye className="text-xl mb-1" />
             Preview

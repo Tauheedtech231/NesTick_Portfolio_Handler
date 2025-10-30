@@ -176,142 +176,145 @@ export default function BackupPage() {
 
   return (
     <MainLayout>
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="space-y-6 transition-colors duration-300"
+  >
+    <div className="flex justify-between items-center">
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+        Data & Backup
+      </h1>
+    </div>
+
+    {/* Storage Info */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-3">
+          <Database className="text-gray-700 dark:text-gray-300" size={24} />
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Storage Usage</h3>
+            <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{storageSize}</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Local storage consumption</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-3">
+          <Download className="text-gray-700 dark:text-gray-300" size={24} />
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Last Backup</h3>
+            <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{lastBackup}</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Most recent data export</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Backup Actions */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {backupActions.map((action, index) => (
+        <motion.div
+          key={action.title}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md text-center border border-gray-200 dark:border-gray-700"
+        >
+          <action.icon size={48} className="mx-auto mb-4 text-gray-400 dark:text-gray-300" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {action.title}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{action.description}</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={action.onClick}
+            className={`w-full py-2 px-4 rounded-lg text-white bg-gray-900 hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300 transition-all duration-300`}
+          >
+            {action.buttonText}
+          </motion.button>
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Hidden file input for import */}
+    <input
+      id="import-file"
+      type="file"
+      accept=".json"
+      onChange={importData}
+      className="hidden"
+    />
+
+    {/* Clear Data Modal */}
+    {showClearModal && (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 transition-colors duration-300"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
       >
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Data & Backup</h1>
-        </div>
-
-        {/* Storage Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="flex items-center space-x-3">
-              <Database className="text-blue-600 dark:text-blue-400" size={24} />
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100">Storage Usage</h3>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-200">{storageSize}</p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Local storage consumption</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="flex items-center space-x-3">
-              <Download className="text-green-600 dark:text-green-400" size={24} />
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-gray-100">Last Backup</h3>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-200">{lastBackup}</p>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Most recent data export</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Backup Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {backupActions.map((action, index) => (
-            <motion.div
-              key={action.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center"
-            >
-              <action.icon size={48} className="mx-auto mb-4 text-gray-400 dark:text-gray-300" />
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                {action.title}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+        >
+          <div className="p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Clear All Data
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{action.description}</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={action.onClick}
-                className={`w-full text-white py-2 px-4 rounded-lg ${action.color}`}
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              This will permanently delete all colleges, themes, announcements, and settings.
+              Please export your data first if needed.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="px-4 py-2 text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors"
               >
-                {action.buttonText}
-              </motion.button>
-            </motion.div>
+                Cancel
+              </button>
+              <button
+                onClick={clearAllData}
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+              >
+                Clear All Data
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+
+    {/* ✅ Safe Data Summary */}
+    {typeof window !== 'undefined' && (
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          Data Summary
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {['colleges', 'announcements', 'settings'].map((key) => (
+            <div
+              key={key}
+              className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            >
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {dataSummary[key] || 0}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                {key}
+              </div>
+            </div>
           ))}
         </div>
+      </div>
+    )}
+  </motion.div>
+</MainLayout>
 
-        {/* Hidden file input for import */}
-        <input
-          id="import-file"
-          type="file"
-          accept=".json"
-          onChange={importData}
-          className="hidden"
-        />
-
-        {/* Clear Data Modal */}
-        {showClearModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md"
-            >
-              <div className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Clear All Data
-                  </h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  This will permanently delete all colleges, themes, announcements, and settings.
-                  Please export your data first if needed.
-                </p>
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setShowClearModal(false)}
-                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={clearAllData}
-                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
-                  >
-                    Clear All Data
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* ✅ Safe Data Summary (client only) */}
-        {typeof window !== 'undefined' && (
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              Data Summary
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {['colleges', 'announcements', 'settings'].map((key) => (
-                <div
-                  key={key}
-                  className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                >
-                  <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                    {dataSummary[key] || 0}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                    {key}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </motion.div>
-    </MainLayout>
   );
 }

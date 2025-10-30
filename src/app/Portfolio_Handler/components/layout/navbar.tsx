@@ -34,19 +34,19 @@ export function Navbar() {
   const handleNavigateCollege = () => (window.location.href = '/College_Portfolio_Handler');
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 sm:px-8 py-3 shadow-sm transition-colors duration-500">
+    <nav className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 px-4 sm:px-8 py-3 shadow-sm transition-colors duration-500">
       <div className="flex justify-between items-center">
-        {/* Left side (empty or can hold logo later) */}
+        {/* Left side (optional heading or logo) */}
         <div className="flex-1">
-          {/* Optional logo placeholder */}
+          {/* Placeholder if needed */}
         </div>
 
-        {/* Right side (buttons + dark mode) */}
+        {/* Right side buttons */}
         <div className="flex items-center justify-end gap-3 sm:gap-4 flex-1">
           {/* Home Button */}
           <button
             onClick={handleNavigateHome}
-            className="flex items-center gap-2 bg-gradient-to-r from-green-400 to-teal-500 text-white font-medium px-3 sm:px-4 py-2 rounded-xl shadow-md hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
+            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 sm:px-4 py-2 rounded-xl shadow-sm hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
           >
             <HomeIcon size={18} />
             <span className="hidden sm:inline">Home</span>
@@ -55,7 +55,7 @@ export function Navbar() {
           {/* College Portfolio Button */}
           <button
             onClick={handleNavigateCollege}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-medium px-3 sm:px-4 py-2 rounded-xl shadow-md hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
+            className="flex items-center gap-2 bg-gray-800 dark:bg-gray-100 text-white dark:text-black font-medium px-3 sm:px-4 py-2 rounded-xl shadow-sm hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
           >
             <Building2 size={18} />
             <span className="hidden sm:inline">College Portfolio</span>
@@ -65,7 +65,7 @@ export function Navbar() {
           {/* Dark mode toggle */}
           <button
             onClick={toggleDarkMode}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-all duration-300"
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>

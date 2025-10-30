@@ -1,4 +1,3 @@
-// components/colleges/add-college-modal.tsx
 'use client';
 import { College } from '@/app/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -64,13 +63,17 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl transition-colors duration-500"
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md 
+                       rounded-2xl shadow-xl w-full max-w-2xl 
+                       border border-gray-200 dark:border-gray-700 
+                       transition-colors duration-500"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -79,7 +82,7 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
               </h2>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
               >
                 <X size={24} />
               </button>
@@ -98,10 +101,11 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                     required
                     value={formData.name}
                     onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
+                               bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
                                placeholder-gray-400 dark:placeholder-gray-500
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                               focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                               transition-colors"
                   />
                 </div>
 
@@ -117,9 +121,10 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, representativeName: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
+                               bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
+                               focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                               transition-colors"
                   />
                 </div>
 
@@ -133,9 +138,10 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
+                               bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
+                               focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                               transition-colors"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -150,9 +156,10 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                   <select
                     value={formData.theme}
                     onChange={(e) => setFormData((prev) => ({ ...prev, theme: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100
-                               focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
+                               bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
+                               focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                               transition-colors"
                   >
                     <option value="modern">Modern</option>
                     <option value="minimal">Minimal</option>
@@ -177,8 +184,9 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                     />
                   )}
                   <label className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-700 
-                                    rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 
-                                    dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
+                                    rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 
+                                    hover:bg-gray-200 dark:hover:bg-gray-700 
+                                    text-gray-700 dark:text-gray-300 transition-colors">
                     <Upload size={20} />
                     <span>Upload Logo</span>
                     <input
@@ -196,13 +204,17 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 
+                             hover:text-gray-900 dark:hover:text-white 
+                             transition-colors rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 
+                             hover:from-indigo-700 hover:to-purple-700 
+                             text-white rounded-lg shadow-md transition-all duration-300"
                 >
                   Save College
                 </button>

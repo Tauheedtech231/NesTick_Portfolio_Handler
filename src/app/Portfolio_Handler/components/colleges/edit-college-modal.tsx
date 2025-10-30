@@ -169,21 +169,22 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row justify-end sm:space-x-3 space-y-3 sm:space-y-0 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition"
-                >
-                  Save Changes
-                </button>
-              </div>
+          <div className="flex flex-col sm:flex-row justify-end sm:space-x-3 space-y-3 sm:space-y-0 pt-6 border-t border-gray-200 dark:border-gray-700">
+  <button
+    type="button"
+    onClick={onClose}
+    className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-gray-600 transition"
+  >
+    Cancel
+  </button>
+  <button
+    type="submit"
+    className="px-6 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 transition"
+  >
+    Save Changes
+  </button>
+</div>
+
             </form>
           </motion.div>
         </motion.div>
