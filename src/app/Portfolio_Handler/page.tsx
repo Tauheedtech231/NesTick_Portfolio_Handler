@@ -12,12 +12,25 @@ import { College } from '@/app/types';
 export default function DashboardPage() {
   const router = useRouter();
   const [colleges, setColleges] = useState<College[]>([]);
+  // useEffect(()=>{
+  //   const user=localStorage.getItem('loggedInCollege')
+  //   if(!user){
+  //     return router.push('/auth/login')
+  //   }
+  //   const parsedUser=JSON.parse(user)
+  //   if(parsedUser.email!=='imransir@gmail.com'){
+      
+  
+  //     return router.push('/')
+  //   }
+  // })
 
   // Load colleges from localStorage once on mount
   useEffect(() => {
     const stored = localStorage.getItem('colleges');
     if (stored) setColleges(JSON.parse(stored));
   }, []);
+
 
   const total = colleges.length;
   const active = colleges.filter((c) => c.status === 'active').length;

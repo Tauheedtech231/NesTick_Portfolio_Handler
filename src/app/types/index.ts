@@ -1,9 +1,20 @@
-// types/index.ts
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
+// types/theme.ts
+export interface Theme {
+  id: string;
+  name: string;
+  description: string;
+  image: string; // base64 string
+  zipFile: string;
+  liveUrl?: string;
+  createdAt: string;
+}
+
+export interface ThemeFormData {
+  name: string;
+  description: string;
+  image: File | null;
+  zipFile: File | null;
+  liveUrl: string;
 }
 export interface College {
   id: string;
@@ -11,19 +22,20 @@ export interface College {
   representativeName: string;
   logo: string;
   status: 'active' | 'inactive';
-  theme: string;
-   customTheme?: ThemeColors;
-  modules: {
-    about: boolean;
-    faculty: boolean;
-    events: boolean;
-    gallery: boolean;
-    achievements: boolean;
-    contact?: boolean; // ✅ Added new "Contact" module
-    [key: string]: boolean | undefined; // ✅ Supports additional dynamic modules
-  };
-  createdAt: Date;
-  updatedAt: Date;
+  theme: 'modern' | 'minimal' | 'classic' | 'elegant' | 'bold';
+createdAt?: string | Date;   // ✅ allow both
+  updatedAt?: string | Date; 
+
+  // ✅ Optional nested structure
+ modules?: {
+  about?: boolean;
+  faculty?: boolean;
+  events?: boolean;
+  gallery?: boolean;
+  achievements?: boolean;
+  [key: string]: boolean | undefined; // ✅ allows dynamic string keys
+};
+
 }
 
 
@@ -31,23 +43,9 @@ export interface Announcement {
   id: string;
   title: string;
   message: string;
-  targetCollege: string; // 'all' or college id
-  createdAt: Date;
+  targetCollege: string; // 'all' or college.id
+  createdAt: string | Date;
 }
 
-export interface Theme {
-  id: string;
-  name: string;
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-  };
-  isCustom?: boolean;
-}
 
-export interface AppSettings {
-  darkMode: boolean;
-  accentColor: 'blue' | 'purple' | 'green';
-}
+

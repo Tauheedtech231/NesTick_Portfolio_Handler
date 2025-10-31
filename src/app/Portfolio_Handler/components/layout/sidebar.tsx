@@ -1,9 +1,10 @@
+/* eslint-disable */
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   Building2,
@@ -29,7 +30,26 @@ const menuItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
+
   const toggleSidebar = () => setCollapsed((prev) => !prev);
+
+  useEffect(() => {
+    const admin = localStorage.getItem('superAdminTest');
+    if (admin) {
+      try {
+        const parsed = JSON.parse(admin);
+        setAdminEmail(parsed.email);
+        console.log("Admin Data:", parsed);
+      } catch (err) {
+        console.error("Invalid admin data in localStorage");
+      }
+    }
+  }, []);
+  useEffect(()=>{
+    const data=localStorage.getItem('colleges')
+    console.log('colleges data in add modal',data)
+  })
 
   return (
     <motion.aside
@@ -52,6 +72,13 @@ export function Sidebar() {
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Admin Portal
               </p>
+
+              {/* Admin Email */}
+              {adminEmail && (
+                <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-1">
+                  {adminEmail}
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex justify-center w-full">

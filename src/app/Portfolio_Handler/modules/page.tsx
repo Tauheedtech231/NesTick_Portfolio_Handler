@@ -50,10 +50,11 @@ export default function ModulesPage() {
   const handleToggle = (key: string) => {
     if (!selectedCollege) return;
 
-    const updatedModules = {
-      ...selectedCollege.modules,
-      [key]: !selectedCollege.modules[key],
-    };
+   const updatedModules = {
+  ...(selectedCollege.modules ?? {}), // ensures modules is always an object
+  [key]: !selectedCollege.modules?.[key],
+};
+
 
     const updatedCollege = { ...selectedCollege, modules: updatedModules };
     const updatedList = colleges.map((col) =>
@@ -209,9 +210,10 @@ export default function ModulesPage() {
                     </div>
 
                     <ToggleSwitch
-                      enabled={selectedCollege.modules[mod.key] ?? false}
-                      onChange={() => handleToggle(mod.key)}
-                    />
+  enabled={selectedCollege.modules?.[mod.key] ?? false}
+  onChange={() => handleToggle(mod.key)}
+/>
+
                   </motion.div>
                 ))}
               </div>

@@ -1,21 +1,41 @@
 'use client';
-import { College } from '@/app/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
+
+// 🧩 Type Definitions
+type StatusType = 'active' | 'inactive';
+type ThemeType = 'modern' | 'minimal' | 'classic' | 'elegant' | 'bold';
+
+interface AddCollegeFormData {
+  name: string;
+  representativeName: string;
+  logo: string;
+  status: StatusType;
+  theme: ThemeType;
+  modules: {
+    about: boolean;
+    faculty: boolean;
+    events: boolean;
+    gallery: boolean;
+    achievements: boolean;
+  };
+}
 
 interface AddCollegeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (collegeData: Omit<College, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (collegeData: Omit<AddCollegeFormData, 'id' | 'createdAt' | 'updatedAt'>) => void;
 }
 
 export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProps) {
-  const [formData, setFormData] = useState({
+  // 🧠 Strongly Typed useState
+  const [formData, setFormData] = useState<AddCollegeFormData>({
     name: '',
     representativeName: '',
     logo: '',
-    status: 'active' as 'active' | 'inactive',
+    status: 'active',
     theme: 'modern',
     modules: {
       about: true,
@@ -26,6 +46,7 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
     },
   });
 
+  // 🖼️ Logo Upload Handler
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -37,9 +58,11 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
     }
   };
 
+  // 💾 Submit Handler
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
+    // Reset form
     setFormData({
       name: '',
       representativeName: '',
@@ -136,7 +159,10 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                   <select
                     value={formData.status}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        status: e.target.value as StatusType,
+                      }))
                     }
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
                                bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
@@ -155,7 +181,12 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                   </label>
                   <select
                     value={formData.theme}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, theme: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        theme: e.target.value as ThemeType,
+                      }))
+                    }
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 
                                bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100
                                focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
@@ -177,16 +208,16 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
                 </label>
                 <div className="flex items-center space-x-4">
                   {formData.logo && (
-                    <img
-                      src={formData.logo}
-                      alt="College logo"
-                      className="h-16 w-16 rounded-full object-cover border border-gray-300 dark:border-gray-700"
-                    />
+                    <div className="relative h-16 w-16 rounded-full overflow-hidden border border-gray-300 dark:border-gray-700">
+                      <Image src={formData.logo} alt="College logo" fill className="object-cover" />
+                    </div>
                   )}
-                  <label className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-700 
-                                    rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 
-                                    hover:bg-gray-200 dark:hover:bg-gray-700 
-                                    text-gray-700 dark:text-gray-300 transition-colors">
+                  <label
+                    className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-700 
+                               rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 
+                               hover:bg-gray-200 dark:hover:bg-gray-700 
+                               text-gray-700 dark:text-gray-300 transition-colors"
+                  >
                     <Upload size={20} />
                     <span>Upload Logo</span>
                     <input

@@ -5,7 +5,7 @@ import { GalleryItem } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiAward, FiImage, FiStar } from 'react-icons/fi';
-
+import Image from 'next/image';
 import { gsap } from 'gsap';
 
 interface GallerySectionProps {
@@ -14,7 +14,7 @@ interface GallerySectionProps {
   onUpdate: (data: GalleryItem[]) => void;
 }
 
-export function GallerySection({ data, college, onUpdate }: GallerySectionProps) {
+export function GallerySection({ data, onUpdate }: GallerySectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [gallery, setGallery] = useState<GalleryItem[]>(data);
   const [filter, setFilter] = useState<'all' | 'award' | 'photo' | 'achievement'>('all');
@@ -274,11 +274,12 @@ export function GallerySection({ data, college, onUpdate }: GallerySectionProps)
             >
               <div className={`h-48 bg-gradient-to-r ${getCategoryColor(item.category)} relative overflow-hidden`}>
                 {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+                  <Image
+  src={item.image}
+  alt={item.title}
+  fill
+  className="object-cover"
+/>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white text-4xl">
                     {getCategoryIcon(item.category)}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Course } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button'; 
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, FiDownload } from 'react-icons/fi';
+import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook} from 'react-icons/fi';
 /* eslint-disable */
 
 interface CoursesSectionProps {

@@ -5,14 +5,14 @@ import { Faculty, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiUsers } from 'react-icons/fi';
-
+import Image from 'next/image';
 interface FacultySectionProps {
   data: Faculty[];
   college: College;
   onUpdate: (data: Faculty[]) => void;
 }
 
-export function FacultySection({ data, college, onUpdate }: FacultySectionProps) {
+export function FacultySection({ data, onUpdate }: FacultySectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [faculty, setFaculty] = useState<Faculty[]>(data);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -216,11 +216,13 @@ export function FacultySection({ data, college, onUpdate }: FacultySectionProps)
             >
               <div className="text-center mb-4">
                 {member.image ? (
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-20 h-20 mx-auto rounded-full object-cover mb-3"
-                  />
+                 <Image
+  src={member.image}
+  alt={member.name}
+  width={80}   // 20 * 4 (Tailwind w-20 = 5rem = 80px)
+  height={80}  // h-20
+  className="mx-auto rounded-full mb-3 object-cover"
+/>
                 ) : (
                   <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold mb-3">
                     {member.name.split(' ').map(n => n[0]).join('')}

@@ -2,174 +2,538 @@
 'use client';
 import { College } from '@/app/types';
 import { motion } from 'framer-motion';
-import { Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Calendar } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { EditCollegeModal } from './edit-college-modal';
-
+import Image from 'next/image';
 interface CollegeTableProps {
   colleges: College[];
   onEdit: (id: string, collegeData: Partial<College>) => void;
   onDelete: (id: string) => void;
 }
 
+interface RequestedCollege {
+  id: string;
+  name: string;
+  collegeName: string;
+  email: string;
+  whatsapp: string;
+  selectedPlan: string;
+  themeName: string;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) {
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
+  const [requestedColleges, setRequestedColleges] = useState<RequestedCollege[]>([]);
+  const [activeTab, setActiveTab] = useState<'colleges' | 'requests'>('colleges');
 
   const handleStatusToggle = (id: string, currentStatus: 'active' | 'inactive') => {
     onEdit(id, { status: currentStatus === 'active' ? 'inactive' : 'active' });
   };
 
+  // Load requested colleges from localStorage
+  useEffect(() => {
+    const loadRequestedColleges = () => {
+      try {
+        const stored = localStorage.getItem('requested_college');
+        if (stored) {
+          const requests = JSON.parse(stored);/* eslint-disable */
+          // Add status to existing requests if not present
+          const requestsWithStatus = requests.map((req: any) => ({
+            ...req,
+            status: req.status || 'pending'
+          }));
+          setRequestedColleges(requestsWithStatus);
+        }
+      } catch (error) {
+        console.error('Error loading requested colleges:', error);
+      }
+    };
+
+    loadRequestedColleges();
+    
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      loadRequestedColleges();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Update localStorage when requested colleges change
+  useEffect(() => {
+    if (requestedColleges.length > 0) {
+      localStorage.setItem('requested_college', JSON.stringify(requestedColleges));
+    }
+  }, [requestedColleges]);
+
+  const handleApproveRequest = (id: string) => {
+    setRequestedColleges(prev => 
+      prev.map(req => 
+        req.id === id ? { ...req, status: 'approved' } : req
+      )
+    );
+  };
+
+  const handleRejectRequest = (id: string) => {
+    setRequestedColleges(prev => 
+      prev.map(req => 
+        req.id === id ? { ...req, status: 'rejected' } : req
+      )
+    );
+  };
+
+  const handleDeleteRequest = (id: string) => {
+    setRequestedColleges(prev => prev.filter(req => req.id !== id));
+  };
+
+  const getStatusBadge = (status: 'pending' | 'approved' | 'rejected') => {
+    const statusConfig = {
+      pending: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', label: 'Pending' },
+      approved: { color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', label: 'Approved' },
+      rejected: { color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200', label: 'Rejected' }
+    };
+
+    const config = statusConfig[status];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    );
+  };
+
+  const getPlanBadge = (plan: string) => {
+    const planConfig = {
+      basic: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', label: 'Basic' },
+      professional: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200', label: 'Professional' },
+      enterprise: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200', label: 'Enterprise' }
+    };
+
+    const config = planConfig[plan as keyof typeof planConfig] || planConfig.basic;
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    );
+  };
+
   return (
     <>
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-gray-700">
-        {/* Desktop Table */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-100 dark:bg-gray-800">
-              <tr>
-                {['College', 'Representative', 'Status', 'Created', 'Actions'].map((header) => (
-                  <th
-                    key={header}
-                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
+      {/* Tabs */}
+      <div className="flex space-x-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('colleges')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
+            activeTab === 'colleges'
+              ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+          }`}
+        >
+          Approved Colleges ({colleges.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('requests')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
+            activeTab === 'requests'
+              ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+          }`}
+        >
+          College Requests ({requestedColleges.length})
+        </button>
+      </div>
+
+      {/* Approved Colleges Table */}
+      {activeTab === 'colleges' && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-gray-700">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  {['College', 'Representative', 'Status', 'Created', 'Actions'].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {colleges.map((college, index) => (
+                  <motion.tr
+                    key={college.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300"
                   >
-                    {header}
-                  </th>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                     
+
+<div className="flex items-center">
+  {college.logo && (
+    <div className="relative h-8 w-8 rounded-full overflow-hidden mr-3 border border-gray-300 dark:border-gray-600">
+      <Image
+        src={college.logo}
+        alt={college.name}
+        fill
+        className="object-cover"
+      />
+    </div>
+  )}
+  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+    {college.name}
+  </span>
+</div>
+
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      {college.representativeName}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleStatusToggle(college.id, college.status)}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition border ${
+                          college.status === 'active'
+                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
+                        }`}
+                      >
+                        {college.status === 'active' ? (
+                          <Eye size={12} className="mr-1" />
+                        ) : (
+                          <EyeOff size={12} className="mr-1" />
+                        )}
+                        {college.status}
+                      </button>
+                    </td>
+
+                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+  {new Date(college.createdAt ?? '').toLocaleDateString()}
+</td>
+
+
+                    <td className="px-6 py-4 text-sm font-medium space-x-3 flex items-center">
+                      <button
+                        onClick={() => setEditingCollege(college)}
+                        className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                        title="Edit"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => onDelete(college.id)}
+                        className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </motion.tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {colleges.map((college, index) => (
-                <motion.tr
-                  key={college.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {college.logo && (
-                        <img
-                          src={college.logo}
-                          alt={college.name}
-                          className="h-8 w-8 rounded-full object-cover mr-3 border border-gray-300 dark:border-gray-600"
-                        />
-                      )}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {college.name}
-                      </span>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="md:hidden space-y-4 p-4">
+            {colleges.map((college, index) => (
+              <motion.div
+                key={college.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+              >
+              
+
+<div className="flex items-center space-x-3 mb-3">
+  {college.logo && (
+    <div className="relative h-10 w-10 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600">
+      <Image
+        src={college.logo}
+        alt={college.name}
+        fill
+        className="object-cover"
+      />
+    </div>
+  )}
+  <div>
+    <p className="text-base font-semibold text-gray-900 dark:text-white">
+      {college.name}
+    </p>
+    <p className="text-sm text-gray-600 dark:text-gray-400">
+      {college.representativeName}
+    </p>
+  </div>
+</div>
+
+
+                <div className="flex justify-between text-sm mb-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                      college.status === 'active'
+                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
+                    }`}
+                  >
+                    {college.status}
+                  </span>
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+  {new Date(college.createdAt ?? '').toLocaleDateString()}
+</td>
+
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setEditingCollege(college)}
+                    className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDelete(college.id)}
+                    className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Requested Colleges Table */}
+      {activeTab === 'requests' && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-gray-700">
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  {['Requester', 'College', 'Contact', 'Plan', 'Theme', 'Submitted', 'Status', 'Actions'].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                {requestedColleges.map((request, index) => (
+                  <motion.tr
+                    key={request.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+                          <User size={14} className="text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 block">
+                            {request.name}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {request.email}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Building size={14} className="text-gray-400 mr-2" />
+                        <span className="text-sm text-gray-900 dark:text-gray-100">
+                          {request.collegeName}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <Mail size={12} className="mr-1" />
+                          {request.email}
+                        </div>
+                        <div className="flex items-center">
+                          <Phone size={12} className="mr-1" />
+                          {request.whatsapp}
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {getPlanBadge(request.selectedPlan)}
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                      {request.themeName}
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center">
+                        <Calendar size={12} className="mr-1" />
+                        {new Date(request.submittedAt).toLocaleDateString()}
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {getStatusBadge(request.status)}
+                    </td>
+
+<td className="px-6 py-4 text-sm font-medium flex flex-wrap items-center gap-2">
+  {request.status === 'pending' && (
+    <>
+      <button
+        onClick={() => handleApproveRequest(request.id)}
+        className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm"
+        title="Approve Request"
+      >
+        <Check size={14} />
+        <span>Approve</span>
+      </button>
+
+      <button
+        onClick={() => handleRejectRequest(request.id)}
+        className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm"
+        title="Reject Request"
+      >
+        <X size={14} />
+        <span>Reject</span>
+      </button>
+    </>
+  )}
+
+  <button
+    onClick={() => handleDeleteRequest(request.id)}
+    className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm"
+    title="Delete Request"
+  >
+    <Trash2 size={14} />
+    <span>Delete</span>
+  </button>
+</td>
+
+
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="md:hidden space-y-4 p-4">
+            {requestedColleges.map((request, index) => (
+              <motion.div
+                key={request.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                      <User size={16} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                  </td>
+                    <div>
+                      <p className="text-base font-semibold text-gray-900 dark:text-white">
+                        {request.name}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {request.collegeName}
+                      </p>
+                    </div>
+                  </div>
+                  {getStatusBadge(request.status)}
+                </div>
 
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {college.representativeName}
-                  </td>
+                <div className="space-y-2 text-sm mb-4">
+                  <div className="flex items-center text-gray-600 dark:text-gray-400">
+                    <Mail size={12} className="mr-2" />
+                    {request.email}
+                  </div>
+                  <div className="flex items-center text-gray-600 dark:text-gray-400">
+                    <Phone size={12} className="mr-2" />
+                    {request.whatsapp}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {getPlanBadge(request.selectedPlan)}
+                    </span>
+                    <span className="text-gray-500 dark:text-gray-400 text-xs">
+                      <Calendar size={10} className="inline mr-1" />
+                      {new Date(request.submittedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
 
-                  <td className="px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    {request.themeName}
+                  </span>
+                  
+                  <div className="flex space-x-2">
+                    {request.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleApproveRequest(request.id)}
+                          className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition"
+                          title="Approve"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleRejectRequest(request.id)}
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition"
+                          title="Reject"
+                        >
+                          <X size={16} />
+                        </button>
+                      </>
+                    )}
                     <button
-                      onClick={() => handleStatusToggle(college.id, college.status)}
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition border ${
-                        college.status === 'active'
-                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
-                      }`}
-                    >
-                      {college.status === 'active' ? (
-                        <Eye size={12} className="mr-1" />
-                      ) : (
-                        <EyeOff size={12} className="mr-1" />
-                      )}
-                      {college.status}
-                    </button>
-                  </td>
-
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(college.createdAt).toLocaleDateString()}
-                  </td>
-
-                  <td className="px-6 py-4 text-sm font-medium space-x-3 flex items-center">
-                    <button
-                      onClick={() => setEditingCollege(college)}
-                      className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
-                      title="Edit"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => onDelete(college.id)}
-                      className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
+                      onClick={() => handleDeleteRequest(request.id)}
+                      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition"
                       title="Delete"
                     >
                       <Trash2 size={16} />
                     </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile View */}
-        <div className="md:hidden space-y-4 p-4">
-          {colleges.map((college, index) => (
-            <motion.div
-              key={college.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-            >
-              <div className="flex items-center space-x-3 mb-3">
-                {college.logo && (
-                  <img
-                    src={college.logo}
-                    alt={college.name}
-                    className="h-10 w-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
-                  />
-                )}
-                <div>
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">
-                    {college.name}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {college.representativeName}
-                  </p>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
+            ))}
 
-              <div className="flex justify-between text-sm mb-3">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                    college.status === 'active'
-                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
-                  }`}
-                >
-                  {college.status}
-                </span>
-                <span className="text-gray-600 dark:text-gray-400">
-                  {new Date(college.createdAt).toLocaleDateString()}
-                </span>
+            {requestedColleges.length === 0 && (
+              <div className="text-center py-8">
+                <div className="text-gray-400 dark:text-gray-500 mb-2">
+                  <User size={48} className="mx-auto" />
+                </div>
+                <p className="text-gray-500 dark:text-gray-400">No college requests found</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                  College requests will appear here when users submit them through the landing page.
+                </p>
               </div>
-
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setEditingCollege(college)}
-                  className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
-                >
-                  <Edit2 size={16} />
-                </button>
-                <button
-                  onClick={() => onDelete(college.id)}
-                  className="text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {editingCollege && (
         <EditCollegeModal

@@ -1,9 +1,10 @@
-// components/colleges/edit-college-modal.tsx
 'use client';
+
 import { College } from '@/app/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface EditCollegeModalProps {
   college: College;
@@ -12,13 +13,23 @@ interface EditCollegeModalProps {
   onSave: (collegeData: Partial<College>) => void;
 }
 
-export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditCollegeModalProps) {
+export function EditCollegeModal({
+  college,
+  isOpen,
+  onClose,
+  onSave,
+}: EditCollegeModalProps) {
   const [formData, setFormData] = useState({
-    name: college.name,
-    representativeName: college.representativeName,
-    logo: college.logo,
-    status: college.status,
-    theme: college.theme,
+    name: college.name || '',
+    representativeName: college.representativeName || '',
+    logo: college.logo || '',
+    status: (college.status || 'active') as 'active' | 'inactive',
+    theme: (college.theme || 'modern') as
+      | 'modern'
+      | 'minimal'
+      | 'classic'
+      | 'elegant'
+      | 'bold',
   });
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,13 +56,13 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl transition-colors duration-300"
+            className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-2xl transition-colors duration-300"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -78,8 +89,10 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
                     type="text"
                     required
                     value={formData.name}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                 </div>
 
@@ -93,9 +106,12 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
                     required
                     value={formData.representativeName}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, representativeName: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        representativeName: e.target.value,
+                      }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                 </div>
 
@@ -112,7 +128,7 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
                         status: e.target.value as 'active' | 'inactive',
                       }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -127,9 +143,17 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
                   <select
                     value={formData.theme}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, theme: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        theme: e.target.value as
+                          | 'modern'
+                          | 'minimal'
+                          | 'classic'
+                          | 'elegant'
+                          | 'bold',
+                      }))
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   >
                     <option value="modern">Modern</option>
                     <option value="minimal">Minimal</option>
@@ -145,16 +169,24 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   College Logo
                 </label>
+
                 <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
                   {formData.logo && (
-                    <img
-                      src={formData.logo}
-                      alt="College logo"
-                      className="h-16 w-16 rounded-full object-cover"
-                    />
+                    <div className="relative h-16 w-16 rounded-full overflow-hidden border border-gray-300 dark:border-gray-700">
+                      <Image
+                        src={formData.logo}
+                        alt="College logo"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   )}
+
                   <label className="flex items-center space-x-2 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                    <Upload size={20} className="text-gray-600 dark:text-gray-300" />
+                    <Upload
+                      size={20}
+                      className="text-gray-600 dark:text-gray-300"
+                    />
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                       Upload Logo
                     </span>
@@ -169,22 +201,21 @@ export function EditCollegeModal({ college, isOpen, onClose, onSave }: EditColle
               </div>
 
               {/* Buttons */}
-          <div className="flex flex-col sm:flex-row justify-end sm:space-x-3 space-y-3 sm:space-y-0 pt-6 border-t border-gray-200 dark:border-gray-700">
-  <button
-    type="button"
-    onClick={onClose}
-    className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white border border-gray-300 dark:border-gray-600 transition"
-  >
-    Cancel
-  </button>
-  <button
-    type="submit"
-    className="px-6 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 transition"
-  >
-    Save Changes
-  </button>
-</div>
-
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all duration-300"
+                >
+                  Save Changes
+                </button>
+              </div>
             </form>
           </motion.div>
         </motion.div>

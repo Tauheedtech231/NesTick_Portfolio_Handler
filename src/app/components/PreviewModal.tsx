@@ -3,8 +3,8 @@
 import React, { useEffect } from 'react';
 import { CollegeData } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
-import { FiX, FiExternalLink, FiMapPin, FiCalendar, FiClock, FiUsers, FiAward, FiMail, FiPhone, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiBook, FiCamera, FiStar, FiGlobe } from 'react-icons/fi';
-import { cn } from '@/lib/utils';
+import { FiX, FiExternalLink, FiMapPin, FiCalendar, FiClock, FiUsers, FiAward, FiMail, FiPhone, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiBook, FiStar, FiGlobe } from 'react-icons/fi';
+
 import { gsap } from 'gsap';
 import Image from 'next/image';
 

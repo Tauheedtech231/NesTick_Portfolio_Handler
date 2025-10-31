@@ -5,7 +5,7 @@ import { Event } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiCalendar } from 'react-icons/fi';
-import { formatDate, cn } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 /* eslint-disable */
 
 interface EventsSectionProps {
