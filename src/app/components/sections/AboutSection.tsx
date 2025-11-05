@@ -45,10 +45,7 @@ export function AboutSection({ college }: AboutSectionProps) {
     coverImage: 0,
   };
 
-  const MAX_FILE_SIZE_MB = 2;
-  const ALLOWED_FILE_TYPES = ['image/png', 'image/jpeg'];
-
-  // Load saved data
+  // ✅ Load saved data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) setFormData(JSON.parse(saved));
@@ -83,34 +80,19 @@ export function AboutSection({ college }: AboutSectionProps) {
     if (value.length <= MAX_LENGTH[key]) updateForm({ [key]: value });
   };
 
-  // Handle image change
-const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | string) => {
-  if (typeof fileOrString === 'string') {
-    // already base64
-    updateForm({ [key]: fileOrString });
-    return;
-  }
+  // ✅ Simplified image handler (UploadImage handles size/type validation)
+  const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      updateForm({ [key]: fileOrString });
+      return;
+    }
 
-  // file validation
-  if (!ALLOWED_FILE_TYPES.includes(fileOrString.type)) {
-    alert('Only PNG or JPG files are allowed!');
-    return;
-  }
-
-  if (fileOrString.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-    alert('File size exceeds 2MB!');
-    return;
-  }
-
-
-
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    updateForm({ [key]: reader.result as string });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateForm({ [key]: reader.result as string });
+    };
+    reader.readAsDataURL(fileOrString);
   };
-  reader.readAsDataURL(fileOrString);
-};
-
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
@@ -141,18 +123,18 @@ const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | stri
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              College Logo (PNG/JPG, max 2MB)
+              College Logo (PNG/JPG, max 500KB)
             </label>
             <UploadImage
               value={formData.logo}
-              onChange={(file) => handleImageChange('logo', file )}
+              onChange={(file) => handleImageChange('logo', file)}
               onRemove={() => updateForm({ logo: undefined })}
               aspectRatio="square"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Cover Image (PNG/JPG, max 2MB)
+              Cover Image (PNG/JPG, max 500KB)
             </label>
             <UploadImage
               value={formData.coverImage}
@@ -170,8 +152,8 @@ const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | stri
             return (
               <div key={key}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
-  {key.replace(/([A-Z])/g, ' $1')} ({(formData[key] ?? '').length}/{MAX_LENGTH[key]})
-</label>
+                  {key.replace(/([A-Z])/g, ' $1')} ({(formData[key] ?? '').length}/{MAX_LENGTH[key]})
+                </label>
 
                 {isTextArea ? (
                   <textarea
