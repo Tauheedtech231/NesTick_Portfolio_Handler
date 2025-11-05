@@ -6,10 +6,12 @@ import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Cale
 import { useEffect, useState } from 'react';
 import { EditCollegeModal } from './edit-college-modal';
 import Image from 'next/image';
+
 interface CollegeTableProps {
   colleges: College[];
   onEdit: (id: string, collegeData: Partial<College>) => void;
   onDelete: (id: string) => void;
+  onAddCollege: (college: College) => void; // New prop to add approved colleges
 }
 
 interface RequestedCollege {
@@ -24,7 +26,9 @@ interface RequestedCollege {
   status: 'pending' | 'approved' | 'rejected';
 }
 
-export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) {
+type CollegePlan = 'basic' | 'professional' | 'enterprise';
+
+export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: CollegeTableProps) {
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
   const [requestedColleges, setRequestedColleges] = useState<RequestedCollege[]>([]);
   const [activeTab, setActiveTab] = useState<'colleges' | 'requests'>('colleges');
@@ -39,9 +43,8 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
       try {
         const stored = localStorage.getItem('requested_college');
         if (stored) {
-          const requests = JSON.parse(stored);/* eslint-disable */
-          // Add status to existing requests if not present
-          const requestsWithStatus = requests.map((req: any) => ({
+          const requests = JSON.parse(stored);
+          const requestsWithStatus = requests.map((req: RequestedCollege) => ({
             ...req,
             status: req.status || 'pending'
           }));
@@ -54,7 +57,6 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
 
     loadRequestedColleges();
     
-    // Listen for storage changes
     const handleStorageChange = () => {
       loadRequestedColleges();
     };
@@ -70,12 +72,47 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
     }
   }, [requestedColleges]);
 
-  const handleApproveRequest = (id: string) => {
+  // Check if college name already exists in approved colleges
+  const isDuplicateCollege = (collegeName: string): boolean => {
+    return colleges.some(college => 
+      college.name.toLowerCase() === collegeName.toLowerCase()
+    );
+  };
+
+  const handleApproveRequest = (request: RequestedCollege) => {
+    // Check for duplicate college name
+    if (isDuplicateCollege(request.collegeName)) {
+      alert(`College "${request.collegeName}" is already in the approved list.`);
+      return;
+    }
+
+    // Create a new college object from the request
+    const newCollege: College = {
+      id: `college-${Date.now()}`, // Generate a unique ID
+      name: request.collegeName,
+      logo: '', // You might want to add a default logo or handle this differently
+      representativeName: request.name,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      // Add any other required fields from your College type
+      email: request.email,
+      phone: request.whatsapp,
+      plan: request.selectedPlan as CollegePlan, // Use type assertion with defined type
+      theme: request.themeName,
+    };
+
+    // Add the new college to approved colleges
+    onAddCollege(newCollege);
+
+    // Update the request status to approved but KEEP it in the requests list
     setRequestedColleges(prev => 
       prev.map(req => 
-        req.id === id ? { ...req, status: 'approved' } : req
+        req.id === request.id ? { ...req, status: 'approved' } : req
       )
     );
+
+    // Optional: Show success message or notification
+    console.log('College approved and added to approved colleges:', newCollege);
   };
 
   const handleRejectRequest = (id: string) => {
@@ -106,19 +143,22 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
   };
 
   const getPlanBadge = (plan: string) => {
-    const planConfig = {
+    const planConfig: Record<CollegePlan, { color: string; label: string }> = {
       basic: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', label: 'Basic' },
       professional: { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200', label: 'Professional' },
       enterprise: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200', label: 'Enterprise' }
     };
 
-    const config = planConfig[plan as keyof typeof planConfig] || planConfig.basic;
+    const config = planConfig[plan as CollegePlan] || planConfig.basic;
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
         {config.label}
       </span>
     );
   };
+
+  // Filter requests to show in the table (you can adjust this if needed)
+  const displayedRequests = requestedColleges;
 
   return (
     <>
@@ -174,24 +214,21 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                     className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
-                     
-
-<div className="flex items-center">
-  {college.logo && (
-    <div className="relative h-8 w-8 rounded-full overflow-hidden mr-3 border border-gray-300 dark:border-gray-600">
-      <Image
-        src={college.logo}
-        alt={college.name}
-        fill
-        className="object-cover"
-      />
-    </div>
-  )}
-  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-    {college.name}
-  </span>
-</div>
-
+                      <div className="flex items-center">
+                        {college.logo && (
+                          <div className="relative h-8 w-8 rounded-full overflow-hidden mr-3 border border-gray-300 dark:border-gray-600">
+                            <Image
+                              src={college.logo}
+                              alt={college.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {college.name}
+                        </span>
+                      </div>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -216,10 +253,9 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                       </button>
                     </td>
 
-                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-  {new Date(college.createdAt ?? '').toLocaleDateString()}
-</td>
-
+                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(college.createdAt ?? '').toLocaleDateString()}
+                    </td>
 
                     <td className="px-6 py-4 text-sm font-medium space-x-3 flex items-center">
                       <button
@@ -253,29 +289,26 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                 transition={{ delay: index * 0.05 }}
                 className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
               >
-              
-
-<div className="flex items-center space-x-3 mb-3">
-  {college.logo && (
-    <div className="relative h-10 w-10 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600">
-      <Image
-        src={college.logo}
-        alt={college.name}
-        fill
-        className="object-cover"
-      />
-    </div>
-  )}
-  <div>
-    <p className="text-base font-semibold text-gray-900 dark:text-white">
-      {college.name}
-    </p>
-    <p className="text-sm text-gray-600 dark:text-gray-400">
-      {college.representativeName}
-    </p>
-  </div>
-</div>
-
+                <div className="flex items-center space-x-3 mb-3">
+                  {college.logo && (
+                    <div className="relative h-10 w-10 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600">
+                      <Image
+                        src={college.logo}
+                        alt={college.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-base font-semibold text-gray-900 dark:text-white">
+                      {college.name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {college.representativeName}
+                    </p>
+                  </div>
+                </div>
 
                 <div className="flex justify-between text-sm mb-3">
                   <span
@@ -287,10 +320,9 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                   >
                     {college.status}
                   </span>
-                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-  {new Date(college.createdAt ?? '').toLocaleDateString()}
-</td>
-
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {new Date(college.createdAt ?? '').toLocaleDateString()}
+                  </span>
                 </div>
 
                 <div className="flex justify-end space-x-3">
@@ -332,7 +364,7 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                {requestedColleges.map((request, index) => (
+                {displayedRequests.map((request, index) => (
                   <motion.tr
                     key={request.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -361,6 +393,11 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                         <Building size={14} className="text-gray-400 mr-2" />
                         <span className="text-sm text-gray-900 dark:text-gray-100">
                           {request.collegeName}
+                          {request.status === 'approved' && (
+                            <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                              ✓ Approved
+                            </span>
+                          )}
                         </span>
                       </div>
                     </td>
@@ -397,40 +434,44 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                       {getStatusBadge(request.status)}
                     </td>
 
-<td className="px-6 py-4 text-sm font-medium flex flex-wrap items-center gap-2">
-  {request.status === 'pending' && (
-    <>
-      <button
-        onClick={() => handleApproveRequest(request.id)}
-        className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm"
-        title="Approve Request"
-      >
-        <Check size={14} />
-        <span>Approve</span>
-      </button>
+                    <td className="px-6 py-4 text-sm font-medium flex flex-wrap items-center gap-2">
+                      {request.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleApproveRequest(request)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm"
+                            title="Approve Request"
+                          >
+                            <Check size={14} />
+                            <span>Approve</span>
+                          </button>
 
-      <button
-        onClick={() => handleRejectRequest(request.id)}
-        className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm"
-        title="Reject Request"
-      >
-        <X size={14} />
-        <span>Reject</span>
-      </button>
-    </>
-  )}
+                          <button
+                            onClick={() => handleRejectRequest(request.id)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm"
+                            title="Reject Request"
+                          >
+                            <X size={14} />
+                            <span>Reject</span>
+                          </button>
+                        </>
+                      )}
 
-  <button
-    onClick={() => handleDeleteRequest(request.id)}
-    className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm"
-    title="Delete Request"
-  >
-    <Trash2 size={14} />
-    <span>Delete</span>
-  </button>
-</td>
+                      {request.status === 'approved' && (
+                        <span className="text-xs text-green-600 dark:text-green-400 px-2">
+                          Added to Colleges
+                        </span>
+                      )}
 
-
+                      <button
+                        onClick={() => handleDeleteRequest(request.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm"
+                        title="Delete Request"
+                      >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                      </button>
+                    </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -439,7 +480,7 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
 
           {/* Mobile View */}
           <div className="md:hidden space-y-4 p-4">
-            {requestedColleges.map((request, index) => (
+            {displayedRequests.map((request, index) => (
               <motion.div
                 key={request.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -458,6 +499,11 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {request.collegeName}
+                        {request.status === 'approved' && (
+                          <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+                            ✓ Approved
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -493,7 +539,7 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                     {request.status === 'pending' && (
                       <>
                         <button
-                          onClick={() => handleApproveRequest(request.id)}
+                          onClick={() => handleApproveRequest(request)}
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition"
                           title="Approve"
                         >
@@ -508,6 +554,11 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
                         </button>
                       </>
                     )}
+                    {request.status === 'approved' && (
+                      <span className="text-xs text-green-600 dark:text-green-400">
+                        Added
+                      </span>
+                    )}
                     <button
                       onClick={() => handleDeleteRequest(request.id)}
                       className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition"
@@ -520,7 +571,7 @@ export function CollegeTable({ colleges, onEdit, onDelete }: CollegeTableProps) 
               </motion.div>
             ))}
 
-            {requestedColleges.length === 0 && (
+            {displayedRequests.length === 0 && (
               <div className="text-center py-8">
                 <div className="text-gray-400 dark:text-gray-500 mb-2">
                   <User size={48} className="mx-auto" />

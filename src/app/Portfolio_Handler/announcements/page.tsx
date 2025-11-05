@@ -23,6 +23,7 @@ export default function AnnouncementsPage() {
 
   const loadData = () => {
     const storedAnnouncements = localStorage.getItem('announcements');
+    console.log("the announcement",storedAnnouncements)
     const storedColleges = localStorage.getItem('colleges');
 
     if (storedAnnouncements) {

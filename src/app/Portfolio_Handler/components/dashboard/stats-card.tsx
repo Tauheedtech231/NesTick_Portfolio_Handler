@@ -6,9 +6,10 @@ interface StatsCardProps {
   value: string;
   description: string;
   trend: string;
+   alert?: boolean; // optional prop
 }
 
-export function StatsCard({ title, value, description, trend }: StatsCardProps) {
+export function StatsCard({ title, value, description, trend, }: StatsCardProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}

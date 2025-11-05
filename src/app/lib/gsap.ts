@@ -87,6 +87,7 @@ export interface CollegeData {
 }
 
 export type SectionType = 
+  | 'dashboard'   // ✅ added dashboard
   | 'about' 
   | 'faculty' 
   | 'events' 

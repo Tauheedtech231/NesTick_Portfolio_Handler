@@ -19,10 +19,13 @@ export interface ThemeFormData {
 export interface College {
   id: string;
   name: string;
+  email: string;
   representativeName: string;
+  phone: number | string;
+  plan:string; 
   logo: string;
   status: 'active' | 'inactive';
-  theme: 'modern' | 'minimal' | 'classic' | 'elegant' | 'bold';
+  theme: 'modern' | 'minimal' | 'classic' | 'elegant' | 'bold' |string;
 createdAt?: string | Date;   // ✅ allow both
   updatedAt?: string | Date; 
 
@@ -38,7 +41,7 @@ createdAt?: string | Date;   // ✅ allow both
 
 }
 
-
+export type AddCollegeFormData = Omit<College, 'id' | 'createdAt' | 'updatedAt'>;
 export interface Announcement {
   id: string;
   title: string;

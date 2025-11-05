@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Button } from './button';
 import { FiUpload, FiLink, FiX } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
@@ -13,12 +14,12 @@ interface UploadImageProps {
   aspectRatio?: 'square' | 'video' | 'banner';
 }
 
-export function UploadImage({ 
-  value, 
-  onChange, 
-  onRemove, 
+export function UploadImage({
+  value,
+  onChange,
+  onRemove,
   className,
-  aspectRatio = 'square' 
+  aspectRatio = 'square'
 }: UploadImageProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
@@ -47,16 +48,12 @@ export function UploadImage({
     const files = Array.from(e.dataTransfer.files);
     const imageFile = files.find(file => file.type.startsWith('image/'));
     
-    if (imageFile) {
-      handleFileSelect(imageFile);
-    }
+    if (imageFile) handleFileSelect(imageFile);
   }, [handleFileSelect]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
+    if (file) handleFileSelect(file);
   }, [handleFileSelect]);
 
   const handleUrlSubmit = useCallback((e: React.FormEvent) => {
@@ -78,16 +75,20 @@ export function UploadImage({
     setIsDragOver(false);
   }, []);
 
+  // ✅ When image is already uploaded
   if (value) {
     return (
       <div className={cn('relative group', className)}>
         <div className={cn('relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800', aspectClasses[aspectRatio])}>
-          <img
+          <Image
             src={value}
             alt="Preview"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            unoptimized={value.startsWith('data:')} // ✅ Prevents Next.js optimization error for base64
           />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
             <Button
               variant="destructive"
               size="sm"
@@ -102,6 +103,7 @@ export function UploadImage({
     );
   }
 
+  // ✅ When no image is uploaded yet
   return (
     <div
       className={cn(
@@ -121,7 +123,7 @@ export function UploadImage({
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Drag & drop an image or
         </p>
-        
+
         <div className="flex gap-2">
           <Button
             type="button"
@@ -131,7 +133,7 @@ export function UploadImage({
           >
             Browse Files
           </Button>
-          
+
           <Button
             type="button"
             variant="secondary"

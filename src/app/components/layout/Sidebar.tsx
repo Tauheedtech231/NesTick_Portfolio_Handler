@@ -16,23 +16,31 @@ import {
 } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 
-const sections = [
-  { id: 'about' as SectionType, name: 'About College', icon: FiHome },
-  { id: 'faculty' as SectionType, name: 'Faculty', icon: FiUsers },
-  { id: 'events' as SectionType, name: 'Events & Announcements', icon: FiCalendar },
-  { id: 'gallery' as SectionType, name: 'Gallery & Achievements', icon: FiImage },
-  { id: 'courses' as SectionType, name: 'Courses', icon: FiBook },
-  { id: 'contact' as SectionType, name: 'Contact Info', icon: FiMail },
-];
-
 interface SidebarProps {
   activeSection: SectionType;
   onSectionChange: (section: SectionType) => void;
   onPreview: () => void;
+  modules: string[]; // active module IDs as array
 }
 
-export function Sidebar({ activeSection, onSectionChange, onPreview }: SidebarProps) {
+export function Sidebar({ activeSection, onSectionChange, onPreview, modules }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+
+  // Base section definitions
+  const allSections = [
+    { id: 'dashboard', name: 'Dashboard', icon: FiImage }, // Dashboard always on top
+    { id: 'about', name: 'About College', icon: FiHome },
+    { id: 'faculty', name: 'Faculty', icon: FiUsers },
+    { id: 'events', name: 'Events & Announcements', icon: FiCalendar },
+    { id: 'gallery', name: 'Gallery', icon: FiImage },
+    { id: 'courses', name: 'Courses', icon: FiBook },
+    { id: 'contact', name: 'Contact Info', icon: FiMail },
+  ];
+
+  // Filter modules based on active modules array, but always include dashboard
+  const activeSections = allSections.filter(
+    (section) => section.id === 'dashboard' || modules.includes(section.id)
+  );
 
   return (
     <aside
@@ -52,22 +60,18 @@ export function Sidebar({ activeSection, onSectionChange, onPreview }: SidebarPr
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="rounded-xl text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
         >
-          {isCollapsed ? (
-            <FiChevronRight className="w-5 h-5" />
-          ) : (
-            <FiChevronLeft className="w-5 h-5" />
-          )}
+          {isCollapsed ? <FiChevronRight className="w-5 h-5" /> : <FiChevronLeft className="w-5 h-5" />}
         </Button>
       </div>
 
       {/* Navigation Items */}
       <nav className="flex-1 p-4 space-y-2">
-        {sections.map((section) => {
+        {activeSections.map((section) => {
           const Icon = section.icon;
           return (
             <button
               key={section.id}
-              onClick={() => onSectionChange(section.id)}
+              onClick={() => onSectionChange(section.id as SectionType)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200',
                 activeSection === section.id

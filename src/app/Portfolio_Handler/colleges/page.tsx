@@ -27,8 +27,8 @@ export default function CollegesPage() {
     const byStatus = status === 'all' || c.status === status;
     return bySearch && byStatus;
   });
-
-  const handleAdd = (data: Omit<College, 'id' | 'createdAt' | 'updatedAt'>) => {
+/* eslint-disable */
+  const handleAdd = (data: any) => {
     const newCollege: College = {
       ...data,
       id: Date.now().toString(),
@@ -40,6 +40,20 @@ export default function CollegesPage() {
     setColleges(updated);
     localStorage.setItem('colleges', JSON.stringify(updated));
     setShowAddModal(false);
+    
+  };
+
+  // NEW: Handle adding approved colleges from requests
+  const handleAddCollege = (newCollege: College) => {
+    const collegeWithTimestamps: College = {
+      ...newCollege,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const updated = [...colleges, collegeWithTimestamps];
+    setColleges(updated);
+    localStorage.setItem('colleges', JSON.stringify(updated));
   };
 
   const handleEdit = (id: string, changes: Partial<College>) => {
@@ -121,11 +135,12 @@ export default function CollegesPage() {
           </div>
         </section>
 
-        {/* Table */}
+        {/* Table - Updated with onAddCollege prop */}
         <CollegeTable
           colleges={filtered}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onAddCollege={handleAddCollege} // NEW PROP
         />
 
         {/* Modal */}

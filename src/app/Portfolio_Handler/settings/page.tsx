@@ -4,7 +4,7 @@ import { MainLayout } from '../components/layout/main-layout';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
-import { Moon, Sun, Palette, RefreshCw } from 'lucide-react';
+import { Moon, Sun, RefreshCw } from 'lucide-react';
 /* eslint-disable */
 export default function SettingsPage() {
   const [settings, setSettings] = useState({

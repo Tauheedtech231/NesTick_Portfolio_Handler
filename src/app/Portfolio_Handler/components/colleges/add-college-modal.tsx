@@ -43,6 +43,7 @@ export function AddCollegeModal({ isOpen, onClose, onSave }: AddCollegeModalProp
       events: true,
       gallery: true,
       achievements: true,
+      
     },
   });
 

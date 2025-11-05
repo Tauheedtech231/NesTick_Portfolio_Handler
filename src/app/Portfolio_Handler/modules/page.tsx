@@ -23,7 +23,9 @@ export default function ModulesPage() {
   // Load data from localStorage
   useEffect(() => {
     const savedColleges = localStorage.getItem('colleges');
+    console.log('Saved Colleges:', savedColleges);
     const savedModules = localStorage.getItem('customModules');
+    console.log('Saved Custom Modules:', savedModules);
 
     if (savedColleges) {
       const parsedColleges = JSON.parse(savedColleges);

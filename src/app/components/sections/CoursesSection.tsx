@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Course } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button'; 
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook} from 'react-icons/fi';
+import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, FiChevronDown, FiTag } from 'react-icons/fi';
 /* eslint-disable */
 
 interface CoursesSectionProps {
@@ -13,17 +13,59 @@ interface CoursesSectionProps {
   onUpdate: (data: Course[]) => void;
 }
 
+interface Department {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [courses, setCourses] = useState<Course[]>(data);
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState<number | null>(null);
+  const [newDepartmentName, setNewDepartmentName] = useState('');
+
+  // Load departments from localStorage on component mount
+  useEffect(() => {
+    const savedDepartments = localStorage.getItem('departments');
+    if (savedDepartments) {
+      setDepartments(JSON.parse(savedDepartments));
+    } else {
+      // Initialize with default departments if none exist
+      const defaultDepartments: Department[] = [
+        { id: 'dept-1', name: 'Computer Science', createdAt: new Date().toISOString() },
+        { id: 'dept-2', name: 'Electrical Engineering', createdAt: new Date().toISOString() },
+        { id: 'dept-3', name: 'Mechanical Engineering', createdAt: new Date().toISOString() },
+        { id: 'dept-4', name: 'Business Administration', createdAt: new Date().toISOString() },
+        { id: 'dept-5', name: 'Arts and Sciences', createdAt: new Date().toISOString() },
+      ];
+      setDepartments(defaultDepartments);
+      localStorage.setItem('departments', JSON.stringify(defaultDepartments));
+    }
+  }, []);
+
+  // Save departments to localStorage whenever departments change
+  useEffect(() => {
+    if (departments.length > 0) {
+      localStorage.setItem('departments', JSON.stringify(departments));
+    }
+  }, [departments]);
+
+  // Save courses to localStorage whenever courses change (in edit mode)
+  useEffect(() => {
+    if (isEditing && courses.length > 0) {
+      localStorage.setItem('courses', JSON.stringify(courses));
+    }
+  }, [courses, isEditing]);
 
   const addCourse = () => {
     const newCourse: Course = {
       id: `course-${Date.now()}`,
       name: '',
       duration: '',
-      department: '',
+      department: departments.length > 0 ? departments[0].name : '',
       description: '',
       credits: 0,
     };
@@ -40,17 +82,51 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
     setCourses(courses.filter((_, i) => i !== index));
   };
 
+  const addNewDepartment = () => {
+    if (newDepartmentName.trim() && !departments.find(dept => 
+      dept.name.toLowerCase() === newDepartmentName.trim().toLowerCase()
+    )) {
+      const newDepartment: Department = {
+        id: `dept-${Date.now()}`,
+        name: newDepartmentName.trim(),
+        createdAt: new Date().toISOString(),
+      };
+      const updatedDepartments = [...departments, newDepartment];
+      setDepartments(updatedDepartments);
+      setNewDepartmentName('');
+      
+      // If we're adding a department while editing a course, update that course's department
+      if (showDepartmentDropdown !== null) {
+        updateCourse(showDepartmentDropdown, 'department', newDepartment.name);
+      }
+    }
+  };
+
+  const selectDepartment = (courseIndex: number, departmentName: string) => {
+    updateCourse(courseIndex, 'department', departmentName);
+    setShowDepartmentDropdown(null);
+  };
+
   const saveChanges = () => {
     onUpdate(courses);
     setIsEditing(false);
+    // Also save to localStorage for persistence
+    localStorage.setItem('courses', JSON.stringify(courses));
   };
 
   const cancelEditing = () => {
-    setCourses(data);
+    // Restore from localStorage or original data
+    const savedCourses = localStorage.getItem('courses');
+    if (savedCourses) {
+      setCourses(JSON.parse(savedCourses));
+    } else {
+      setCourses(data);
+    }
     setIsEditing(false);
   };
 
-  const departments = ['all', ...new Set(courses.map(course => course.department))];
+  // Get unique departments for filter from current courses
+  const availableDepartments = ['all', ...new Set(courses.map(course => course.department).filter(Boolean))];
   const filteredCourses = departmentFilter === 'all' 
     ? courses 
     : courses.filter(course => course.department === departmentFilter);
@@ -70,30 +146,29 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
           </Button>
         ) : (
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-  <Button
-    variant="secondary"
-    onClick={cancelEditing}
-    className="w-full sm:w-auto"
-  >
-    <FiX className="w-4 h-4 mr-2" />
-    Cancel
-  </Button>
+            <Button
+              variant="secondary"
+              onClick={cancelEditing}
+              className="w-full sm:w-auto"
+            >
+              <FiX className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
 
-  <Button
-    onClick={saveChanges}
-    className="w-full sm:w-auto"
-  >
-    <FiSave className="w-4 h-4 mr-2" />
-    Save Changes
-  </Button>
-</div>
-
+            <Button
+              onClick={saveChanges}
+              className="w-full sm:w-auto"
+            >
+              <FiSave className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+          </div>
         )}
       </div>
 
       {!isEditing && (
         <div className="flex flex-wrap gap-2 mb-6">
-          {departments.map((dept) => (
+          {availableDepartments.map((dept) => (
             <button
               key={dept}
               onClick={() => setDepartmentFilter(dept)}
@@ -111,10 +186,16 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
 
       {isEditing ? (
         <div className="space-y-6">
-          <Button onClick={addCourse} variant="secondary">
-            <FiPlus className="w-4 h-4 mr-2" />
-            Add New Course
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+            <Button onClick={addCourse} variant="secondary">
+              <FiPlus className="w-4 h-4 mr-2" />
+              Add New Course
+            </Button>
+            
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">{departments.length}</span> departments available
+            </div>
+          </div>
 
           <div className="grid gap-6">
             {courses.map((course, index) => (
@@ -177,18 +258,60 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                           placeholder="4 Years"
                         />
                       </div>
-                      <div>
+                      
+                      <div className="relative">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Department *
                         </label>
-                        <input
-                          type="text"
-                          value={course.department}
-                          onChange={(e) => updateCourse(index, 'department', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                          placeholder="Computer Science"
-                        />
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowDepartmentDropdown(showDepartmentDropdown === index ? null : index)}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left flex items-center justify-between"
+                          >
+                            <span>{course.department || 'Select Department'}</span>
+                            <FiChevronDown className="w-4 h-4 text-gray-500" />
+                          </button>
+                          
+                          {showDepartmentDropdown === index && (
+                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                              {/* Existing Departments */}
+                              {departments.map((dept) => (
+                                <button
+                                  key={dept.id}
+                                  onClick={() => selectDepartment(index, dept.name)}
+                                  className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                >
+                                  <FiTag className="w-3 h-3 text-gray-500" />
+                                  {dept.name}
+                                </button>
+                              ))}
+                              
+                              {/* Add New Department */}
+                              <div className="border-t border-gray-200 dark:border-gray-600 p-3">
+                                <div className="flex gap-2 mb-2">
+                                  <input
+                                    type="text"
+                                    value={newDepartmentName}
+                                    onChange={(e) => setNewDepartmentName(e.target.value)}
+                                    placeholder="New department name"
+                                    className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    onKeyPress={(e) => e.key === 'Enter' && addNewDepartment()}
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={addNewDepartment}
+                                    disabled={!newDepartmentName.trim()}
+                                  >
+                                    <FiPlus className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Credits *
@@ -259,9 +382,9 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   {course.name}
                 </h3>
-                {/* <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                   {course.department}
-                </span> */}
+                </span>
               </div>
 
               {course.image && (
@@ -292,25 +415,6 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                   </div>
                 </div>
               </div>
-
-              {/* <div className="flex gap-2">
-                {course.syllabus && (
-                  <Button variant="secondary" size="sm" asChild>
-                    <a href={course.syllabus} target="_blank" rel="noopener noreferrer">
-                      <FiDownload className="w-4 h-4 mr-2" />
-                      Syllabus
-                    </a>
-                  </Button>
-                )}
-                {course.feeStructure && (
-                  <Button variant="secondary" size="sm" asChild>
-                    <a href={course.feeStructure} target="_blank" rel="noopener noreferrer">
-                      <FiDownload className="w-4 h-4 mr-2" />
-                      Fee Structure
-                    </a>
-                  </Button>
-                )}
-              </div> */}
             </div>
           ))}
         </div>

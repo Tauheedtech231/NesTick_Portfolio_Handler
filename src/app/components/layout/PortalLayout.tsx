@@ -1,19 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
-import { FiMenu } from 'react-icons/fi';
-import {
-  FiUser,
-  FiBookOpen,
-  FiCamera,
-  FiCalendar,
-  FiUsers,
-  FiPhoneCall,
-  FiEye,
-} from 'react-icons/fi';
+import { FiMenu, FiUser, FiBookOpen, FiCamera, FiCalendar, FiUsers, FiPhoneCall, FiEye } from 'react-icons/fi';
 import { SectionType } from '@/app/lib/gsap';
+import { College, Announcement } from '@/app/types/index';
 
 interface PortalLayoutProps {
   collegeName: string;
@@ -30,9 +22,42 @@ export function PortalLayout({
   activeSection,
   onSectionChange,
 }: PortalLayoutProps) {
+  
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
-  const mobileSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
+  const CURRENT_COLLEGE_ID = '1762352574095'; // replace later with logged-in college
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // ✅ Load college data and active modules
+    const rawColleges = localStorage.getItem('colleges');
+    const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
+    const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
+
+    const sourceModules = found?.modules ?? {};
+    const enabled = Object.keys(sourceModules).filter(
+      (k) => sourceModules[k as keyof typeof sourceModules]
+    );
+    setActiveModules(enabled as (keyof College['modules'])[]);
+    console.log('Active modules loaded:', activeModules);
+
+    // ✅ Load announcements for this college
+   
+    const rawAnnouncements = localStorage.getItem('announcements');
+    const annArr: Announcement[] = rawAnnouncements ? JSON.parse(rawAnnouncements) : [];
+    const filtered = annArr
+      .filter((a) => a.targetCollege === 'all' || a.targetCollege === CURRENT_COLLEGE_ID)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    setAnnouncements(filtered);
+    
+  }, [activeModules]);
+
+  // Mobile sections
+  const allSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
     { id: 'about', label: 'About', icon: <FiUser /> },
     { id: 'faculty', label: 'Faculty', icon: <FiUsers /> },
     { id: 'courses', label: 'Courses', icon: <FiBookOpen /> },
@@ -41,12 +66,16 @@ export function PortalLayout({
     { id: 'contact', label: 'Contact', icon: <FiPhoneCall /> },
   ];
 
+  // Only active modules
+// Only active modules (dynamic)
+const mobileSections = allSections.filter(
+  (s) => activeModules.includes(s.id as keyof College['modules'])
+);
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex flex-col">
-      {/* Header */}
       <Header collegeName={collegeName} />
 
-      {/* Main Content Layout */}
       <div className="flex flex-1 relative">
         {/* Sidebar */}
         <aside
@@ -58,10 +87,12 @@ export function PortalLayout({
             activeSection={activeSection}
             onSectionChange={onSectionChange}
             onPreview={onPreview}
+            modules={activeModules} // ✅ send active modules dynamically
+             // ✅ optionally send announcements
           />
         </aside>
 
-        {/* Overlay for mobile */}
+        {/* Overlay */}
         {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-40 sm:hidden z-30"
@@ -69,9 +100,9 @@ export function PortalLayout({
           />
         )}
 
-        {/* Main Content */}
+        {/* Main content */}
         <main className="flex-1 p-4 sm:p-6 w-full sm:ml-0 overflow-y-auto">
-          {/* Mobile Menu Button */}
+          {/* Mobile menu */}
           <button
             onClick={() => setSidebarOpen(!isSidebarOpen)}
             className="sm:hidden mb-4 p-2 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center gap-2 shadow-md hover:opacity-90 transition-all duration-300"
@@ -84,7 +115,7 @@ export function PortalLayout({
         </main>
       </div>
 
-      {/* Bottom Navigation (Mobile Only) */}
+      {/* Bottom Navigation (mobile) */}
       <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
         <ul className="flex justify-around items-center py-2">
           {mobileSections.map((item) => (
@@ -102,7 +133,7 @@ export function PortalLayout({
             </li>
           ))}
 
-          {/* Preview Button */}
+          {/* Preview */}
           <li
             onClick={onPreview}
             className="flex flex-col items-center text-sm cursor-pointer text-gray-800 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
