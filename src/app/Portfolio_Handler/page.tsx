@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Plus, Palette, Download, Trash2, Check, X, User, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Palette, Download, Trash2, Check, X, User, Calendar, AlertTriangle, CheckCircle } from 'lucide-react';
 
 import { MainLayout } from './components/layout/main-layout';
 import { StatsCard } from './components/dashboard/stats-card';
@@ -17,32 +17,31 @@ interface DeleteRequest {
   requestedAt: string;
 }
 
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error';
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [colleges, setColleges] = useState<College[]>([]);
   const [deleteRequests, setDeleteRequests] = useState<DeleteRequest[]>([]);
   const [showDeleteRequests, setShowDeleteRequests] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [approveConfirmModal, setApproveConfirmModal] = useState<{show: boolean; request: DeleteRequest | null}>({
+    show: false,
+    request: null
+  });
 
   // Load colleges from localStorage once on mount
-useEffect(() => {
-  const stored = localStorage.getItem('colleges');
-  // console.log("The stored colleges are:", stored);
-
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    setColleges(parsed);
-
-    // Print modules names with true/false
-    // parsed.forEach((college: any) => {
-    //   console.log(`College: ${college.name}`);
-    //   Object.entries(college.modules).forEach(([moduleName, status]) => {
-    //     console.log(`  ${moduleName}: ${status}`);
-    //   });
-    // });
-  }
-}, []);
-
-
+  useEffect(() => {
+    const stored = localStorage.getItem('colleges');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setColleges(parsed);
+    }
+  }, []);
 
   // Load delete requests from localStorage
   useEffect(() => {
@@ -51,6 +50,21 @@ useEffect(() => {
       setDeleteRequests(JSON.parse(stored));
     }
   }, []);
+
+  // Toast notification system
+  const addToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = Date.now().toString();
+    const newToast: Toast = { id, message, type };
+    setToasts(prev => [...prev, newToast]);
+    
+    setTimeout(() => {
+      removeToast(id);
+    }, 5000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   const total = colleges.length;
   const active = colleges.filter((c) => c.status === 'active').length;
@@ -78,34 +92,18 @@ useEffect(() => {
     link.download = 'portfolio-backup.json';
     link.click();
   };
-  //handle id logic
-  // useEffect(() => {
-  //   // LocalStorage se data get karo
-  //   const storedData = localStorage.getItem('colleges');
 
-  //   if (storedData) {
-  //     try {
-  //       // JSON parse karo
-  //       const college = JSON.parse(storedData);
+  // Show approval confirmation modal
+  const showApproveConfirmation = (request: DeleteRequest) => {
+    setApproveConfirmModal({ show: true, request });
+  };
 
-  //       // Agar ek array hai
-  //       if (Array.isArray(college)) {
-  //         college.forEach((c) => console.log('College ID:', c.id));
-  //       } 
-  //       // Agar single object hai
-  //       else {
-  //         console.log('College ID:', college.id);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error parsing college data:', error);
-  //     }
-  //   } else {
-  //     console.log('No college data found in localStorage');
-  //   }
-  // }, []);
+  // Handle approving delete requests
+  const handleApproveDeleteRequest = () => {
+    if (!approveConfirmModal.request) return;
 
-  // NEW: Handle approving delete requests
-  const handleApproveDeleteRequest = (requestId: string) => {
+    const requestId = approveConfirmModal.request.id;
+    
     // Clear all data except deleteRequests
     const savedDeleteRequests = localStorage.getItem('deleteRequests');
     localStorage.clear();
@@ -123,21 +121,24 @@ useEffect(() => {
     // Update colleges state to empty
     setColleges([]);
 
-    alert('✅ Data deletion approved and all data has been cleared!');
-    // Optionally reload the page to reflect changes
-    // window.location.reload();
+    // Close modal and show success toast
+    setApproveConfirmModal({ show: false, request: null });
+    addToast('✅ Data deletion approved and all data has been cleared!', 'success');
+    
+    // Close the delete requests modal if open
+    setShowDeleteRequests(false);
   };
 
-  // NEW: Handle rejecting delete requests
+  // Handle rejecting delete requests
   const handleRejectDeleteRequest = (requestId: string) => {
     const updatedRequests = deleteRequests.filter(req => req.id !== requestId);
     setDeleteRequests(updatedRequests);
     localStorage.setItem('deleteRequests', JSON.stringify(updatedRequests));
     
-    alert('❌ Delete request has been rejected.');
+    addToast('❌ Delete request has been rejected.', 'success');
   };
 
-  // NEW: Format date for display
+  // Format date for display
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -150,6 +151,40 @@ useEffect(() => {
 
   return (
     <MainLayout>
+      {/* Toast Notifications */}
+      <AnimatePresence>
+        {toasts.map((toast) => (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 0.9 }}
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center space-x-3 px-6 py-4 rounded-lg shadow-lg border ${
+              toast.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle size={20} className="text-green-600" />
+            ) : (
+              <X size={20} className="text-red-600" />
+            )}
+            <span className="font-medium">{toast.message}</span>
+            <button
+              onClick={() => removeToast(toast.id)}
+              className={`p-1 rounded-full hover:bg-opacity-20 ${
+                toast.type === 'success' 
+                  ? 'hover:bg-green-600 text-green-600' 
+                  : 'hover:bg-red-600 text-red-600'
+              }`}
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -360,7 +395,7 @@ useEffect(() => {
           </div>
         </section>
 
-        {/* NEW: Delete Requests Modal */}
+        {/* Delete Requests Modal */}
         {showDeleteRequests && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -433,7 +468,7 @@ useEffect(() => {
 
                           <div className="flex space-x-2 ml-4">
                             <button
-                              onClick={() => handleApproveDeleteRequest(request.id)}
+                              onClick={() => showApproveConfirmation(request)}
                               className="flex items-center space-x-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm"
                               title="Approve and Delete Data"
                             >
@@ -469,6 +504,94 @@ useEffect(() => {
             </motion.div>
           </motion.div>
         )}
+
+        {/* Approval Confirmation Modal */}
+        <AnimatePresence>
+          {approveConfirmModal.show && approveConfirmModal.request && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+              >
+                <div className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
+                      <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Confirm Data Deletion
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        This action cannot be undone
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <p className="text-gray-700 dark:text-gray-300 mb-3">
+                      You are about to approve the deletion request from:
+                    </p>
+                    <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="font-semibold text-red-800 dark:text-red-300">
+                        {approveConfirmModal.request.userName}
+                      </p>
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        {approveConfirmModal.request.contactNumber}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+                      Requested on: {formatDate(approveConfirmModal.request.requestedAt)}
+                    </p>
+                  </div>
+
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 mb-6">
+                    <div className="flex items-start space-x-2">
+                      <AlertTriangle size={16} className="text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                          Warning: This will permanently delete all data
+                        </p>
+                        <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                          • All colleges and their data<br/>
+                          • All themes and settings<br/>
+                          • All announcements<br/>
+                          • This action cannot be reversed
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => setApproveConfirmModal({ show: false, request: null })}
+                      className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white 
+                               border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 
+                               transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleApproveDeleteRequest}
+                      className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg 
+                               transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <Trash2 size={16} />
+                      <span>Delete All Data</span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </MainLayout>
   );

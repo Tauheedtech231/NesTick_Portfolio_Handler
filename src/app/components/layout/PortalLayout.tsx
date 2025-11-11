@@ -3,12 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
-import { FiMenu, FiUser, FiBookOpen, FiCamera, FiCalendar, FiUsers, FiPhoneCall, FiEye } from 'react-icons/fi';
+import {
+  FiMenu,
+  FiUser,
+  FiBookOpen,
+  FiCamera,
+  FiCalendar,
+  FiUsers,
+  FiPhoneCall,
+  FiEye,
+} from 'react-icons/fi';
 import { SectionType } from '@/app/lib/gsap';
 import { College, Announcement } from '@/app/types/index';
 
 interface PortalLayoutProps {
   collegeName: string;
+  logo?: string; // ✅ Added this line
   children: React.ReactNode;
   onPreview: () => void;
   activeSection: SectionType;
@@ -17,12 +27,12 @@ interface PortalLayoutProps {
 
 export function PortalLayout({
   collegeName,
+  logo,
   children,
   onPreview,
   activeSection,
   onSectionChange,
 }: PortalLayoutProps) {
-  
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,30 +43,28 @@ export function PortalLayout({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // ✅ Load college data and active modules
+    // ✅ Load college data and active modules once
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
+    console.log('Loaded colleges from localStorage:', colleges);
     const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
 
     const sourceModules = found?.modules ?? {};
     const enabled = Object.keys(sourceModules).filter(
       (k) => sourceModules[k as keyof typeof sourceModules]
     );
-    setActiveModules(enabled as (keyof College['modules'])[]);
-    console.log('Active modules loaded:', activeModules);
 
-    // ✅ Load announcements for this college
-   
+    setActiveModules(enabled as (keyof College['modules'])[]);
+
+    // ✅ Load announcements for this college once
     const rawAnnouncements = localStorage.getItem('announcements');
     const annArr: Announcement[] = rawAnnouncements ? JSON.parse(rawAnnouncements) : [];
     const filtered = annArr
       .filter((a) => a.targetCollege === 'all' || a.targetCollege === CURRENT_COLLEGE_ID)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setAnnouncements(filtered);
-    
-  }, [activeModules]);
+  }, []); // ✅ empty dependency array to prevent re-renders
 
-  // Mobile sections
   const allSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
     { id: 'about', label: 'About', icon: <FiUser /> },
     { id: 'faculty', label: 'Faculty', icon: <FiUsers /> },
@@ -66,15 +74,15 @@ export function PortalLayout({
     { id: 'contact', label: 'Contact', icon: <FiPhoneCall /> },
   ];
 
-  // Only active modules
-// Only active modules (dynamic)
-const mobileSections = allSections.filter(
-  (s) => activeModules.includes(s.id as keyof College['modules'])
-);
+  // ✅ Only include active modules in mobile nav
+  const mobileSections = allSections.filter(
+    (s) => activeModules.includes(s.id as keyof College['modules'])
+  );
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex flex-col">
-      <Header collegeName={collegeName} />
+      {/* ✅ Pass logo down to Header */}
+      <Header collegeName={collegeName} logo={logo} />
 
       <div className="flex flex-1 relative">
         {/* Sidebar */}
@@ -87,8 +95,7 @@ const mobileSections = allSections.filter(
             activeSection={activeSection}
             onSectionChange={onSectionChange}
             onPreview={onPreview}
-            modules={activeModules} // ✅ send active modules dynamically
-             // ✅ optionally send announcements
+            modules={activeModules}
           />
         </aside>
 

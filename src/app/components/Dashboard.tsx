@@ -252,6 +252,7 @@ export default function DashboardPage({ initialData }: DashboardProps) {
 
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
+ 
     const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
 
     if (found) {
@@ -352,6 +353,7 @@ const collegeStatus = (collegeData.college as any)?.status || 'active';
   return (
     <PortalLayout
       collegeName={collegeName}
+      logo={collegeData.college?.logo || ''}
       onPreview={() => setIsPreviewOpen(true)}
       activeSection={activeSection}
       onSectionChange={(s) => setActiveSection(s)}

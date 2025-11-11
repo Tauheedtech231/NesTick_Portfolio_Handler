@@ -3,12 +3,12 @@
 import React from 'react';
 import { SectionType } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
-import { 
-  FiHome, 
-  FiUsers, 
-  FiCalendar, 
-  FiImage, 
-  FiBook, 
+import {
+  FiHome,
+  FiUsers,
+  FiCalendar,
+  FiImage,
+  FiBook,
   FiMail,
   FiEye,
   FiChevronLeft,
@@ -26,9 +26,8 @@ interface SidebarProps {
 export function Sidebar({ activeSection, onSectionChange, onPreview, modules }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
-  // Base section definitions
   const allSections = [
-    { id: 'dashboard', name: 'Dashboard', icon: FiImage }, // Dashboard always on top
+    { id: 'dashboard', name: 'Dashboard', icon: FiImage },
     { id: 'about', name: 'About College', icon: FiHome },
     { id: 'faculty', name: 'Faculty', icon: FiUsers },
     { id: 'events', name: 'Events & Announcements', icon: FiCalendar },
@@ -37,7 +36,6 @@ export function Sidebar({ activeSection, onSectionChange, onPreview, modules }: 
     { id: 'contact', name: 'Contact Info', icon: FiMail },
   ];
 
-  // Filter modules based on active modules array, but always include dashboard
   const activeSections = allSections.filter(
     (section) => section.id === 'dashboard' || modules.includes(section.id)
   );
@@ -45,49 +43,74 @@ export function Sidebar({ activeSection, onSectionChange, onPreview, modules }: 
   return (
     <aside
       className={cn(
-        'bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col',
+        'bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 min-h-screen shadow-md transition-all duration-500 flex flex-col justify-between',
         isCollapsed ? 'w-20' : 'w-64'
       )}
     >
-      {/* Toggle Button */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        {!isCollapsed && (
-          <h2 className="text-lg font-semibold text-black dark:text-white">Navigation</h2>
+      {/* ==== Header Section ==== */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+        {!isCollapsed ? (
+          <div>
+            <h2 className="text-xl font-extrabold text-black dark:text-white tracking-tight">
+              College Portal
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              Editor Dashboard
+            </p>
+          </div>
+        ) : (
+          <div className="flex justify-center w-full">
+            <span className="text-2xl text-black dark:text-white font-bold">C</span>
+          </div>
         )}
+
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="rounded-xl text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
         >
-          {isCollapsed ? <FiChevronRight className="w-5 h-5" /> : <FiChevronLeft className="w-5 h-5" />}
+          {isCollapsed ? (
+            <FiChevronRight className="w-5 h-5" />
+          ) : (
+            <FiChevronLeft className="w-5 h-5" />
+          )}
         </Button>
       </div>
 
-      {/* Navigation Items */}
-      <nav className="flex-1 p-4 space-y-2">
+      {/* ==== Navigation ==== */}
+      <nav className="flex-1 flex flex-col gap-1 p-4">
         {activeSections.map((section) => {
           const Icon = section.icon;
+          const isActive = activeSection === section.id;
           return (
             <button
               key={section.id}
               onClick={() => onSectionChange(section.id as SectionType)}
               className={cn(
-                'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200',
-                activeSection === section.id
-                  ? 'bg-black text-white dark:bg-white dark:text-black shadow-md'
-                  : 'text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                'group flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 w-full text-left',
+                isActive
+                  ? 'bg-gray-100 dark:bg-gray-900 text-black dark:text-white border-l-4 border-gray-800 dark:border-white'
+                  : 'text-gray-700 hover:text-black hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
               )}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              {!isCollapsed && <span className="font-medium">{section.name}</span>}
+              <Icon
+                size={20}
+                className={cn(
+                  'transition-transform duration-300',
+                  isActive
+                    ? 'scale-110 text-black dark:text-white'
+                    : 'group-hover:scale-110 text-gray-600 dark:text-gray-300'
+                )}
+              />
+              {!isCollapsed && <span>{section.name}</span>}
             </button>
           );
         })}
       </nav>
 
-      {/* Preview Button */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      {/* ==== Preview Button ==== */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <Button
           onClick={onPreview}
           className={cn(

@@ -1,9 +1,9 @@
 'use client';
 /* eslint-disable */
 import { MainLayout } from '../components/layout/main-layout';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Download, Upload, Trash2, Database, AlertTriangle, User, Phone } from 'lucide-react';
+import { Download, Upload, Trash2, Database, AlertTriangle, User, Phone, CheckCircle, X, XCircle } from 'lucide-react';
 
 interface DeleteRequest {
   id: string;
@@ -11,6 +11,12 @@ interface DeleteRequest {
   contactNumber: string;
   status: 'pending' | 'approved';
   requestedAt: string;
+}
+
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error';
 }
 
 export default function BackupPage() {
@@ -23,6 +29,7 @@ export default function BackupPage() {
     userName: '',
     contactNumber: ''
   });
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   // ✅ Run only on client side
   useEffect(() => {
@@ -32,6 +39,23 @@ export default function BackupPage() {
       calculateDataSummary();
     }
   }, []);
+
+  // ✅ Add toast notification
+  const addToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = Date.now().toString();
+    const newToast: Toast = { id, message, type };
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      removeToast(id);
+    }, 5000);
+  };
+
+  // ✅ Remove toast notification
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   // ✅ Calculate localStorage total size
   const calculateStorageSize = () => {
@@ -120,10 +144,12 @@ export default function BackupPage() {
         calculateStorageSize();
         calculateDataSummary();
 
-        alert('✅ Data imported successfully! Reloading...');
-        window.location.reload();
+        addToast('✅ Data imported successfully! Reloading...', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (error) {
-        alert('❌ Error importing data. Invalid format.');
+        addToast('❌ Error importing data. Invalid format.', 'error');
         console.error('Import error:', error);
       }
     };
@@ -134,7 +160,7 @@ export default function BackupPage() {
   // ✅ NEW: Submit delete request
   const submitDeleteRequest = () => {
     if (!formData.userName.trim() || !formData.contactNumber.trim()) {
-      alert('Please fill in both name and contact number');
+      addToast('Please fill in both name and contact number', 'error');
       return;
     }
 
@@ -157,7 +183,7 @@ export default function BackupPage() {
     setShowFormModal(false);
     setShowConfirmModal(false);
     
-    alert('✅ Delete request submitted successfully! It is now pending admin approval.');
+    addToast('✅ Delete request submitted successfully! It is now pending admin approval.', 'success');
   };
 
   // ✅ Calculate Data Summary safely
@@ -197,7 +223,7 @@ export default function BackupPage() {
     {
       icon: Trash2,
       title: 'Request Data Deletion',
-      description: 'Submit a request to delete all data (requires admin approval)',
+      description: 'Submit a request to delete all data' ,
       buttonText: 'Request Deletion',
       onClick: () => setShowConfirmModal(true),
       color: 'bg-red-600 hover:bg-red-700',
@@ -206,6 +232,40 @@ export default function BackupPage() {
 
   return (
     <MainLayout>
+      {/* Toast Notifications */}
+      <AnimatePresence>
+        {toasts.map((toast) => (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 0.9 }}
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center space-x-3 px-6 py-4 rounded-lg shadow-lg border ${
+              toast.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle size={20} className="text-green-600" />
+            ) : (
+              <XCircle size={20} className="text-red-600" />
+            )}
+            <span className="font-medium">{toast.message}</span>
+            <button
+              onClick={() => removeToast(toast.id)}
+              className={`p-1 rounded-full hover:bg-opacity-20 ${
+                toast.type === 'success' 
+                  ? 'hover:bg-green-600 text-green-600' 
+                  : 'hover:bg-red-600 text-red-600'
+              }`}
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
