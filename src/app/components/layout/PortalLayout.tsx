@@ -18,7 +18,7 @@ import { College, Announcement } from '@/app/types/index';
 
 interface PortalLayoutProps {
   collegeName: string;
-  logo?: string; // ✅ Added this line
+  logo?: string;
   children: React.ReactNode;
   onPreview: () => void;
   activeSection: SectionType;
@@ -34,36 +34,43 @@ export function PortalLayout({
   onSectionChange,
 }: PortalLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [activeModules, setActiveModules] = useState<string[]>([]);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const CURRENT_COLLEGE_ID = '1762352574095'; // replace later with logged-in college
+  const CURRENT_COLLEGE_ID = '1762352574095'; // Replace later with logged-in college
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // ✅ Load college data and active modules once
+    // Load college data from localStorage
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
-    console.log('Loaded colleges from localStorage:', colleges);
     const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
 
-    const sourceModules = found?.modules ?? {};
-    const enabled = Object.keys(sourceModules).filter(
-      (k) => sourceModules[k as keyof typeof sourceModules]
-    );
+    if (found) {
+      const sourceModules = found.modules ?? {};
+      const enabled = Object.keys(sourceModules).filter(
+        (k) => sourceModules[k as keyof typeof sourceModules]
+      );
+      setActiveModules(enabled as (keyof College['modules'])[]);
+    } else {
+      // No data found, show all modules
+      setActiveModules(['about', 'faculty', 'courses', 'events', 'gallery', 'contact']);
+      setErrorMessage(
+        'No college data found in localStorage. Showing all modules for now.'
+      );
+    }
 
-    setActiveModules(enabled as (keyof College['modules'])[]);
-
-    // ✅ Load announcements for this college once
+    // Load announcements
     const rawAnnouncements = localStorage.getItem('announcements');
     const annArr: Announcement[] = rawAnnouncements ? JSON.parse(rawAnnouncements) : [];
     const filtered = annArr
       .filter((a) => a.targetCollege === 'all' || a.targetCollege === CURRENT_COLLEGE_ID)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setAnnouncements(filtered);
-  }, []); // ✅ empty dependency array to prevent re-renders
+  }, []);
 
   const allSections: { id: SectionType; label: string; icon: React.ReactNode }[] = [
     { id: 'about', label: 'About', icon: <FiUser /> },
@@ -74,15 +81,22 @@ export function PortalLayout({
     { id: 'contact', label: 'Contact', icon: <FiPhoneCall /> },
   ];
 
-  // ✅ Only include active modules in mobile nav
+  // Only include active modules in mobile nav
   const mobileSections = allSections.filter(
     (s) => activeModules.includes(s.id as keyof College['modules'])
   );
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex flex-col">
-      {/* ✅ Pass logo down to Header */}
+      {/* Header */}
       <Header collegeName={collegeName} logo={logo} />
+
+      {/* Optional error message */}
+      {errorMessage && (
+        <div className="bg-red-500 text-white text-center py-2 font-medium">
+          {errorMessage}
+        </div>
+      )}
 
       <div className="flex flex-1 relative">
         {/* Sidebar */}
@@ -91,12 +105,14 @@ export function PortalLayout({
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } sm:translate-x-0 transition-transform duration-300 z-40`}
         >
-          <Sidebar
-            activeSection={activeSection}
-            onSectionChange={onSectionChange}
-            onPreview={onPreview}
-            modules={activeModules}
-          />
+         <Sidebar
+  activeSection={activeSection}
+  onSectionChange={onSectionChange}
+  onPreview={onPreview}
+  modules={activeModules}
+  
+/>
+
         </aside>
 
         {/* Overlay */}

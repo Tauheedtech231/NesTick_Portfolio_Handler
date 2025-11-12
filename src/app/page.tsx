@@ -15,6 +15,7 @@ interface Theme {
   image: string;
   zipFile: string;
   liveUrl?: string;
+  type: 'free' | 'paid';
   createdAt: string;
 }
 
@@ -63,6 +64,10 @@ export default function LandingPage() {
     themeName: ''
   });
 
+  // Form validation states
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+
   // Refs for animations
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
@@ -79,6 +84,75 @@ export default function LandingPage() {
   const addToRefs = (el: HTMLDivElement | null, refArray: React.MutableRefObject<HTMLDivElement[]>) => {
     if (el && !refArray.current.includes(el)) {
       refArray.current.push(el);
+    }
+  };
+
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+  };
+
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'email':
+        if (!value.trim()) return 'Email is required';
+        if (!validateEmail(value)) return 'Please enter a valid email';
+        return '';
+      case 'whatsapp':
+        if (!value.trim()) return 'WhatsApp number is required';
+        if (!validatePhone(value)) return 'Please enter a valid phone number';
+        return '';
+      case 'name':
+        if (!value.trim()) return 'Full name is required';
+        if (value.trim().length < 2) return 'Name must be at least 2 characters';
+        return '';
+      case 'collegeName':
+        if (!value.trim()) return 'College name is required';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  // Check for duplicate email for free themes
+  const isDuplicateEmail = (email: string, themeId: string): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    const existingRequests = JSON.parse(localStorage.getItem('requested_college') || '[]');
+    return existingRequests.some((request: any) => 
+      request.email.toLowerCase() === email.toLowerCase() && 
+      request.theme.id === themeId &&
+      request.theme.type === 'free'
+    );
+  };
+
+  // Handle input blur for validation
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+    
+    const error = validateField(name, value);
+    setFormErrors(prev => ({ ...prev, [name]: error }));
+  };
+
+  // Handle buy now input change with validation
+  const handleBuyNowInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setBuyNowFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      const error = validateField(name, value);
+      setFormErrors(prev => ({ ...prev, [name]: error }));
     }
   };
 
@@ -99,7 +173,6 @@ export default function LandingPage() {
 
     loadThemes();
     
-    // Listen for storage changes to update themes in real-time
     const handleStorageChange = () => {
       loadThemes();
     };
@@ -121,7 +194,7 @@ export default function LandingPage() {
     }
   }, []);
 
-  // 🔹 Handle Logout
+  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('loggedInCollege');
     setUser(null);
@@ -195,10 +268,8 @@ export default function LandingPage() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Simulate form submission
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      // In a real application, you would send the data to your backend here
       console.log('Form submitted:', formData);
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -216,19 +287,42 @@ export default function LandingPage() {
       ...prev,
       themeName: theme.name
     }));
+    setFormErrors({});
+    setTouchedFields({});
     setIsBuyNowModalOpen(true);
-  };
-
-  const handleBuyNowInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setBuyNowFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
 
   const handleBuyNowSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all fields
+    const errors: Record<string, string> = {};
+    Object.keys(buyNowFormData).forEach(key => {
+      if (key !== 'selectedPlan' && key !== 'themeName') {
+        const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData]);
+        if (error) errors[key] = error;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      // Mark all fields as touched to show errors
+      const allTouched = Object.keys(buyNowFormData).reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setTouchedFields(allTouched);
+      return;
+    }
+
+    // Check for duplicate email for free themes
+    if (selectedTheme?.type === 'free' && isDuplicateEmail(buyNowFormData.email, selectedTheme.id)) {
+      setFormErrors(prev => ({ 
+        ...prev, 
+        email: 'You have already requested this free theme with this email address.' 
+      }));
+      return;
+    }
     
     // Save to localStorage
     const existingRequests = JSON.parse(localStorage.getItem('requested_college') || '[]');
@@ -254,6 +348,8 @@ export default function LandingPage() {
       selectedPlan: 'basic',
       themeName: ''
     });
+    setFormErrors({});
+    setTouchedFields({});
   };
 
   const handlePreviewClick = (themeId: string) => {
@@ -387,10 +483,10 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-black font-bold text-sm">P</span>
+              <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
+                <span className="text-white dark:text-gray-900 font-bold text-sm">P</span>
               </div>
-              <span className="text-xl font-bold text-black dark:text-white">
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
                 Portfolio Handler
               </span>
             </div>
@@ -401,19 +497,18 @@ export default function LandingPage() {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className="relative px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all duration-300 ease-out group"
+                  className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
                 >
                   <span className="font-medium text-sm uppercase tracking-wide">
                     {item.charAt(0).toUpperCase() + item.slice(1)}
                   </span>
-                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-black dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
+                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
                 </button>
               ))}
             </div>
 
             {/* Right Side Buttons */}
             <div className="flex items-center space-x-3">
-              {/* 👤 Logged-in User */}
               {user ? (
                 <div className="relative">
                   <button
@@ -424,8 +519,8 @@ export default function LandingPage() {
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                    <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                           {user.adminName || 'Admin'}
                         </p>
@@ -435,7 +530,7 @@ export default function LandingPage() {
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-800 transition-all"
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 transition-all"
                       >
                         <LogOut className="w-4 h-4 mr-2" /> Logout
                       </button>
@@ -444,25 +539,22 @@ export default function LandingPage() {
                 </div>
               ) : (
                 <>
-                  {/* Login Button */}
                   <button
                     onClick={() => (window.location.href = '/auth/login')}
-                    className="hidden lg:block bg-white text-black border border-black dark:bg-black dark:text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
+                    className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
                   >
                     Login
                   </button>
 
-                  {/* Sign Up Button */}
                   <button
                     onClick={() => (window.location.href = '/auth/sign_up')}
-                    className="hidden lg:block bg-black text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 shadow-sm"
+                    className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
                   >
                     Sign Up
                   </button>
                 </>
               )}
 
-              {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
@@ -489,9 +581,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* 📱 Mobile Menu Content */}
+          {/* Mobile Menu Content */}
           {isMobileMenuOpen && (
-            <div className="lg:hidden mt-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
+            <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
               {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
                 <button
                   key={item}
@@ -499,7 +591,7 @@ export default function LandingPage() {
                     scrollToSection(item);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                  className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1)}
                 </button>
@@ -509,13 +601,13 @@ export default function LandingPage() {
                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
                   <button
                     onClick={() => (window.location.href = '/auth/login')}
-                    className="w-full bg-white text-black border border-black dark:bg-black dark:text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => (window.location.href = '/auth/sign_up')}
-                    className="w-full bg-black text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:scale-105 shadow-sm transition-all"
+                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
                   >
                     Sign Up
                   </button>
@@ -532,17 +624,16 @@ export default function LandingPage() {
         ref={heroRef}
         className="pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 
                    bg-gradient-to-br from-gray-50 via-white to-gray-100 
-                   dark:from-gray-900 dark:via-black dark:to-gray-800 
+                   dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 
                    relative overflow-hidden transition-colors duration-700"
       >
-        {/* Background decorations */}
         <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-gray-200 dark:bg-gray-800 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-gray-200 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
 
         <div className="container mx-auto max-w-6xl text-center relative z-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8 leading-tight">
             Simplify College Portfolios{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-black to-gray-600 dark:from-white dark:to-gray-400 bg-size-200 animate-gradient">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-size-200 animate-gradient">
               One Unified Platform
             </span>
           </h1>
@@ -552,7 +643,6 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
-            {/* Black & White Button */}
             <button
               onClick={() => {
                 const section = document.getElementById("themes");
@@ -560,10 +650,10 @@ export default function LandingPage() {
                   section.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="w-full sm:w-auto bg-black text-white dark:bg-white dark:text-black 
+              className="w-full sm:w-auto bg-gray-900 text-white dark:bg-white dark:text-gray-900 
                          px-8 py-4 md:px-10 md:py-5 rounded-2xl font-semibold text-lg md:text-xl 
                          transition-all duration-500 ease-in-out transform hover:scale-105 
-                         shadow-2xl hover:shadow-gray-400/40 dark:hover:shadow-gray-800/60 
+                         shadow-2xl hover:shadow-gray-400/40 dark:hover:shadow-gray-600/60 
                          relative overflow-hidden"
             >
               Get Started Free
@@ -579,41 +669,35 @@ export default function LandingPage() {
         className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-gray-900 relative overflow-hidden transition-colors duration-500"
       >
         <div className="container mx-auto max-w-6xl">
-          {/* Section Heading */}
           <div className="text-center mb-16 md:mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Powerful <span className="text-black dark:text-gray-100">Features</span>
+              Powerful <span className="text-gray-900 dark:text-white">Features</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Everything you need to manage student portfolios efficiently
             </p>
           </div>
 
-          {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
                 title: "Unified Dashboard",
-                description:
-                  "A centralized control panel to manage portfolio activities, student data, and insights — all from one place.",
+                description: "A centralized control panel to manage portfolio activities, student data, and insights — all from one place.",
                 icon: "📊",
               },
               {
                 title: "Theme Management",
-                description:
-                  "Easily switch between light and dark themes, or customize the interface according to your institution's style.",
+                description: "Easily switch between light and dark themes, or customize the interface according to your institution's style.",
                 icon: "🎨",
               },
               {
                 title: "Data Tools",
-                description:
-                  "Powerful import/export options, bulk management, and detailed analytics to simplify workflows.",
+                description: "Powerful import/export options, bulk management, and detailed analytics to simplify workflows.",
                 icon: "📈",
               },
               {
                 title: "Multi-College Support",
-                description:
-                  "Designed to handle multiple institutions with independent workspaces and role-based access.",
+                description: "Designed to handle multiple institutions with independent workspaces and role-based access.",
                 icon: "🏫",
               },
             ].map((feature, index) => (
@@ -626,7 +710,7 @@ export default function LandingPage() {
               >
                 <div className="relative z-10">
                   <div
-                    className="w-14 h-14 bg-black dark:bg-white text-white dark:text-black 
+                    className="w-14 h-14 bg-gray-900 dark:bg-white text-white dark:text-gray-900 
                                rounded-2xl flex items-center justify-center mb-6 text-2xl"
                   >
                     {feature.icon}
@@ -638,9 +722,7 @@ export default function LandingPage() {
                     {feature.description}
                   </p>
                 </div>
-
-                {/* Hover Background */}
-                <div className="absolute inset-0 bg-black/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gray-900/5 dark:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
             ))}
           </div>
@@ -650,10 +732,9 @@ export default function LandingPage() {
       {/* Enhanced Theme Preview Section */}
       <section
         id="themes"
-        className="py-20 md:py-28 px-4 sm:px-6 bg-gray-50 dark:bg-gray-800/50 relative overflow-hidden"
+        className="py-20 md:py-28 px-4 sm:px-6 bg-gray-50 dark:bg-gray-900 relative overflow-hidden"
       >
         <div className="container mx-auto max-w-6xl">
-          {/* Header */}
           <div className="text-center mb-16 md:mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Beautiful Portfolio Themes
@@ -665,32 +746,34 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Theme Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {themes.length > 0 ? (
               themes.map((theme) => (
                 <div
                   key={theme.id}
                   ref={el => addToRefs(el, themeCardsRef)}
-                  className="group bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
+                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
                 >
-                  {/* Image Section */}
                   <div className="h-48 relative overflow-hidden">
                     <Image
-    src={theme.image}
-    alt={theme.name}
-    fill
-    className="object-cover group-hover:scale-110 transition-transform duration-700"
-  />
+                      src={theme.image}
+                      alt={theme.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-500"></div>
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 flex gap-2">
                       <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
                         Portfolio Theme
+                      </span>
+                      <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                        theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                      }`}>
+                        {theme.type === 'free' ? 'Free' : 'Paid'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="p-6 md:p-8">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                       {theme.name}
@@ -699,53 +782,64 @@ export default function LandingPage() {
                       {theme.description}
                     </p>
 
-                    {/* Action Buttons */}
                     <div className="flex gap-3">
                       <button
                         onClick={() => handlePreviewClick(theme.id)}
-                        className="flex-1 bg-black dark:bg-white text-white dark:text-black py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
+                        className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
                       >
                         Preview
                       </button>
                       <button
                         onClick={() => handleBuyNowClick(theme)}
-                        className="flex-1 border border-black dark:border-white text-black dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
+                        className="flex-1 border border-gray-900 dark:border-white text-gray-900 dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900"
                       >
-                        Buy Now
+                        {theme.type === 'free' ? 'Get Free' : 'Buy Now'}
                       </button>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              // Fallback demo themes when no themes are uploaded
               [
                 {
                   id: 'demo-1',
                   name: "Modern Professional",
                   description: "Clean, corporate design perfect for business and engineering portfolios.",
                   image: "/port1.jpg",
+                  type: 'free' as const,
                 },
                 {
                   id: 'demo-2',
                   name: "Creative Arts",
                   description: "Vibrant and expressive layout for art, design, and media students.",
                   image: "/port2.jpg",
+                  type: 'paid' as const,
                 },
                 {
                   id: 'demo-3',
                   name: "Academic Classic",
                   description: "Traditional layout with modern elements for research and academic portfolios.",
                   image: "/port3.jpg",
+                  type: 'free' as const,
                 },
               ].map((theme) => (
                 <div
                   key={theme.id}
-                  className="group bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 opacity-60"
+                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 opacity-60"
                 >
                   <div className="h-48 relative overflow-hidden bg-gray-200 dark:bg-gray-700">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-gray-500 dark:text-gray-400">No Preview Available</span>
+                    </div>
+                    <div className="absolute top-4 left-4 flex gap-2">
+                      <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
+                        Portfolio Theme
+                      </span>
+                      <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                        theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                      }`}>
+                        {theme.type === 'free' ? 'Free' : 'Paid'}
+                      </span>
                     </div>
                   </div>
                   <div className="p-6 md:p-8">
@@ -774,7 +868,6 @@ export default function LandingPage() {
         ref={aboutRef}
         className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-gray-900 relative overflow-hidden transition-colors duration-500"
       >
-        {/* Wave Divider */}
         <div className="absolute top-0 left-0 right-0 transform -translate-y-1">
           <svg viewBox="0 0 1440 120" className="w-full h-12 md:h-16">
             <path
@@ -787,7 +880,7 @@ export default function LandingPage() {
 
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8">
-            About The <span className="text-black dark:text-white">System</span>
+            About The <span className="text-gray-900 dark:text-white">System</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto">
             College Portfolio Handler System centralizes digital portfolios for institutions, 
@@ -803,11 +896,11 @@ export default function LandingPage() {
             ].map((stat) => (
               <div key={stat.label} className="group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 bg-black dark:bg-white rounded-2xl 
+                  className="w-20 h-20 md:w-24 md:h-24 bg-gray-900 dark:bg-white rounded-2xl 
                              flex items-center justify-center mx-auto mb-3 transition-all duration-500 
                              ease-in-out transform group-hover:scale-110"
                 >
-                  <span className="text-white dark:text-black text-xl md:text-2xl font-bold">
+                  <span className="text-white dark:text-gray-900 text-xl md:text-2xl font-bold">
                     {stat.number}
                   </span>
                 </div>
@@ -829,7 +922,7 @@ export default function LandingPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 md:mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Get In <span className="text-black dark:text-white">Touch</span>
+              Get In <span className="text-gray-900 dark:text-white">Touch</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Have questions? We would love to hear from you. Send us a message and we will respond as soon as possible.
@@ -837,7 +930,6 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
-            {/* Contact Information */}
             <div className="space-y-8">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -852,8 +944,8 @@ export default function LandingPage() {
               <div className="space-y-6">
                 {[
                   {
-                    iconBg: "bg-black dark:bg-white",
-                    iconColor: "text-white dark:text-black",
+                    iconBg: "bg-gray-900 dark:bg-white",
+                    iconColor: "text-white dark:text-gray-900",
                     label: "Phone",
                     value: "+92 319 3236529",
                     svg: (
@@ -861,8 +953,8 @@ export default function LandingPage() {
                     )
                   },
                   {
-                    iconBg: "bg-black dark:bg-white",
-                    iconColor: "text-white dark:text-black",
+                    iconBg: "bg-gray-900 dark:bg-white",
+                    iconColor: "text-white dark:text-gray-900",
                     label: "Email",
                     value: "support@portfoliohandler.com",
                     svg: (
@@ -870,8 +962,8 @@ export default function LandingPage() {
                     )
                   },
                   {
-                    iconBg: "bg-black dark:bg-white",
-                    iconColor: "text-white dark:text-black",
+                    iconBg: "bg-gray-900 dark:bg-white",
+                    iconColor: "text-white dark:text-gray-900",
                     label: "Website",
                     value: "https://nesticktech.com",
                     svg: (
@@ -880,8 +972,8 @@ export default function LandingPage() {
                     href: "https://nesticktech.com"
                   },
                   {
-                    iconBg: "bg-black dark:bg-white",
-                    iconColor: "text-white dark:text-black",
+                    iconBg: "bg-gray-900 dark:bg-white",
+                    iconColor: "text-white dark:text-gray-900",
                     label: "Office Hours",
                     value: "Mon - Fri | 9:00 AM - 6:00 PM",
                     svg: (
@@ -913,14 +1005,12 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="bg-black dark:bg-white rounded-2xl shadow-xl p-8 transition-colors duration-500">
+            <div className="bg-gray-900 dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-500">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Name Field */}
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-900 mb-2"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Full Name *
                   </label>
@@ -932,15 +1022,14 @@ export default function LandingPage() {
                     onChange={handleInputChange}
                     required
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
+                    className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
                   />
                 </div>
 
-                {/* Email Field */}
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-900 mb-2"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Email Address *
                   </label>
@@ -952,15 +1041,14 @@ export default function LandingPage() {
                     onChange={handleInputChange}
                     required
                     placeholder="Enter your email address"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
+                    className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
                   />
                 </div>
 
-                {/* Subject Field */}
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <label
                     htmlFor="subject"
-                    className="block text-sm font-medium text-gray-900 mb-2"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Subject *
                   </label>
@@ -970,7 +1058,7 @@ export default function LandingPage() {
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
+                    className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
                   >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
@@ -981,11 +1069,10 @@ export default function LandingPage() {
                   </select>
                 </div>
 
-                {/* Message Field */}
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-gray-900 mb-2"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Message *
                   </label>
@@ -997,21 +1084,20 @@ export default function LandingPage() {
                     required
                     rows={5}
                     placeholder="Tell us about your inquiry..."
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 resize-none"
+                    className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300 resize-none"
                   />
                 </div>
 
-                {/* Submit Button */}
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-500 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full bg-white text-gray-900 py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-500 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
                         <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white dark:text-gray-900"
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-900"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -1038,18 +1124,17 @@ export default function LandingPage() {
                   </button>
                 </div>
 
-                {/* Status Messages */}
                 {submitStatus === 'success' && (
-                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
-                    <p className="text-green-800 dark:text-green-200 text-center">
+                  <div className="p-4 bg-green-900/20 border border-green-800 rounded-xl">
+                    <p className="text-green-200 text-center">
                       ✅ Thank you for your message! We will get back to you soon.
                     </p>
                   </div>
                 )}
 
                 {submitStatus === 'error' && (
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                    <p className="text-red-800 dark:text-red-200 text-center">
+                  <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
+                    <p className="text-red-200 text-center">
                       ❌ There was an error sending your message. Please try again.
                     </p>
                   </div>
@@ -1062,17 +1147,13 @@ export default function LandingPage() {
 
       {/* Enhanced Footer */}
       <footer className="bg-gray-900 text-white py-16 px-4 sm:px-6 relative overflow-hidden">
-        {/* Soft background glow */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-0 w-32 h-32 bg-gray-700 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-gray-600 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto max-w-6xl relative z-10">
-          {/* Grid layout */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
-            
-            {/* Brand Section */}
             <div className="col-span-2 md:col-span-1 lg:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center">
@@ -1087,7 +1168,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h3 className="text-lg font-semibold mb-6 text-white">Quick Links</h3>
               <div className="space-y-4">
@@ -1103,7 +1183,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Contact Section */}
             <div>
               <h3 className="text-lg font-semibold mb-6 text-white">Contact</h3>
               <div className="space-y-3 text-gray-400">
@@ -1114,13 +1193,11 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Footer Bottom */}
           <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
             <div className="text-gray-400 text-center md:text-left">
               © 2025 College Portfolio Handler System. All rights reserved.
             </div>
 
-            {/* Social Links */}
             <div className="flex space-x-4">
               {[
                 { href: "https://x.com/nesticktech", label: "X" },
@@ -1146,21 +1223,19 @@ export default function LandingPage() {
       {/* Buy Now Modal */}
       {isBuyNowModalOpen && selectedTheme && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
-            {/* Header */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Purchase {selectedTheme.name}
+                {selectedTheme.name} – Submit Request
               </h3>
               <button
                 onClick={() => setIsBuyNowModalOpen(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
               >
                 <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleBuyNowSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1171,10 +1246,16 @@ export default function LandingPage() {
                   name="name"
                   value={buyNowFormData.name}
                   onChange={handleBuyNowInputChange}
+                  onBlur={handleInputBlur}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white transition-all"
+                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
+                    formErrors.name && touchedFields.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   placeholder="Enter your full name"
                 />
+                {formErrors.name && touchedFields.name && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                )}
               </div>
 
               <div>
@@ -1186,10 +1267,16 @@ export default function LandingPage() {
                   name="collegeName"
                   value={buyNowFormData.collegeName}
                   onChange={handleBuyNowInputChange}
+                  onBlur={handleInputBlur}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white transition-all"
+                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
+                    formErrors.collegeName && touchedFields.collegeName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   placeholder="Enter your college name"
                 />
+                {formErrors.collegeName && touchedFields.collegeName && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.collegeName}</p>
+                )}
               </div>
 
               <div>
@@ -1201,10 +1288,16 @@ export default function LandingPage() {
                   name="email"
                   value={buyNowFormData.email}
                   onChange={handleBuyNowInputChange}
+                  onBlur={handleInputBlur}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white transition-all"
+                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
+                    formErrors.email && touchedFields.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   placeholder="Enter your email"
                 />
+                {formErrors.email && touchedFields.email && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                )}
               </div>
 
               <div>
@@ -1216,32 +1309,40 @@ export default function LandingPage() {
                   name="whatsapp"
                   value={buyNowFormData.whatsapp}
                   onChange={handleBuyNowInputChange}
+                  onBlur={handleInputBlur}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white transition-all"
+                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
+                    formErrors.whatsapp && touchedFields.whatsapp ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}
                   placeholder="Enter your WhatsApp number"
                 />
+                {formErrors.whatsapp && touchedFields.whatsapp && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.whatsapp}</p>
+                )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select Plan *
-                </label>
-                <select
-                  name="selectedPlan"
-                  value={buyNowFormData.selectedPlan}
-                  onChange={handleBuyNowInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-black dark:focus:border-white transition-all"
-                >
-                  <option value="basic">Basic Plan - $49</option>
-                  <option value="professional">Professional Plan - $99</option>
-                  <option value="enterprise">Enterprise Plan - $199</option>
-                </select>
-              </div>
+              {selectedTheme.type === 'paid' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Select Plan *
+                  </label>
+                  <select
+                    name="selectedPlan"
+                    value={buyNowFormData.selectedPlan}
+                    onChange={handleBuyNowInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all"
+                  >
+                    <option value="basic">Basic Plan - $49</option>
+                    <option value="professional">Professional Plan - $99</option>
+                    <option value="enterprise">Enterprise Plan - $199</option>
+                  </select>
+                </div>
+              )}
 
               <button
                 type="submit"
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 mt-4"
+                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 mt-4"
               >
                 Submit Request
               </button>
@@ -1253,7 +1354,7 @@ export default function LandingPage() {
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1269,7 +1370,7 @@ export default function LandingPage() {
                 Our team will contact you shortly.
               </p>
 
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
                 <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                   <strong>Website:</strong> https://nesticktech.com
                 </p>
@@ -1280,7 +1381,7 @@ export default function LandingPage() {
 
               <button
                 onClick={() => setShowSuccessPopup(false)}
-                className="w-full bg-black dark:bg-white text-white dark:text-black py-3 px-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 Close
               </button>

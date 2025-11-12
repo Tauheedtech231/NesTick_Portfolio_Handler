@@ -2,16 +2,17 @@
 'use client';
 import { College } from '@/app/types';
 import { motion } from 'framer-motion';
-import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Calendar } from 'lucide-react';
+import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Calendar, DollarSign, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { EditCollegeModal } from './edit-college-modal';
 import Image from 'next/image';
+/* eslint-disable */
 
 interface CollegeTableProps {
   colleges: College[];
   onEdit: (id: string, collegeData: Partial<College>) => void;
   onDelete: (id: string) => void;
-  onAddCollege: (college: College) => void; // New prop to add approved colleges
+  onAddCollege: (college: College) => void;
 }
 
 interface RequestedCollege {
@@ -24,6 +25,7 @@ interface RequestedCollege {
   themeName: string;
   submittedAt: string;
   status: 'pending' | 'approved' | 'rejected';
+  themeType?: 'free' | 'paid'; // Add themeType to track free/paid
 }
 
 type CollegePlan = 'basic' | 'professional' | 'enterprise';
@@ -32,23 +34,45 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
   const [requestedColleges, setRequestedColleges] = useState<RequestedCollege[]>([]);
   const [activeTab, setActiveTab] = useState<'colleges' | 'requests'>('colleges');
+  const [availableThemes, setAvailableThemes] = useState<any[]>([]);
 
   const handleStatusToggle = (id: string, currentStatus: 'active' | 'inactive') => {
     onEdit(id, { status: currentStatus === 'active' ? 'inactive' : 'active' });
   };
 
-  // Load requested colleges from localStorage
+  // Load available themes from localStorage to get theme types
+  useEffect(() => {
+    const loadThemes = () => {
+      try {
+        const storedThemes = localStorage.getItem('themes');
+        if (storedThemes) {
+          setAvailableThemes(JSON.parse(storedThemes));
+        }
+      } catch (error) {
+        console.error('Error loading themes:', error);
+      }
+    };
+
+    loadThemes();
+  }, []);
+
+  // Load requested colleges from localStorage and enhance with theme type
   useEffect(() => {
     const loadRequestedColleges = () => {
       try {
         const stored = localStorage.getItem('requested_college');
         if (stored) {
           const requests = JSON.parse(stored);
-          const requestsWithStatus = requests.map((req: RequestedCollege) => ({
-            ...req,
-            status: req.status || 'pending'
-          }));
-          setRequestedColleges(requestsWithStatus);
+          const enhancedRequests = requests.map((req: RequestedCollege) => {
+            // Find the theme in available themes to get its type
+            const theme = availableThemes.find(t => t.name === req.themeName);
+            return {
+              ...req,
+              themeType: theme?.type || 'paid', // Default to paid if not found
+              status: req.status || 'pending'
+            };
+          });
+          setRequestedColleges(enhancedRequests);
         }
       } catch (error) {
         console.error('Error loading requested colleges:', error);
@@ -63,7 +87,7 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [availableThemes]);
 
   // Update localStorage when requested colleges change
   useEffect(() => {
@@ -80,38 +104,33 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
   };
 
   const handleApproveRequest = (request: RequestedCollege) => {
-    // Check for duplicate college name
     if (isDuplicateCollege(request.collegeName)) {
       alert(`College "${request.collegeName}" is already in the approved list.`);
       return;
     }
 
-    // Create a new college object from the request
-    const newCollege: College = {
-      id: `college-${Date.now()}`, // Generate a unique ID
-      name: request.collegeName,
-      logo: '', // You might want to add a default logo or handle this differently
-      representativeName: request.name,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      // Add any other required fields from your College type
-      email: request.email,
-      phone: request.whatsapp,
-      plan: request.selectedPlan as CollegePlan, // Use type assertion with defined type
-      theme: request.themeName,
-    };
+    const newCollege = {
+  id: `college-${Date.now()}`,
+  name: request.collegeName,
+  logo: '',
+  representativeName: request.name,
+  status: 'active',
+  createdAt: new Date().toISOString(),
+  email: request.email,
+  phone: request.whatsapp,
+  plan: request.selectedPlan as CollegePlan,
+  theme: request.themeName,
+  themeType: request.themeType || 'paid', // extra property
+} as unknown as College;
 
-    // Add the new college to approved colleges
     onAddCollege(newCollege);
 
-    // Update the request status to approved but KEEP it in the requests list
     setRequestedColleges(prev => 
       prev.map(req => 
         req.id === request.id ? { ...req, status: 'approved' } : req
       )
     );
 
-    // Optional: Show success message or notification
     console.log('College approved and added to approved colleges:', newCollege);
   };
 
@@ -157,7 +176,32 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
     );
   };
 
-  // Filter requests to show in the table (you can adjust this if needed)
+  const getThemeTypeBadge = (themeType: 'free' | 'paid' = 'paid') => {
+    const typeConfig = {
+      free: { 
+        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+        icon: Tag,
+        label: 'Free'
+      },
+      paid: { 
+        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+        icon: DollarSign,
+        label: 'Paid'
+      }
+    };
+
+    const config = typeConfig[themeType];
+    const Icon = config.icon;
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        <Icon size={12} className="mr-1" />
+        {config.label}
+      </span>
+    );
+  };
+
+  // Filter requests to show in the table
   const displayedRequests = requestedColleges;
 
   return (
@@ -194,7 +238,7 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
             <table className="w-full">
               <thead className="bg-gray-100 dark:bg-gray-800">
                 <tr>
-                  {['College', 'Representative', 'Status', 'Created', 'Actions'].map((header) => (
+                  {['College', 'Representative', 'Status', 'Theme Type', 'Created', 'Actions'].map((header) => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
@@ -252,6 +296,11 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                         {college.status}
                       </button>
                     </td>
+
+                    <td className="px-6 py-4">
+  {getThemeTypeBadge((college as any).themeType as 'free' | 'paid')}
+</td>
+
 
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {new Date(college.createdAt ?? '').toLocaleDateString()}
@@ -311,15 +360,19 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                 </div>
 
                 <div className="flex justify-between text-sm mb-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                      college.status === 'active'
-                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
-                    }`}
-                  >
-                    {college.status}
-                  </span>
+                  <div className="flex space-x-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        college.status === 'active'
+                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-700'
+                      }`}
+                    >
+                      {college.status}
+                    </span>
+                    
+                    {getThemeTypeBadge((college as any).themeType as 'free' | 'paid')}
+                  </div>
                   <span className="text-gray-600 dark:text-gray-400">
                     {new Date(college.createdAt ?? '').toLocaleDateString()}
                   </span>
@@ -353,7 +406,7 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
             <table className="w-full">
               <thead className="bg-gray-100 dark:bg-gray-800">
                 <tr>
-                  {['Requester', 'College', 'Contact', 'Plan', 'Theme', 'Submitted', 'Status', 'Actions'].map((header) => (
+                  {['Requester', 'College', 'Contact', 'Plan', 'Theme', 'Type', 'Submitted', 'Status', 'Actions'].map((header) => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
@@ -421,6 +474,10 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
 
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                       {request.themeName}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {getThemeTypeBadge(request.themeType)}
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -520,9 +577,10 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                     {request.whatsapp}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <div className="flex space-x-2">
                       {getPlanBadge(request.selectedPlan)}
-                    </span>
+                      {getThemeTypeBadge(request.themeType)}
+                    </div>
                     <span className="text-gray-500 dark:text-gray-400 text-xs">
                       <Calendar size={10} className="inline mr-1" />
                       {new Date(request.submittedAt).toLocaleDateString()}

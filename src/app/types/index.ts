@@ -1,11 +1,13 @@
 // types/theme.ts
+// app/types.ts
 export interface Theme {
   id: string;
   name: string;
   description: string;
   image: string; // base64 string
-  zipFile: string;
+  zipFile: string; // file name
   liveUrl?: string;
+  type: 'free' | 'paid'; // Add this
   createdAt: string;
 }
 
@@ -15,6 +17,7 @@ export interface ThemeFormData {
   image: File | null;
   zipFile: File | null;
   liveUrl: string;
+  type: 'free' | 'paid'; // Add this
 }
 export interface College {
   id: string;

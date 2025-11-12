@@ -1,6 +1,8 @@
+// app/dashboard/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { CollegeData, SectionType } from '@/app/lib/gsap';
 import { PortalLayout } from '@/app/components/layout/PortalLayout';
@@ -42,7 +44,6 @@ export interface College {
     courses: boolean;
     contact: boolean;
   };
-  // Add other college properties that might exist in CollegeData
   about?: any;
   faculty?: any;
   events?: any;
@@ -51,6 +52,68 @@ export interface College {
   courses?: any;
   contact?: any;
 }
+
+interface AuthCollege {
+  email: string;
+  name: string;
+  collegeId: string;
+  token: string;
+  timestamp: number;
+}
+
+// Add authentication check component
+const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const authCollege = localStorage.getItem('auth_college');
+      
+      if (!authCollege) {
+        setIsAuthenticated(false);
+        router.push('/College_Portfolio_Handler/login');
+        return;
+      }
+
+      try {
+        const authData: AuthCollege = JSON.parse(authCollege);
+        // Optional: Check if token is still valid (e.g., not expired)
+        const isExpired = Date.now() - authData.timestamp > 24 * 60 * 60 * 1000; // 24 hours
+        if (isExpired) {
+          localStorage.removeItem('auth_college');
+          setIsAuthenticated(false);
+          router.push('/College_Portfolio_Handler/login');
+        } else {
+          setIsAuthenticated(true);
+        }
+      } catch {
+        localStorage.removeItem('auth_college');
+        setIsAuthenticated(false);
+        router.push('/College_Portfolio_Handler/login');
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect in useEffect
+  }
+
+  return <>{children}</>;
+};
 
 /* Announcements Section */
 const AnnouncementsSection: React.FC<{ announcements: Announcement[] }> = ({ announcements }) => (
@@ -236,7 +299,7 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
   ),
 };
 
-export default function DashboardPage({ initialData }: DashboardProps) {
+function DashboardContent({ initialData }: DashboardProps) {
   const [activeSection, setActiveSection] = useState<SectionType>('dashboard');
   const [collegeData, setCollegeData] = useState<CollegeData>(initialData);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -291,31 +354,19 @@ export default function DashboardPage({ initialData }: DashboardProps) {
       if (section === 'about') updated.college = { ...updated.college, ...data };
       else (updated as any)[section] = data;
 
-      // Ensure we have the required properties for College type
-persistCollegeToLocal({
-  id: updated.college.id,
-  name: updated.college.name,
-  status: (updated.college as any).status,
-  modules: { ...updated.college as any  }.modules,
-});
+      persistCollegeToLocal({
+        id: updated.college.id,
+        name: updated.college.name,
+        status: (updated.college as any).status,
+        modules: { ...updated.college as any  }.modules,
+      });
 
       return updated;
     });
   };
 
-  // Add safe access to college properties with fallbacks
-const collegeStatus = (collegeData.college as any)?.status || 'active';
-
+  const collegeStatus = (collegeData.college as any)?.status || 'active';
   const collegeName = collegeData.college?.name || 'College Portal';
-  const collegeModules = (collegeData.college as any)?.modules || {
-    about: true,
-    faculty: true,
-    events: true,
-    gallery: true,
-    achievements: true,
-    courses: true,
-    contact: true,
-  };
 
   // Portal locked view
   if (collegeStatus === 'inactive') {
@@ -377,5 +428,13 @@ const collegeStatus = (collegeData.college as any)?.status || 'active';
 
       <PreviewPane isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} data={collegeData} />
     </PortalLayout>
+  );
+}
+
+export default function DashboardPage({ initialData }: DashboardProps) {
+  return (
+    <AuthChecker>
+      <DashboardContent initialData={initialData} />
+    </AuthChecker>
   );
 }

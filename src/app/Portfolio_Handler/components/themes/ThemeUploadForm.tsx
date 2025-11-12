@@ -15,6 +15,7 @@ export default function ThemeUploadForm() {
     image: null,
     zipFile: null,
     liveUrl: '',
+    type: 'free', // Add type field with default value
   });
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +23,7 @@ export default function ThemeUploadForm() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -77,6 +78,7 @@ export default function ThemeUploadForm() {
         image: imageBase64,
         zipFile: formData.zipFile.name,
         liveUrl: formData.liveUrl || undefined,
+        type: formData.type, // Include the type
         createdAt: new Date().toISOString(),
       };
 
@@ -88,6 +90,7 @@ export default function ThemeUploadForm() {
         image: null,
         zipFile: null,
         liveUrl: '',
+        type: 'free', // Reset to default
       });
       setImagePreview('');
       setShowSuccess(true);
@@ -157,6 +160,37 @@ export default function ThemeUploadForm() {
             className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 text-sm text-black dark:text-white"
             required
           />
+        </div>
+
+        {/* Add Theme Type Selection */}
+        <div>
+          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Theme Type *
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="type"
+                value="free"
+                checked={formData.type === 'free'}
+                onChange={handleInputChange}
+                className="mr-2 text-black dark:text-white focus:ring-black dark:focus:ring-white"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">Free</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="type"
+                value="paid"
+                checked={formData.type === 'paid'}
+                onChange={handleInputChange}
+                className="mr-2 text-black dark:text-white focus:ring-black dark:focus:ring-white"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">Paid</span>
+            </label>
+          </div>
         </div>
 
         <div>
