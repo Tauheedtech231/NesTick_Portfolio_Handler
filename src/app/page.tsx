@@ -105,7 +105,7 @@ export default function LandingPage() {
         if (!validateEmail(value)) return 'Please enter a valid email';
         return '';
       case 'whatsapp':
-        if (!value.trim()) return 'WhatsApp number is required';
+        if (!value.trim()) return ' number is required';
         if (!validatePhone(value)) return 'Please enter a valid phone number';
         return '';
       case 'name':
@@ -1302,7 +1302,7 @@ export default function LandingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  WhatsApp Number *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"

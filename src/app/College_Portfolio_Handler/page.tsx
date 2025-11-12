@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import  Dashboard  from '../components/Dashboard';
 import { CollegeData } from '../lib/gsap';
-
+// 123xyzABC
 interface RawData {
   college: {
     id: string;

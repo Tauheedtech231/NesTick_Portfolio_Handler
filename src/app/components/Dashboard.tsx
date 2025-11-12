@@ -305,13 +305,17 @@ function DashboardContent({ initialData }: DashboardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     gsap.fromTo('.section-content', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
   }, [activeSection]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
 
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
@@ -334,6 +338,11 @@ function DashboardContent({ initialData }: DashboardProps) {
     const filtered = annArr.filter((a) => a.targetCollege === 'all' || a.targetCollege === CURRENT_COLLEGE_ID);
     filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setAnnouncements(filtered);
+
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
   }, []);
 
   const persistCollegeToLocal = (updatedCollege: College) => {
@@ -364,6 +373,18 @@ function DashboardContent({ initialData }: DashboardProps) {
       return updated;
     });
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const collegeStatus = (collegeData.college as any)?.status || 'active';
   const collegeName = collegeData.college?.name || 'College Portal';
