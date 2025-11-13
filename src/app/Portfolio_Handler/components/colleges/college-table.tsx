@@ -2,7 +2,7 @@
 'use client';
 import { College } from '@/app/types';
 import { motion } from 'framer-motion';
-import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Calendar, DollarSign, Tag } from 'lucide-react';
+import { Edit2, Trash2, Eye, EyeOff, Check, X, User, Building, Mail, Phone, Calendar, DollarSign, Tag, Key } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { EditCollegeModal } from './edit-college-modal';
 import Image from 'next/image';
@@ -25,7 +25,7 @@ interface RequestedCollege {
   themeName: string;
   submittedAt: string;
   status: 'pending' | 'approved' | 'rejected';
-  themeType?: 'free' | 'paid'; // Add themeType to track free/paid
+  themeType?: 'free' | 'paid';
 }
 
 type CollegePlan = 'basic' | 'professional' | 'enterprise';
@@ -35,12 +35,109 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
   const [requestedColleges, setRequestedColleges] = useState<RequestedCollege[]>([]);
   const [activeTab, setActiveTab] = useState<'colleges' | 'requests'>('colleges');
   const [availableThemes, setAvailableThemes] = useState<any[]>([]);
+  const [isSendingEmail, setIsSendingEmail] = useState<string | null>(null);
 
   const handleStatusToggle = (id: string, currentStatus: 'active' | 'inactive') => {
     onEdit(id, { status: currentStatus === 'active' ? 'inactive' : 'active' });
   };
 
-  // Load available themes from localStorage to get theme types
+  // Generate random password
+  const generatePassword = (): string => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  };
+
+  // Send email with credentials
+  const sendCredentialsEmail = async (email: string, password: string, collegeName: string, adminName: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/send-credentials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: email,
+          collegeName,
+          adminName,
+          email,
+          password
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error sending credentials email:', error);
+      return false;
+    }
+  };
+
+  // Save college admin to localStorage
+// Save college admin to localStorage
+const saveCollegeAdmin = (email: string, password: string, collegeName: string, adminName: string, collegeId: string) => {
+  try {
+    // Safely get and parse existing admins
+    const existingAdminsStr = localStorage.getItem('college_admin');
+    let existingAdmins: any[] = [];
+    
+    if (existingAdminsStr) {
+      try {
+        const parsed = JSON.parse(existingAdminsStr);
+        // Ensure it's an array
+        if (Array.isArray(parsed)) {
+          existingAdmins = parsed;
+        } else {
+          console.warn('college_admin data is not an array, resetting to empty array');
+          existingAdmins = [];
+        }
+      } catch (parseError) {
+        console.error('Error parsing college_admin data:', parseError);
+        existingAdmins = [];
+      }
+    }
+
+    const newAdmin = {
+      email,
+      password,
+      collegeName,
+      adminName,
+      collegeId,
+      createdAt: new Date().toISOString()
+    };
+
+    // Check if admin already exists
+    const existingIndex = existingAdmins.findIndex((admin: any) => admin.email === email);
+    if (existingIndex >= 0) {
+      existingAdmins[existingIndex] = newAdmin;
+    } else {
+      existingAdmins.push(newAdmin);
+    }
+
+    localStorage.setItem('college_admin', JSON.stringify(existingAdmins));
+    console.log('College admin saved to localStorage:', newAdmin);
+  } catch (error) {
+    console.error('Error saving college admin to localStorage:', error);
+    // Initialize with empty array if there's an error
+    localStorage.setItem('college_admin', JSON.stringify([{
+      email,
+      password,
+      collegeName,
+      adminName,
+      collegeId,
+      createdAt: new Date().toISOString()
+    }]));
+  }
+};
+
+  // Load available themes from localStorage
   useEffect(() => {
     const loadThemes = () => {
       try {
@@ -56,7 +153,7 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
     loadThemes();
   }, []);
 
-  // Load requested colleges from localStorage and enhance with theme type
+  // Load requested colleges from localStorage
   useEffect(() => {
     const loadRequestedColleges = () => {
       try {
@@ -64,11 +161,10 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
         if (stored) {
           const requests = JSON.parse(stored);
           const enhancedRequests = requests.map((req: RequestedCollege) => {
-            // Find the theme in available themes to get its type
             const theme = availableThemes.find(t => t.name === req.themeName);
             return {
               ...req,
-              themeType: theme?.type || 'paid', // Default to paid if not found
+              themeType: theme?.type || 'paid',
               status: req.status || 'pending'
             };
           });
@@ -96,42 +192,77 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
     }
   }, [requestedColleges]);
 
-  // Check if college name already exists in approved colleges
+  // Check if college name already exists
   const isDuplicateCollege = (collegeName: string): boolean => {
     return colleges.some(college => 
       college.name.toLowerCase() === collegeName.toLowerCase()
     );
   };
 
-  const handleApproveRequest = (request: RequestedCollege) => {
+  const handleApproveRequest = async (request: RequestedCollege) => {
     if (isDuplicateCollege(request.collegeName)) {
       alert(`College "${request.collegeName}" is already in the approved list.`);
       return;
     }
 
-    const newCollege = {
-  id: `college-${Date.now()}`,
-  name: request.collegeName,
-  logo: '',
-  representativeName: request.name,
-  status: 'active',
-  createdAt: new Date().toISOString(),
-  email: request.email,
-  phone: request.whatsapp,
-  plan: request.selectedPlan as CollegePlan,
-  theme: request.themeName,
-  themeType: request.themeType || 'paid', // extra property
-} as unknown as College;
+    setIsSendingEmail(request.id);
 
-    onAddCollege(newCollege);
+    try {
+      // Generate password
+      const generatedPassword = generatePassword();
 
-    setRequestedColleges(prev => 
-      prev.map(req => 
-        req.id === request.id ? { ...req, status: 'approved' } : req
-      )
-    );
+      // Create new college
+      const newCollege = {
+        id: `college-${Date.now()}`,
+        name: request.collegeName,
+        logo: '',
+        representativeName: request.name,
+        status: 'active' as const,
+        createdAt: new Date().toISOString(),
+        email: request.email,
+        phone: request.whatsapp,
+        plan: request.selectedPlan as CollegePlan,
+        theme: request.themeName,
+        themeType: request.themeType || 'paid',
+      } as unknown as College;
 
-    console.log('College approved and added to approved colleges:', newCollege);
+      // Save college admin credentials
+      saveCollegeAdmin(request.email, generatedPassword, request.collegeName, request.name, newCollege.id);
+
+      // Send email with credentials
+      const emailSent = await sendCredentialsEmail(
+        request.email, 
+        generatedPassword, 
+        request.collegeName, 
+        request.name
+      );
+
+      if (!emailSent) {
+        console.warn('Failed to send credentials email, but college was still approved');
+      }
+
+      // Add college to approved list
+      onAddCollege(newCollege);
+
+      // Update request status
+      setRequestedColleges(prev => 
+        prev.map(req => 
+          req.id === request.id ? { ...req, status: 'approved' } : req
+        )
+      );
+
+      console.log('College approved and credentials sent:', {
+        college: newCollege,
+        email: request.email,
+        password: generatedPassword
+      });
+
+    } catch (error) {
+      console.error('Error approving college:', error);
+      alert('Error approving college. Please try again.');
+    } finally {
+      setIsSendingEmail(null);
+    }
   };
 
   const handleRejectRequest = (id: string) => {
@@ -201,7 +332,6 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
     );
   };
 
-  // Filter requests to show in the table
   const displayedRequests = requestedColleges;
 
   return (
@@ -298,9 +428,8 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                     </td>
 
                     <td className="px-6 py-4">
-  {getThemeTypeBadge((college as any).themeType as 'free' | 'paid')}
-</td>
-
+                      {getThemeTypeBadge((college as any).themeType as 'free' | 'paid')}
+                    </td>
 
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {new Date(college.createdAt ?? '').toLocaleDateString()}
@@ -496,16 +625,27 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                         <>
                           <button
                             onClick={() => handleApproveRequest(request)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm"
+                            disabled={isSendingEmail === request.id}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Approve Request"
                           >
-                            <Check size={14} />
-                            <span>Approve</span>
+                            {isSendingEmail === request.id ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                                <span>Sending...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Check size={14} />
+                                <span>Approve</span>
+                              </>
+                            )}
                           </button>
 
                           <button
                             onClick={() => handleRejectRequest(request.id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm"
+                            disabled={isSendingEmail === request.id}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm disabled:opacity-50"
                             title="Reject Request"
                           >
                             <X size={14} />
@@ -515,14 +655,16 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                       )}
 
                       {request.status === 'approved' && (
-                        <span className="text-xs text-green-600 dark:text-green-400 px-2">
-                          Added to Colleges
+                        <span className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 rounded-lg text-xs">
+                          <Key size={12} />
+                          Credentials Sent
                         </span>
                       )}
 
                       <button
                         onClick={() => handleDeleteRequest(request.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm"
+                        disabled={isSendingEmail === request.id}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm disabled:opacity-50"
                         title="Delete Request"
                       >
                         <Trash2 size={14} />
@@ -598,14 +740,20 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                       <>
                         <button
                           onClick={() => handleApproveRequest(request)}
-                          className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition"
+                          disabled={isSendingEmail === request.id}
+                          className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200 transition disabled:opacity-50"
                           title="Approve"
                         >
-                          <Check size={16} />
+                          {isSendingEmail === request.id ? (
+                            <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Check size={16} />
+                          )}
                         </button>
                         <button
                           onClick={() => handleRejectRequest(request.id)}
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition"
+                          disabled={isSendingEmail === request.id}
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition disabled:opacity-50"
                           title="Reject"
                         >
                           <X size={16} />
@@ -613,13 +761,15 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
                       </>
                     )}
                     {request.status === 'approved' && (
-                      <span className="text-xs text-green-600 dark:text-green-400">
-                        Added
+                      <span className="text-xs text-green-600 dark:text-green-400 flex items-center">
+                        <Key size={12} className="mr-1" />
+                        Sent
                       </span>
                     )}
                     <button
                       onClick={() => handleDeleteRequest(request.id)}
-                      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition"
+                      disabled={isSendingEmail === request.id}
+                      className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition disabled:opacity-50"
                       title="Delete"
                     >
                       <Trash2 size={16} />

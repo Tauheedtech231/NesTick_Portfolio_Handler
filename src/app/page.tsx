@@ -77,6 +77,8 @@ export default function LandingPage() {
   const featureCardsRef = useRef<HTMLDivElement[]>([]);
   const themeCardsRef = useRef<HTMLDivElement[]>([]);
   const formElementsRef = useRef<HTMLDivElement[]>([]);
+  
+  // Updated user state to check multiple login sources
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -105,7 +107,7 @@ export default function LandingPage() {
         if (!validateEmail(value)) return 'Please enter a valid email';
         return '';
       case 'whatsapp':
-        if (!value.trim()) return ' number is required';
+        if (!value.trim()) return 'WhatsApp number is required';
         if (!validatePhone(value)) return 'Please enter a valid phone number';
         return '';
       case 'name':
@@ -181,23 +183,45 @@ export default function LandingPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Handle current user
+  // Updated user authentication check - check multiple login sources
   useEffect(() => {
-    const user = localStorage.getItem('loggedInCollege');
-    console.log("The logged in user:", user);
+    const checkUserAuthentication = () => {
+      if (typeof window !== 'undefined') {
+        // Check multiple possible login sources
+        const loginUser = localStorage.getItem('login_user');
+        const loggedInCollege = localStorage.getItem('loggedInCollege');
+        const superAdminTest = localStorage.getItem('superAdminTest');
+        
+        if (loginUser) {
+          setUser(JSON.parse(loginUser));
+        } else if (loggedInCollege) {
+          setUser(JSON.parse(loggedInCollege));
+        } else if (superAdminTest) {
+          setUser(JSON.parse(superAdminTest));
+        } else {
+          setUser(null);
+        }
+      }
+    };
+
+    checkUserAuthentication();
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      checkUserAuthentication();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('loggedInCollege');
-      if (stored) setUser(JSON.parse(stored));
-    }
-  }, []);
-
-  // Handle logout
+  // Updated logout function to clear all login sources
   const handleLogout = () => {
+    localStorage.removeItem('login_user');
     localStorage.removeItem('loggedInCollege');
+    localStorage.removeItem('superAdminTest');
     setUser(null);
+    setIsDropdownOpen(false);
     window.location.href = '/';
   };
 
@@ -354,6 +378,18 @@ export default function LandingPage() {
 
   const handlePreviewClick = (themeId: string) => {
     window.open(`/Portfolio_Handler/themes/${themeId}`, '_blank');
+  };
+
+  // Get user display name
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    return user.name || user.adminName || user.email || 'User';
+  };
+
+  // Get user email
+  const getUserEmail = () => {
+    if (!user) return '';
+    return user.email || '';
   };
 
   // Enhanced animations with better performance
@@ -513,19 +549,22 @@ export default function LandingPage() {
                 <div className="relative">
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                    className="flex items-center space-x-2 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
                   >
                     <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden md:block">
+                      {getUserDisplayName()}
+                    </span>
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden">
+                    <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-50">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                          {user.adminName || 'Admin'}
+                          {getUserDisplayName()}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {user.email}
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {getUserEmail()}
                         </p>
                       </div>
                       <button
@@ -597,7 +636,7 @@ export default function LandingPage() {
                 </button>
               ))}
 
-              {!user && (
+              {!user ? (
                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
                   <button
                     onClick={() => (window.location.href = '/auth/login')}
@@ -610,6 +649,23 @@ export default function LandingPage() {
                     className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
                   >
                     Sign Up
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <div className="px-3 py-2 mb-2">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                      {getUserDisplayName()}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {getUserEmail()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 transition-all rounded-lg"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" /> Logout
                   </button>
                 </div>
               )}
@@ -1302,7 +1358,7 @@ export default function LandingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number *
+                  WhatsApp Number *
                 </label>
                 <input
                   type="tel"
@@ -1351,7 +1407,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Success Popup */}
+      {/* Success Popup - UPDATED MESSAGE */}
       {showSuccessPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
@@ -1363,17 +1419,26 @@ export default function LandingPage() {
               </div>
               
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Request Submitted!
+                Request Submitted Successfully!
               </h3>
               
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Our team will contact you shortly.
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Thank you for your interest in our theme. Our team at <strong>Nestick Tech</strong> will contact you shortly to discuss your requirements and provide further assistance.
+              </p>
+
+              <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
+                For more information about our services and portfolio, please visit our website:
               </p>
 
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                  <strong>Website:</strong> https://nesticktech.com
-                </p>
+                <a 
+                  href="https://nesticktech.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-lg block mb-2"
+                >
+                  https://nesticktech.com
+                </a>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   <strong>Contact:</strong> +92 319 3236529
                 </p>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, Building2, Crown } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Building2, Crown, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
@@ -26,57 +26,91 @@ export default function LoginPage() {
     setMessage('');
     setIsLoading(true);
 
-    // 🔹 Admin Test Login
+    // 🔹 Admin Test Login (Hardcoded credentials)
     if (email === ADMIN_TEST_EMAIL && password === ADMIN_TEST_PASSWORD) {
-      localStorage.setItem('superAdminTest', JSON.stringify({ email, name: 'Super Admin' }));
+      const adminData = { 
+        email, 
+        name: 'Super Admin', 
+        type: 'super_admin',
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('superAdminTest', JSON.stringify(adminData));
+      localStorage.setItem('login_user', JSON.stringify(adminData));
+      
       setTimeout(() => {
         window.location.href = '/Portfolio_Handler';
       }, 500);
       return;
     }
 
-    // 🔹 Check if collegeAdmins exist
-    const stored = localStorage.getItem('collegeAdmins');
-    if (!stored) {
-      setMessage('No college accounts found. Please sign up first.');
-      setIsLoading(false);
-      return;
+    // 🔹 Check regular users first (from signup)
+    const usersStored = localStorage.getItem('users');
+    if (usersStored) {
+      const users = JSON.parse(usersStored);
+      const existingUser = users.find((u: any) => 
+        u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      );
+
+      if (existingUser) {
+        // ✅ Regular user login success
+        const userData = {
+          email: existingUser.email,
+          name: existingUser.fullName,
+          country: existingUser.country,
+          type: 'user',
+          loginTime: new Date().toISOString()
+        };
+        
+        localStorage.setItem('login_user', JSON.stringify(userData));
+        
+        setIsLoading(false);
+        setMessage('Login successful! Redirecting...');
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+        return;
+      }
     }
 
-    const arr = JSON.parse(stored);
+    // 🔹 Check college admins (existing functionality)
+    const collegeAdminsStored = localStorage.getItem('collegeAdmins');
+    if (collegeAdminsStored) {
+      const collegeAdmins = JSON.parse(collegeAdminsStored);
 
-    // 🔹 Check if email exists
-    /* eslint-disable */
+      const existingCollegeAdmin = collegeAdmins.find(
+        (u: any) => u.email.toLowerCase() === email.toLowerCase()
+      );
 
-    const existingUser = arr.find(
-      (u: any) => u.email.toLowerCase() === email.toLowerCase()
-    );
+      if (existingCollegeAdmin) {
+        // 🔹 Check if password matches
+        if (existingCollegeAdmin.password !== password) {
+          setMessage('Invalid password. Please try again.');
+          setIsLoading(false);
+          return;
+        }
 
-    if (!existingUser) {
-      setMessage('No account found for this email. Please sign up first.');
-      setIsLoading(false);
-      return;
+        // ✅ College admin login success
+        const adminData = {
+          email: existingCollegeAdmin.email,
+          collegeName: existingCollegeAdmin.collegeName,
+          adminName: existingCollegeAdmin.adminName,
+          type: 'college_admin',
+          loginTime: new Date().toISOString()
+        };
+
+        localStorage.setItem('loggedInCollege', JSON.stringify(adminData));
+        localStorage.setItem('login_user', JSON.stringify(adminData));
+
+        setIsLoading(false);
+        setShowContactModal(true);
+        return;
+      }
     }
 
-    // 🔹 Check if password matches
-    if (existingUser.password !== password) {
-      setMessage('Invalid password. Please try again.');
-      setIsLoading(false);
-      return;
-    }
-
-    // ✅ Login success
-    localStorage.setItem(
-      'loggedInCollege',
-      JSON.stringify({
-        email: existingUser.email,
-        collegeName: existingUser.collegeName,
-        adminName: existingUser.adminName,
-      })
-    );
-
+    // 🔹 If no user found in any storage
+    setMessage('No account found with these credentials. Please sign up first.');
     setIsLoading(false);
-    setShowContactModal(true);
   }
 
   function handleModalOk() {
@@ -86,12 +120,14 @@ export default function LoginPage() {
     }, 300);
   }
 
-  // Error popup component (same as college portal)
+  // Message popup component
   const MessagePopup = () => {
     if (!message) return null;
 
-    const isError = message.includes('❌') || message.includes('⚠️') || message.includes('Invalid') || message.includes('No account');
-    const displayMessage = message.replace(/[❌⚠️]/g, '').trim();
+    const isError = message.includes('Invalid') || 
+                   message.includes('No account') || 
+                   message.includes('failed');
+    const isSuccess = message.includes('successful');
 
     return (
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in duration-300">
@@ -99,18 +135,22 @@ export default function LoginPage() {
           "rounded-lg px-4 py-3 shadow-lg border",
           isError 
             ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-            : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+            : isSuccess
+            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+            : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
         )}>
           <div className="flex items-center gap-2">
             <div className={cn(
               "w-2 h-2 rounded-full",
-              isError ? "bg-red-500" : "bg-green-500"
+              isError ? "bg-red-500" : isSuccess ? "bg-green-500" : "bg-blue-500"
             )}></div>
             <p className={cn(
               "text-sm font-medium",
-              isError ? "text-red-700 dark:text-red-300" : "text-green-700 dark:text-green-300"
+              isError ? "text-red-700 dark:text-red-300" : 
+              isSuccess ? "text-green-700 dark:text-green-300" : 
+              "text-blue-700 dark:text-blue-300"
             )}>
-              {displayMessage}
+              {message}
             </p>
           </div>
         </div>
@@ -126,13 +166,13 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto w-12 h-12 bg-gray-900 dark:bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-            <Crown className="w-6 h-6 text-white dark:text-gray-900" />
+            <User className="w-6 h-6 text-white dark:text-gray-900" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Admin Login
+            Login
           </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Access the administration dashboard
+            Sign in to your account
           </p>
         </div>
 
@@ -226,14 +266,14 @@ export default function LoginPage() {
                 Signing in...
               </div>
             ) : (
-              'Login to Admin Portal'
+              'Login'
             )}
           </button>
 
           {/* Help Text */}
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Don not have an account?{' '}
+              Don't have an account?{' '}
               <a
                 href="/auth/sign_up"
                 className="font-semibold underline hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
@@ -246,13 +286,13 @@ export default function LoginPage() {
           {/* Demo Credentials Hint */}
           <div className="text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Demo: imransir@gmail.com / 123456
+              Demo Admin: imransir@gmail.com / 123456
             </p>
           </div>
         </form>
       </div>
 
-      {/* Contact Modal - Updated Styling */}
+      {/* Contact Modal - Only for College Admins */}
       {showContactModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div

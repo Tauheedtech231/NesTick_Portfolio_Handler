@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface CollegeAdmin {
   email: string;
   password: string;
-  name: string;
+ adminName: string;
   collegeId: string;
 }
 
@@ -32,71 +32,77 @@ export default function LoginPage() {
   useEffect(() => {
     // Check if user is already authenticated
     const authCollege = localStorage.getItem('auth_college');
+    console.log('Auth college from localStorage:', authCollege);
     if (authCollege) {
       router.push('/College_Portfolio_Handler');
     }
   }, [router]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    try {
-      // Check for hardcoded credentials first
-      if (email === 'imransir@gmail.com' && password === '123456') {
-        // Create auth session for hardcoded user
-        const authData: AuthCollege = {
-          email: 'imransir@gmail.com',
-          name: 'Imran Sir',
-          collegeId: 'hardcoded_access',
-          token: `college_${Date.now()}`,
-          timestamp: Date.now()
-        };
-
-        localStorage.setItem('auth_college', JSON.stringify(authData));
-        
-        // Redirect to dashboard
-        router.push('/College_Portfolio_Handler');
-        return;
-      }
-
-      // If not hardcoded credentials, check stored admin credentials
-      const collegeAdminStr = localStorage.getItem('college_admin');
-      
-      if (!collegeAdminStr) {
-        setError('No admin credentials found. Please contact support.');
-        setIsLoading(false);
-        return;
-      }
-
-      const collegeAdmin: CollegeAdmin = JSON.parse(collegeAdminStr);
-
-      // Validate credentials against stored admin
-      if (email === collegeAdmin.email && password === collegeAdmin.password) {
-        // Create auth session
-        const authData: AuthCollege = {
-          email: collegeAdmin.email,
-          name: collegeAdmin.name,
-          collegeId: collegeAdmin.collegeId,
-          token: `college_${Date.now()}`,
-          timestamp: Date.now()
-        };
-
-        localStorage.setItem('auth_college', JSON.stringify(authData));
-        
-        // Redirect to dashboard
-        router.push('/College_Portfolio_Handler');
-      } else {
-        setError('Invalid email or password');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-      console.error('Login error:', err);
-    } finally {
-      setIsLoading(false);
+  try {
+    // Hardcoded credentials
+    if (email === 'imransir@gmail.com' && password === '123456') {
+      const authData: AuthCollege = {
+        email: 'imransir@gmail.com',
+        name: 'Imran Sir',
+        collegeId: 'hardcoded_access',
+        token: `college_${Date.now()}`,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('auth_college', JSON.stringify(authData));
+      router.push('/College_Portfolio_Handler');
+      return;
     }
-  };
+
+    // Retrieve stored admins
+    const collegeAdminStr = localStorage.getItem('college_admin');
+    if (!collegeAdminStr) {
+      setError('No admin credentials found. Please contact support.');
+      setIsLoading(false);
+      return;
+    }
+
+    // Parse as array
+    const collegeAdmins: CollegeAdmin[] = JSON.parse(collegeAdminStr);
+    console.log('Stored admins:', collegeAdmins);
+
+    // Trim inputs to prevent accidental whitespace errors
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    // Find matching admin
+    const matchingAdmin = collegeAdmins.find(
+      (admin) =>
+        admin.email.trim() === trimmedEmail &&
+        admin.password.trim() === trimmedPassword
+    );
+
+    if (matchingAdmin) {
+      const authData: AuthCollege = {
+        email: matchingAdmin.email,
+        name: matchingAdmin.adminName, // Use correct property
+        collegeId: matchingAdmin.collegeId,
+        token: `college_${Date.now()}`,
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('auth_college', JSON.stringify(authData));
+      router.push('/College_Portfolio_Handler');
+    } else {
+      setError('Invalid email or password');
+    }
+  } catch (err) {
+    setError('Login failed. Please try again.');
+    console.error('Login error:', err);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // Error popup component
   const ErrorPopup = () => {
