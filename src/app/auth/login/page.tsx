@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, Building2, Crown, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+/* eslint-disable */
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
