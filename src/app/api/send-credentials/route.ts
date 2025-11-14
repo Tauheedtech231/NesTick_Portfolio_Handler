@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/login" 
+              <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/College_Portfolio_Handler/login" 
                  style="background: #000000; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
                 Access Your Dashboard
               </a>

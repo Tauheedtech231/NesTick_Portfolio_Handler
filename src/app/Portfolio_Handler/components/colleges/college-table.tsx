@@ -65,7 +65,9 @@ export function CollegeTable({ colleges, onEdit, onDelete, onAddCollege }: Colle
           collegeName,
           adminName,
           email,
-          password
+          password,
+           
+          
         }),
       });
 

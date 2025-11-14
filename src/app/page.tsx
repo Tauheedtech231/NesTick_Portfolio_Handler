@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { LogOut, User, X } from "lucide-react";
+import { LogOut, User, X, LayoutDashboard } from "lucide-react";
 /* eslint-disable */
 
 // Define types
@@ -28,6 +28,13 @@ interface BuyNowFormData {
   themeName: string;
 }
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -40,7 +47,7 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   
   // Contact form state
-  const [formData, setFormData] = useState({
+  const [contactFormData, setContactFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     subject: '',
@@ -215,6 +222,11 @@ export default function LandingPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Check if user is super admin
+  const isSuperAdmin = () => {
+    return user && localStorage.getItem('superAdminTest');
+  };
+
   // Updated logout function to clear all login sources
   const handleLogout = () => {
     localStorage.removeItem('login_user');
@@ -223,6 +235,11 @@ export default function LandingPage() {
     setUser(null);
     setIsDropdownOpen(false);
     window.location.href = '/';
+  };
+
+  // Handle dashboard redirect for super admin
+  const handleDashboardRedirect = () => {
+    window.location.href = '/Portfolio_Handler';
   };
 
   // Handle mounting and system preference
@@ -279,25 +296,38 @@ export default function LandingPage() {
   };
 
   // Contact form handlers
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleContactInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setContactFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Contact Form Submission
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Form submitted:', formData);
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactFormData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setContactFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send message');
+      }
     } catch (error) {
+      console.error('Contact form error:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -343,7 +373,7 @@ export default function LandingPage() {
     if (selectedTheme?.type === 'free' && isDuplicateEmail(buyNowFormData.email, selectedTheme.id)) {
       setFormErrors(prev => ({ 
         ...prev, 
-        email: 'You have already requested this free theme with this email address.' 
+        email: 'An account with this email already exists.' 
       }));
       return;
     }
@@ -514,165 +544,169 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-500 font-sans overflow-x-hidden">
       {/* Enhanced Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-gray-900 font-bold text-sm">P</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
-                Portfolio Handler
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-1">
-              {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(item)}
-                  className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
-                >
-                  <span className="font-medium text-sm uppercase tracking-wide">
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </span>
-                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
-                </button>
-              ))}
-            </div>
-
-            {/* Right Side Buttons */}
-            <div className="flex items-center space-x-3">
-              {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2 p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
-                  >
-                    <User className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden md:block">
-                      {getUserDisplayName()}
-                    </span>
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden z-50">
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                          {getUserDisplayName()}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {getUserEmail()}
-                        </p>
-                      </div>
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 transition-all"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" /> Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <button
-                    onClick={() => (window.location.href = '/auth/login')}
-                    className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
-                  >
-                    Login
-                  </button>
-
-                  <button
-                    onClick={() => (window.location.href = '/auth/sign_up')}
-                    className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
-                  >
-                    Sign Up
-                  </button>
-                </>
-              )}
-
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
-                aria-label="Toggle menu"
-              >
-                <div className="w-6 h-6 flex flex-col justify-center space-y-1.5">
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                      isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-                    }`}
-                  ></span>
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
-                      isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
-                    }`}
-                  ></span>
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                      isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-                    }`}
-                  ></span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Menu Content */}
-          {isMobileMenuOpen && (
-            <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
-              {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => {
-                    scrollToSection(item);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-                >
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </button>
-              ))}
-
-              {!user ? (
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                  <button
-                    onClick={() => (window.location.href = '/auth/login')}
-                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => (window.location.href = '/auth/sign_up')}
-                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              ) : (
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <div className="px-3 py-2 mb-2">
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                      {getUserDisplayName()}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {getUserEmail()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-gray-700 transition-all rounded-lg"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+<nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <div className="flex items-center justify-between">
+      {/* Logo */}
+      <div className="flex items-center space-x-2">
+        <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
+          <span className="text-white dark:text-gray-900 font-bold text-sm">P</span>
         </div>
-      </nav>
+        <span className="text-xl font-bold text-gray-900 dark:text-white">
+          Portfolio Handler
+        </span>
+      </div>
+
+      {/* Desktop Navigation */}
+      <div className="hidden lg:flex items-center space-x-1">
+        {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
+          <button
+            key={item}
+            onClick={() => scrollToSection(item)}
+            className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
+          >
+            <span className="font-medium text-sm uppercase tracking-wide">
+              {item.charAt(0).toUpperCase() + item.slice(1)}
+            </span>
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
+          </button>
+        ))}
+      </div>
+
+      {/* Right Side Buttons */}
+      <div className="flex items-center space-x-3">
+        {user ? (
+          <div className="hidden lg:flex items-center space-x-3">
+            {/* Dashboard Button for Super Admin */}
+            {isSuperAdmin() && (
+              <button
+                onClick={handleDashboardRedirect}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl
+                  bg-black text-white dark:bg-white dark:text-black
+                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span className="text-sm font-medium">Dashboard</span>
+              </button>
+            )}
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-2 px-4 py-2 rounded-xl
+                bg-black text-white dark:bg-white dark:text-black
+                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              onClick={() => (window.location.href = '/auth/login')}
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => (window.location.href = '/auth/sign_up')}
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+            >
+              Sign Up
+            </button>
+          </>
+        )}
+
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+          aria-label="Toggle menu"
+        >
+          <div className="w-6 h-6 flex flex-col justify-center space-y-1.5">
+            <span
+              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
+                isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
+                isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
+                isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+              }`}
+            ></span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    {/* Mobile Menu Content */}
+    {isMobileMenuOpen && (
+      <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
+        {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
+          <button
+            key={item}
+            onClick={() => {
+              scrollToSection(item);
+              setIsMobileMenuOpen(false);
+            }}
+            className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+          >
+            {item.charAt(0).toUpperCase() + item.slice(1)}
+          </button>
+        ))}
+
+        {user && (
+          <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+            {isSuperAdmin() && (
+              <button
+                onClick={handleDashboardRedirect}
+                className="w-full flex items-center justify-center px-4 py-2 mb-2 text-sm
+                  bg-black text-white dark:bg-white dark:text-black
+                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
+              >
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </button>
+            )}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center px-4 py-2 text-sm
+                bg-black text-white dark:bg-white dark:text-black
+                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
+            >
+              <LogOut className="w-4 h-4 mr-2" /> Logout
+            </button>
+          </div>
+        )}
+
+        {!user && (
+          <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+            <button
+              onClick={() => (window.location.href = '/auth/login')}
+              className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => (window.location.href = '/auth/sign_up')}
+              className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</nav>
+
+
 
       {/* Enhanced Hero Section */}
       <section
@@ -1062,7 +1096,7 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-gray-900 dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-500">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleContactSubmit} className="space-y-6">
                 <div ref={el => addToRefs(el, formElementsRef)}>
                   <label
                     htmlFor="name"
@@ -1074,8 +1108,8 @@ export default function LandingPage() {
                     type="text"
                     id="name"
                     name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
+                    value={contactFormData.name}
+                    onChange={handleContactInputChange}
                     required
                     placeholder="Enter your full name"
                     className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
@@ -1093,8 +1127,8 @@ export default function LandingPage() {
                     type="email"
                     id="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    value={contactFormData.email}
+                    onChange={handleContactInputChange}
                     required
                     placeholder="Enter your email address"
                     className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
@@ -1111,17 +1145,16 @@ export default function LandingPage() {
                   <select
                     id="subject"
                     name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
+                    value={contactFormData.subject}
+                    onChange={handleContactInputChange}
                     required
                     className="w-full px-4 py-3 border border-gray-600 rounded-xl bg-gray-800 text-white focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition-all duration-300"
                   >
                     <option value="">Select a subject</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="demo">Request Demo</option>
-                    <option value="support">Technical Support</option>
-                    <option value="partnership">Partnership</option>
-                    <option value="other">Other</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Partnership">Partnership</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
@@ -1135,8 +1168,8 @@ export default function LandingPage() {
                   <textarea
                     id="message"
                     name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
+                    value={contactFormData.message}
+                    onChange={handleContactInputChange}
                     required
                     rows={5}
                     placeholder="Tell us about your inquiry..."
@@ -1358,7 +1391,7 @@ export default function LandingPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  WhatsApp Number *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"

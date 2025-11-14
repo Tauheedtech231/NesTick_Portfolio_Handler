@@ -13,15 +13,14 @@ import { EventsSection } from '@/app/components/sections/EventsSection';
 import { GallerySection } from '@/app/components/sections/GallerySection';
 import { CoursesSection } from '@/app/components/sections/CoursesSection';
 import { ContactSection } from '@/app/components/sections/ContactSection';
+/* eslint-disable */
+
 import { Lock, Bell, Eye, Grid3X3, Users, Calendar, Image, BookOpen, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DashboardProps {
   initialData: CollegeData;
 }
-
-/* eslint-disable */
-const CURRENT_COLLEGE_ID = '1762352574095';
 
 export interface Announcement {
   id: string;
@@ -54,16 +53,18 @@ export interface College {
 }
 
 interface AuthCollege {
-  email: string;
-  name: string;
+  adminName: string;
   collegeId: string;
-  token: string;
-  timestamp: number;
+  collegeName: string;
+  createdAt: string;
+  email: string;
+  password: string;
 }
 
 // Add authentication check component
 const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [currentCollegeId, setCurrentCollegeId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,15 +79,8 @@ const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       try {
         const authData: AuthCollege = JSON.parse(authCollege);
-        // Optional: Check if token is still valid (e.g., not expired)
-        const isExpired = Date.now() - authData.timestamp > 24 * 60 * 60 * 1000; // 24 hours
-        if (isExpired) {
-          localStorage.removeItem('auth_college');
-          setIsAuthenticated(false);
-          router.push('/College_Portfolio_Handler/login');
-        } else {
-          setIsAuthenticated(true);
-        }
+        setCurrentCollegeId(authData.collegeId);
+        setIsAuthenticated(true);
       } catch {
         localStorage.removeItem('auth_college');
         setIsAuthenticated(false);
@@ -305,7 +299,8 @@ function DashboardContent({ initialData }: DashboardProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentCollegeId, setCurrentCollegeId] = useState<string | null>(null);
 
   useEffect(() => {
     gsap.fromTo('.section-content', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
@@ -317,10 +312,27 @@ function DashboardContent({ initialData }: DashboardProps) {
       return;
     }
 
+    // Get collegeId from localStorage
+    const authCollege = localStorage.getItem('auth_college');
+    if (authCollege) {
+      try {
+        const parsed: AuthCollege = JSON.parse(authCollege);
+        setCurrentCollegeId(parsed.collegeId);
+      } catch (error) {
+        console.error('Error parsing auth_college:', error);
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      setIsLoading(false);
+      return;
+    }
+
+    // Load college data using dynamic collegeId
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
  
-    const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
+    const found = colleges.find((c) => c.id === currentCollegeId);
 
     if (found) {
       setCollegeData((prev) => ({
@@ -335,7 +347,7 @@ function DashboardContent({ initialData }: DashboardProps) {
 
     const rawAnnouncements = localStorage.getItem('announcements');
     const annArr: Announcement[] = rawAnnouncements ? JSON.parse(rawAnnouncements) : [];
-    const filtered = annArr.filter((a) => a.targetCollege === 'all' || a.targetCollege === CURRENT_COLLEGE_ID);
+    const filtered = annArr.filter((a) => a.targetCollege === 'all' || a.targetCollege === currentCollegeId);
     filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     setAnnouncements(filtered);
 
@@ -343,14 +355,15 @@ function DashboardContent({ initialData }: DashboardProps) {
     setTimeout(() => {
       setIsLoading(false);
     }, 800);
-  }, []);
+  }, [currentCollegeId]);
 
   const persistCollegeToLocal = (updatedCollege: College) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !currentCollegeId) return;
+    
     const rawColleges = localStorage.getItem('colleges');
     const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
 
-    const idx = colleges.findIndex((c) => c.id === updatedCollege.id);
+    const idx = colleges.findIndex((c) => c.id === currentCollegeId);
     if (idx >= 0) colleges[idx] = updatedCollege;
     else colleges.push(updatedCollege);
 
@@ -358,13 +371,15 @@ function DashboardContent({ initialData }: DashboardProps) {
   };
 
   const updateSectionData = (section: SectionType, data: any) => {
+    if (!currentCollegeId) return;
+    
     setCollegeData((prev) => {
       const updated = structuredClone(prev);
       if (section === 'about') updated.college = { ...updated.college, ...data };
       else (updated as any)[section] = data;
 
       persistCollegeToLocal({
-        id: updated.college.id,
+        id: currentCollegeId,
         name: updated.college.name,
         status: (updated.college as any).status,
         modules: { ...updated.college as any  }.modules,
@@ -381,6 +396,27 @@ function DashboardContent({ initialData }: DashboardProps) {
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no collegeId found after loading
+  if (!currentCollegeId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-red-600 dark:text-red-400" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">College Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load college information.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
