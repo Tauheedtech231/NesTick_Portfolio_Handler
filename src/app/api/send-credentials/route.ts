@@ -68,12 +68,13 @@ export async function POST(request: NextRequest) {
               You can now login to your dashboard and start managing your college portfolio, faculty, events, and more.
             </p>
             
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/College_Portfolio_Handler/login" 
-                 style="background: #000000; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
-                Access Your Dashboard
-              </a>
-            </div>
+           <div style="text-align: center; margin: 30px 0;">
+  <a href="https://nes-tick-portfolio-handler.vercel.app/College_Portfolio_Handler/login" 
+     style="background: #000000; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+    Access Your Dashboard
+  </a>
+</div>
+
             
             <div style="border-top: 1px solid #e5e5e5; padding-top: 20px; margin-top: 30px;">
               <p style="color: #999999; font-size: 12px; margin: 0;">

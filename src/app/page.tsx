@@ -578,41 +578,42 @@ export default function LandingPage() {
       <div className="flex items-center space-x-3">
         {user ? (
           <div className="hidden lg:flex items-center space-x-3">
-            {/* Dashboard Button for Super Admin */}
+            {/* Dashboard Button */}
             {isSuperAdmin() && (
               <button
                 onClick={handleDashboardRedirect}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl
+                className="flex items-center space-x-2 px-5.5 py-2.75 rounded-xl
                   bg-black text-white dark:bg-white dark:text-black
-                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all"
+                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
               >
-                <LayoutDashboard className="w-4 h-4" />
-                <span className="text-sm font-medium">Dashboard</span>
+                <LayoutDashboard className="w-4.5 h-4.5" />
+                <span className="font-medium">Dashboard</span>
               </button>
             )}
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl
+              className="flex items-center space-x-2 px-5.5 py-2.75 rounded-xl
                 bg-black text-white dark:bg-white dark:text-black
-                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all"
+                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
             >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm font-medium">Logout</span>
+              <LogOut className="w-4.5 h-4.5" />
+              <span className="font-medium">Logout</span>
             </button>
           </div>
         ) : (
           <>
+            {/* Login & Sign Up Buttons */}
             <button
               onClick={() => (window.location.href = '/auth/login')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               Login
             </button>
             <button
               onClick={() => (window.location.href = '/auth/sign_up')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               Sign Up
             </button>
@@ -709,6 +710,8 @@ export default function LandingPage() {
 
 
 
+
+
       {/* Enhanced Hero Section */}
      <section
   id="home"
@@ -799,7 +802,7 @@ export default function LandingPage() {
                    shadow-2xl hover:shadow-gray-400/40 dark:hover:shadow-gray-600/60
                    relative overflow-hidden"
       >
-        Get Started Free
+        Get Started 
       </button>
     </div>
   </div>
