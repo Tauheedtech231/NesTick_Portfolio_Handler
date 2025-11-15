@@ -76,11 +76,11 @@ export default function CollegesPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="space-y-6 transition-colors duration-500"
+        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
       >
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             College Management
           </h1>
 
@@ -89,7 +89,7 @@ export default function CollegesPage() {
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowAddModal(true)}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl 
-                       bg-gray-900 dark:bg-gray-100 text-white dark:text-black 
+                       bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 
                        shadow-sm hover:opacity-90 active:scale-95 transition-all duration-300"
           >
             <Plus size={18} />
@@ -98,7 +98,7 @@ export default function CollegesPage() {
         </header>
 
         {/* Filters */}
-        <section className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-colors duration-500">
+        <section className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
@@ -111,10 +111,10 @@ export default function CollegesPage() {
                 placeholder="Search colleges..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
-                           bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 
-                           placeholder-gray-400 dark:placeholder-gray-500
-                           focus:ring-1 focus:ring-gray-500 focus:border-transparent 
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                           placeholder-gray-500 dark:placeholder-gray-400
+                           focus:ring-2 focus:ring-gray-500 focus:border-transparent 
                            transition-colors duration-300"
               />
             </div>
@@ -123,9 +123,9 @@ export default function CollegesPage() {
             <select
               value={status}
               onChange={e => setStatus(e.target.value as 'all' | 'active' | 'inactive')}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700
-                         bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100
-                         focus:ring-1 focus:ring-gray-500 focus:border-transparent
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
+                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                         focus:ring-2 focus:ring-gray-500 focus:border-transparent
                          transition-colors duration-300"
             >
               <option value="all">All Status</option>

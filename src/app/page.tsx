@@ -55,6 +55,7 @@ export default function LandingPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+// run wh
   
   // New states for themes and buy now modal
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -537,20 +538,20 @@ export default function LandingPage() {
   // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300" />
+      <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300" />
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-500 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-500 font-sans overflow-x-hidden">
       {/* Enhanced Navbar */}
-<nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
+<nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
   <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
     <div className="flex items-center justify-between">
       {/* Logo */}
       <div className="flex items-center space-x-2">
         <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-          <span className="text-white dark:text-gray-900 font-bold text-sm">P</span>
+          <span className="text-white dark:text-black font-bold text-sm">P</span>
         </div>
         <span className="text-xl font-bold text-gray-900 dark:text-white">
           Portfolio Handler
@@ -605,13 +606,13 @@ export default function LandingPage() {
           <>
             <button
               onClick={() => (window.location.href = '/auth/login')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               Login
             </button>
             <button
               onClick={() => (window.location.href = '/auth/sign_up')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               Sign Up
             </button>
@@ -689,13 +690,13 @@ export default function LandingPage() {
           <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
             <button
               onClick={() => (window.location.href = '/auth/login')}
-              className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
+              className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
             >
               Login
             </button>
             <button
               onClick={() => (window.location.href = '/auth/sign_up')}
-              className="w-full bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
+              className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
             >
               Sign Up
             </button>
@@ -709,54 +710,107 @@ export default function LandingPage() {
 
 
       {/* Enhanced Hero Section */}
-      <section
-        id="home"
-        ref={heroRef}
-        className="pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 
-                   bg-gradient-to-br from-gray-50 via-white to-gray-100 
-                   dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 
-                   relative overflow-hidden transition-colors duration-700"
+     <section
+  id="home"
+  ref={heroRef}
+  className="pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6
+             bg-gradient-to-br from-gray-50 via-white to-gray-100
+             dark:from-black dark:via-black dark:to-black
+             relative overflow-hidden transition-colors duration-700"
+>
+  {/* --- Upward Curved Line Background --- */}
+  <div className="absolute inset-0 pointer-events-none opacity-30">
+    <svg
+      className="w-full h-full"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+      viewBox="0 0 1440 900"
+    >
+      <defs>
+        <linearGradient id="lineColor" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6C63FF" />   {/* Blue-Purple Like Image */}
+          <stop offset="100%" stopColor="#A855F7" />
+        </linearGradient>
+      </defs>
+
+      {/* First Upward Curved Line */}
+      <path
+        d="M0 700 C300 550 600 750 900 600 C1200 450 1500 650 1800 500"
+        fill="none"
+        stroke="url(#lineColor)"
+        strokeWidth="1.5"
+        opacity="0.45"
+      />
+      {/* Second Upward Curved Line */}
+      <path
+        d="M0 600 C300 450 600 650 900 500 C1200 350 1500 550 1800 400"
+        fill="none"
+        stroke="url(#lineColor)"
+        strokeWidth="1.2"
+        opacity="0.35"
+      />
+      {/* Third Upward Curved Line */}
+      <path
+        d="M0 500 C300 350 600 550 900 400 C1200 250 1500 450 1800 300"
+        fill="none"
+        stroke="url(#lineColor)"
+        strokeWidth="1"
+        opacity="0.28"
+      />
+      {/* Fourth Upward Curved Line */}
+      <path
+        d="M0 400 C300 250 600 450 900 300 C1200 150 1500 350 1800 200"
+        fill="none"
+        stroke="url(#lineColor)"
+        strokeWidth="0.8"
+        opacity="0.22"
+      />
+    </svg>
+  </div>
+
+  {/* --- Existing Blobs (optional) --- */}
+  <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
+  <div className="absolute bottom-10 right-10 w-96 h-96 bg-gray-200 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
+
+  {/* --- Main Content --- */}
+  <div className="container mx-auto max-w-6xl text-center relative z-10">
+    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8 leading-tight">
+      Simplify College Portfolios{" "}
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-size-200 animate-gradient">
+        One Unified Platform
+      </span>
+    </h1>
+
+    <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed font-light">
+      Manage events, themes, and profiles effortlessly in one place. Built for modern educational institutions.
+    </p>
+
+    <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
+      <button
+        onClick={() => {
+          const section = document.getElementById("themes");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+        className="w-full sm:w-auto bg-gray-900 text-white dark:bg-white dark:text-black
+                   px-8 py-4 md:px-10 md:py-5 rounded-2xl font-semibold text-lg md:text-xl
+                   transition-all duration-500 ease-in-out transform hover:scale-105
+                   shadow-2xl hover:shadow-gray-400/40 dark:hover:shadow-gray-600/60
+                   relative overflow-hidden"
       >
-        <div className="absolute top-10 left-10 w-72 h-72 bg-gray-300 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-gray-200 dark:bg-gray-700 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
+        Get Started Free
+      </button>
+    </div>
+  </div>
+</section>
 
-        <div className="container mx-auto max-w-6xl text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8 leading-tight">
-            Simplify College Portfolios{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-size-200 animate-gradient">
-              One Unified Platform
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed font-light">
-            Manage events, themes, and profiles effortlessly in one place. Built for modern educational institutions.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
-            <button
-              onClick={() => {
-                const section = document.getElementById("themes");
-                if (section) {
-                  section.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-              className="w-full sm:w-auto bg-gray-900 text-white dark:bg-white dark:text-gray-900 
-                         px-8 py-4 md:px-10 md:py-5 rounded-2xl font-semibold text-lg md:text-xl 
-                         transition-all duration-500 ease-in-out transform hover:scale-105 
-                         shadow-2xl hover:shadow-gray-400/40 dark:hover:shadow-gray-600/60 
-                         relative overflow-hidden"
-            >
-              Get Started Free
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Enhanced Features Section */}
       <section
         id="features"
         ref={featuresRef}
-        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-gray-900 relative overflow-hidden transition-colors duration-500"
+        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-black relative overflow-hidden transition-colors duration-500"
       >
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 md:mb-20">
@@ -820,148 +874,156 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Theme Preview Section */}
-      <section
-        id="themes"
-        className="py-20 md:py-28 px-4 sm:px-6 bg-gray-50 dark:bg-gray-900 relative overflow-hidden"
-      >
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 md:mb-20">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Beautiful Portfolio Themes
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              {themes.length > 0 
-                ? "Professionally designed templates for every academic discipline" 
-                : "No themes uploaded yet. Upload themes from the admin panel to see them here."}
-            </p>
-          </div>
+     <section
+  id="themes"
+  className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-black relative overflow-hidden"
+>
+  <div className="container mx-auto max-w-6xl">
+    <div className="text-center mb-16 md:mb-20">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        Beautiful Portfolio Themes
+      </h2>
+      <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        {themes.length > 0
+          ? "Professionally designed templates for every academic discipline"
+          : "No themes uploaded yet. Upload themes from the admin panel to see them here."}
+      </p>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {themes.length > 0 ? (
-              themes.map((theme) => (
-                <div
-                  key={theme.id}
-                  ref={el => addToRefs(el, themeCardsRef)}
-                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      {themes.length > 0 ? (
+        themes.map((theme) => (
+          <div
+            key={theme.id}
+            ref={el => addToRefs(el, themeCardsRef)}
+            className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
+          >
+            <div className="h-48 relative overflow-hidden">
+              <Image
+                src={theme.image}
+                alt={theme.name}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-500"></div>
+              <div className="absolute top-4 left-4 flex gap-2">
+                <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
+                  Portfolio Theme
+                </span>
+                <span
+                  className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                    theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                  }`}
                 >
-                  <div className="h-48 relative overflow-hidden">
-                    <Image
-                      src={theme.image}
-                      alt={theme.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-500"></div>
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
-                        Portfolio Theme
-                      </span>
-                      <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
-                        theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
-                      }`}>
-                        {theme.type === 'free' ? 'Free' : 'Paid'}
-                      </span>
-                    </div>
-                  </div>
+                  {theme.type === 'free' ? 'Free' : 'Paid'}
+                </span>
+              </div>
+            </div>
 
-                  <div className="p-6 md:p-8">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                      {theme.name}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
-                      {theme.description}
-                    </p>
+            <div className="p-6 md:p-8">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                {theme.name}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
+                {theme.description}
+              </p>
 
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handlePreviewClick(theme.id)}
-                        className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
-                      >
-                        Preview
-                      </button>
-                      <button
-                        onClick={() => handleBuyNowClick(theme)}
-                        className="flex-1 border border-gray-900 dark:border-white text-gray-900 dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900"
-                      >
-                        {theme.type === 'free' ? 'Get Free' : 'Buy Now'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              [
-                {
-                  id: 'demo-1',
-                  name: "Modern Professional",
-                  description: "Clean, corporate design perfect for business and engineering portfolios.",
-                  image: "/port1.jpg",
-                  type: 'free' as const,
-                },
-                {
-                  id: 'demo-2',
-                  name: "Creative Arts",
-                  description: "Vibrant and expressive layout for art, design, and media students.",
-                  image: "/port2.jpg",
-                  type: 'paid' as const,
-                },
-                {
-                  id: 'demo-3',
-                  name: "Academic Classic",
-                  description: "Traditional layout with modern elements for research and academic portfolios.",
-                  image: "/port3.jpg",
-                  type: 'free' as const,
-                },
-              ].map((theme) => (
-                <div
-                  key={theme.id}
-                  className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 opacity-60"
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handlePreviewClick(theme.id)}
+                  className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
                 >
-                  <div className="h-48 relative overflow-hidden bg-gray-200 dark:bg-gray-700">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-500 dark:text-gray-400">No Preview Available</span>
-                    </div>
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
-                        Portfolio Theme
-                      </span>
-                      <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
-                        theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
-                      }`}>
-                        {theme.type === 'free' ? 'Free' : 'Paid'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-6 md:p-8">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                      {theme.name}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
-                      {theme.description}
-                    </p>
-                    <div className="text-center py-4">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Upload themes in admin panel to enable purchasing
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+                  Preview
+                </button>
+                <button
+                  onClick={() => handleBuyNowClick(theme)}
+                  className="flex-1 border border-gray-900 dark:border-white text-gray-900 dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900"
+                >
+                  {theme.type === 'free' ? 'Get Free' : 'Buy Now'}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        ))
+      ) : (
+        [
+          {
+            id: 'demo-1',
+            name: "Modern Professional",
+            description:
+              "Clean, corporate design perfect for business and engineering portfolios.",
+            image: "/port1.jpg",
+            type: 'free' as const,
+          },
+          {
+            id: 'demo-2',
+            name: "Creative Arts",
+            description:
+              "Vibrant and expressive layout for art, design, and media students.",
+            image: "/port2.jpg",
+            type: 'paid' as const,
+          },
+          {
+            id: 'demo-3',
+            name: "Academic Classic",
+            description:
+              "Traditional layout with modern elements for research and academic portfolios.",
+            image: "/port3.jpg",
+            type: 'free' as const,
+          },
+        ].map((theme) => (
+          <div
+            key={theme.id}
+            className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 opacity-60"
+          >
+            <div className="h-48 relative overflow-hidden bg-gray-200 dark:bg-gray-700">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-gray-500 dark:text-gray-400">No Preview Available</span>
+              </div>
+              <div className="absolute top-4 left-4 flex gap-2">
+                <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
+                  Portfolio Theme
+                </span>
+                <span
+                  className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                    theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                  }`}
+                >
+                  {theme.type === 'free' ? 'Free' : 'Paid'}
+                </span>
+              </div>
+            </div>
+            <div className="p-6 md:p-8">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                {theme.name}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
+                {theme.description}
+              </p>
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Upload themes in admin panel to enable purchasing
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+</section>
+
 
       {/* Enhanced About Section */}
       <section
         id="about"
         ref={aboutRef}
-        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-gray-900 relative overflow-hidden transition-colors duration-500"
+        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-black relative overflow-hidden transition-colors duration-500"
       >
         <div className="absolute top-0 left-0 right-0 transform -translate-y-1">
           <svg viewBox="0 0 1440 120" className="w-full h-12 md:h-16">
             <path
-              fill={isDarkMode ? "#111827" : "#ffffff"}
+              fill={isDarkMode ? "#000000" : "#ffffff"}
               fillOpacity="1"
               d="M0,64L80,58.7C160,53,320,43,480,48C640,53,800,75,960,74.7C1120,75,1280,53,1360,42.7L1440,32L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"
             ></path>
@@ -1007,7 +1069,7 @@ export default function LandingPage() {
       <section
         id="contact"
         ref={contactRef}
-        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-gray-900 transition-colors duration-500"
+        className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-black transition-colors duration-500"
       >
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 md:mb-20">
@@ -1235,7 +1297,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="bg-gray-900 text-white py-16 px-4 sm:px-6 relative overflow-hidden">
+      <footer className="bg-gray-900 dark:bg-black text-white py-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-0 w-32 h-32 bg-gray-700 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-gray-600 rounded-full blur-3xl"></div>

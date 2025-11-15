@@ -190,12 +190,12 @@ export default function AnnouncementsPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 transition-colors duration-300"
+        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
       >
         {/* Header (Responsive) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Announcements
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -208,7 +208,7 @@ export default function AnnouncementsPage() {
             whileTap={{ scale: 0.97 }}
             onClick={() => setIsFormOpen(true)}
             className="px-4 py-2 rounded-lg font-semibold 
-                       bg-gray-900 text-white dark:bg-gray-100 dark:text-black
+                       bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900
                        hover:opacity-90 active:scale-95 
                        shadow-md transition-all duration-300 
                        flex items-center justify-center space-x-2 w-full sm:w-auto"
@@ -228,10 +228,10 @@ export default function AnnouncementsPage() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
             >
               <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {editingAnnouncement ? 'Edit Announcement' : 'Create Announcement'}
                 </h2>
                 <button
@@ -245,7 +245,7 @@ export default function AnnouncementsPage() {
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-gray-800 dark:text-gray-300">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
                       Title
                     </label>
                     <span className={`text-sm ${getTitleCountColor()}`}>
@@ -259,7 +259,7 @@ export default function AnnouncementsPage() {
                     value={formData.title}
                     onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
+                               rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
                                focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter announcement title"
                   />
@@ -272,7 +272,7 @@ export default function AnnouncementsPage() {
 
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-gray-800 dark:text-gray-300">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
                       Message
                     </label>
                     <span className={`text-sm ${getMessageCountColor()}`}>
@@ -286,7 +286,7 @@ export default function AnnouncementsPage() {
                     value={formData.message}
                     onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
+                               rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
                                focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-300"
                     placeholder="Enter announcement message"
                   />
@@ -298,7 +298,7 @@ export default function AnnouncementsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">
                     Target College
                   </label>
                   <select
@@ -307,7 +307,7 @@ export default function AnnouncementsPage() {
                       setFormData((prev) => ({ ...prev, targetCollege: e.target.value }))
                     }
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                               rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
+                               rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
                                focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="all">All Colleges</option>
@@ -323,7 +323,7 @@ export default function AnnouncementsPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors"
+                    className="px-4 py-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
                   >
                     Cancel
                   </button>
@@ -355,7 +355,7 @@ export default function AnnouncementsPage() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
               >
                 <div className="p-6">
                   <div className="flex items-center space-x-3 mb-4">
@@ -363,7 +363,7 @@ export default function AnnouncementsPage() {
                       <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Delete Announcement
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -393,7 +393,7 @@ export default function AnnouncementsPage() {
                     <button
                       onClick={() => setDeletingAnnouncement(null)}
                       className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white 
-                                 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 
+                                 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 
                                  transition-colors duration-200"
                     >
                       Cancel
@@ -414,9 +414,9 @@ export default function AnnouncementsPage() {
         </AnimatePresence>
 
         {/* Announcements List */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Recent Announcements ({announcements.length})
             </h2>
           </div>
@@ -434,11 +434,11 @@ export default function AnnouncementsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
+                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
                 >
                   <div className="flex justify-between items-start flex-col sm:flex-row sm:items-center">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         {announcement.title}
                         {announcement.title.length > TITLE_LIMIT && (
                           <span className="ml-2 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">
@@ -454,8 +454,8 @@ export default function AnnouncementsPage() {
                           </span>
                         )}
                       </p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded">
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 py-1 rounded">
                           {getTargetCollegeName(announcement.targetCollege)}
                         </span>
                         <span>

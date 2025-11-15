@@ -1,44 +1,24 @@
 'use client';
-import { Moon, Sun, Home as HomeIcon, Building2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { HomeIcon, Building2 } from 'lucide-react';
+import { ThemeToggleProfessional } from '../../../components/layout/ThemeToggleProfessional';
 
 export function Navbar() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const settings = localStorage.getItem('settings');
-    if (settings) {
-      const { darkMode } = JSON.parse(settings);
-      setDarkMode(darkMode);
-      if (darkMode) document.documentElement.classList.add('dark');
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setDarkMode(prefersDark);
-      if (prefersDark) document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    const settings = localStorage.getItem('settings');
-    const currentSettings = settings ? JSON.parse(settings) : {};
-    const updatedSettings = { ...currentSettings, darkMode: newDarkMode };
-    localStorage.setItem('settings', JSON.stringify(updatedSettings));
-
-    if (newDarkMode) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  };
-
   const handleNavigateHome = () => (window.location.href = '/');
   const handleNavigateCollege = () => (window.location.href = '/College_Portfolio_Handler');
 
   return (
-    <nav className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 px-4 sm:px-8 py-3 shadow-sm transition-colors duration-500">
-      <div className="flex justify-between items-center">
-        {/* Left side (optional heading or logo) */}
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-8 py-4 shadow-sm transition-colors duration-500">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Left side - Brand/Logo placeholder */}
         <div className="flex-1">
-          {/* Placeholder if needed */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-xl flex items-center justify-center">
+              <span className="text-white dark:text-gray-900 font-bold text-sm">P</span>
+            </div>
+            <span className="text-lg font-bold text-gray-900 dark:text-white hidden sm:block">
+              Portfolio Handler
+            </span>
+          </div>
         </div>
 
         {/* Right side buttons */}
@@ -46,7 +26,7 @@ export function Navbar() {
           {/* Home Button */}
           <button
             onClick={handleNavigateHome}
-            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-medium px-3 sm:px-4 py-2 rounded-xl shadow-sm hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
+            className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium px-4 py-2.5 rounded-xl shadow-sm hover:bg-gray-800 dark:hover:bg-gray-100 active:scale-95 text-sm sm:text-base transition-all duration-300"
           >
             <HomeIcon size={18} />
             <span className="hidden sm:inline">Home</span>
@@ -55,20 +35,15 @@ export function Navbar() {
           {/* College Portfolio Button */}
           <button
             onClick={handleNavigateCollege}
-            className="flex items-center gap-2 bg-gray-800 dark:bg-gray-100 text-white dark:text-black font-medium px-3 sm:px-4 py-2 rounded-xl shadow-sm hover:opacity-90 active:scale-95 text-sm sm:text-base transition-all duration-300"
+            className="flex items-center gap-2 bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-900 font-medium px-4 py-2.5 rounded-xl shadow-sm hover:bg-gray-700 dark:hover:bg-gray-200 active:scale-95 text-sm sm:text-base transition-all duration-300"
           >
             <Building2 size={18} />
             <span className="hidden sm:inline">College Portfolio</span>
             <span className="sm:hidden">Portfolio</span>
           </button>
 
-          {/* Dark mode toggle */}
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-all duration-300"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          {/* Professional Theme Toggle */}
+          <ThemeToggleProfessional />
         </div>
       </div>
     </nav>

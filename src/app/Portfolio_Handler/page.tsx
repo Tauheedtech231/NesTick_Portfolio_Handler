@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Palette, Download, Trash2, Check, X, User, Calendar, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, Palette, Download, Trash2, Check, X, User, Calendar, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 
 import { MainLayout } from './components/layout/main-layout';
 import { StatsCard } from './components/dashboard/stats-card';
 import { College } from '@/app/types';
+
+// Import Recharts for professional charts
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface DeleteRequest {
   id: string;
@@ -23,6 +26,27 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+// Fixed Chart data interfaces
+interface ChartData {
+  month: string;
+  colleges: number;
+  active: number;
+  inactive: number;
+}
+
+interface StatusData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+// Type for Pie chart data that matches Recharts expectations
+interface PieChartData {
+  name: string;
+  value: number;
+  color: string;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [colleges, setColleges] = useState<College[]>([]);
@@ -34,12 +58,17 @@ export default function DashboardPage() {
     request: null
   });
 
+  // Chart data states
+  const [lineChartData, setLineChartData] = useState<ChartData[]>([]);
+  const [statusData, setStatusData] = useState<PieChartData[]>([]);
+
   // Load colleges from localStorage once on mount
   useEffect(() => {
     const stored = localStorage.getItem('colleges');
     if (stored) {
       const parsed = JSON.parse(stored);
       setColleges(parsed);
+      generateChartData(parsed);
     }
   }, []);
 
@@ -50,6 +79,38 @@ export default function DashboardPage() {
       setDeleteRequests(JSON.parse(stored));
     }
   }, []);
+
+  // Generate chart data based on colleges
+  const generateChartData = (collegesData: College[]) => {
+    // Generate sample monthly data (in a real app, you'd use actual creation dates)
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonth = new Date().getMonth();
+    
+    const chartData: ChartData[] = months.slice(0, currentMonth + 1).map((month, index) => {
+      // Simulate growth data - in real app, use actual college creation dates
+      const baseCount = Math.max(1, Math.floor(collegesData.length * (index + 1) / (currentMonth + 1)));
+      const activeCount = Math.floor(baseCount * 0.7); // 70% active
+      const inactiveCount = baseCount - activeCount;
+      
+      return {
+        month,
+        colleges: baseCount,
+        active: activeCount,
+        inactive: inactiveCount
+      };
+    });
+
+    setLineChartData(chartData);
+
+    // Status distribution for pie chart
+    const active = collegesData.filter(c => c.status === 'active').length;
+    const inactive = collegesData.filter(c => c.status === 'inactive').length;
+    
+    setStatusData([
+      { name: 'Active', value: active, color: '#10B981' },
+      { name: 'Inactive', value: inactive, color: '#EF4444' }
+    ]);
+  };
 
   // Toast notification system
   const addToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -117,6 +178,7 @@ export default function DashboardPage() {
       localStorage.setItem('deleteRequests', JSON.stringify(updatedRequests));
       setDeleteRequests(updatedRequests);
     }
+/* eslint-disable */
 
     // Update colleges state to empty
     setColleges([]);
@@ -147,6 +209,49 @@ export default function DashboardPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Custom tooltip for charts
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+          <p className="font-semibold text-gray-900 dark:text-white">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }} className="text-sm">
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Fixed Pie chart label function
+  const renderCustomizedLabel = ({
+    cx, cy, midAngle, innerRadius, outerRadius, percent, name
+  }: any) => {
+    if (typeof percent === 'undefined') return null;
+    
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize={12}
+        fontWeight="bold"
+      >
+        {`${name}: ${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
   };
 
   return (
@@ -189,11 +294,11 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="min-h-screen bg-white dark:bg-black p-6 space-y-8 transition-colors duration-300"
+        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-8 transition-colors duration-300"
       >
         {/* Header */}
         <header className="flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-black dark:text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Dashboard
           </h1>
         </header>
@@ -235,16 +340,16 @@ export default function DashboardPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleAdd}
             className="group relative flex items-center space-x-3 p-6 rounded-2xl shadow-sm 
-                       bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 
-                       hover:shadow-md hover:shadow-gray-400/10 transition-all duration-300"
+                       bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                       hover:shadow-md transition-all duration-300"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/20 to-gray-300/10 
-                            dark:from-gray-800/30 dark:to-gray-700/20 opacity-0 
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/20 to-gray-100/10 
+                            dark:from-gray-700/30 dark:to-gray-600/20 opacity-0 
                             group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
 
-            <Plus size={24} className="text-gray-900 dark:text-white relative z-10" />
+            <Plus size={24} className="text-gray-700 dark:text-gray-200 relative z-10" />
             <div className="relative z-10 text-left">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Add College</h3>
+              <h3 className="font-semibold text-gray-700 dark:text-gray-200">Add College</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Register a new college</p>
             </div>
           </motion.button>
@@ -255,16 +360,16 @@ export default function DashboardPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleThemes}
             className="group relative flex items-center space-x-3 p-6 rounded-2xl shadow-sm 
-                       bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 
-                       hover:shadow-md hover:shadow-gray-400/10 transition-all duration-300"
+                       bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                       hover:shadow-md transition-all duration-300"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/20 to-gray-300/10 
-                            dark:from-gray-800/30 dark:to-gray-700/20 opacity-0 
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/20 to-gray-100/10 
+                            dark:from-gray-700/30 dark:to-gray-600/20 opacity-0 
                             group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
 
-            <Palette size={24} className="text-gray-900 dark:text-white relative z-10" />
+            <Palette size={24} className="text-gray-700 dark:text-gray-200 relative z-10" />
             <div className="relative z-10 text-left">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Manage Themes</h3>
+              <h3 className="font-semibold text-gray-700 dark:text-gray-200">Manage Themes</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Customize appearance</p>
             </div>
           </motion.button>
@@ -275,16 +380,16 @@ export default function DashboardPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleBackup}
             className="group relative flex items-center space-x-3 p-6 rounded-2xl shadow-sm 
-                       bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 
-                       hover:shadow-md hover:shadow-gray-400/10 transition-all duration-300"
+                       bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                       hover:shadow-md transition-all duration-300"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-100/20 to-gray-300/10 
-                            dark:from-gray-800/30 dark:to-gray-700/20 opacity-0 
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/20 to-gray-100/10 
+                            dark:from-gray-700/30 dark:to-gray-600/20 opacity-0 
                             group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
 
-            <Download size={24} className="text-gray-900 dark:text-white relative z-10" />
+            <Download size={24} className="text-gray-700 dark:text-gray-200 relative z-10" />
             <div className="relative z-10 text-left">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Backup Data</h3>
+              <h3 className="font-semibold text-gray-700 dark:text-gray-200">Backup Data</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Export all data</p>
             </div>
           </motion.button>
@@ -297,26 +402,26 @@ export default function DashboardPage() {
             className={`group relative flex items-center space-x-3 p-6 rounded-2xl shadow-sm 
                        border transition-all duration-300 ${
                          pendingDeleteRequests > 0
-                           ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:shadow-red-400/10'
-                           : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-gray-400/10'
+                           ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:shadow-md'
+                           : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md'
                        }`}
           >
             <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none ${
               pendingDeleteRequests > 0
-                ? 'bg-gradient-to-b from-red-100/20 to-red-300/10 dark:from-red-800/30 dark:to-red-700/20'
-                : 'bg-gradient-to-b from-gray-100/20 to-gray-300/10 dark:from-gray-800/30 dark:to-gray-700/20'
+                ? 'bg-gradient-to-b from-red-50/20 to-red-100/10 dark:from-red-800/30 dark:to-red-700/20'
+                : 'bg-gradient-to-b from-gray-50/20 to-gray-100/10 dark:from-gray-700/30 dark:to-gray-600/20'
             }`}></div>
 
             <Trash2 size={24} className={`relative z-10 ${
               pendingDeleteRequests > 0 
                 ? 'text-red-600 dark:text-red-400' 
-                : 'text-gray-900 dark:text-white'
+                : 'text-gray-700 dark:text-gray-200'
             }`} />
             <div className="relative z-10 text-left">
               <h3 className={`font-semibold ${
                 pendingDeleteRequests > 0 
-                  ? 'text-red-800 dark:text-red-300' 
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-red-700 dark:text-red-300' 
+                  : 'text-gray-700 dark:text-gray-200'
               }`}>
                 Delete Requests
               </h3>
@@ -331,18 +436,110 @@ export default function DashboardPage() {
           </motion.button>
         </section>
 
-        {/* Analytics */}
+        {/* NEW: Professional Charts Section */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300">
-            <h3 className="font-semibold text-black dark:text-white mb-4">
+          {/* Line Chart - College Growth Trend */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <TrendingUp size={20} />
+                  College Growth Trend
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Monthly college registration growth
+                </p>
+              </div>
+            </div>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={lineChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#6B7280"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="#6B7280"
+                    fontSize={12}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="colleges" 
+                    stroke="#3B82F6" 
+                    strokeWidth={2}
+                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: '#1D4ED8' }}
+                    name="Total Colleges"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="active" 
+                    stroke="#10B981" 
+                    strokeWidth={2}
+                    strokeDasharray="3 3"
+                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                    name="Active Colleges"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Status Distribution Pie Chart */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Status Distribution
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Active vs Inactive colleges
+                </p>
+              </div>
+            </div>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                <Pie
+  data={statusData as unknown as { name?: string; value: number; color?: string }[]}
+  nameKey="status"    // use the property in your objects for labels
+  dataKey="value"
+  cx="50%"
+  cy="50%"
+  labelLine={false}
+  label={renderCustomizedLabel}
+  outerRadius={80}
+  fill="#8884d8"
+>
+  {statusData.map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={entry.color} />
+  ))}
+</Pie>
+
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+
+        {/* Analytics Summary Cards */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
               College Status Distribution
             </h3>
-            <div className="space-y-4 text-gray-800 dark:text-gray-300">
+            <div className="space-y-4 text-gray-700 dark:text-gray-300">
               <div className="flex justify-between items-center">
                 <span>Active Colleges</span>
                 <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
                   <div
-                    className="h-2 rounded-full bg-gray-900 dark:bg-gray-100"
+                    className="h-2 rounded-full bg-green-500"
                     style={{ width: `${total ? (active / total) * 100 : 0}%` }}
                   />
                 </div>
@@ -353,7 +550,7 @@ export default function DashboardPage() {
                 <span>Inactive Colleges</span>
                 <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
                   <div
-                    className="h-2 rounded-full bg-gray-500 dark:bg-gray-400"
+                    className="h-2 rounded-full bg-red-500"
                     style={{ width: `${total ? (inactive / total) * 100 : 0}%` }}
                   />
                 </div>
@@ -362,12 +559,12 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* NEW: Delete Requests Summary */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.01] transition-all duration-300">
-            <h3 className="font-semibold text-black dark:text-white mb-4">
+          {/* Delete Requests Summary */}
+          <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
               Delete Requests Summary
             </h3>
-            <div className="space-y-4 text-gray-800 dark:text-gray-300">
+            <div className="space-y-4 text-gray-700 dark:text-gray-300">
               <div className="flex justify-between items-center">
                 <span>Pending Requests</span>
                 <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
@@ -405,13 +602,13 @@ export default function DashboardPage() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden border border-gray-200 dark:border-gray-700"
             >
               <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Trash2 className="text-red-600 dark:text-red-400" size={24} />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                       Data Deletion Requests
                     </h3>
                   </div>
@@ -440,7 +637,7 @@ export default function DashboardPage() {
                         key={request.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                        className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -449,7 +646,7 @@ export default function DashboardPage() {
                                 <User size={16} className="text-red-600 dark:text-red-400" />
                               </div>
                               <div>
-                                <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                                <h4 className="font-semibold text-gray-900 dark:text-white">
                                   {request.userName}
                                 </h4>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -477,7 +674,7 @@ export default function DashboardPage() {
                             </button>
                             <button
                               onClick={() => handleRejectDeleteRequest(request.id)}
-                              className="flex items-center space-x-1 px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition text-sm"
+                              className="flex items-center space-x-1 px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 rounded-lg transition text-sm"
                               title="Reject Request"
                             >
                               <X size={14} />
@@ -491,7 +688,7 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
                 <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                   <span>
                     Total pending: {deleteRequests.filter(req => req.status === 'pending').length}
@@ -518,7 +715,7 @@ export default function DashboardPage() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
               >
                 <div className="p-6">
                   <div className="flex items-center space-x-3 mb-4">
@@ -526,7 +723,7 @@ export default function DashboardPage() {
                       <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Confirm Data Deletion
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -573,7 +770,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setApproveConfirmModal({ show: false, request: null })}
                       className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white 
-                               border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 
+                               border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 
                                transition-colors duration-200"
                     >
                       Cancel

@@ -269,32 +269,32 @@ export default function BackupPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 transition-colors duration-300"
+        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
       >
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Data & Backup
           </h1>
         </div>
 
         {/* Storage Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
               <Database className="text-gray-700 dark:text-gray-300" size={24} />
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Storage Usage</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Storage Usage</h3>
                 <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">{storageSize}</p>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">Local storage consumption</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
               <Download className="text-gray-700 dark:text-gray-300" size={24} />
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Last Backup</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Last Backup</h3>
                 <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{lastBackup}</p>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">Most recent data export</p>
               </div>
@@ -310,10 +310,10 @@ export default function BackupPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md text-center border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm text-center border border-gray-200 dark:border-gray-700"
             >
-              <action.icon size={48} className="mx-auto mb-4 text-gray-400 dark:text-gray-300" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              <action.icon size={48} className="mx-auto mb-4 text-gray-600 dark:text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {action.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">{action.description}</p>
@@ -321,7 +321,13 @@ export default function BackupPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={action.onClick}
-                className={`w-full py-2 px-4 rounded-lg text-white bg-gray-900 hover:bg-gray-700 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300 transition-all duration-300`}
+                className={`w-full py-2 px-4 rounded-lg text-white font-medium transition-all duration-300 ${
+                  action.title.includes('Export') 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : action.title.includes('Import')
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
               >
                 {action.buttonText}
               </motion.button>
@@ -348,12 +354,12 @@ export default function BackupPage() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
             >
               <div className="p-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Request Data Deletion
                   </h3>
                 </div>
@@ -364,7 +370,7 @@ export default function BackupPage() {
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setShowConfirmModal(false)}
-                    className="px-4 py-2 text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors"
+                    className="px-4 py-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
                   >
                     Cancel
                   </button>
@@ -373,7 +379,7 @@ export default function BackupPage() {
                       setShowConfirmModal(false);
                       setShowFormModal(true);
                     }}
-                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
                   >
                     Continue
                   </button>
@@ -393,19 +399,19 @@ export default function BackupPage() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
             >
               <div className="p-6">
                 <div className="flex items-center space-x-3 mb-6">
                   <User className="text-red-600 dark:text-red-400" size={24} />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Submit Deletion Request
                   </h3>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">
                       Your Name *
                     </label>
                     <div className="relative">
@@ -415,15 +421,15 @@ export default function BackupPage() {
                         value={formData.userName}
                         onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                                 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-300"
                         placeholder="Enter your full name"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-2">
                       Contact Number *
                     </label>
                     <div className="relative">
@@ -433,8 +439,8 @@ export default function BackupPage() {
                         value={formData.contactNumber}
                         onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                                 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                                 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-300"
                         placeholder="Enter your contact number"
                       />
                     </div>
@@ -444,13 +450,13 @@ export default function BackupPage() {
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setShowFormModal(false)}
-                    className="px-4 py-2 text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white transition-colors"
+                    className="px-4 py-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={submitDeleteRequest}
-                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!formData.userName.trim() || !formData.contactNumber.trim()}
                   >
                     Submit Request
@@ -463,17 +469,17 @@ export default function BackupPage() {
 
         {/* ✅ Safe Data Summary */}
         {typeof window !== 'undefined' && (
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Data Summary
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {['colleges', 'announcements', 'settings'].map((key) => (
                 <div
                   key={key}
-                  className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
                     {dataSummary[key] || 0}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">

@@ -4,24 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiVideo, FiYoutube, FiTrash2 } from 'react-icons/fi';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { FiEdit2, FiSave, FiX, FiVideo, FiYoutube, FiTrash2, FiInfo } from 'react-icons/fi';
 
 interface AboutSectionProps {
   college: College;
@@ -40,16 +23,6 @@ interface FormDataType {
   localVideo?: string; // base64 for local videos
 }
 
-// Define block types for drag and drop
-type ContentBlockType = 'text' | 'image' | 'video';
-
-interface ContentBlock {
-  id: string;
-  type: ContentBlockType;
-  field?: keyof FormDataType;
-  label: string;
-}
-
 export function AboutSection({ college }: AboutSectionProps) {
   const STORAGE_KEY = `about_${college.id}`;
 
@@ -66,16 +39,7 @@ export function AboutSection({ college }: AboutSectionProps) {
     localVideo: undefined,
   });
 
-  // Define content blocks with their order
-  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([
-    { id: 'logo', type: 'image', field: 'logo', label: 'College Logo' },
-    { id: 'coverImage', type: 'image', field: 'coverImage', label: 'Cover Image' },
-    { id: 'name', type: 'text', field: 'name', label: 'College Name' },
-    { id: 'shortDescription', type: 'text', field: 'shortDescription', label: 'Short Description' },
-    { id: 'longDescription', type: 'text', field: 'longDescription', label: 'Long Description' },
-    { id: 'mission', type: 'text', field: 'mission', label: 'Mission' },
-    { id: 'vision', type: 'text', field: 'vision', label: 'Vision' },
-  ]);
+  const [showVideoSection, setShowVideoSection] = useState(false);
 
   const MAX_LENGTH: Record<keyof FormDataType, number> = {
     name: 50,
@@ -89,14 +53,6 @@ export function AboutSection({ college }: AboutSectionProps) {
     localVideo: 0,
   };
 
-  // Configure drag and drop sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
   // ✅ Load saved data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -104,9 +60,9 @@ export function AboutSection({ college }: AboutSectionProps) {
       const parsedData = JSON.parse(saved);
       setFormData(parsedData.formData || parsedData);
       
-      // Load block order if saved
-      if (parsedData.contentBlocks) {
-        setContentBlocks(parsedData.contentBlocks);
+      // Check if video content exists
+      if (parsedData.videoUrl || parsedData.localVideo) {
+        setShowVideoSection(true);
       }
     }
   }, [STORAGE_KEY]);
@@ -118,7 +74,6 @@ export function AboutSection({ college }: AboutSectionProps) {
   const handleSave = () => {
     const dataToSave = {
       formData,
-      contentBlocks,
       savedAt: new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
@@ -130,9 +85,6 @@ export function AboutSection({ college }: AboutSectionProps) {
     if (saved) {
       const parsedData = JSON.parse(saved);
       setFormData(parsedData.formData || parsedData);
-      if (parsedData.contentBlocks) {
-        setContentBlocks(parsedData.contentBlocks);
-      }
     } else {
       setFormData({
         name: college.name || '',
@@ -182,54 +134,77 @@ export function AboutSection({ college }: AboutSectionProps) {
 
   const removeVideo = () => {
     updateForm({ videoUrl: '', localVideo: undefined });
+    setShowVideoSection(false);
   };
 
-  // ✅ Drag and drop handlers
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const addVideoSection = () => {
+    setShowVideoSection(true);
+  };
 
-    if (over && active.id !== over.id) {
-      setContentBlocks((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        
-        return arrayMove(items, oldIndex, newIndex);
-      });
+  // Content blocks in fixed order for better UX
+  const contentSections = [
+    {
+      id: 'logo',
+      type: 'image' as const,
+      field: 'logo' as const,
+      label: 'College Logo',
+      description: 'Upload your college logo (PNG/JPG, max 500KB)'
+    },
+    {
+      id: 'coverImage',
+      type: 'image' as const,
+      field: 'coverImage' as const,
+      label: 'Cover Image',
+      description: 'Add a banner image for your college (PNG/JPG, max 500KB)'
+    },
+    {
+      id: 'name',
+      type: 'text' as const,
+      field: 'name' as const,
+      label: 'College Name',
+      description: 'Enter the official name of your college'
+    },
+    {
+      id: 'shortDescription',
+      type: 'text' as const,
+      field: 'shortDescription' as const,
+      label: 'Short Description',
+      description: 'Brief introduction about your college (max 150 characters)'
+    },
+    {
+      id: 'longDescription',
+      type: 'text' as const,
+      field: 'longDescription' as const,
+      label: 'Detailed Description',
+      description: 'Comprehensive overview of your college (max 500 characters)'
+    },
+    {
+      id: 'mission',
+      type: 'text' as const,
+      field: 'mission' as const,
+      label: 'Mission Statement',
+      description: 'What your college aims to achieve (max 200 characters)'
+    },
+    {
+      id: 'vision',
+      type: 'text' as const,
+      field: 'vision' as const,
+      label: 'Vision Statement',
+      description: 'Future aspirations of your college (max 200 characters)'
     }
-  };
-
-  // ✅ Add video block
-  const addVideoBlock = () => {
-    const videoBlock: ContentBlock = {
-      id: `video-${Date.now()}`,
-      type: 'video',
-      label: 'Video Content'
-    };
-    setContentBlocks(prev => [...prev, videoBlock]);
-  };
-
-  // ✅ Remove block (only for video blocks)
-  const removeBlock = (blockId: string) => {
-    if (blockId.startsWith('video-')) {
-      setContentBlocks(prev => prev.filter(block => block.id !== blockId));
-      removeVideo();
-    }
-  };
-
-  // Check if video block exists
-  const hasVideoBlock = contentBlocks.some(block => block.type === 'video');
+  ];
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About College</h2>
-          <p className="text-gray-600 dark:text-gray-400">Manage college info and branding</p>
+          <p className="text-gray-600 dark:text-gray-400">Manage college information and branding</p>
         </div>
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>
-            <FiEdit2 className="w-4 h-4 mr-2" /> Edit
+            <FiEdit2 className="w-4 h-4 mr-2" /> Edit Information
           </Button>
         ) : (
           <div className="flex gap-2">
@@ -237,159 +212,161 @@ export function AboutSection({ college }: AboutSectionProps) {
               <FiX className="w-4 h-4 mr-2" /> Cancel
             </Button>
             <Button onClick={handleSave}>
-              <FiSave className="w-4 h-4 mr-2" /> Save
+              <FiSave className="w-4 h-4 mr-2" /> Save Changes
             </Button>
           </div>
         )}
       </div>
 
       {isEditing && (
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-start gap-3">
+            <FiInfo className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Drag & Drop Enabled</h3>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                Drag blocks to rearrange content order
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                You can now modify all college information. Changes will be saved to your browsers storage.
               </p>
             </div>
-            {!hasVideoBlock && (
-              <Button onClick={addVideoBlock} variant="outline" size="sm">
-                <FiVideo className="w-4 h-4 mr-2" /> Add Video
-              </Button>
-            )}
           </div>
         </div>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={contentBlocks} strategy={verticalListSortingStrategy}>
-          <div className="grid gap-6">
-            {contentBlocks.map((block) => (
-              <SortableBlock
-                key={block.id}
-                block={block}
-                isEditing={isEditing}
-                formData={formData}
-                onTextChange={handleTextChange}
-                onImageChange={handleImageChange}
-                onVideoUrlChange={handleVideoUrlChange}
-                onLocalVideoChange={handleLocalVideoChange}
-                onRemoveVideo={removeVideo}
-                onRemoveBlock={() => removeBlock(block.id)}
-                maxLength={MAX_LENGTH}
-              />
-            ))}
+      <div className="space-y-8">
+        {/* Main Content Sections */}
+        {contentSections.map((section) => (
+          <ContentSection
+            key={section.id}
+            section={section}
+            isEditing={isEditing}
+            formData={formData}
+            onTextChange={handleTextChange}
+            onImageChange={handleImageChange}
+            maxLength={MAX_LENGTH}
+          />
+        ))}
+
+        {/* Video Section */}
+        {(showVideoSection || isEditing) && (
+          <VideoSection
+            formData={formData}
+            isEditing={isEditing}
+            onVideoUrlChange={handleVideoUrlChange}
+            onLocalVideoChange={handleLocalVideoChange}
+            onRemoveVideo={removeVideo}
+            onRemoveSection={() => setShowVideoSection(false)}
+          />
+        )}
+
+        {/* Add Video Section Button */}
+        {isEditing && !showVideoSection && (
+          <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center">
+            <FiVideo className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Add Video Content
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
+              Enhance your college profile with a video tour or promotional content
+            </p>
+            <Button onClick={addVideoSection}>
+              <FiVideo className="w-4 h-4 mr-2" /> Add Video Section
+            </Button>
           </div>
-        </SortableContext>
-      </DndContext>
+        )}
+      </div>
     </div>
   );
 }
 
-// Sortable Block Component
-interface SortableBlockProps {
-  block: ContentBlock;
+// Content Section Component
+interface ContentSectionProps {
+  section: {
+    id: string;
+    type: 'text' | 'image';
+    field: keyof FormDataType;
+    label: string;
+    description: string;
+  };
   isEditing: boolean;
   formData: FormDataType;
   onTextChange: (key: keyof FormDataType, value: string) => void;
   onImageChange: (key: 'logo' | 'coverImage', file: File | string) => void;
-  onVideoUrlChange: (url: string) => void;
-  onLocalVideoChange: (file: File) => void;
-  onRemoveVideo: () => void;
-  onRemoveBlock: () => void;
   maxLength: Record<keyof FormDataType, number>;
 }
 
-function SortableBlock({
-  block,
+function ContentSection({
+  section,
   isEditing,
   formData,
   onTextChange,
   onImageChange,
-  onVideoUrlChange,
-  onLocalVideoChange,
-  onRemoveVideo,
-  onRemoveBlock,
   maxLength
-}: SortableBlockProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: block.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
+}: ContentSectionProps) {
   const renderContent = () => {
-    switch (block.type) {
+    switch (section.type) {
       case 'text':
-        if (!block.field) return null;
+        const isTextArea = ['shortDescription', 'longDescription', 'mission', 'vision'].includes(section.field);
+        const charCount = (formData[section.field] ?? '').length;
+        const charLimit = maxLength[section.field];
         
-        const isTextArea = ['shortDescription', 'longDescription', 'mission', 'vision'].includes(block.field);
         return (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
-              {block.label} ({(formData[block.field] ?? '').length}/{maxLength[block.field]})
-            </label>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                {section.label}
+              </label>
+              <span className={`text-xs ${charCount > charLimit * 0.8 ? 'text-orange-500' : 'text-gray-500'}`}>
+                {charCount}/{charLimit}
+              </span>
+            </div>
+            
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {section.description}
+            </p>
+            
             {isTextArea ? (
               <textarea
-                value={formData[block.field] || ''}
-                onChange={(e) => onTextChange(block.field!, e.target.value)}
+                value={formData[section.field] || ''}
+                onChange={(e) => onTextChange(section.field, e.target.value)}
                 disabled={!isEditing}
-                rows={block.field === 'longDescription' ? 4 : 2}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700 resize-none"
+                rows={section.field === 'longDescription' ? 5 : 3}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700 resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder={`Enter ${section.label.toLowerCase()}...`}
               />
             ) : (
               <input
                 type="text"
-                value={formData[block.field] || ''}
-                onChange={(e) => onTextChange(block.field!, e.target.value)}
+                value={formData[section.field] || ''}
+                onChange={(e) => onTextChange(section.field, e.target.value)}
                 disabled={!isEditing}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-700"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                placeholder={`Enter ${section.label.toLowerCase()}...`}
               />
             )}
           </div>
         );
 
       case 'image':
-        if (!block.field) return null;
-        
-        const isLogo = block.field === 'logo';
+        const isLogo = section.field === 'logo';
         return (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {block.label} (PNG/JPG, max 500KB)
-            </label>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                {section.label}
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {section.description}
+              </p>
+            </div>
+            
             <UploadImage
-              value={formData[block.field]}
-              onChange={(file) => onImageChange(block.field as 'logo' | 'coverImage', file)}
-              onRemove={() => onImageChange(block.field as 'logo' | 'coverImage', '')}
+              value={formData[section.field]}
+              onChange={(file) => onImageChange(section.field as 'logo' | 'coverImage', file)}
+              onRemove={() => onImageChange(section.field as 'logo' | 'coverImage', '')}
               aspectRatio={isLogo ? "square" : "banner"}
+              disabled={!isEditing}
             />
           </div>
-        );
-
-      case 'video':
-        return (
-          <VideoBlock
-            formData={formData}
-            isEditing={isEditing}
-            onVideoUrlChange={onVideoUrlChange}
-            onLocalVideoChange={onLocalVideoChange}
-            onRemoveVideo={onRemoveVideo}
-            onRemoveBlock={onRemoveBlock}
-          />
         );
 
       default:
@@ -398,55 +375,36 @@ function SortableBlock({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`relative group ${
-        isEditing ? 'cursor-grab active:cursor-grabbing' : ''
-      }`}
-    >
-      {/* Drag handle */}
-      {isEditing && (
-        <div className="absolute -left-8 top-0 h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="w-6 h-6 flex items-center justify-center rounded bg-gray-200 dark:bg-gray-700">
-            <div className="w-4 h-4 flex flex-col justify-between">
-              <div className="w-full h-0.5 bg-gray-600"></div>
-              <div className="w-full h-0.5 bg-gray-600"></div>
-              <div className="w-full h-0.5 bg-gray-600"></div>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all hover:border-gray-300 dark:hover:border-gray-600">
       {renderContent()}
     </div>
   );
 }
 
-// Video Block Component
-interface VideoBlockProps {
+// Video Section Component
+interface VideoSectionProps {
   formData: FormDataType;
   isEditing: boolean;
   onVideoUrlChange: (url: string) => void;
   onLocalVideoChange: (file: File) => void;
   onRemoveVideo: () => void;
-  onRemoveBlock: () => void;
+  onRemoveSection: () => void;
 }
 
-function VideoBlock({
+function VideoSection({
   formData,
   isEditing,
   onVideoUrlChange,
   onLocalVideoChange,
   onRemoveVideo,
-  onRemoveBlock
-}: VideoBlockProps) {
+  onRemoveSection
+}: VideoSectionProps) {
   const [videoUrlInput, setVideoUrlInput] = useState(formData.videoUrl || '');
 
   const handleUrlSubmit = () => {
-    onVideoUrlChange(videoUrlInput);
+    if (videoUrlInput.trim()) {
+      onVideoUrlChange(videoUrlInput.trim());
+    }
   };
 
   const handleLocalVideoUpload = (file: File) => {
@@ -455,7 +413,7 @@ function VideoBlock({
 
   const handleRemove = () => {
     onRemoveVideo();
-    onRemoveBlock();
+    onRemoveSection();
   };
 
   const isYouTubeUrl = (url: string) => {
@@ -467,12 +425,22 @@ function VideoBlock({
     return videoId ? `https://www.youtube.com/embed/${videoId[1]}` : url;
   };
 
+  const hasVideoContent = formData.videoUrl || formData.localVideo;
+
   return (
-    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <FiVideo className="w-5 h-5" /> Video Content
-        </h3>
+    <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+            <FiVideo className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Video Content</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Add a video tour or promotional content
+            </p>
+          </div>
+        </div>
         {isEditing && (
           <Button variant="destructive" size="sm" onClick={handleRemove}>
             <FiTrash2 className="w-4 h-4 mr-2" /> Remove
@@ -481,10 +449,10 @@ function VideoBlock({
       </div>
 
       {/* Video Preview */}
-      {(formData.videoUrl || formData.localVideo) && (
-        <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Video Preview:</h4>
-          <div className="aspect-video bg-black rounded-lg overflow-hidden">
+      {hasVideoContent && (
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Video Preview</h4>
+          <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-lg">
             {formData.localVideo ? (
               <video
                 controls
@@ -499,8 +467,11 @@ function VideoBlock({
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white">
-                Invalid video URL
+              <div className="w-full h-full flex items-center justify-center text-white bg-gray-800">
+                <div className="text-center">
+                  <FiVideo className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>Invalid video URL</p>
+                </div>
               </div>
             )}
           </div>
@@ -508,46 +479,70 @@ function VideoBlock({
       )}
 
       {isEditing && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* YouTube URL Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               <FiYoutube className="w-4 h-4 inline mr-2" />
-              YouTube URL
+              YouTube Video URL
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <input
                 type="url"
                 value={videoUrlInput}
                 onChange={(e) => setVideoUrlInput(e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=..."
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
-              <Button onClick={handleUrlSubmit} disabled={!videoUrlInput}>
-                Add URL
+              <Button 
+                onClick={handleUrlSubmit} 
+                disabled={!videoUrlInput.trim()}
+                className="whitespace-nowrap"
+              >
+                Add YouTube Video
               </Button>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Paste a YouTube video URL to embed it on your page
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500">Or</span>
             </div>
           </div>
 
           {/* Local Video Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               <FiVideo className="w-4 h-4 inline mr-2" />
-              Upload Local Video (MP4, max 10MB)
+              Upload Local Video
             </label>
-            <input
-              type="file"
-              accept="video/mp4,video/webm,video/ogg"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file && file.size <= 10 * 1024 * 1024) { // 10MB limit
-                  handleLocalVideoUpload(file);
-                } else {
-                  alert('Please select a video file under 10MB');
-                }
-              }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center">
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/ogg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size <= 10 * 1024 * 1024) { // 10MB limit
+                      handleLocalVideoUpload(file);
+                    } else {
+                      alert('Please select a video file under 10MB');
+                    }
+                  }
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <FiVideo className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Click to upload a video file (MP4, max 10MB)
+              </p>
+            </div>
           </div>
         </div>
       )}

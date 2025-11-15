@@ -73,79 +73,78 @@ export default function SettingsPage() {
   ];
 
   return (
-   <MainLayout>
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="space-y-6 transition-colors duration-300"
-  >
-    {/* Header */}
-    <div className="flex justify-between items-center">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-        Settings
-      </h1>
-    </div>
-
-    {/* Appearance Section */}
-    <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-md overflow-hidden transition-colors duration-500">
-      <div className="bg-gray-100 dark:bg-neutral-900 px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
-          Customize the portal appearance
-        </p>
-      </div>
-
-      <div className="p-6 space-y-8">
-        {/* Dark Mode Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gray-200 dark:bg-neutral-800 rounded-lg">
-              {settings.darkMode ? (
-                <Moon className="text-white" size={24} />
-              ) : (
-                <Sun className="text-black" size={24} />
-              )}
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">Dark Mode</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Switch between light and dark modes
-              </p>
-            </div>
-          </div>
-          <ToggleSwitch enabled={settings.darkMode} onChange={handleDarkModeToggle} />
+    <MainLayout>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            Settings
+          </h1>
         </div>
 
-     
-      </div>
-    </div>
-
-    {/* Reset Preferences */}
-    <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 p-6 rounded-lg shadow-md transition-colors duration-500">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="p-3 bg-gray-100 dark:bg-neutral-800 rounded-lg">
-            <RefreshCw className="text-gray-800 dark:text-gray-300" size={24} />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">Reset Preferences</h3>
+        {/* Appearance Section */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden transition-colors duration-300">
+          <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Reset all settings to their default values
+              Customize the portal appearance
             </p>
           </div>
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={resetPreferences}
-          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg border border-gray-700 dark:border-gray-300 transition-colors hover:opacity-80"
-        >
-          Reset
-        </motion.button>
-      </div>
-    </div>
-  </motion.div>
-</MainLayout>
 
+          <div className="p-6 space-y-8">
+            {/* Dark Mode Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                  {settings.darkMode ? (
+                    <Moon className="text-gray-700 dark:text-gray-300" size={24} />
+                  ) : (
+                    <Sun className="text-gray-700 dark:text-gray-300" size={24} />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Dark Mode</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Switch between light and dark modes
+                  </p>
+                </div>
+              </div>
+              <ToggleSwitch enabled={settings.darkMode} onChange={handleDarkModeToggle} />
+            </div>
+
+          
+          </div>
+        </div>
+
+        {/* Reset Preferences */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-sm transition-colors duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <RefreshCw className="text-gray-700 dark:text-gray-300" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Reset Preferences</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  Reset all settings to their default values
+                </p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={resetPreferences}
+              className="px-6 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors hover:bg-gray-700 dark:hover:bg-gray-300"
+            >
+              Reset
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+    </MainLayout>
   );
 }

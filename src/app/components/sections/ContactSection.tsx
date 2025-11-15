@@ -15,7 +15,8 @@ import {
   FiTwitter, 
   FiLinkedin, 
   FiInstagram,
-  FiExternalLink
+  FiExternalLink,
+  FiCopy
 } from 'react-icons/fi';
 import { validateEmail, validateUrl } from '@/lib/utils';
 /* eslint-disable */
@@ -28,11 +29,10 @@ interface ContactSectionProps {
 
 export function ContactSection({ data, college, onUpdate }: ContactSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
-  // initialize from the section `data` when present so preview updates reflect edits
   const [contactInfo, setContactInfo] = useState<ContactInfo>(data ?? college.contact);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [copySuccess, setCopySuccess] = useState(false);
 
-  // helper to update local contact info and notify parent for live preview
   const updateContact = (patch: Partial<ContactInfo>) => {
     const next: ContactInfo = {
       ...contactInfo,
@@ -45,7 +45,6 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Required field validation
     if (!contactInfo.email?.trim()) {
       newErrors.email = 'Email is required';
     } else if (!validateEmail(contactInfo.email)) {
@@ -60,7 +59,6 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
       newErrors.address = 'Address is required';
     }
 
-    // Optional URL validation
     if (contactInfo.website && !validateUrl(contactInfo.website)) {
       newErrors.website = 'Please enter a valid URL';
     }
@@ -94,7 +92,6 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
   };
 
   const cancelEditing = () => {
-    // revert to the original section data (or college.contact as fallback)
     const original = data ?? college.contact;
     setContactInfo(original);
     onUpdate(original);
@@ -104,7 +101,6 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
 
   const updateContactField = (field: keyof ContactInfo, value: string) => {
     updateContact({ [field]: value } as Partial<ContactInfo>);
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -116,10 +112,16 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
       [platform]: value,
     };
     updateContact({ socialMedia: nextSocial } as Partial<ContactInfo>);
-    // Clear error when user starts typing
     if (errors[platform]) {
       setErrors(prev => ({ ...prev, [platform]: '' }));
     }
+  };
+
+  const handleCopyContactInfo = () => {
+    const contactText = `Email: ${contactInfo.email}\nPhone: ${contactInfo.phone}\nAddress: ${contactInfo.address}${contactInfo.website ? `\nWebsite: ${contactInfo.website}` : ''}`;
+    navigator.clipboard.writeText(contactText);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
   };
 
   const socialMediaPlatforms = [
@@ -157,7 +159,8 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
     Object.values(contactInfo.socialMedia).some(val => val && val.trim() !== '');
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contact Information</h2>
@@ -172,41 +175,49 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
             Edit Contact Info
           </Button>
         ) : (
-          
-         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-  <Button
-    variant="secondary"
-    onClick={cancelEditing}
-    className="w-full sm:w-auto"
-  >
-    <FiX className="w-4 h-4 mr-2" />
-    Cancel
-  </Button>
-
-  <Button
-    onClick={saveChanges}
-    className="w-full sm:w-auto"
-  >
-    <FiSave className="w-4 h-4 mr-2" />
-    Save Changes
-  </Button>
-</div>
-
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              onClick={cancelEditing}
+              className="w-full sm:w-auto"
+            >
+              <FiX className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              onClick={saveChanges}
+              className="w-full sm:w-auto"
+            >
+              <FiSave className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+          </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Basic Contact Information */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Basic Contact Information
-            </h3>
-            
-            <div className="space-y-4">
-              {/* Email */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                <FiMail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Basic Contact Information
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Primary contact details for your college
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Email */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                  <FiMail className="w-4 h-4 inline mr-2" />
                   Email Address *
                 </label>
                 {isEditing ? (
@@ -215,7 +226,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       type="email"
                       value={contactInfo.email}
                       onChange={(e) => updateContactField('email', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.email 
                           ? 'border-red-500 dark:border-red-400' 
                           : 'border-gray-300 dark:border-gray-600'
@@ -227,7 +238,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                  <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiMail className="w-5 h-5 text-gray-400" />
                     <span className="text-gray-900 dark:text-white">{contactInfo.email}</span>
                   </div>
@@ -235,8 +246,9 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
               </div>
 
               {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                  <FiPhone className="w-4 h-4 inline mr-2" />
                   Phone Number *
                 </label>
                 {isEditing ? (
@@ -245,7 +257,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       type="tel"
                       value={contactInfo.phone}
                       onChange={(e) => updateContactField('phone', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.phone 
                           ? 'border-red-500 dark:border-red-400' 
                           : 'border-gray-300 dark:border-gray-600'
@@ -257,7 +269,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                  <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiPhone className="w-5 h-5 text-gray-400" />
                     <span className="text-gray-900 dark:text-white">{contactInfo.phone}</span>
                   </div>
@@ -265,8 +277,9 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
               </div>
 
               {/* Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                  <FiMapPin className="w-4 h-4 inline mr-2" />
                   Address *
                 </label>
                 {isEditing ? (
@@ -275,7 +288,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       value={contactInfo.address}
                       onChange={(e) => updateContactField('address', e.target.value)}
                       rows={3}
-                      className={`w-full px-3 py-2 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+                      className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none ${
                         errors.address 
                           ? 'border-red-500 dark:border-red-400' 
                           : 'border-gray-300 dark:border-gray-600'
@@ -287,16 +300,17 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                  <div className="flex items-start gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiMapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                    <span className="text-gray-900 dark:text-white">{contactInfo.address}</span>
+                    <span className="text-gray-900 dark:text-white leading-relaxed">{contactInfo.address}</span>
                   </div>
                 )}
               </div>
 
               {/* Website */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                  <FiGlobe className="w-4 h-4 inline mr-2" />
                   Website
                 </label>
                 {isEditing ? (
@@ -305,7 +319,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       type="url"
                       value={contactInfo.website || ''}
                       onChange={(e) => updateContactField('website', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.website 
                           ? 'border-red-500 dark:border-red-400' 
                           : 'border-gray-300 dark:border-gray-600'
@@ -318,7 +332,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                   </div>
                 ) : (
                   contactInfo.website && (
-                    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                       <div className="flex items-center gap-3">
                         <FiGlobe className="w-5 h-5 text-gray-400" />
                         <span className="text-gray-900 dark:text-white">
@@ -329,7 +343,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                         href={contactInfo.website} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                       >
                         <FiExternalLink className="w-4 h-4" />
                       </a>
@@ -343,30 +357,41 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
 
         {/* Social Media Links */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Social Media Links
-            </h3>
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                <FiGlobe className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Social Media Links
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Connect with your audience on social platforms
+                </p>
+              </div>
+            </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               {socialMediaPlatforms.map(({ key, icon: Icon, label, color, placeholder }) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div key={key} className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                    <Icon className={`w-4 h-4 inline mr-2 ${color}`} />
                     {label}
                   </label>
                   {isEditing ? (
                     <div>
                       <div className="flex gap-2">
-                        <div className="flex items-center px-3 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-xl bg-gray-50 dark:bg-gray-700">
+                        <div className="flex items-center px-4 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-xl bg-gray-50 dark:bg-gray-700">
                           <Icon className={`w-5 h-5 ${color}`} />
                         </div>
                         <input
                           type="url"
                           value={contactInfo.socialMedia?.[key as keyof typeof contactInfo.socialMedia] || ''}
                           onChange={(e) => updateSocialMedia(key, e.target.value)}
-                          className={`flex-1 px-3 py-2 border rounded-r-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          className={`flex-1 px-4 py-3 border rounded-r-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                             errors[key] 
-                              ? 'border-red-500 dark:border-red-400' 
+                              ? 'border-red-500 dark:border-red-400 border-l-0' 
                               : 'border-gray-300 dark:border-gray-600 border-l-0'
                           }`}
                           placeholder={placeholder}
@@ -378,7 +403,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                     </div>
                   ) : (
                     contactInfo.socialMedia?.[key as keyof typeof contactInfo.socialMedia] && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                         <div className="flex items-center gap-3">
                           <Icon className={`w-5 h-5 ${color}`} />
                           <span className="text-gray-900 dark:text-white">
@@ -389,7 +414,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                           href={contactInfo.socialMedia[key as keyof typeof contactInfo.socialMedia]} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                         >
                           <FiExternalLink className="w-4 h-4" />
                         </a>
@@ -415,30 +440,29 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
         </div>
       </div>
 
-      {/* Preview Card */}
-   
-
       {/* Quick Actions */}
       {!isEditing && (
-        <div className="mt-6 flex justify-end">
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                // Copy contact info to clipboard
-                const contactText = `Email: ${contactInfo.email}\nPhone: ${contactInfo.phone}\nAddress: ${contactInfo.address}${contactInfo.website ? `\nWebsite: ${contactInfo.website}` : ''}`;
-                navigator.clipboard.writeText(contactText);
-                // You could add a toast notification here
-              }}
-            >
-              Copy Contact Info
-            </Button>
-            <Button
-              onClick={() => setIsEditing(true)}
-            >
-              <FiEdit2 className="w-4 h-4 mr-2" />
-              Edit Contact Info
-            </Button>
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Make your contact information easily accessible
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={handleCopyContactInfo}
+                className="flex items-center gap-2"
+              >
+                <FiCopy className="w-4 h-4" />
+                {copySuccess ? 'Copied!' : 'Copy Contact Info'}
+              </Button>
+              <Button
+                onClick={() => setIsEditing(true)}
+              >
+                <FiEdit2 className="w-4 h-4 mr-2" />
+                Edit Contact Info
+              </Button>
+            </div>
           </div>
         </div>
       )}

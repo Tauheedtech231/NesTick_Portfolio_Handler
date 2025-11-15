@@ -12,6 +12,7 @@ interface UploadImageProps {
   onRemove?: () => void;
   className?: string;
   aspectRatio?: 'square' | 'video' | 'banner';
+  disabled?: boolean; // ✅ Added disabled prop
 }
 
 interface AlertMessage {
@@ -30,6 +31,7 @@ export function UploadImage({
   onRemove,
   className,
   aspectRatio = 'square',
+  disabled = false, // ✅ Default to false
 }: UploadImageProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
@@ -72,6 +74,8 @@ export function UploadImage({
 
   const handleFileSelect = useCallback(
     (file: File) => {
+      if (disabled) return; // ✅ Prevent if disabled
+      
       if (file.size > MAX_FILE_SIZE) {
         showAlert(
           'error',
@@ -121,11 +125,13 @@ export function UploadImage({
 
       reader.readAsDataURL(file);
     },
-    [onChange, showAlert]
+    [onChange, showAlert, disabled] // ✅ Added disabled to dependencies
   );
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
+      if (disabled) return; // ✅ Prevent if disabled
+      
       e.preventDefault();
       setIsDragOver(false);
 
@@ -143,11 +149,13 @@ export function UploadImage({
         );
       }
     },
-    [handleFileSelect, showAlert]
+    [handleFileSelect, showAlert, disabled] // ✅ Added disabled to dependencies
   );
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (disabled) return; // ✅ Prevent if disabled
+      
       const file = e.target.files?.[0];
       if (file) handleFileSelect(file);
       
@@ -156,11 +164,16 @@ export function UploadImage({
         fileInputRef.current.value = '';
       }
     },
-    [handleFileSelect]
+    [handleFileSelect, disabled] // ✅ Added disabled to dependencies
   );
 
   const handleUrlSubmit = useCallback(
     (e: React.FormEvent) => {
+      if (disabled) {
+        e.preventDefault();
+        return; // ✅ Prevent if disabled
+      }
+      
       e.preventDefault();
       if (imageUrl) {
         // Basic URL validation
@@ -185,18 +198,22 @@ export function UploadImage({
         }
       }
     },
-    [imageUrl, onChange, showAlert]
+    [imageUrl, onChange, showAlert, disabled] // ✅ Added disabled to dependencies
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (disabled) return; // ✅ Prevent if disabled
+    
     e.preventDefault();
     setIsDragOver(true);
-  }, []);
+  }, [disabled]); // ✅ Added disabled to dependencies
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
+    if (disabled) return; // ✅ Prevent if disabled
+    
     e.preventDefault();
     setIsDragOver(false);
-  }, []);
+  }, [disabled]); // ✅ Added disabled to dependencies
 
   const getAlertStyles = (type: AlertMessage['type']) => {
     const baseStyles = "flex items-start space-x-3 p-4 rounded-xl shadow-2xl border-l-4 max-w-sm w-full transform transition-all duration-300 mx-auto";
@@ -268,7 +285,8 @@ export function UploadImage({
           <div
             className={cn(
               'relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800',
-              aspectClasses[aspectRatio]
+              aspectClasses[aspectRatio],
+              disabled && 'opacity-60' // ✅ Add opacity when disabled
             )}
           >
             <Image
@@ -279,16 +297,18 @@ export function UploadImage({
               sizes="(max-width: 768px) 100vw, 50vw"
               unoptimized={value.startsWith('data:')}
             />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={onRemove}
-                className="rounded-full"
-              >
-                <FiX className="w-4 h-4" />
-              </Button>
-            </div>
+            {!disabled && ( // ✅ Only show remove button when not disabled
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={onRemove}
+                  className="rounded-full"
+                >
+                  <FiX className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </>
@@ -329,8 +349,10 @@ export function UploadImage({
       <div
         className={cn(
           'border-2 border-dashed rounded-xl transition-colors',
-          isDragOver
+          isDragOver && !disabled
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+            : disabled
+            ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed' // ✅ Disabled styles
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
           aspectClasses[aspectRatio],
           className
@@ -339,62 +361,79 @@ export function UploadImage({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-          <FiUpload className="w-8 h-8 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Drag & drop an image or
+        <div className={cn(
+          "flex flex-col items-center justify-center h-full p-6 text-center",
+          disabled && "opacity-60" // ✅ Add opacity when disabled
+        )}>
+          <FiUpload className={cn(
+            "w-8 h-8 mb-2",
+            disabled ? "text-gray-400" : "text-gray-400"
+          )} />
+          <p className={cn(
+            "text-sm mb-4",
+            disabled ? "text-gray-500 dark:text-gray-500" : "text-gray-600 dark:text-gray-400"
+          )}>
+            {disabled ? "Upload disabled" : "Drag & drop an image or"}
           </p>
 
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Browse Files
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setShowUrlInput(true)}
-            >
-              <FiLink className="w-4 h-4 mr-1" />
-              Paste URL
-            </Button>
-          </div>
-
-          {/* File size info */}
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-            Max file size: 500KB • Supported: JPG, PNG, GIF, WebP
-          </p>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-            onChange={handleFileInput}
-            className="hidden"
-          />
-
-          {showUrlInput && (
-            <form onSubmit={handleUrlSubmit} className="mt-4 w-full">
+          {!disabled && ( // ✅ Only show buttons when not disabled
+            <>
               <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                  className="flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <Button type="submit" size="sm">
-                  Add
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={disabled}
+                >
+                  Browse Files
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowUrlInput(true)}
+                  disabled={disabled}
+                >
+                  <FiLink className="w-4 h-4 mr-1" />
+                  Paste URL
                 </Button>
               </div>
-            </form>
+
+              {/* File size info */}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                Max file size: 500KB • Supported: JPG, PNG, GIF, WebP
+              </p>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                onChange={handleFileInput}
+                className="hidden"
+                disabled={disabled}
+              />
+
+              {showUrlInput && (
+                <form onSubmit={handleUrlSubmit} className="mt-4 w-full">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                      disabled={disabled}
+                    />
+                    <Button type="submit" size="sm" disabled={disabled}>
+                      Add
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Search
 } from 'lucide-react';
 
 const menuItems = [
@@ -31,6 +32,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
@@ -40,80 +42,87 @@ export function Sidebar() {
       try {
         const parsed = JSON.parse(admin);
         setAdminEmail(parsed.email);
-        console.log("Admin Data:", parsed);
-      } catch (err) {
+      } catch {
         console.error("Invalid admin data in localStorage");
       }
     }
   }, []);
-  useEffect(()=>{
-    const data=localStorage.getItem('colleges')
-    console.log('colleges data in add modal',data)
-  })
+
+  const filteredMenu = menuItems.filter((item) =>
+    item.label.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <motion.aside
       initial={{ x: -60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`${
-        collapsed ? 'w-20' : 'w-64'
-      } bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 min-h-screen shadow-md flex flex-col justify-between transition-all duration-500`}
+      className={`${collapsed ? 'w-20' : 'w-64'}
+        bg-white dark:bg-gray-900
+        border-r border-gray-200 dark:border-gray-700
+        min-h-screen shadow-md flex flex-col justify-between
+        transition-all duration-500`}
     >
-      {/* ==== Top Section ==== */}
       <div className="p-4 flex flex-col h-full">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          {!collapsed ? (
-            <div>
-              <h1 className="text-xl font-extrabold text-black dark:text-white tracking-tight">
-                Portfolio Handler
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                Admin Portal
-              </p>
 
-              {/* Admin Email */}
-              {adminEmail && (
-                <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-1">
-                  {adminEmail}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="flex justify-center w-full">
-              <span className="text-2xl text-black dark:text-white font-bold">P</span>
-            </div>
-          )}
+        {/* ==== Header ==== */}
+        <div className="flex items-center justify-between mb-6">
+          {/* Desktop: Left heading */}
+          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight hidden lg:block">
+            Admin Portal
+          </h1>
 
-          {/* Collapse button */}
+          {/* Mobile: Right heading */}
+          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight block lg:hidden ml-auto">
+            Admin Portal
+          </h1>
+
+          {/* Desktop: Collapse Arrow */}
           <button
             onClick={toggleSidebar}
-            className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 p-2 rounded-lg transition-colors"
+            className="hidden lg:flex text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors ml-auto"
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
 
-        {/* Navigation */}
+        {/* ==== Rounded Search Bar ==== */}
+        {!collapsed && (
+          <div className="relative mb-6">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-4 py-2 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 transition-all"
+            />
+            <Search
+              size={18}
+              className="absolute right-4 top-2.5 text-gray-500 dark:text-gray-400"
+            />
+          </div>
+        )}
+
+        {/* ==== Navigation ==== */}
         <nav className="flex flex-col gap-1">
-          {menuItems.map((item) => {
+          {filteredMenu.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
+                className={`group flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-300
+                ${
                   isActive
-                    ? 'bg-gray-100 dark:bg-gray-900 text-black dark:text-white border-l-4 border-gray-800 dark:border-white'
-                    : 'text-gray-700 hover:text-black hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-l-4 border-gray-900 dark:border-white'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
                 }`}
               >
                 <item.icon
                   size={20}
                   className={`transition-transform duration-300 ${
                     isActive
-                      ? 'scale-110 text-black dark:text-white'
+                      ? 'scale-110 text-gray-900 dark:text-white'
                       : 'group-hover:scale-110 text-gray-600 dark:text-gray-300'
                   }`}
                 />
@@ -133,6 +142,20 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        {/* ==== Admin Details at Bottom ==== */}
+        {!collapsed && (
+          <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300 mb-1">
+              Admin Info
+            </h3>
+            {adminEmail ? (
+              <p className="text-xs text-gray-600 dark:text-gray-400">{adminEmail}</p>
+            ) : (
+              <p className="text-xs text-gray-500 dark:text-gray-500">No admin found</p>
+            )}
+          </div>
+        )}
       </div>
     </motion.aside>
   );
