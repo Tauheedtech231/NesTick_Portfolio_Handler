@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Faculty, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
@@ -8,23 +8,66 @@ import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiUsers, FiMail, FiBriefcase, F
 import Image from 'next/image';
 
 interface FacultySectionProps {
-  data: Faculty[];
   college: College;
-  onUpdate: (data: Faculty[]) => void;
 }
 
-export function FacultySection({ data, onUpdate }: FacultySectionProps) {
+export function FacultySection({ college }: FacultySectionProps) {
+  const STORAGE_KEY = `faculty_${college.id}`;
   const [isEditing, setIsEditing] = useState(false);
-  const [faculty, setFaculty] = useState<Faculty[]>(data);
+  const [faculty, setFaculty] = useState<Faculty[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ✅ Load faculty data from database
+  useEffect(() => {
+    const loadFacultyData = async () => {
+      setIsLoading(true);
+      try {
+        // Try loading from localStorage first for quick display
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          setFaculty(parsedData.faculty || []);
+        }
+
+        // Then load from database
+        const response = await fetch(
+          `/api/sections?template_id=1&section_name=Faculty`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sections && data.sections.length > 0) {
+            const dbContent = data.sections[0].content;
+            if (dbContent && dbContent.faculty) {
+              setFaculty(dbContent.faculty);
+              // Also save to localStorage for offline access
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                faculty: dbContent.faculty,
+                loadedAt: new Date().toISOString()
+              }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading faculty data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFacultyData();
+  }, [STORAGE_KEY]);
 
   const addFaculty = () => {
     const newFaculty: Faculty = {
-      id: `fac-${Date.now()}`,
+      id: `fac-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: '',
       position: '',
       department: '',
       email: '',
       bio: '',
+      image: undefined,
       order: faculty.length + 1,
     };
     setFaculty([...faculty, newFaculty]);
@@ -40,15 +83,91 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
     setFaculty(faculty.filter((_, i) => i !== index));
   };
 
-  const saveChanges = () => {
-    onUpdate(faculty);
-    setIsEditing(false);
+  const saveChanges = async () => {
+    setIsSaving(true);
+    try {
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        faculty,
+        savedAt: new Date().toISOString()
+      }));
+
+      // Save to database
+      const dbContent = {
+        faculty: faculty.map(member => ({
+          id: member.id,
+          name: member.name,
+          position: member.position,
+          department: member.department,
+          email: member.email,
+          bio: member.bio,
+          image: member.image || null,
+          order: member.order
+        }))
+      };
+
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: 1,
+          section_name: "Faculty",
+          content: dbContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await response.json();
+      console.log('Saved faculty to database:', result);
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving faculty:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const cancelEditing = () => {
-    setFaculty(data);
+    // Reload from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsedData = JSON.parse(saved);
+      setFaculty(parsedData.faculty || []);
+    }
     setIsEditing(false);
   };
+
+  // Handle image upload for faculty member
+  const handleImageChange = (index: number, fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      updateFaculty(index, 'image', fileOrString);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateFaculty(index, 'image', reader.result as string);
+    };
+    reader.readAsDataURL(fileOrString);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading faculty data...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
@@ -76,10 +195,11 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
             </Button>
             <Button
               onClick={saveChanges}
+              disabled={isSaving}
               className="w-full sm:w-auto"
             >
               <FiSave className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         )}
@@ -146,7 +266,7 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
                     </div>
                     <UploadImage
                       value={member.image}
-                      onChange={(url) => updateFaculty(index, 'image', url)}
+                      onChange={(file) => handleImageChange(index, file)}
                       onRemove={() => updateFaculty(index, 'image', '')}
                       aspectRatio="square"
                       disabled={!isEditing}
@@ -237,7 +357,7 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
       ) : (
         /* View Mode - Faculty Cards */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {faculty.map((member) => (
+          {faculty.sort((a, b) => (a.order || 0) - (b.order || 0)).map((member) => (
             <div
               key={member.id}
               className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
@@ -255,11 +375,11 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
                   </div>
                 ) : (
                   <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold mb-4 shadow-lg">
-                    {member.name.split(' ').map(n => n[0]).join('')}
+                    {member.name ? member.name.split(' ').map(n => n[0]).join('') : 'FM'}
                   </div>
                 )}
                 <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">
-                  {member.name}
+                  {member.name || 'Faculty Member'}
                 </h3>
                 <div className="space-y-2">
                   <p className="text-blue-600 dark:text-blue-400 text-sm font-semibold">
@@ -273,17 +393,19 @@ export function FacultySection({ data, onUpdate }: FacultySectionProps) {
               
               <div className="space-y-4">
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-4">
-                  {member.bio}
+                  {member.bio || 'No biography available'}
                 </p>
-                <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-                  >
-                    <FiMail className="w-4 h-4 mr-2" />
-                    {member.email}
-                  </a>
-                </div>
+                {member.email && (
+                  <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
+                    >
+                      <FiMail className="w-4 h-4 mr-2" />
+                      {member.email}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           ))}

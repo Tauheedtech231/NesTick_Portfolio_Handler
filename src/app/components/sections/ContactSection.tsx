@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContactInfo, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button'; 
 import { 
@@ -19,27 +19,90 @@ import {
   FiCopy
 } from 'react-icons/fi';
 import { validateEmail, validateUrl } from '@/lib/utils';
-/* eslint-disable */
 
 interface ContactSectionProps {
-  data: any;
   college: College;
-  onUpdate: (data: any) => void;
 }
 
-export function ContactSection({ data, college, onUpdate }: ContactSectionProps) {
+export function ContactSection({ college }: ContactSectionProps) {
+  const STORAGE_KEY = `contacts_${college.id}`;
+  
   const [isEditing, setIsEditing] = useState(false);
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(data ?? college.contact);
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    email: '',
+    phone: '',
+    address: '',
+    website: '',
+    socialMedia: {
+      facebook: '',
+      twitter: '',
+      linkedin: '',
+      instagram: ''
+    }
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ✅ Load contact data from database
+  useEffect(() => {
+    const loadContactData = async () => {
+      setIsLoading(true);
+      try {
+        // Try loading from localStorage first for quick display
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          setContactInfo(parsedData.contactInfo || {});
+        }
+
+        // Then load from database
+        const response = await fetch(
+          `/api/sections?template_id=1&section_name=Contacts`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sections && data.sections.length > 0) {
+            const dbContent = data.sections[0].content;
+            if (dbContent && dbContent.contactInfo) {
+              setContactInfo({
+                email: dbContent.contactInfo.email || '',
+                phone: dbContent.contactInfo.phone || '',
+                address: dbContent.contactInfo.address || '',
+                website: dbContent.contactInfo.website || '',
+                socialMedia: {
+                  facebook: dbContent.contactInfo.socialMedia?.facebook || '',
+                  twitter: dbContent.contactInfo.socialMedia?.twitter || '',
+                  linkedin: dbContent.contactInfo.socialMedia?.linkedin || '',
+                  instagram: dbContent.contactInfo.socialMedia?.instagram || ''
+                }
+              });
+              
+              // Also save to localStorage for offline access
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                contactInfo: dbContent.contactInfo,
+                loadedAt: new Date().toISOString()
+              }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading contact data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadContactData();
+  }, [STORAGE_KEY]);
 
   const updateContact = (patch: Partial<ContactInfo>) => {
-    const next: ContactInfo = {
-      ...contactInfo,
+    setContactInfo(prev => ({
+      ...prev,
       ...patch,
-    };
-    setContactInfo(next);
-    onUpdate(next);
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -83,18 +146,73 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
     return Object.keys(newErrors).length === 0;
   };
 
-  const saveChanges = () => {
-    if (validateForm()) {
-      onUpdate(contactInfo);
+  const saveChanges = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        contactInfo,
+        savedAt: new Date().toISOString()
+      }));
+
+      // Prepare content for database
+      const dbContent = {
+        contactInfo: {
+          email: contactInfo.email || '',
+          phone: contactInfo.phone || '',
+          address: contactInfo.address || '',
+          website: contactInfo.website || '',
+          socialMedia: {
+            facebook: contactInfo.socialMedia?.facebook || '',
+            twitter: contactInfo.socialMedia?.twitter || '',
+            linkedin: contactInfo.socialMedia?.linkedin || '',
+            instagram: contactInfo.socialMedia?.instagram || ''
+          }
+        }
+      };
+
+      // Save to database
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: 1,
+          section_name: "Contacts",
+          content: dbContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await response.json();
+      console.log('Saved contact info to database:', result);
+      
       setIsEditing(false);
       setErrors({});
+    } catch (error) {
+      console.error('Error saving contact info:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const cancelEditing = () => {
-    const original = data ?? college.contact;
-    setContactInfo(original);
-    onUpdate(original);
+    // Reload from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsedData = JSON.parse(saved);
+      setContactInfo(parsedData.contactInfo || {});
+    }
     setIsEditing(false);
     setErrors({});
   };
@@ -123,6 +241,17 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading contact information...</span>
+        </div>
+      </div>
+    );
+  }
 
   const socialMediaPlatforms = [
     { 
@@ -186,10 +315,11 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
             </Button>
             <Button
               onClick={saveChanges}
+              disabled={isSaving}
               className="w-full sm:w-auto"
             >
               <FiSave className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         )}
@@ -224,7 +354,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                   <div>
                     <input
                       type="email"
-                      value={contactInfo.email}
+                      value={contactInfo.email || ''}
                       onChange={(e) => updateContactField('email', e.target.value)}
                       className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.email 
@@ -240,7 +370,9 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                 ) : (
                   <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiMail className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-900 dark:text-white">{contactInfo.email}</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {contactInfo.email || 'Not provided'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -255,7 +387,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                   <div>
                     <input
                       type="tel"
-                      value={contactInfo.phone}
+                      value={contactInfo.phone || ''}
                       onChange={(e) => updateContactField('phone', e.target.value)}
                       className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
                         errors.phone 
@@ -271,7 +403,9 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                 ) : (
                   <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiPhone className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-900 dark:text-white">{contactInfo.phone}</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {contactInfo.phone || 'Not provided'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -285,7 +419,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                 {isEditing ? (
                   <div>
                     <textarea
-                      value={contactInfo.address}
+                      value={contactInfo.address || ''}
                       onChange={(e) => updateContactField('address', e.target.value)}
                       rows={3}
                       className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none ${
@@ -302,7 +436,9 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                 ) : (
                   <div className="flex items-start gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                     <FiMapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                    <span className="text-gray-900 dark:text-white leading-relaxed">{contactInfo.address}</span>
+                    <span className="text-gray-900 dark:text-white leading-relaxed">
+                      {contactInfo.address || 'Not provided'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -331,7 +467,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                     )}
                   </div>
                 ) : (
-                  contactInfo.website && (
+                  contactInfo.website ? (
                     <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                       <div className="flex items-center gap-3">
                         <FiGlobe className="w-5 h-5 text-gray-400" />
@@ -347,6 +483,10 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       >
                         <FiExternalLink className="w-4 h-4" />
                       </a>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl text-gray-500 dark:text-gray-400 italic">
+                      No website provided
                     </div>
                   )
                 )}
@@ -402,7 +542,7 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                       )}
                     </div>
                   ) : (
-                    contactInfo.socialMedia?.[key as keyof typeof contactInfo.socialMedia] && (
+                    contactInfo.socialMedia?.[key as keyof typeof contactInfo.socialMedia] ? (
                       <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
                         <div className="flex items-center gap-3">
                           <Icon className={`w-5 h-5 ${color}`} />
@@ -418,6 +558,10 @@ export function ContactSection({ data, college, onUpdate }: ContactSectionProps)
                         >
                           <FiExternalLink className="w-4 h-4" />
                         </a>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-xl text-gray-500 dark:text-gray-400 italic">
+                        No {label} link provided
                       </div>
                     )
                   )}

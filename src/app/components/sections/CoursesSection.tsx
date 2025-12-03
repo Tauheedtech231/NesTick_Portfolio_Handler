@@ -1,16 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Course } from '@/app/lib/gsap';
+import { Course, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button'; 
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, FiChevronDown, FiTag, FiClock, FiCreditCard } from 'react-icons/fi';
 /* eslint-disable */
 
 interface CoursesSectionProps {
-  data: Course[];
-  college: any;
-  onUpdate: (data: Course[]) => void;
+  college: College;
 }
 
 interface Department {
@@ -19,55 +17,98 @@ interface Department {
   createdAt: string;
 }
 
-export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps) {
+export function CoursesSection({ college }: CoursesSectionProps) {
+  const STORAGE_KEY = `courses_${college.id}`;
+  const DEPARTMENTS_KEY = `departments_${college.id}`;
+  
   const [isEditing, setIsEditing] = useState(false);
-  const [courses, setCourses] = useState<Course[]>(data);
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [courses, setCourses] = useState<Course[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState<number | null>(null);
   const [newDepartmentName, setNewDepartmentName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Load departments from localStorage on component mount
+  // ✅ Load courses and departments data from database
   useEffect(() => {
-    const savedDepartments = localStorage.getItem('departments');
-    if (savedDepartments) {
-      setDepartments(JSON.parse(savedDepartments));
-    } else {
-      // Initialize with default departments if none exist
-      const defaultDepartments: Department[] = [
-        { id: 'dept-1', name: 'Computer Science', createdAt: new Date().toISOString() },
-        { id: 'dept-2', name: 'Electrical Engineering', createdAt: new Date().toISOString() },
-        { id: 'dept-3', name: 'Mechanical Engineering', createdAt: new Date().toISOString() },
-        { id: 'dept-4', name: 'Business Administration', createdAt: new Date().toISOString() },
-        { id: 'dept-5', name: 'Arts and Sciences', createdAt: new Date().toISOString() },
-      ];
-      setDepartments(defaultDepartments);
-      localStorage.setItem('departments', JSON.stringify(defaultDepartments));
-    }
-  }, []);
+    const loadCoursesData = async () => {
+      setIsLoading(true);
+      try {
+        // Try loading from localStorage first for quick display
+        const savedCourses = localStorage.getItem(STORAGE_KEY);
+        const savedDepartments = localStorage.getItem(DEPARTMENTS_KEY);
+        
+        if (savedCourses) {
+          const parsedCourses = JSON.parse(savedCourses);
+          setCourses(parsedCourses.courses || []);
+        }
+        
+        if (savedDepartments) {
+          const parsedDepartments = JSON.parse(savedDepartments);
+          setDepartments(parsedDepartments.departments || []);
+        }
 
-  // Save departments to localStorage whenever departments change
-  useEffect(() => {
-    if (departments.length > 0) {
-      localStorage.setItem('departments', JSON.stringify(departments));
-    }
-  }, [departments]);
+        // Then load from database
+        const response = await fetch(
+          `/api/sections?template_id=1&section_name=Courses`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sections && data.sections.length > 0) {
+            const dbContent = data.sections[0].content;
+            
+            // Load courses
+            if (dbContent && dbContent.courses) {
+              setCourses(dbContent.courses);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                courses: dbContent.courses,
+                loadedAt: new Date().toISOString()
+              }));
+            }
+            
+            // Load departments (might be separate or part of courses section)
+            if (dbContent && dbContent.departments) {
+              setDepartments(dbContent.departments);
+              localStorage.setItem(DEPARTMENTS_KEY, JSON.stringify({
+                departments: dbContent.departments,
+                loadedAt: new Date().toISOString()
+              }));
+            } else {
+              // If no departments in database, create default ones
+              const defaultDepartments: Department[] = [
+                { id: 'dept-1', name: 'Computer Science', createdAt: new Date().toISOString() },
+                { id: 'dept-2', name: 'Electrical Engineering', createdAt: new Date().toISOString() },
+                { id: 'dept-3', name: 'Mechanical Engineering', createdAt: new Date().toISOString() },
+                { id: 'dept-4', name: 'Business Administration', createdAt: new Date().toISOString() },
+                { id: 'dept-5', name: 'Arts and Sciences', createdAt: new Date().toISOString() },
+              ];
+              setDepartments(defaultDepartments);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading courses data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // Save courses to localStorage whenever courses change (in edit mode)
-  useEffect(() => {
-    if (isEditing && courses.length > 0) {
-      localStorage.setItem('courses', JSON.stringify(courses));
-    }
-  }, [courses, isEditing]);
+    loadCoursesData();
+  }, [STORAGE_KEY, DEPARTMENTS_KEY]);
 
   const addCourse = () => {
     const newCourse: Course = {
-      id: `course-${Date.now()}`,
+      id: `course-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: '',
       duration: '',
       department: departments.length > 0 ? departments[0].name : '',
       description: '',
       credits: 0,
+      image: undefined,
+      syllabus: '',
+      feeStructure: '',
     };
     setCourses([...courses, newCourse]);
   };
@@ -82,7 +123,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
     setCourses(courses.filter((_, i) => i !== index));
   };
 
-  const addNewDepartment = () => {
+  const addNewDepartment = async () => {
     if (newDepartmentName.trim() && !departments.find(dept => 
       dept.name.toLowerCase() === newDepartmentName.trim().toLowerCase()
     )) {
@@ -99,6 +140,12 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
       if (showDepartmentDropdown !== null) {
         updateCourse(showDepartmentDropdown, 'department', newDepartment.name);
       }
+      
+      // Save departments to localStorage for immediate access
+      localStorage.setItem(DEPARTMENTS_KEY, JSON.stringify({
+        departments: updatedDepartments,
+        savedAt: new Date().toISOString()
+      }));
     }
   };
 
@@ -107,22 +154,94 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
     setShowDepartmentDropdown(null);
   };
 
-  const saveChanges = () => {
-    onUpdate(courses);
-    setIsEditing(false);
-    // Also save to localStorage for persistence
-    localStorage.setItem('courses', JSON.stringify(courses));
+  const saveChanges = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Validate required fields
+      const invalidCourses = courses.filter(course => 
+        !course.name.trim() || !course.duration || !course.department || !course.description.trim()
+      );
+
+      if (invalidCourses.length > 0) {
+        alert(`Please fill all required fields for ${invalidCourses.length} course(s).`);
+        setIsSaving(false);
+        return;
+      }
+
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        courses,
+        savedAt: new Date().toISOString()
+      }));
+
+      // Prepare content for database
+      const dbContent = {
+        courses: courses.map(course => ({
+          id: course.id,
+          name: course.name,
+          duration: course.duration,
+          department: course.department,
+          description: course.description,
+          credits: course.credits || 0,
+          image: course.image || null,
+          syllabus: course.syllabus || '',
+          feeStructure: course.feeStructure || ''
+        })),
+        departments: departments
+      };
+
+      // Save to database
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: 1,
+          section_name: "Courses",
+          content: dbContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await response.json();
+      console.log('Saved courses to database:', result);
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving courses:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const cancelEditing = () => {
-    // Restore from localStorage or original data
-    const savedCourses = localStorage.getItem('courses');
+    // Reload from localStorage
+    const savedCourses = localStorage.getItem(STORAGE_KEY);
     if (savedCourses) {
-      setCourses(JSON.parse(savedCourses));
-    } else {
-      setCourses(data);
+      const parsedData = JSON.parse(savedCourses);
+      setCourses(parsedData.courses || []);
     }
     setIsEditing(false);
+  };
+
+  // Handle image upload for courses
+  const handleImageChange = (index: number, fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      updateCourse(index, 'image', fileOrString);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateCourse(index, 'image', reader.result as string);
+    };
+    reader.readAsDataURL(fileOrString);
   };
 
   // Get unique departments for filter from current courses
@@ -130,6 +249,17 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
   const filteredCourses = departmentFilter === 'all' 
     ? courses 
     : courses.filter(course => course.department === departmentFilter);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading courses data...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
@@ -157,10 +287,11 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
             </Button>
             <Button
               onClick={saveChanges}
+              disabled={isSaving}
               className="w-full sm:w-auto"
             >
               <FiSave className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         )}
@@ -250,7 +381,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                     </div>
                     <UploadImage
                       value={course.image}
-                      onChange={(url) => updateCourse(index, 'image', url)}
+                      onChange={(file) => handleImageChange(index, file)}
                       onRemove={() => updateCourse(index, 'image', '')}
                       aspectRatio="video"
                       disabled={!isEditing}
@@ -265,7 +396,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                       </label>
                       <input
                         type="text"
-                        value={course.name}
+                        value={course.name || ''}
                         onChange={(e) => updateCourse(index, 'name', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         placeholder="Computer Science and Engineering"
@@ -280,7 +411,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                         </label>
                         <input
                           type="text"
-                          value={course.duration}
+                          value={course.duration || ''}
                           onChange={(e) => updateCourse(index, 'duration', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           placeholder="4 Years"
@@ -351,7 +482,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                         </label>
                         <input
                           type="number"
-                          value={course.credits}
+                          value={course.credits || 0}
                           onChange={(e) => updateCourse(index, 'credits', parseInt(e.target.value) || 0)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           placeholder="160"
@@ -395,7 +526,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                         Describe the course curriculum, objectives, and career opportunities
                       </p>
                       <textarea
-                        value={course.description}
+                        value={course.description || ''}
                         onChange={(e) => updateCourse(index, 'description', e.target.value)}
                         rows={4}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -423,15 +554,15 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {course.name}
+                      {course.name || 'Untitled Course'}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {course.department}
+                      {course.department || 'No Department'}
                     </p>
                   </div>
                 </div>
                 <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {course.department}
+                  {course.department || 'General'}
                 </span>
               </div>
 
@@ -439,14 +570,14 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                 <div className="mb-4 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
                   <img
                     src={course.image}
-                    alt={course.name}
+                    alt={course.name || 'Course image'}
                     className="w-full h-48 object-cover"
                   />
                 </div>
               )}
 
               <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                {course.description}
+                {course.description || 'No description available'}
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-4">
@@ -456,7 +587,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                     Duration
                   </div>
                   <div className="font-semibold text-blue-700 dark:text-blue-300">
-                    {course.duration}
+                    {course.duration || 'N/A'}
                   </div>
                 </div>
                 <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
@@ -465,7 +596,7 @@ export function CoursesSection({ data, college, onUpdate }: CoursesSectionProps)
                     Credits
                   </div>
                   <div className="font-semibold text-green-700 dark:text-green-300">
-                    {course.credits}
+                    {course.credits || 0}
                   </div>
                 </div>
               </div>

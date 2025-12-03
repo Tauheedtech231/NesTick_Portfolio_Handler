@@ -460,7 +460,7 @@ function DashboardContent({ initialData }: DashboardProps) {
 
   return (
     <PortalLayout
-      collegeName={collegeName}
+      // collegeName={collegeName}
       logo={collegeData.college?.logo || ''}
       onPreview={() => setIsPreviewOpen(true)}
       activeSection={activeSection}

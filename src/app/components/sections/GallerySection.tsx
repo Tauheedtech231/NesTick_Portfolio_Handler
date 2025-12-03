@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { GalleryItem } from '@/app/lib/gsap';
+import { GalleryItem, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiAward, FiImage, FiStar, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
@@ -9,9 +9,7 @@ import Image from 'next/image';
 import { gsap } from 'gsap';
 
 interface GallerySectionProps {
-  data: GalleryItem[];
-  college: string;
-  onUpdate: (data: GalleryItem[]) => void;
+  college: College;
 }
 
 interface AlertMessage {
@@ -20,11 +18,55 @@ interface AlertMessage {
   title: string;
 }
 
-export function GallerySection({ data, onUpdate }: GallerySectionProps) {
+export function GallerySection({ college }: GallerySectionProps) {
+  const STORAGE_KEY = `gallery_${college.id}`;
   const [isEditing, setIsEditing] = useState(false);
-  const [gallery, setGallery] = useState<GalleryItem[]>(data);
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'award' | 'photo' | 'achievement'>('all');
   const [alerts, setAlerts] = useState<AlertMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ✅ Load gallery data from database
+  useEffect(() => {
+    const loadGalleryData = async () => {
+      setIsLoading(true);
+      try {
+        // Try loading from localStorage first for quick display
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          setGallery(parsedData.gallery || []);
+        }
+
+        // Then load from database
+        const response = await fetch(
+          `/api/sections?template_id=1&section_name=Gallery`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sections && data.sections.length > 0) {
+            const dbContent = data.sections[0].content;
+            if (dbContent && dbContent.gallery) {
+              setGallery(dbContent.gallery);
+              // Also save to localStorage for offline access
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                gallery: dbContent.gallery,
+                loadedAt: new Date().toISOString()
+              }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading gallery data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadGalleryData();
+  }, [STORAGE_KEY]);
 
   // GSAP animations
   useEffect(() => {
@@ -89,7 +131,7 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
 
   const addItem = () => {
     const newItem: GalleryItem = {
-      id: `gallery-${Date.now()}`,
+      id: `gallery-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
@@ -117,7 +159,10 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
     showAlert('warning', 'Item Removed', `"${itemTitle}" has been removed from the gallery.`);
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
+    setIsSaving(true);
+    
+    // Validate required fields
     const invalidItems = gallery.filter(item => 
       !item.title.trim() || !item.description.trim() || !item.image
     );
@@ -126,18 +171,81 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
       showAlert('error', 'Validation Error', 
         `Please fill all required fields (title, description, and image) for ${invalidItems.length} item(s).`
       );
+      setIsSaving(false);
       return;
     }
 
-    onUpdate(gallery);
-    setIsEditing(false);
-    showAlert('success', 'Changes Saved', 'All gallery changes have been successfully saved!');
+    try {
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        gallery,
+        savedAt: new Date().toISOString()
+      }));
+
+      // Save to database
+      const dbContent = {
+        gallery: gallery.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          date: item.date,
+          image: item.image,
+          category: item.category || 'photo'
+        }))
+      };
+
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: 1,
+          section_name: "Gallery",
+          content: dbContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await response.json();
+      console.log('Saved gallery to database:', result);
+      
+      setIsEditing(false);
+      showAlert('success', 'Changes Saved', 'All gallery changes have been successfully saved!');
+    } catch (error) {
+      console.error('Error saving gallery:', error);
+      showAlert('error', 'Save Failed', 'Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const cancelEditing = () => {
-    setGallery(data);
+    // Reload from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsedData = JSON.parse(saved);
+      setGallery(parsedData.gallery || []);
+    }
     setIsEditing(false);
     showAlert('warning', 'Changes Cancelled', 'All unsaved changes have been discarded.');
+  };
+
+  // Handle image upload for gallery items
+  const handleImageChange = (index: number, fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      updateItem(index, 'image', fileOrString);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateItem(index, 'image', reader.result as string);
+    };
+    reader.readAsDataURL(fileOrString);
   };
 
   const filteredItems = filter === 'all' 
@@ -161,6 +269,17 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
       default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading gallery data...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
@@ -213,10 +332,11 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
             </Button>
             <Button
               onClick={saveChanges}
+              disabled={isSaving}
               className="w-full sm:w-auto"
             >
               <FiSave className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         )}
@@ -331,7 +451,7 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                     </div>
                     <UploadImage
                       value={item.image}
-                      onChange={(url) => updateItem(index, 'image', url)}
+                      onChange={(file) => handleImageChange(index, file)}
                       onRemove={() => updateItem(index, 'image', '')}
                       aspectRatio="video"
                       disabled={!isEditing}
@@ -346,7 +466,7 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                       </label>
                       <input
                         type="text"
-                        value={item.title}
+                        value={item.title || ''}
                         onChange={(e) => updateItem(index, 'title', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         placeholder="Best Engineering College Award"
@@ -370,7 +490,7 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                           Category *
                         </label>
                         <select
-                          value={item.category}
+                          value={item.category || 'photo'}
                           onChange={(e) => updateItem(index, 'category', e.target.value as "photo")}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         >
@@ -387,24 +507,24 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                           Description * (Max 500 characters)
                         </label>
                         <span className={`text-xs ${
-                          item.description.length > 450 
+                          (item.description?.length || 0) > 450 
                             ? 'text-red-500' 
-                            : item.description.length > 400 
+                            : (item.description?.length || 0) > 400 
                             ? 'text-yellow-500' 
                             : 'text-gray-500'
                         }`}>
-                          {item.description.length}/500
+                          {item.description?.length || 0}/500
                         </span>
                       </div>
                       <textarea
-                        value={item.description}
+                        value={item.description || ''}
                         onChange={(e) => updateItem(index, 'description', e.target.value)}
                         rows={3}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         placeholder="Describe this achievement or photo..."
                         maxLength={500}
                       />
-                      {item.description.length >= 500 && (
+                      {(item.description?.length || 0) >= 500 && (
                         <p className="text-xs text-red-500 mt-1">
                           Maximum character limit reached
                         </p>
@@ -428,9 +548,10 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                 {item.image ? (
                   <Image
                     src={item.image}
-                    alt={item.title}
+                    alt={item.title || 'Gallery image'}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -438,8 +559,8 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                   </div>
                 )}
                 <div className="absolute top-3 right-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category)}`}>
-                    {getCategoryIcon(item.category)}
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category || 'photo')}`}>
+                    {getCategoryIcon(item.category || 'photo')}
                   </span>
                 </div>
               </div>
@@ -447,7 +568,7 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-gray-900 dark:text-white text-lg line-clamp-1">
-                    {item.title}
+                    {item.title || 'Untitled Item'}
                   </h3>
                 </div>
                 
@@ -456,12 +577,12 @@ export function GallerySection({ data, onUpdate }: GallerySectionProps) {
                 </p>
                 
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
-                  {item.description}
+                  {item.description || 'No description available'}
                 </p>
                 
                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {item.description.length} characters
+                    {(item.description?.length || 0)} characters
                   </p>
                 </div>
               </div>

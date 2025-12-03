@@ -4,10 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { SectionType } from '@/app/lib/gsap';
-import { College } from '@/app/types/index';
+
+interface Template {
+  id: number;
+  name: string;
+}
+/* eslint-disable */
 
 interface PortalLayoutProps {
-  collegeName: string;
   logo?: string;
   children: React.ReactNode;
   onPreview: () => void;
@@ -16,7 +20,6 @@ interface PortalLayoutProps {
 }
 
 export function PortalLayout({
-  collegeName,
   logo,
   children,
   onPreview,
@@ -24,45 +27,42 @@ export function PortalLayout({
   onSectionChange,
 }: PortalLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [activeModules, setActiveModules] = useState<string[]>([]);
+  const [activeModules, setActiveModules] = useState<string[]>([
+    'about',
+    'faculty',
+    'courses',
+    'events',
+    'gallery',
+    'contact',
+  ]);
+  const [templateName, setTemplateName] = useState<string>('Loading...');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const getCurrentCollegeId = () => {
-    if (typeof window === 'undefined') return null;
-    const raw = localStorage.getItem('auth_college');
-    if (!raw) return null;
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed?.collegeId || null;
-    } catch {
-      return null;
-    }
-  };
-
-  const CURRENT_COLLEGE_ID = getCurrentCollegeId();
-
+  // Fetch template data from /api/templates (example: first template)
   useEffect(() => {
-    if (!CURRENT_COLLEGE_ID) {
-      setErrorMessage('No logged-in college found. Showing all modules.');
-      setActiveModules(['about', 'faculty', 'courses', 'events', 'gallery', 'contact']);
-      return;
+    async function fetchTemplate() {
+      try {
+        const res = await fetch('/api/templates');
+        if (!res.ok) throw new Error('Failed to fetch templates');
+
+        const templates: Template[] = await res.json();
+        if (templates.length === 0) {
+          setErrorMessage('No templates found.');
+          setTemplateName('Default Template');
+          return;
+        }
+
+        const currentTemplate = templates[0];
+        setTemplateName(currentTemplate.name);
+      } catch (err: any) {
+        console.error(err);
+        setErrorMessage(err.message || 'Error fetching templates');
+        setTemplateName('Default Template');
+      }
     }
 
-    const rawColleges = localStorage.getItem('colleges');
-    const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
-    const found = colleges.find((c) => c.id === CURRENT_COLLEGE_ID);
-
-    if (found) {
-      const sourceModules = found.modules ?? {};
-      const enabled = Object.keys(sourceModules).filter(
-        (k) => sourceModules[k as keyof typeof sourceModules]
-      );
-      setActiveModules(enabled as (keyof College['modules'])[]);
-    } else {
-      setActiveModules(['about', 'faculty', 'courses', 'events', 'gallery', 'contact']);
-      setErrorMessage('No college data found for this account. Showing all modules.');
-    }
-  }, [CURRENT_COLLEGE_ID]);
+    fetchTemplate();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-white text-black dark:bg-black dark:text-white transition-colors duration-500">
@@ -90,9 +90,9 @@ export function PortalLayout({
 
       {/* 🔹 Main Content */}
       <div className="flex-1 flex flex-col transition-colors duration-500 md:ml-0">
-        {/* Pass sidebar toggle to Header */}
+        {/* Header */}
         <Header
-          collegeName={collegeName}
+          collegeName={templateName} // Template name in header
           logo={logo}
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Event } from '@/app/lib/gsap';
+import React, { useState, useEffect } from 'react';
+import { Event, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiCalendar, FiMapPin, FiStar } from 'react-icons/fi';
@@ -9,25 +9,67 @@ import { formatDate } from '@/lib/utils';
 /* eslint-disable */
 
 interface EventsSectionProps {
-  data: Event[];
-  college: any;
-  onUpdate: (data: Event[]) => void;
+  college: College;
 }
 
-export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
+export function EventsSection({ college }: EventsSectionProps) {
+  const STORAGE_KEY = `events_${college.id}`;
   const [isEditing, setIsEditing] = useState(false);
-  const [events, setEvents] = useState<Event[]>(data);
-/* eslint-disable */
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ✅ Load events data from database
+  useEffect(() => {
+    const loadEventsData = async () => {
+      setIsLoading(true);
+      try {
+        // Try loading from localStorage first for quick display
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          setEvents(parsedData.events || []);
+        }
+
+        // Then load from database
+        const response = await fetch(
+          `/api/sections?template_id=1&section_name=Events`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sections && data.sections.length > 0) {
+            const dbContent = data.sections[0].content;
+            if (dbContent && dbContent.events) {
+              setEvents(dbContent.events);
+              // Also save to localStorage for offline access
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                events: dbContent.events,
+                loadedAt: new Date().toISOString()
+              }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading events data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEventsData();
+  }, [STORAGE_KEY]);
 
   const addEvent = () => {
     const newEvent: Event = {
-      id: `event-${Date.now()}`,
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: '',
       description: '',
       date: new Date().toISOString().split('T')[0],
       location: '',
       type: 'event',
       featured: false,
+      image: undefined,
     };
     setEvents([...events, newEvent]);
   };
@@ -42,15 +84,91 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
     setEvents(events.filter((_, i) => i !== index));
   };
 
-  const saveChanges = () => {
-    onUpdate(events);
-    setIsEditing(false);
+  const saveChanges = async () => {
+    setIsSaving(true);
+    try {
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        events,
+        savedAt: new Date().toISOString()
+      }));
+
+      // Save to database
+      const dbContent = {
+        events: events.map(event => ({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          date: event.date,
+          location: event.location,
+          type: event.type,
+          featured: event.featured || false,
+          image: event.image || null
+        }))
+      };
+
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: 1,
+          section_name: "Events",
+          content: dbContent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await response.json();
+      console.log('Saved events to database:', result);
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving events:', error);
+      alert('Failed to save changes. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const cancelEditing = () => {
-    setEvents(data);
+    // Reload from localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsedData = JSON.parse(saved);
+      setEvents(parsedData.events || []);
+    }
     setIsEditing(false);
   };
+
+  // Handle image upload for events
+  const handleImageChange = (index: number, fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      updateEvent(index, 'image', fileOrString);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateEvent(index, 'image', reader.result as string);
+    };
+    reader.readAsDataURL(fileOrString);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading events data...</span>
+        </div>
+      </div>
+    );
+  }
 
   const featuredEvents = events.filter(event => event.featured);
   const regularEvents = events.filter(event => !event.featured);
@@ -81,10 +199,11 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
             </Button>
             <Button
               onClick={saveChanges}
+              disabled={isSaving}
               className="w-full sm:w-auto"
             >
               <FiSave className="w-4 h-4 mr-2" />
-              Save Changes
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         )}
@@ -151,7 +270,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                     </div>
                     <UploadImage
                       value={event.image}
-                      onChange={(url) => updateEvent(index, 'image', url)}
+                      onChange={(file) => handleImageChange(index, file)}
                       onRemove={() => updateEvent(index, 'image', '')}
                       aspectRatio="video"
                       disabled={!isEditing}
@@ -166,7 +285,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                       </label>
                       <input
                         type="text"
-                        value={event.title}
+                        value={event.title || ''}
                         onChange={(e) => updateEvent(index, 'title', e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         placeholder="Annual Tech Symposium"
@@ -193,7 +312,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                         </label>
                         <input
                           type="text"
-                          value={event.location}
+                          value={event.location || ''}
                           onChange={(e) => updateEvent(index, 'location', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           placeholder="Main Campus Auditorium"
@@ -207,7 +326,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                           Event Type
                         </label>
                         <select
-                          value={event.type}
+                          value={event.type || 'event'}
                           onChange={(e) => updateEvent(index, 'type', e.target.value as 'event' | 'announcement')}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                         >
@@ -219,7 +338,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                         <input
                           type="checkbox"
                           id={`featured-${index}`}
-                          checked={event.featured}
+                          checked={event.featured || false}
                           onChange={(e) => updateEvent(index, 'featured', e.target.checked)}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                         />
@@ -238,7 +357,7 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                         Provide details about the event or announcement
                       </p>
                       <textarea
-                        value={event.description}
+                        value={event.description || ''}
                         onChange={(e) => updateEvent(index, 'description', e.target.value)}
                         rows={4}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -285,12 +404,12 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                         {event.type}
                       </span>
                     </div>
-                    <h4 className="text-xl font-bold mb-3">{event.title}</h4>
-                    <p className="opacity-90 mb-4 leading-relaxed">{event.description}</p>
+                    <h4 className="text-xl font-bold mb-3">{event.title || 'Untitled Event'}</h4>
+                    <p className="opacity-90 mb-4 leading-relaxed">{event.description || 'No description available'}</p>
                     <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-2">
                         <FiMapPin className="w-4 h-4" />
-                        {event.location}
+                        {event.location || 'Location not specified'}
                       </span>
                       <div className="flex items-center gap-2 text-yellow-300">
                         <FiStar className="w-4 h-4" />
@@ -330,15 +449,15 @@ export function EventsSection({ data, college, onUpdate }: EventsSectionProps) {
                       <span className="text-sm">{formatDate(event.date)}</span>
                     </div>
                     <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-lg">
-                      {event.title}
+                      {event.title || 'Untitled Event'}
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">
-                      {event.description}
+                      {event.description || 'No description available'}
                     </p>
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                       <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <FiMapPin className="w-4 h-4" />
-                        {event.location}
+                        {event.location || 'Location not specified'}
                       </span>
                       <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
                         {event.type}
