@@ -166,7 +166,7 @@ export default function ModulesPage() {
 
     // Also remove this module from all colleges' module settings
     const updatedColleges = colleges.map(college => {
-      if (college.modules && college.modules[key] !== undefined) {
+      if (college.modules && college.modules[key] !== undefined) {     
         const { [key]: removed, ...remainingModules } = college.modules;
         return { ...college, modules: remainingModules };
       }

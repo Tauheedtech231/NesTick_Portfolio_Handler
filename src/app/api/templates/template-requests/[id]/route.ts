@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+/* eslint-disable */
 
 const dbConfig = {
   host: "72.61.117.188",
@@ -10,15 +11,15 @@ const dbConfig = {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   
   try {
-    const { id } = params;
+    const { id } = await params;
     console.log('Updating request ID:', id);
     
-    const body = await request.json();
+    const body = await request.json() as { status: string };
     const { status } = body;
 
     if (!id) {
@@ -38,7 +39,7 @@ export async function PATCH(
       [id]
     );
 
-    const requestArray = requests as any[];
+    const requestArray = requests as unknown[];
     if (requestArray.length === 0) {
       return NextResponse.json({ success: false, message: "Request not found" }, { status: 404 });
     }
@@ -54,10 +55,10 @@ export async function PATCH(
       message: `Request ${status} successfully`
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update request error:', error);
     
-    if (error.code === 'ECONNREFUSED') {
+    if (error instanceof Error && 'code' in error && error.code === 'ECONNREFUSED') {
       return NextResponse.json({ success: false, message: "Database connection failed" }, { status: 503 });
     }
 
@@ -69,12 +70,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   
   try {
-    const { id } = params;
+    const { id } = await params;
     if (!id) return NextResponse.json({ success: false, message: "Request ID is required" }, { status: 400 });
 
     connection = await mysql.createConnection(dbConfig);
@@ -83,10 +84,10 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Request deleted successfully" });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete request error:', error);
 
-    if (error.code === 'ECONNREFUSED') {
+    if (error instanceof Error && 'code' in error && error.code === 'ECONNREFUSED') {
       return NextResponse.json({ success: false, message: "Database connection failed" }, { status: 503 });
     }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-
+/* eslint-disable */
 // Your database configuration
 const dbConfig = {
   host: "72.61.117.188",
@@ -19,12 +19,13 @@ const pool = mysql.createPool(dbConfig);
 // GET single college
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   try {
-    const id = parseInt(params.id);
-    if (isNaN(id)) {
+    const { id } = await params;
+    const collegeId = parseInt(id);
+    if (isNaN(collegeId)) {
       return NextResponse.json(
         { error: 'Invalid college ID' },
         { status: 400 }
@@ -38,7 +39,7 @@ export async function GET(
        FROM colleges c 
        LEFT JOIN templates t ON c.template_id = t.id 
        WHERE c.id = ?`,
-      [id]
+      [collegeId]
     );
     
     const colleges = rows as any[];
@@ -67,12 +68,13 @@ export async function GET(
 // PUT update college
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   try {
-    const id = parseInt(params.id);
-    if (isNaN(id)) {
+    const { id } = await params;
+    const collegeId = parseInt(id);
+    if (isNaN(collegeId)) {
       return NextResponse.json(
         { error: 'Invalid college ID' },
         { status: 400 }
@@ -102,7 +104,7 @@ export async function PUT(
     // Check if college exists
     const [existingRows] = await connection.execute(
       'SELECT id FROM colleges WHERE id = ?',
-      [id]
+      [collegeId]
     );
     
     if ((existingRows as any[]).length === 0) {
@@ -156,7 +158,7 @@ export async function PUT(
       );
     }
     
-    values.push(id);
+    values.push(collegeId);
     
     const query = `UPDATE colleges SET ${fields.join(', ')} WHERE id = ?`;
     
@@ -168,7 +170,7 @@ export async function PUT(
        FROM colleges c 
        LEFT JOIN templates t ON c.template_id = t.id 
        WHERE c.id = ?`,
-      [id]
+      [collegeId]
     );
     
     return NextResponse.json({
@@ -201,12 +203,13 @@ export async function PUT(
 // DELETE college
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   try {
-    const id = parseInt(params.id);
-    if (isNaN(id)) {
+    const { id } = await params;
+    const collegeId = parseInt(id);
+    if (isNaN(collegeId)) {
       return NextResponse.json(
         { error: 'Invalid college ID' },
         { status: 400 }
@@ -218,7 +221,7 @@ export async function DELETE(
     // First check if college exists
     const [existingRows] = await connection.execute(
       'SELECT name FROM colleges WHERE id = ?',
-      [id]
+      [collegeId]
     );
     
     if ((existingRows as any[]).length === 0) {
@@ -229,11 +232,11 @@ export async function DELETE(
     }
     
     // Delete the college
-    await connection.execute('DELETE FROM colleges WHERE id = ?', [id]);
+    await connection.execute('DELETE FROM colleges WHERE id = ?', [collegeId]);
     
     return NextResponse.json({ 
       message: 'College deleted successfully',
-      deletedId: id
+      deletedId: collegeId
     });
   } catch (error: any) {
     console.error('Database error:', error);

@@ -12,12 +12,12 @@ const dbConfig = {
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   
   try {
-    const id = params.id;
+    const { id } = await params;
     
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
@@ -55,10 +55,10 @@ export async function DELETE(
       message: "Template deleted successfully"
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Delete template error:', error);
     
-    if (error.code === 'ECONNREFUSED') {
+    if (error instanceof Error && 'code' in error && error.code === 'ECONNREFUSED') {
       return NextResponse.json(
         { success: false, message: "Database connection failed" },
         { status: 503 }
@@ -80,12 +80,12 @@ export async function DELETE(
 // GET single template by ID (optional, for future use)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   let connection;
   
   try {
-    const id = params.id;
+    const { id } = await params;
     
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json(
@@ -103,7 +103,7 @@ export async function GET(
       [id]
     );
 
-    const templateArray = templates as any[];
+    const templateArray = templates as unknown[];
 
     if (templateArray.length === 0) {
       return NextResponse.json(
@@ -114,13 +114,13 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      template: templateArray[0]
+      template: templateArray[0] as Record<string, unknown>
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get template error:', error);
     
-    if (error.code === 'ECONNREFUSED') {
+    if (error instanceof Error && 'code' in error && error.code === 'ECONNREFUSED') {
       return NextResponse.json(
         { success: false, message: "Database connection failed" },
         { status: 503 }
