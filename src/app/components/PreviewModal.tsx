@@ -75,7 +75,7 @@ export function PreviewPane({ isOpen, onClose, data }: PreviewPaneProps) {
                   {college.name}
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  Portfolio Preview
+                  Portfolio Previewsmnc m
                 </p>
               </div>
             </div>

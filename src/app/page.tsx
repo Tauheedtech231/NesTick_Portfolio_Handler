@@ -4,28 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { LogOut, User, X, LayoutDashboard } from "lucide-react";
+import { LogOut, User, X, LayoutDashboard, Eye, ExternalLink } from "lucide-react";
 /* eslint-disable */
 
 // Define types
-interface Theme {
-  id: string;
+interface Template {
+  id: number;
   name: string;
   description: string;
-  image: string;
-  zipFile: string;
-  liveUrl?: string;
+  image: string; // base64 image or URL
+  live_url: string | null;
   type: 'free' | 'paid';
-  createdAt: string;
+  created_at: string;
 }
 
 interface BuyNowFormData {
   name: string;
-  collegeName: string;
+  college: string;
   email: string;
-  whatsapp: string;
+  phone: string;
   selectedPlan: string;
-  themeName: string;
+  templateName: string;
 }
 
 interface ContactFormData {
@@ -55,21 +54,22 @@ export default function LandingPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-// run wh
   
-  // New states for themes and buy now modal
-  const [themes, setThemes] = useState<Theme[]>([]);
+  // New states for templates and buy now modal
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   
   const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
     name: '',
-    collegeName: '',
+    college: '',
     email: '',
-    whatsapp: '',
+    phone: '',
     selectedPlan: 'basic',
-    themeName: ''
+    templateName: ''
   });
 
   // Form validation states
@@ -83,10 +83,10 @@ export default function LandingPage() {
   const contactRef = useRef(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const featureCardsRef = useRef<HTMLDivElement[]>([]);
-  const themeCardsRef = useRef<HTMLDivElement[]>([]);
+  const templateCardsRef = useRef<HTMLDivElement[]>([]);
   const formElementsRef = useRef<HTMLDivElement[]>([]);
   
-  // Updated user state to check multiple login sources
+  // Updated user state to check only login_user
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -114,15 +114,15 @@ export default function LandingPage() {
         if (!value.trim()) return 'Email is required';
         if (!validateEmail(value)) return 'Please enter a valid email';
         return '';
-      case 'whatsapp':
-        if (!value.trim()) return 'WhatsApp number is required';
+      case 'phone':
+        if (!value.trim()) return 'Phone number is required';
         if (!validatePhone(value)) return 'Please enter a valid phone number';
         return '';
       case 'name':
         if (!value.trim()) return 'Full name is required';
         if (value.trim().length < 2) return 'Name must be at least 2 characters';
         return '';
-      case 'collegeName':
+      case 'college':
         if (!value.trim()) return 'College name is required';
         return '';
       default:
@@ -130,16 +130,16 @@ export default function LandingPage() {
     }
   };
 
-  // Check for duplicate email for free themes
-  const isDuplicateEmail = (email: string, themeId: string): boolean => {
-    if (typeof window === 'undefined') return false;
-    
-    const existingRequests = JSON.parse(localStorage.getItem('requested_college') || '[]');
-    return existingRequests.some((request: any) => 
-      request.email.toLowerCase() === email.toLowerCase() && 
-      request.theme.id === themeId &&
-      request.theme.type === 'free'
-    );
+  // Check for duplicate email for free templates
+  const checkDuplicateRequest = async (email: string, templateId: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/templates/template-requests/check-duplicate?email=${encodeURIComponent(email)}&template_id=${templateId}`);
+      const data = await response.json();
+      return data.duplicate || false;
+    } catch (error) {
+      console.error('Error checking duplicate:', error);
+      return false;
+    }
   };
 
   // Handle input blur for validation
@@ -166,46 +166,43 @@ export default function LandingPage() {
     }
   };
 
-  // Load themes from localStorage
-  useEffect(() => {
-    const loadThemes = () => {
-      if (typeof window !== 'undefined') {
-        const storedThemes = localStorage.getItem('themes');
-        if (storedThemes) {
-          try {
-            setThemes(JSON.parse(storedThemes));
-          } catch (error) {
-            console.error('Error parsing themes from localStorage:', error);
-          }
-        }
+  // Fetch templates from backend
+  const fetchTemplates = async () => {
+    setLoadingTemplates(true);
+    try {
+      const response = await fetch('/api/templates');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch templates');
       }
-    };
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setTemplates(data.templates);
+      } else {
+        console.error('Failed to load templates:', data.message);
+      }
+    } catch (err: any) {
+      console.error('Error fetching templates:', err);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
 
-    loadThemes();
-    
-    const handleStorageChange = () => {
-      loadThemes();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+  useEffect(() => {
+    fetchTemplates();
   }, []);
 
-  // Updated user authentication check - check multiple login sources
+  // Updated user authentication check - only check login_user
   useEffect(() => {
     const checkUserAuthentication = () => {
       if (typeof window !== 'undefined') {
-        // Check multiple possible login sources
+        // Only check login_user
         const loginUser = localStorage.getItem('login_user');
-        const loggedInCollege = localStorage.getItem('loggedInCollege');
-        const superAdminTest = localStorage.getItem('superAdminTest');
         
         if (loginUser) {
           setUser(JSON.parse(loginUser));
-        } else if (loggedInCollege) {
-          setUser(JSON.parse(loggedInCollege));
-        } else if (superAdminTest) {
-          setUser(JSON.parse(superAdminTest));
         } else {
           setUser(null);
         }
@@ -223,16 +220,14 @@ export default function LandingPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Check if user is super admin
+  // Check if user is super admin (nestick@gmail.com)
   const isSuperAdmin = () => {
-    return user && localStorage.getItem('superAdminTest');
+    return user && user.email === 'nestick@gmail.com';
   };
 
-  // Updated logout function to clear all login sources
+  // Updated logout function to clear only login_user
   const handleLogout = () => {
     localStorage.removeItem('login_user');
-    localStorage.removeItem('loggedInCollege');
-    localStorage.removeItem('superAdminTest');
     setUser(null);
     setIsDropdownOpen(false);
     window.location.href = '/';
@@ -336,24 +331,24 @@ export default function LandingPage() {
   };
 
   // Buy Now Modal Handlers
-  const handleBuyNowClick = (theme: Theme) => {
-    setSelectedTheme(theme);
+  const handleBuyNowClick = (template: Template) => {
+    setSelectedTemplate(template);
     setBuyNowFormData(prev => ({
       ...prev,
-      themeName: theme.name
+      templateName: template.name
     }));
     setFormErrors({});
     setTouchedFields({});
     setIsBuyNowModalOpen(true);
   };
 
-  const handleBuyNowSubmit = (e: React.FormEvent) => {
+  const handleBuyNowSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate all fields
     const errors: Record<string, string> = {};
     Object.keys(buyNowFormData).forEach(key => {
-      if (key !== 'selectedPlan' && key !== 'themeName') {
+      if (key !== 'selectedPlan' && key !== 'templateName') {
         const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData]);
         if (error) errors[key] = error;
       }
@@ -370,45 +365,97 @@ export default function LandingPage() {
       return;
     }
 
-    // Check for duplicate email for free themes
-    if (selectedTheme?.type === 'free' && isDuplicateEmail(buyNowFormData.email, selectedTheme.id)) {
-      setFormErrors(prev => ({ 
-        ...prev, 
-        email: 'An account with this email already exists.' 
-      }));
-      return;
+    // Check for duplicate email for free templates
+    if (selectedTemplate?.type === 'free') {
+      const isDuplicate = await checkDuplicateRequest(buyNowFormData.email, selectedTemplate.id);
+      if (isDuplicate) {
+        setFormErrors(prev => ({ 
+          ...prev, 
+          email: 'You have already submitted a request for this template with this email.' 
+        }));
+        return;
+      }
     }
     
-    // Save to localStorage
-    const existingRequests = JSON.parse(localStorage.getItem('requested_college') || '[]');
-    const newRequest = {
-      ...buyNowFormData,
-      id: crypto.randomUUID(),
-      submittedAt: new Date().toISOString(),
-      theme: selectedTheme
-    };
-    
-    localStorage.setItem('requested_college', JSON.stringify([...existingRequests, newRequest]));
-    
-    // Show success popup
-    setShowSuccessPopup(true);
-    setIsBuyNowModalOpen(false);
-    
-    // Reset form
-    setBuyNowFormData({
-      name: '',
-      collegeName: '',
-      email: '',
-      whatsapp: '',
-      selectedPlan: 'basic',
-      themeName: ''
-    });
-    setFormErrors({});
-    setTouchedFields({});
+    // Submit request to API
+    try {
+      setIsSubmitting(true);
+      
+      const requestData = {
+        template_id: selectedTemplate!.id,
+        name: buyNowFormData.name.trim(),
+        college: buyNowFormData.college.trim(),
+        email: buyNowFormData.email.toLowerCase().trim(),
+        phone: buyNowFormData.phone.trim(),
+        plan: selectedTemplate?.type === 'paid' ? buyNowFormData.selectedPlan : undefined,
+        type: selectedTemplate!.type
+      };
+
+      const response = await fetch('/api/templates/template-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to submit request');
+      }
+
+      // Show success popup with request ID
+      setSuccessMessage(`Request submitted successfully! Our team will contact you shortly.`);
+      setShowSuccessPopup(true);
+      setIsBuyNowModalOpen(false);
+      
+      // Reset form
+      setBuyNowFormData({
+        name: '',
+        college: '',
+        email: '',
+        phone: '',
+        selectedPlan: 'basic',
+        templateName: ''
+      });
+      setFormErrors({});
+      setTouchedFields({});
+
+    } catch (error: any) {
+      console.error('Submit request error:', error);
+      alert(error.message || 'Failed to submit request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handlePreviewClick = (themeId: string) => {
-    window.open(`/Portfolio_Handler/themes/${themeId}`, '_blank');
+  const handlePreviewClick = (imageUrl: string, templateName: string, description: string) => {
+    // Create a modal for preview
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 z-[60] bg-black bg-opacity-75 flex items-center justify-center p-4';
+    modal.innerHTML = `
+      <div class="relative bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto">
+        <div class="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center z-10">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">${templateName}</h3>
+          <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="p-4">
+          <img src="${imageUrl}" alt="${templateName}" class="w-full h-auto rounded-lg mb-4 max-h-[60vh] object-contain" />
+          <p class="text-gray-600 dark:text-gray-300">${description}</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    };
   };
 
   // Get user display name
@@ -461,8 +508,8 @@ export default function LandingPage() {
         );
       });
 
-      // Theme cards animation with parallax effect
-      themeCardsRef.current.forEach((card, index) => {
+      // Template cards animation with parallax effect
+      templateCardsRef.current.forEach((card, index) => {
         gsap.fromTo(card,
           { opacity: 0, scale: 0.9, rotationY: 10 },
           {
@@ -533,7 +580,7 @@ export default function LandingPage() {
     });
 
     return () => ctx.revert();
-  }, [mounted]);
+  }, [mounted, templates]);
 
   // Prevent hydration mismatch
   if (!mounted) {
@@ -560,7 +607,7 @@ export default function LandingPage() {
 
       {/* Desktop Navigation */}
       <div className="hidden lg:flex items-center space-x-1">
-        {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
+        {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
           <button
             key={item}
             onClick={() => scrollToSection(item)}
@@ -578,7 +625,7 @@ export default function LandingPage() {
       <div className="flex items-center space-x-3">
         {user ? (
           <div className="hidden lg:flex items-center space-x-3">
-            {/* Dashboard Button */}
+            {/* Dashboard Button - Only for nestick@gmail.com */}
             {isSuperAdmin() && (
               <button
                 onClick={handleDashboardRedirect}
@@ -587,7 +634,7 @@ export default function LandingPage() {
                   hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
               >
                 <LayoutDashboard className="w-4.5 h-4.5" />
-                <span className="font-medium">Dashboard</span>
+                <span className="font-medium">Admin Dashboard</span>
               </button>
             )}
 
@@ -597,7 +644,7 @@ export default function LandingPage() {
               className="flex items-center space-x-2 px-5.5 py-2.75 rounded-xl
                 bg-black text-white dark:bg-white dark:text-black
                 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
-            >
+              >
               <LogOut className="w-4.5 h-4.5" />
               <span className="font-medium">Logout</span>
             </button>
@@ -650,7 +697,7 @@ export default function LandingPage() {
     {/* Mobile Menu Content */}
     {isMobileMenuOpen && (
       <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
-        {['home', 'features', 'themes', 'about', 'contact'].map((item) => (
+        {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
           <button
             key={item}
             onClick={() => {
@@ -673,7 +720,7 @@ export default function LandingPage() {
                   hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
               >
                 <LayoutDashboard className="w-4 h-4 mr-2" />
-                Dashboard
+                Admin Dashboard
               </button>
             )}
             <button
@@ -785,13 +832,13 @@ export default function LandingPage() {
     </h1>
 
     <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed font-light">
-      Manage events, themes, and profiles effortlessly in one place. Built for modern educational institutions.
+      Manage events, templates, and profiles effortlessly in one place. Built for modern educational institutions.
     </p>
 
     <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
       <button
         onClick={() => {
-          const section = document.getElementById("themes");
+          const section = document.getElementById("templates");
           if (section) {
             section.scrollIntoView({ behavior: "smooth" });
           }
@@ -833,8 +880,8 @@ export default function LandingPage() {
                 icon: "📊",
               },
               {
-                title: "Theme Management",
-                description: "Easily switch between light and dark themes, or customize the interface according to your institution's style.",
+                title: "Template Management",
+                description: "Easily switch between light and dark templates, or customize the interface according to your institution's style.",
                 icon: "🎨",
               },
               {
@@ -876,107 +923,116 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Enhanced Theme Preview Section */}
+      {/* Enhanced Template Preview Section */}
      <section
-  id="themes"
+  id="templates"
   className="py-20 md:py-28 px-4 sm:px-6 bg-white dark:bg-black relative overflow-hidden"
 >
   <div className="container mx-auto max-w-6xl">
     <div className="text-center mb-16 md:mb-20">
       <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-        Beautiful Portfolio Themes
+        Beautiful Portfolio Templates
       </h2>
       <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-        {themes.length > 0
+        {templates.length > 0
           ? "Professionally designed templates for every academic discipline"
-          : "No themes uploaded yet. Upload themes from the admin panel to see them here."}
+          : loadingTemplates ? "Loading templates..." : "No templates uploaded yet. Upload templates from the admin panel to see them here."}
       </p>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-      {themes.length > 0 ? (
-        themes.map((theme) => (
+    {loadingTemplates ? (
+      <div className="flex justify-center items-center py-12">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    ) : templates.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {templates.map((template) => (
           <div
-            key={theme.id}
-            ref={el => addToRefs(el, themeCardsRef)}
+            key={template.id}
+            ref={el => addToRefs(el, templateCardsRef)}
             className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105"
           >
             <div className="h-48 relative overflow-hidden">
-              <Image
-                src={theme.image}
-                alt={theme.name}
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-700"
+              <img
+                src={template.image}
+                alt={template.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
+                }}
               />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-500"></div>
               <div className="absolute top-4 left-4 flex gap-2">
                 <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
-                  Portfolio Theme
+                  Portfolio Template
                 </span>
                 <span
                   className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
-                    theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                    template.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
                   }`}
                 >
-                  {theme.type === 'free' ? 'Free' : 'Paid'}
+                  {template.type === 'free' ? 'Free' : 'Paid'}
                 </span>
               </div>
             </div>
 
             <div className="p-6 md:p-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                {theme.name}
+                {template.name}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
-                {theme.description}
+                {template.description}
               </p>
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => handlePreviewClick(theme.id)}
-                  className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105"
+                  onClick={() => handlePreviewClick(template.image, template.name, template.description)}
+                  className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                 >
+                  <Eye size={16} />
                   Preview
                 </button>
                 <button
-                  onClick={() => handleBuyNowClick(theme)}
-                  className="flex-1 border border-gray-900 dark:border-white text-gray-900 dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900"
+                  onClick={() => handleBuyNowClick(template)}
+                  className="flex-1 border border-gray-900 dark:border-white text-gray-900 dark:text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 flex items-center justify-center gap-2"
                 >
-                  {theme.type === 'free' ? 'Get Free' : 'Buy Now'}
+                  {template.type === 'free' ? 'Get Free' : 'Buy Now'}
                 </button>
               </div>
             </div>
           </div>
-        ))
-      ) : (
-        [
+        ))}
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        {[
           {
-            id: 'demo-1',
+            id: 1,
             name: "Modern Professional",
-            description:
-              "Clean, corporate design perfect for business and engineering portfolios.",
+            description: "Clean, corporate design perfect for business and engineering portfolios.",
             image: "/port1.jpg",
             type: 'free' as const,
+            live_url: null
           },
           {
-            id: 'demo-2',
+            id: 2,
             name: "Creative Arts",
-            description:
-              "Vibrant and expressive layout for art, design, and media students.",
+            description: "Vibrant and expressive layout for art, design, and media students.",
             image: "/port2.jpg",
             type: 'paid' as const,
+            live_url: null
           },
           {
-            id: 'demo-3',
+            id: 3,
             name: "Academic Classic",
-            description:
-              "Traditional layout with modern elements for research and academic portfolios.",
+            description: "Traditional layout with modern elements for research and academic portfolios.",
             image: "/port3.jpg",
             type: 'free' as const,
+            live_url: null
           },
-        ].map((theme) => (
+        ].map((template) => (
           <div
-            key={theme.id}
+            key={template.id}
             className="group bg-white dark:bg-gray-800 rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 ease-in-out transform hover:scale-105 opacity-60"
           >
             <div className="h-48 relative overflow-hidden bg-gray-200 dark:bg-gray-700">
@@ -985,34 +1041,34 @@ export default function LandingPage() {
               </div>
               <div className="absolute top-4 left-4 flex gap-2">
                 <span className="text-xs font-semibold text-white/90 bg-black/30 px-2 py-1 rounded-full">
-                  Portfolio Theme
+                  Portfolio Template
                 </span>
                 <span
                   className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
-                    theme.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
+                    template.type === 'free' ? 'bg-green-500/80' : 'bg-blue-500/80'
                   }`}
                 >
-                  {theme.type === 'free' ? 'Free' : 'Paid'}
+                  {template.type === 'free' ? 'Free' : 'Paid'}
                 </span>
               </div>
             </div>
             <div className="p-6 md:p-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                {theme.name}
+                {template.name}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
-                {theme.description}
+                {template.description}
               </p>
               <div className="text-center py-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Upload themes in admin panel to enable purchasing
+                  Upload templates in admin panel to enable purchasing
                 </p>
               </div>
             </div>
           </div>
-        ))
-      )}
-    </div>
+        ))}
+      </div>
+    )}
   </div>
 </section>
 
@@ -1325,7 +1381,7 @@ export default function LandingPage() {
             <div>
               <h3 className="text-lg font-semibold mb-6 text-white">Quick Links</h3>
               <div className="space-y-4">
-                {['Features', 'Themes', 'About', 'Contact'].map((link) => (
+                {['Features', 'Templates', 'About', 'Contact'].map((link) => (
                   <button
                     key={link}
                     onClick={() => scrollToSection(link.toLowerCase())}
@@ -1375,12 +1431,12 @@ export default function LandingPage() {
       </footer>
 
       {/* Buy Now Modal */}
-      {isBuyNowModalOpen && selectedTheme && (
+      {isBuyNowModalOpen && selectedTemplate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {selectedTheme.name} – Submit Request
+                {selectedTemplate.name} – Submit Request
               </h3>
               <button
                 onClick={() => setIsBuyNowModalOpen(false)}
@@ -1418,18 +1474,18 @@ export default function LandingPage() {
                 </label>
                 <input
                   type="text"
-                  name="collegeName"
-                  value={buyNowFormData.collegeName}
+                  name="college"
+                  value={buyNowFormData.college}
                   onChange={handleBuyNowInputChange}
                   onBlur={handleInputBlur}
                   required
                   className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.collegeName && touchedFields.collegeName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    formErrors.college && touchedFields.college ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Enter your college name"
                 />
-                {formErrors.collegeName && touchedFields.collegeName && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.collegeName}</p>
+                {formErrors.college && touchedFields.college && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.college}</p>
                 )}
               </div>
 
@@ -1460,22 +1516,22 @@ export default function LandingPage() {
                 </label>
                 <input
                   type="tel"
-                  name="whatsapp"
-                  value={buyNowFormData.whatsapp}
+                  name="phone"
+                  value={buyNowFormData.phone}
                   onChange={handleBuyNowInputChange}
                   onBlur={handleInputBlur}
                   required
                   className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.whatsapp && touchedFields.whatsapp ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                    formErrors.phone && touchedFields.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   }`}
-                  placeholder="Enter your WhatsApp number"
+                  placeholder="Enter your phone number"
                 />
-                {formErrors.whatsapp && touchedFields.whatsapp && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.whatsapp}</p>
+                {formErrors.phone && touchedFields.phone && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
                 )}
               </div>
 
-              {selectedTheme.type === 'paid' && (
+              {selectedTemplate.type === 'paid' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Select Plan *
@@ -1496,16 +1552,17 @@ export default function LandingPage() {
 
               <button
                 type="submit"
-                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 mt-4"
+                disabled={isSubmitting}
+                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Request
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Success Popup - UPDATED MESSAGE */}
+      {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
@@ -1521,11 +1578,11 @@ export default function LandingPage() {
               </h3>
               
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Thank you for your interest in our theme. Our team at <strong>Nestick Tech</strong> will contact you shortly to discuss your requirements and provide further assistance.
+                {successMessage}
               </p>
 
               <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
-                For more information about our services and portfolio, please visit our website:
+                Our team at <strong>Nestick Tech</strong> will contact you shortly to discuss your requirements.
               </p>
 
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
@@ -1543,7 +1600,10 @@ export default function LandingPage() {
               </div>
 
               <button
-                onClick={() => setShowSuccessPopup(false)}
+                onClick={() => {
+                  setShowSuccessPopup(false);
+                  setSuccessMessage('');
+                }}
                 className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
               >
                 Close

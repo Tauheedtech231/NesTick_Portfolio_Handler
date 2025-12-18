@@ -23,7 +23,8 @@ interface AlertMessage {
   duration?: number;
 }
 
-const MAX_FILE_SIZE = 500 * 1024; // ✅ 500 KB limit
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB in bytes
+ 
 
 export function UploadImage({
   value,

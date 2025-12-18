@@ -1,90 +1,134 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Course, College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button'; 
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, FiChevronDown, FiTag, FiClock, FiCreditCard } from 'react-icons/fi';
+import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, FiTag, FiClock, FiCreditCard, FiUser, FiStar, FiAward } from 'react-icons/fi';
+import { FaCertificate, FaCalendarAlt, FaShieldAlt } from 'react-icons/fa';
 /* eslint-disable */
+interface Course {
+  id: number;
+  image: string;
+  title: string;
+  participants: number;
+  duration: string;
+  instructor: string;
+  category: string;
+  rating: number;
+  description: string;
+  features: string[];
+  level: string;
+  price: string;
+}
+
+interface Highlight {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface CoursesData {
+  sectionTitle: string;
+  sectionDescription: string;
+  highlights: Highlight[];
+  courses: Course[];
+}
+
+interface College {
+  id: string;
+  name: string;
+}
 
 interface CoursesSectionProps {
   college: College;
 }
 
-interface Department {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-export function CoursesSection({ college }: CoursesSectionProps) {
-  const STORAGE_KEY = `courses_${college.id}`;
-  const DEPARTMENTS_KEY = `departments_${college.id}`;
-  
+export function CoursesSection({ }: CoursesSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
-  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState<number | null>(null);
-  const [newDepartmentName, setNewDepartmentName] = useState('');
+  const [coursesData, setCoursesData] = useState<CoursesData>({
+    sectionTitle: "Our Featured Programs",
+    sectionDescription: "Industry-recognized safety training programs with hands-on experience and expert guidance",
+    highlights: [
+      {
+        id: 1,
+        icon: "FaCertificate",
+        title: "Internationally Recognized",
+        description: "Certifications accepted by global organizations and regulatory bodies"
+      },
+      {
+        id: 2,
+        icon: "FaCalendarAlt",
+        title: "Flexible Schedule",
+        description: "Weekend, evening & online batches to fit your busy schedule"
+      },
+      {
+        id: 3,
+        icon: "FaShieldAlt",
+        title: "Career Support",
+        description: "Placement assistance and ongoing career guidance for all graduates"
+      }
+    ],
+    courses: [
+      {
+        id: 1,
+        image: "/cu1.jpg",
+        title: "Basic First Aid",
+        participants: 25,
+        duration: "8h",
+        instructor: "Masol Hab",
+        category: "First Aid Training",
+        rating: 4.8,
+        description: "Essential first aid techniques for workplace emergencies",
+        features: ["CPR Certification", "Emergency Response", "Wound Care"],
+        level: "Beginner",
+        price: "$199"
+      },
+      {
+        id: 2,
+        image: "/cu2.jpg",
+        title: "Integrated Safety & Compliance",
+        participants: 42,
+        duration: "40h",
+        instructor: "Masol Hab",
+        category: "All In One",
+        rating: 4.9,
+        description: "Comprehensive safety training covering 7 critical modules",
+        features: ["7 Modules", "Certification", "Practical Training"],
+        level: "Advanced",
+        price: "$899"
+      }
+    ]
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // ✅ Load courses and departments data from database
+  // ✅ Load courses data from database
   useEffect(() => {
     const loadCoursesData = async () => {
       setIsLoading(true);
       try {
-        // Try loading from localStorage first for quick display
-        const savedCourses = localStorage.getItem(STORAGE_KEY);
-        const savedDepartments = localStorage.getItem(DEPARTMENTS_KEY);
-        
-        if (savedCourses) {
-          const parsedCourses = JSON.parse(savedCourses);
-          setCourses(parsedCourses.courses || []);
-        }
-        
-        if (savedDepartments) {
-          const parsedDepartments = JSON.parse(savedDepartments);
-          setDepartments(parsedDepartments.departments || []);
-        }
-
-        // Then load from database
         const response = await fetch(
-          `/api/sections?template_id=1&section_name=Courses`
+          `/api/sections?template_id=2&section_name=Courses`
         );
         
         if (response.ok) {
           const data = await response.json();
+          console.log('Loaded courses data from database:', data);
+          
           if (data.sections && data.sections.length > 0) {
             const dbContent = data.sections[0].content;
+            console.log('Database content:', dbContent);
             
-            // Load courses
-            if (dbContent && dbContent.courses) {
-              setCourses(dbContent.courses);
-              localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                courses: dbContent.courses,
-                loadedAt: new Date().toISOString()
-              }));
-            }
-            
-            // Load departments (might be separate or part of courses section)
-            if (dbContent && dbContent.departments) {
-              setDepartments(dbContent.departments);
-              localStorage.setItem(DEPARTMENTS_KEY, JSON.stringify({
-                departments: dbContent.departments,
-                loadedAt: new Date().toISOString()
-              }));
-            } else {
-              // If no departments in database, create default ones
-              const defaultDepartments: Department[] = [
-                { id: 'dept-1', name: 'Computer Science', createdAt: new Date().toISOString() },
-                { id: 'dept-2', name: 'Electrical Engineering', createdAt: new Date().toISOString() },
-                { id: 'dept-3', name: 'Mechanical Engineering', createdAt: new Date().toISOString() },
-                { id: 'dept-4', name: 'Business Administration', createdAt: new Date().toISOString() },
-                { id: 'dept-5', name: 'Arts and Sciences', createdAt: new Date().toISOString() },
-              ];
-              setDepartments(defaultDepartments);
+            if (dbContent) {
+              setCoursesData({
+                sectionTitle: dbContent.sectionTitle || coursesData.sectionTitle,
+                sectionDescription: dbContent.sectionDescription || coursesData.sectionDescription,
+                highlights: dbContent.highlights || coursesData.highlights,
+                courses: dbContent.courses || coursesData.courses
+              });
             }
           }
         }
@@ -96,62 +140,96 @@ export function CoursesSection({ college }: CoursesSectionProps) {
     };
 
     loadCoursesData();
-  }, [STORAGE_KEY, DEPARTMENTS_KEY]);
+  }, []);
 
-  const addCourse = () => {
-    const newCourse: Course = {
-      id: `course-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: '',
-      duration: '',
-      department: departments.length > 0 ? departments[0].name : '',
-      description: '',
-      credits: 0,
-      image: undefined,
-      syllabus: '',
-      feeStructure: '',
-    };
-    setCourses([...courses, newCourse]);
-  };
-
-  const updateCourse = (index: number, field: keyof Course, value: any) => {
-    const updatedCourses = [...courses];
-    updatedCourses[index] = { ...updatedCourses[index], [field]: value };
-    setCourses(updatedCourses);
-  };
-
-  const removeCourse = (index: number) => {
-    setCourses(courses.filter((_, i) => i !== index));
-  };
-
-  const addNewDepartment = async () => {
-    if (newDepartmentName.trim() && !departments.find(dept => 
-      dept.name.toLowerCase() === newDepartmentName.trim().toLowerCase()
-    )) {
-      const newDepartment: Department = {
-        id: `dept-${Date.now()}`,
-        name: newDepartmentName.trim(),
-        createdAt: new Date().toISOString(),
-      };
-      const updatedDepartments = [...departments, newDepartment];
-      setDepartments(updatedDepartments);
-      setNewDepartmentName('');
-      
-      // If we're adding a department while editing a course, update that course's department
-      if (showDepartmentDropdown !== null) {
-        updateCourse(showDepartmentDropdown, 'department', newDepartment.name);
-      }
-      
-      // Save departments to localStorage for immediate access
-      localStorage.setItem(DEPARTMENTS_KEY, JSON.stringify({
-        departments: updatedDepartments,
-        savedAt: new Date().toISOString()
-      }));
+  // Icon mapping
+  const getIconComponent = (iconName: string) => {
+    switch(iconName) {
+      case 'FaCertificate': return FaCertificate;
+      case 'FaCalendarAlt': return FaCalendarAlt;
+      case 'FaShieldAlt': return FaShieldAlt;
+      default: return FiAward;
     }
   };
 
-  const selectDepartment = (courseIndex: number, departmentName: string) => {
-    updateCourse(courseIndex, 'department', departmentName);
-    setShowDepartmentDropdown(null);
+  const addCourse = () => {
+    const newId = Math.max(...coursesData.courses.map(c => c.id), 0) + 1;
+    const newCourse: Course = {
+      id: newId,
+      image: "",
+      title: "",
+      participants: 0,
+      duration: "",
+      instructor: "",
+      category: "",
+      rating: 4.0,
+      description: "",
+      features: [],
+      level: "Beginner",
+      price: "$0"
+    };
+    setCoursesData(prev => ({
+      ...prev,
+      courses: [...prev.courses, newCourse]
+    }));
+  };
+
+  const updateCourse = (index: number, field: keyof Course, value: any) => {
+    const updatedCourses = [...coursesData.courses];
+    updatedCourses[index] = { ...updatedCourses[index], [field]: value };
+    setCoursesData(prev => ({ ...prev, courses: updatedCourses }));
+  };
+
+  const removeCourse = (index: number) => {
+    setCoursesData(prev => ({
+      ...prev,
+      courses: prev.courses.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addHighlight = () => {
+    const newId = Math.max(...coursesData.highlights.map(h => h.id), 0) + 1;
+    const newHighlight: Highlight = {
+      id: newId,
+      icon: "FaCertificate",
+      title: "",
+      description: ""
+    };
+    setCoursesData(prev => ({
+      ...prev,
+      highlights: [...prev.highlights, newHighlight]
+    }));
+  };
+
+  const updateHighlight = (index: number, field: keyof Highlight, value: string) => {
+    const updatedHighlights = [...coursesData.highlights];
+    updatedHighlights[index] = { ...updatedHighlights[index], [field]: value };
+    setCoursesData(prev => ({ ...prev, highlights: updatedHighlights }));
+  };
+
+  const removeHighlight = (index: number) => {
+    setCoursesData(prev => ({
+      ...prev,
+      highlights: prev.highlights.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addFeature = (courseIndex: number) => {
+    const updatedCourses = [...coursesData.courses];
+    updatedCourses[courseIndex].features.push("");
+    setCoursesData(prev => ({ ...prev, courses: updatedCourses }));
+  };
+
+  const updateFeature = (courseIndex: number, featureIndex: number, value: string) => {
+    const updatedCourses = [...coursesData.courses];
+    updatedCourses[courseIndex].features[featureIndex] = value;
+    setCoursesData(prev => ({ ...prev, courses: updatedCourses }));
+  };
+
+  const removeFeature = (courseIndex: number, featureIndex: number) => {
+    const updatedCourses = [...coursesData.courses];
+    updatedCourses[courseIndex].features.splice(featureIndex, 1);
+    setCoursesData(prev => ({ ...prev, courses: updatedCourses }));
   };
 
   const saveChanges = async () => {
@@ -159,8 +237,8 @@ export function CoursesSection({ college }: CoursesSectionProps) {
     
     try {
       // Validate required fields
-      const invalidCourses = courses.filter(course => 
-        !course.name.trim() || !course.duration || !course.department || !course.description.trim()
+      const invalidCourses = coursesData.courses.filter(course => 
+        !course.title.trim() || !course.description.trim()
       );
 
       if (invalidCourses.length > 0) {
@@ -169,28 +247,6 @@ export function CoursesSection({ college }: CoursesSectionProps) {
         return;
       }
 
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        courses,
-        savedAt: new Date().toISOString()
-      }));
-
-      // Prepare content for database
-      const dbContent = {
-        courses: courses.map(course => ({
-          id: course.id,
-          name: course.name,
-          duration: course.duration,
-          department: course.department,
-          description: course.description,
-          credits: course.credits || 0,
-          image: course.image || null,
-          syllabus: course.syllabus || '',
-          feeStructure: course.feeStructure || ''
-        })),
-        departments: departments
-      };
-
       // Save to database
       const response = await fetch('/api/sections', {
         method: 'POST',
@@ -198,9 +254,9 @@ export function CoursesSection({ college }: CoursesSectionProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          template_id: 1,
+          template_id: 2,
           section_name: "Courses",
-          content: dbContent
+          content: coursesData
         }),
       });
 
@@ -212,6 +268,21 @@ export function CoursesSection({ college }: CoursesSectionProps) {
       console.log('Saved courses to database:', result);
       
       setIsEditing(false);
+      
+      // Reload data from database
+      const refreshResponse = await fetch(
+        `/api/sections?template_id=2&section_name=Courses`
+      );
+      
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        if (refreshData.sections && refreshData.sections.length > 0) {
+          const refreshContent = refreshData.sections[0].content;
+          if (refreshContent) {
+            setCoursesData(refreshContent);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error saving courses:', error);
       alert('Failed to save changes. Please try again.');
@@ -220,14 +291,29 @@ export function CoursesSection({ college }: CoursesSectionProps) {
     }
   };
 
-  const cancelEditing = () => {
-    // Reload from localStorage
-    const savedCourses = localStorage.getItem(STORAGE_KEY);
-    if (savedCourses) {
-      const parsedData = JSON.parse(savedCourses);
-      setCourses(parsedData.courses || []);
+  const cancelEditing = async () => {
+    // Reload from database
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `/api/sections?template_id=2&section_name=Courses`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.sections && data.sections.length > 0) {
+          const dbContent = data.sections[0].content;
+          if (dbContent) {
+            setCoursesData(dbContent);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reloading courses data:', error);
+    } finally {
+      setIsLoading(false);
+      setIsEditing(false);
     }
-    setIsEditing(false);
   };
 
   // Handle image upload for courses
@@ -244,18 +330,18 @@ export function CoursesSection({ college }: CoursesSectionProps) {
     reader.readAsDataURL(fileOrString);
   };
 
-  // Get unique departments for filter from current courses
-  const availableDepartments = ['all', ...new Set(courses.map(course => course.department).filter(Boolean))];
-  const filteredCourses = departmentFilter === 'all' 
-    ? courses 
-    : courses.filter(course => course.department === departmentFilter);
+  // Get unique categories
+  const categories = ['all', ...new Set(coursesData.courses.map(course => course.category).filter(Boolean))];
+  const filteredCourses = selectedCategory === 'all' 
+    ? coursesData.courses 
+    : coursesData.courses.filter(course => course.category === selectedCategory);
 
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading courses data...</span>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading courses...</span>
         </div>
       </div>
     );
@@ -267,7 +353,7 @@ export function CoursesSection({ college }: CoursesSectionProps) {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Courses Management</h2>
-          <p className="text-gray-600 dark:text-gray-400">Manage academic programs and course offerings</p>
+          <p className="text-gray-600 dark:text-gray-400">Manage training programs and course offerings</p>
         </div>
         
         {!isEditing ? (
@@ -297,50 +383,135 @@ export function CoursesSection({ college }: CoursesSectionProps) {
         )}
       </div>
 
-      {!isEditing && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {availableDepartments.map((dept) => (
-            <button
-              key={dept}
-              onClick={() => setDepartmentFilter(dept)}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                departmentFilter === dept
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              {dept === 'all' ? 'All Departments' : dept}
-            </button>
-          ))}
-        </div>
-      )}
-
       {isEditing ? (
-        <div className="space-y-6">
+        <div className="space-y-8">
+          {/* Section Title & Description */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Section Header</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                  Section Title
+                </label>
+                <input
+                  type="text"
+                  value={coursesData.sectionTitle}
+                  onChange={(e) => setCoursesData(prev => ({ ...prev, sectionTitle: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="Our Featured Programs"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                  Section Description
+                </label>
+                <textarea
+                  value={coursesData.sectionDescription}
+                  onChange={(e) => setCoursesData(prev => ({ ...prev, sectionDescription: e.target.value }))}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="Industry-recognized safety training programs..."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Highlights */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Highlights</h3>
+              <Button onClick={addHighlight} size="sm">
+                <FiPlus className="w-4 h-4 mr-2" /> Add Highlight
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {coursesData.highlights.map((highlight, index) => {
+                const IconComponent = getIconComponent(highlight.icon);
+                return (
+                  <div key={highlight.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                          <IconComponent className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Highlight {index + 1}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeHighlight(index)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Icon
+                        </label>
+                        <select
+                          value={highlight.icon}
+                          onChange={(e) => updateHighlight(index, 'icon', e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        >
+                          <option value="FaCertificate">Certificate</option>
+                          <option value="FaCalendarAlt">Calendar</option>
+                          <option value="FaShieldAlt">Shield</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Title
+                        </label>
+                        <input
+                          type="text"
+                          value={highlight.title}
+                          onChange={(e) => updateHighlight(index, 'title', e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          placeholder="Internationally Recognized"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          value={highlight.description}
+                          onChange={(e) => updateHighlight(index, 'description', e.target.value)}
+                          rows={2}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                          placeholder="Certifications accepted by global organizations..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Add Course Button */}
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                Academic Courses
+                Training Programs
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Add and manage academic programs and course offerings
+                Add and manage safety training programs
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-semibold">{departments.length}</span> departments available
-              </div>
-              <Button onClick={addCourse}>
-                <FiPlus className="w-4 h-4 mr-2" />
-                Add New Course
-              </Button>
-            </div>
+            <Button onClick={addCourse}>
+              <FiPlus className="w-4 h-4 mr-2" />
+              Add New Course
+            </Button>
           </div>
 
           {/* Courses List in Edit Mode */}
           <div className="space-y-6">
-            {courses.map((course, index) => (
+            {coursesData.courses.map((course, index) => (
               <div
                 key={course.id}
                 className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
@@ -355,7 +526,7 @@ export function CoursesSection({ college }: CoursesSectionProps) {
                         Course #{index + 1}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {course.name || 'New course'}
+                        {course.title || 'New course'}
                       </p>
                     </div>
                   </div>
@@ -376,7 +547,7 @@ export function CoursesSection({ college }: CoursesSectionProps) {
                         Course Image
                       </label>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        Upload course banner image (PNG/JPG, max 500KB)
+                        Upload course image
                       </p>
                     </div>
                     <UploadImage
@@ -390,17 +561,32 @@ export function CoursesSection({ college }: CoursesSectionProps) {
 
                   {/* Course Details */}
                   <div className="lg:col-span-2 space-y-6">
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                        Course Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={course.name || ''}
-                        onChange={(e) => updateCourse(index, 'name', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        placeholder="Computer Science and Engineering"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                          Course Title *
+                        </label>
+                        <input
+                          type="text"
+                          value={course.title}
+                          onChange={(e) => updateCourse(index, 'title', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          placeholder="Basic First Aid Training"
+                        />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                          Category *
+                        </label>
+                        <input
+                          type="text"
+                          value={course.category}
+                          onChange={(e) => updateCourse(index, 'category', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          placeholder="First Aid Training"
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -411,82 +597,38 @@ export function CoursesSection({ college }: CoursesSectionProps) {
                         </label>
                         <input
                           type="text"
-                          value={course.duration || ''}
+                          value={course.duration}
                           onChange={(e) => updateCourse(index, 'duration', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="4 Years"
+                          placeholder="8h"
                         />
                       </div>
                       
-                      <div className="space-y-3 relative">
+                      <div className="space-y-3">
                         <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                          <FiTag className="w-4 h-4 inline mr-2" />
-                          Department *
+                          <FiUser className="w-4 h-4 inline mr-2" />
+                          Instructor *
                         </label>
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setShowDepartmentDropdown(showDepartmentDropdown === index ? null : index)}
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          >
-                            <span>{course.department || 'Select Department'}</span>
-                            <FiChevronDown className="w-4 h-4 text-gray-500" />
-                          </button>
-                          
-                          {showDepartmentDropdown === index && (
-                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                              {/* Existing Departments */}
-                              {departments.map((dept) => (
-                                <button
-                                  key={dept.id}
-                                  onClick={() => selectDepartment(index, dept.name)}
-                                  className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-                                >
-                                  <FiTag className="w-4 h-4 text-gray-500" />
-                                  <span className="text-gray-900 dark:text-white">{dept.name}</span>
-                                </button>
-                              ))}
-                              
-                              {/* Add New Department */}
-                              <div className="border-t border-gray-200 dark:border-gray-600 p-4">
-                                <div className="flex gap-2 mb-2">
-                                  <input
-                                    type="text"
-                                    value={newDepartmentName}
-                                    onChange={(e) => setNewDepartmentName(e.target.value)}
-                                    placeholder="New department name"
-                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    onKeyPress={(e) => e.key === 'Enter' && addNewDepartment()}
-                                  />
-                                  <Button
-                                    size="sm"
-                                    onClick={addNewDepartment}
-                                    disabled={!newDepartmentName.trim()}
-                                  >
-                                    <FiPlus className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  Add a new department to the list
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <input
+                          type="text"
+                          value={course.instructor}
+                          onChange={(e) => updateCourse(index, 'instructor', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          placeholder="Masol Hab"
+                        />
                       </div>
                       
                       <div className="space-y-3">
                         <label className="block text-sm font-semibold text-gray-900 dark:text-white">
                           <FiCreditCard className="w-4 h-4 inline mr-2" />
-                          Credits *
+                          Price *
                         </label>
                         <input
-                          type="number"
-                          value={course.credits || 0}
-                          onChange={(e) => updateCourse(index, 'credits', parseInt(e.target.value) || 0)}
+                          type="text"
+                          value={course.price}
+                          onChange={(e) => updateCourse(index, 'price', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="160"
-                          min="0"
+                          placeholder="$199"
                         />
                       </div>
                     </div>
@@ -494,44 +636,100 @@ export function CoursesSection({ college }: CoursesSectionProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                          Syllabus URL
+                          <FiUser className="w-4 h-4 inline mr-2" />
+                          Participants
                         </label>
                         <input
-                          type="url"
-                          value={course.syllabus || ''}
-                          onChange={(e) => updateCourse(index, 'syllabus', e.target.value)}
+                          type="number"
+                          value={course.participants}
+                          onChange={(e) => updateCourse(index, 'participants', parseInt(e.target.value) || 0)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="https://example.com/syllabus.pdf"
+                          placeholder="25"
+                          min="0"
                         />
                       </div>
+                      
                       <div className="space-y-3">
                         <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                          Fee Structure URL
+                          <FiStar className="w-4 h-4 inline mr-2" />
+                          Rating
                         </label>
                         <input
-                          type="url"
-                          value={course.feeStructure || ''}
-                          onChange={(e) => updateCourse(index, 'feeStructure', e.target.value)}
+                          type="number"
+                          value={course.rating}
+                          onChange={(e) => updateCourse(index, 'rating', parseFloat(e.target.value) || 0)}
                           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="https://example.com/fees.pdf"
+                          placeholder="4.8"
+                          step="0.1"
+                          min="0"
+                          max="5"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                        Level
+                      </label>
+                      <select
+                        value={course.level}
+                        onChange={(e) => updateCourse(index, 'level', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      >
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">
                         Description *
                       </label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        Describe the course curriculum, objectives, and career opportunities
-                      </p>
                       <textarea
-                        value={course.description || ''}
+                        value={course.description}
                         onChange={(e) => updateCourse(index, 'description', e.target.value)}
-                        rows={4}
+                        rows={3}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        placeholder="Describe the course curriculum, objectives, and career opportunities..."
+                        placeholder="Describe the course..."
                       />
+                    </div>
+
+                    {/* Features */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">
+                          Features
+                        </label>
+                        <Button
+                          size="sm"
+                          onClick={() => addFeature(index)}
+                          variant="outline"
+                        >
+                          <FiPlus className="w-4 h-4 mr-2" /> Add Feature
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {course.features.map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={feature}
+                              onChange={(e) => updateFeature(index, featureIndex, e.target.value)}
+                              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                              placeholder="Feature"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFeature(index, featureIndex)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -540,117 +738,171 @@ export function CoursesSection({ college }: CoursesSectionProps) {
           </div>
         </div>
       ) : (
-        /* View Mode - Courses Display */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredCourses.map((course) => (
-            <div
-              key={course.id}
-              className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                    <FiBook className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {course.name || 'Untitled Course'}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {course.department || 'No Department'}
-                    </p>
-                  </div>
-                </div>
-                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {course.department || 'General'}
-                </span>
-              </div>
-
-              {course.image && (
-                <div className="mb-4 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">
-                  <img
-                    src={course.image}
-                    alt={course.name || 'Course image'}
-                    className="w-full h-48 object-cover"
-                  />
-                </div>
-              )}
-
-              <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                {course.description || 'No description available'}
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    <FiClock className="w-4 h-4" />
-                    Duration
-                  </div>
-                  <div className="font-semibold text-blue-700 dark:text-blue-300">
-                    {course.duration || 'N/A'}
-                  </div>
-                </div>
-                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    <FiCreditCard className="w-4 h-4" />
-                    Credits
-                  </div>
-                  <div className="font-semibold text-green-700 dark:text-green-300">
-                    {course.credits || 0}
-                  </div>
-                </div>
-              </div>
-
-              {(course.syllabus || course.feeStructure) && (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex gap-4">
-                    {course.syllabus && (
-                      <a
-                        href={course.syllabus}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-                      >
-                        View Syllabus
-                      </a>
-                    )}
-                    {course.feeStructure && (
-                      <a
-                        href={course.feeStructure}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-                      >
-                        Fee Structure
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isEditing && filteredCourses.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <FiBook className="w-8 h-8 text-gray-400" />
+        /* View Mode */
+        <div className="space-y-8">
+          {/* Section Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              {coursesData.sectionTitle}
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              {coursesData.sectionDescription}
+            </p>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-            No Courses Found
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-            {departmentFilter !== 'all' 
-              ? `No courses found in ${departmentFilter} department.` 
-              : 'Start by adding your first academic course to showcase your programs.'
-            }
-          </p>
-          <Button onClick={() => setIsEditing(true)}>
-            <FiPlus className="w-4 h-4 mr-2" />
-            Add Course
-          </Button>
+
+          {/* Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {coursesData.highlights.map((highlight) => {
+              const IconComponent = getIconComponent(highlight.icon);
+              return (
+                <div
+                  key={highlight.id}
+                  className="p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all"
+                >
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                    <IconComponent className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {highlight.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {highlight.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-xl transition-all ${
+                  selectedCategory === category
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                }`}
+              >
+                {category === 'all' ? 'All Categories' : category}
+              </button>
+            ))}
+          </div>
+
+          {/* Courses Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredCourses.map((course) => (
+              <div
+                key={course.id}
+                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              >
+                {/* Course Image */}
+                {course.image && (
+                  <div className="relative h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                        {course.category}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Course Content */}
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {course.title}
+                    </h3>
+                    <div className="flex items-center gap-1">
+                      <FiStar className="w-4 h-4 text-yellow-500" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {course.rating}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                    {course.description}
+                  </p>
+
+                  {/* Course Info */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <FiClock className="w-4 h-4" />
+                      <span>{course.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <FiUser className="w-4 h-4" />
+                      <span>{course.participants} participants</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <FiUser className="w-4 h-4" />
+                      <span>{course.instructor}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <FiTag className="w-4 h-4" />
+                      <span>{course.level}</span>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  {course.features.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {course.features.map((feature, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Price and Action */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {course.price}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                        / course
+                      </span>
+                    </div>
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      Enroll Now
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {filteredCourses.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <FiBook className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                No Courses Found
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                {selectedCategory !== 'all' 
+                  ? `No courses found in ${selectedCategory} category.` 
+                  : 'No courses available at the moment.'
+                }
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

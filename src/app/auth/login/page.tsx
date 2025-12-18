@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, Building2, Crown, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 /* eslint-disable */
 
@@ -9,125 +9,84 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [showContactModal, setShowContactModal] = useState(false);
-
-  const ADMIN_TEST_EMAIL = 'imransir@gmail.com';
-  const ADMIN_TEST_PASSWORD = '123456';
-  const CONTACT_WEBSITE = 'https://nesticktech.com';
-  const CONTACT_PHONE = '+92 319 3236529';
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setMessage(''); // Clear message when user starts typing
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const { email, password } = formData;
-    setMessage('');
-    setIsLoading(true);
-
-    // 🔹 Admin Test Login (Hardcoded credentials)
-    if (email === ADMIN_TEST_EMAIL && password === ADMIN_TEST_PASSWORD) {
-      const adminData = { 
-        email, 
-        name: 'Super Admin', 
-        type: 'super_admin',
-        loginTime: new Date().toISOString()
-      };
-      localStorage.setItem('superAdminTest', JSON.stringify(adminData));
-      localStorage.setItem('login_user', JSON.stringify(adminData));
-      
-      setTimeout(() => {
-        window.location.href = '/Portfolio_Handler';
-      }, 500);
+    
+    // Basic validation
+    if (!email || !password) {
+      setMessage('Email and password are required');
       return;
     }
 
-    // 🔹 Check regular users first (from signup)
-    const usersStored = localStorage.getItem('users');
-    if (usersStored) {
-      const users = JSON.parse(usersStored);
-      const existingUser = users.find((u: any) => 
-        u.email.toLowerCase() === email.toLowerCase() && u.password === password
-      );
+    setMessage('');
+    setIsLoading(true);
 
-      if (existingUser) {
-        // ✅ Regular user login success
-        const userData = {
-          email: existingUser.email,
-          name: existingUser.fullName,
-          country: existingUser.country,
-          type: 'user',
-          loginTime: new Date().toISOString()
-        };
-        
-        localStorage.setItem('login_user', JSON.stringify(userData));
-        
+    try {
+      // Call the API for user login
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setMessage(data.message || 'Login failed. Please try again.');
         setIsLoading(false);
-        setMessage('Login successful! Redirecting...');
-        
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
         return;
       }
+
+      // ✅ Login success - store user data
+      const userData = {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.full_name,
+        country: data.user.country,
+        type: 'user',
+        loginTime: new Date().toISOString()
+      };
+      
+      // Store in localStorage for session management
+      localStorage.setItem('login_user', JSON.stringify(userData));
+      
+      // Show success message
+      setMessage('Login successful! Redirecting...');
+      
+      // Redirect to homepage after 1 second
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+
+    } catch (error) {
+      console.error('Login error:', error);
+      setMessage('Network error. Please check your connection and try again.');
+      setIsLoading(false);
     }
-
-    // 🔹 Check college admins (existing functionality)
-    const collegeAdminsStored = localStorage.getItem('collegeAdmins');
-    if (collegeAdminsStored) {
-      const collegeAdmins = JSON.parse(collegeAdminsStored);
-
-      const existingCollegeAdmin = collegeAdmins.find(
-        (u: any) => u.email.toLowerCase() === email.toLowerCase()
-      );
-
-      if (existingCollegeAdmin) {
-        // 🔹 Check if password matches
-        if (existingCollegeAdmin.password !== password) {
-          setMessage('Invalid password. Please try again.');
-          setIsLoading(false);
-          return;
-        }
-
-        // ✅ College admin login success
-        const adminData = {
-          email: existingCollegeAdmin.email,
-          collegeName: existingCollegeAdmin.collegeName,
-          adminName: existingCollegeAdmin.adminName,
-          type: 'college_admin',
-          loginTime: new Date().toISOString()
-        };
-
-        localStorage.setItem('loggedInCollege', JSON.stringify(adminData));
-        localStorage.setItem('login_user', JSON.stringify(adminData));
-
-        setIsLoading(false);
-        setShowContactModal(true);
-        return;
-      }
-    }
-
-    // 🔹 If no user found in any storage
-    setMessage('No account found with these credentials. Please sign up first.');
-    setIsLoading(false);
   }
 
-  function handleModalOk() {
-    setShowContactModal(false);
-    setTimeout(() => {
-      window.location.href = '/'; // Redirect to homepage
-    }, 300);
-  }
-
-  // Message popup component
+  // Message popup component - FIXED VERSION
   const MessagePopup = () => {
     if (!message) return null;
 
+    // Fixed the condition - using logical OR (||) instead of comparison operators
     const isError = message.includes('Invalid') || 
                    message.includes('No account') || 
-                   message.includes('failed');
+                   message.includes('failed') ||
+                   message.includes('verify') ||
+                   message.includes('required') ||
+                   message.includes('error') ||
+                   message.includes('connection');
+    
     const isSuccess = message.includes('successful');
 
     return (
@@ -283,96 +242,8 @@ export default function LoginPage() {
               </a>
             </p>
           </div>
-
-          {/* Demo Credentials Hint */}
-          <div className="text-center">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Demo Admin: imransir@gmail.com / 123456
-            </p>
-          </div>
         </form>
       </div>
-
-      {/* Contact Modal - Only for College Admins */}
-      {showContactModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
-            onClick={() => setShowContactModal(false)}
-          ></div>
-
-          <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 w-11/12 max-w-lg border border-gray-200 dark:border-gray-700 shadow-xl transform transition-all duration-300 scale-100">
-            <div className="text-center mb-2">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <Crown className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Welcome to Admin Portal!
-              </h3>
-            </div>
-            
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed text-center">
-              Our team will contact you soon to complete your setup.
-              <br />
-              Feel free to reach out if you have any questions!
-            </p>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Website</p>
-                  <a
-                    href={CONTACT_WEBSITE}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:underline"
-                  >
-                    {CONTACT_WEBSITE.replace(/^https?:\/\//, '')}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {CONTACT_PHONE}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowContactModal(false)}
-                className={cn(
-                  "px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-                  "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300",
-                  "hover:bg-gray-50 dark:hover:bg-gray-800"
-                )}
-              >
-                Close
-              </button>
-              <button
-                onClick={handleModalOk}
-                className={cn(
-                  "px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200",
-                  "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900",
-                  "hover:bg-gray-800 dark:hover:bg-gray-200"
-                )}
-              >
-                Continue to Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

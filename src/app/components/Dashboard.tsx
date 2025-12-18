@@ -7,7 +7,7 @@ import { gsap } from 'gsap';
 import { CollegeData, SectionType } from '@/app/lib/gsap';
 import { PortalLayout } from '@/app/components/layout/PortalLayout';
 import { PreviewPane } from '@/app/components/PreviewModal';
-import { AboutSection } from '@/app/components/sections/AboutSection';
+import  {AboutSection}  from '@/app/components/sections/AboutSection';
 import { FacultySection } from '@/app/components/sections/FacultySection';
 import { EventsSection } from '@/app/components/sections/EventsSection';
 import { GallerySection } from '@/app/components/sections/GallerySection';

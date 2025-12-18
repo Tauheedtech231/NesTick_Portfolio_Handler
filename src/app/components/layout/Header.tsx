@@ -1,13 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { LogOut, User, Menu, X } from 'lucide-react';
 import { ThemeToggleProfessional } from './ThemeToggleProfessional'; // Custom professional toggle
 
 interface HeaderProps {
   collegeName?: string;
-  logo?: string;
   isSidebarOpen?: boolean;
   toggleSidebar?: () => void;
 }
@@ -20,7 +18,7 @@ interface AuthCollege {
   timestamp: number;
 }
 
-export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: HeaderProps) {
+export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -75,8 +73,7 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
   return (
     <header className="sticky top-0 z-50 w-full bg-white dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-all duration-300 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
-
-        {/* Left: College Brand + Mobile Menu */}
+        {/* Left: College Name + Mobile Menu */}
         <div className="flex items-center gap-2">
           {toggleSidebar && (
             <button
@@ -93,17 +90,6 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
             transition={{ duration: 0.5 }}
             className="flex items-center gap-3"
           >
-            {logo && (
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                <Image
-                  src={logo}
-                  alt={`${collegeName || 'College'} logo`}
-                  width={40}
-                  height={40}
-                  className="object-cover w-full h-full"
-                />
-              </div>
-            )}
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {collegeName || 'College Name'}
             </h1>
@@ -112,17 +98,13 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
 
         {/* Right: Professional Theme Toggle + Auth */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* ✅ Professional Theme Toggle */}
           <ThemeToggleProfessional />
 
-          {/* Authentication Section */}
           {isAuthenticated ? (
             <div className="relative">
               <button
                 onClick={handleProfileClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300
-                         bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white 
-                         hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
               >
                 <User className="w-4 h-4" />
                 <span className="hidden sm:inline">{userName}</span>
@@ -143,8 +125,7 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 dark:text-red-400 
-                             hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -155,8 +136,7 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
           ) : (
             <button
               onClick={handleLogin}
-              className="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300
-                       bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"
+              className="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"
             >
               Login
             </button>
@@ -166,10 +146,7 @@ export function Header({ collegeName, logo, isSidebarOpen, toggleSidebar }: Head
 
       {/* Overlay for dropdown close */}
       {isDropdownOpen && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setIsDropdownOpen(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
       )}
     </header>
   );

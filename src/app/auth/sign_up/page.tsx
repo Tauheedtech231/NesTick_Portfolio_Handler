@@ -1,9 +1,9 @@
-// app/auth/sign_up/page.tsx
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, User, MapPin } from 'lucide-react';
+import { Eye, EyeOff, Mail, User,  } from 'lucide-react';
 import { cn } from '@/lib/utils';
+/* eslint-disable */
 
 interface FormData {
   fullName: string;
@@ -13,43 +13,43 @@ interface FormData {
   country: string;
 }
 
-interface UserData {
-  fullName: string;
-  email: string;
-  password: string;
-  country: string;
-  createdAt: string;
-}
-
 export default function SignUpPage() {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    country: ''
+    country: '',
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   const countries = [
-    'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'France', 'Japan', 'India',
-    'Brazil', 'Mexico', 'Spain', 'Italy', 'South Korea', 'China', 'Russia', 'South Africa',
-    'United Arab Emirates', 'Saudi Arabia', 'Singapore', 'Malaysia', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal'
+    'United States', 'Canada', 'United Kingdom', 'Australia',
+    'Germany', 'France', 'Japan', 'India', 'Brazil', 'Mexico',
+    'Spain', 'Italy', 'South Korea', 'China', 'Russia',
+    'South Africa', 'United Arab Emirates', 'Saudi Arabia',
+    'Singapore', 'Malaysia', 'Pakistan', 'Bangladesh',
+    'Sri Lanka', 'Nepal',
   ];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setMessage(''); // Clear message when user starts typing
+    setMessage('');
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const { fullName, email, password, confirmPassword, country } = formData;
 
-    // Validation
+    // Frontend validation (UX only)
     if (!fullName || !email || !password || !confirmPassword || !country) {
       setMessage('All fields are required.');
       return;
@@ -69,103 +69,72 @@ export default function SignUpPage() {
     setMessage('');
 
     try {
-      // Check for existing email in localStorage
-      const existing = typeof window !== 'undefined' ? localStorage.getItem('users') : null;
-      const arr: UserData[] = existing ? JSON.parse(existing) : [];
-
-      if (arr.find((u: UserData) => u.email.toLowerCase() === email.toLowerCase())) {
-        setMessage('An account with this email already exists. Please login.');
-        setIsLoading(false);
-        return;
-      }
-
-      // Create new user object
-      const newUser: UserData = {
-        fullName,
-        email,
-        password, // Note: In production, never store plain passwords
-        country,
-        createdAt: new Date().toISOString()
-      };
-
-      // Save to localStorage
-      arr.push(newUser);
-      localStorage.setItem('users', JSON.stringify(arr));
-
-      // Send confirmation email via API
       const response = await fetch('/api/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName,
           email,
           password,
-          country
+          country,
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to send confirmation email');
+        throw new Error(result.error || 'Registration failed');
       }
 
-      setMessage('Account created successfully! A confirmation email has been sent.');
-      
-      // Redirect to login after success
+      setMessage(
+        'Account created successfully. Please check your email.'
+      );
+
       setTimeout(() => {
         window.location.href = '/auth/login';
       }, 2000);
 
     } catch (error) {
-      console.error('Registration error:', error);
-      setMessage(error instanceof Error ? error.message : 'Registration failed. Please try again.');
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong. Try again.'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Message popup component
+  /* ================= MESSAGE POPUP ================= */
   const MessagePopup = () => {
     if (!message) return null;
 
-    const isError = message.includes('required') || 
-                   message.includes('match') || 
-                   message.includes('already exists') || 
-                   message.includes('failed') ||
-                   message.includes('characters');
+    const isError =
+      message.toLowerCase().includes('required') ||
+      message.toLowerCase().includes('match') ||
+      message.toLowerCase().includes('exists') ||
+      message.toLowerCase().includes('failed');
 
     return (
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in duration-300">
-        <div className={cn(
-          "rounded-lg px-4 py-3 shadow-lg border",
-          isError 
-            ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-            : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-        )}>
-          <div className="flex items-center gap-2">
-            <div className={cn(
-              "w-2 h-2 rounded-full",
-              isError ? "bg-red-500" : "bg-green-500"
-            )}></div>
-            <p className={cn(
-              "text-sm font-medium",
-              isError ? "text-red-700 dark:text-red-300" : "text-green-700 dark:text-green-300"
-            )}>
-              {message}
-            </p>
-          </div>
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+        <div
+          className={cn(
+            'rounded-lg px-4 py-3 shadow-lg border',
+            isError
+              ? 'bg-red-50 border-red-200 text-red-700'
+              : 'bg-green-50 border-green-200 text-green-700'
+          )}
+        >
+          {message}
         </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <MessagePopup />
-      
+
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -180,217 +149,118 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        {/* Sign Up Form */}
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            {/* Full Name Field */}
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className={cn(
-                    "block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
-                    "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-                    "placeholder-gray-500 dark:placeholder-gray-400",
-                    "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
-                  )}
-                  placeholder="Enter your full name"
-                />
-              </div>
-            </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Full Name */}
+          <Input
+            label="Full Name"
+            icon={<User className="h-5 w-5 text-gray-400" />}
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            placeholder="Enter your full name"
+          />
 
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={cn(
-                    "block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
-                    "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-                    "placeholder-gray-500 dark:placeholder-gray-400",
-                    "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
-                  )}
-                  placeholder="Enter your email address"
-                />
-              </div>
-            </div>
+          {/* Email */}
+          <Input
+            label="Email Address"
+            icon={<Mail className="h-5 w-5 text-gray-400" />}
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+          />
 
-            {/* Country Field */}
-            <div>
-              <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Country
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MapPin className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  id="country"
-                  name="country"
-                  required
-                  value={formData.country}
-                  onChange={handleChange}
-                  className={cn(
-                    "block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
-                    "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-                    "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200 appearance-none cursor-pointer"
-                  )}
-                >
-                  <option value="">Select your country</option>
-                  {countries.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={cn(
-                    "block w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
-                    "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-                    "placeholder-gray-500 dark:placeholder-gray-400",
-                    "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
-                  )}
-                  placeholder="Enter password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={cn(
-                    "block w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
-                    "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
-                    "placeholder-gray-500 dark:placeholder-gray-400",
-                    "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
-                  )}
-                  placeholder="Confirm your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                  )}
-                </button>
-              </div>
-            </div>
+          {/* Country */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Country</label>
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border"
+            >
+              <option value="">Select country</option>
+              {countries.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Submit Button */}
+          {/* Password */}
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={formData.password}
+            show={showPassword}
+            setShow={setShowPassword}
+            onChange={handleChange}
+          />
+
+          {/* Confirm Password */}
+          <PasswordInput
+            label="Confirm Password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            show={showConfirmPassword}
+            setShow={setShowConfirmPassword}
+            onChange={handleChange}
+          />
+
           <button
             type="submit"
             disabled={isLoading}
-            className={cn(
-              "w-full flex justify-center py-3 px-4 border border-transparent rounded-xl",
-              "text-sm font-medium text-white dark:text-gray-900",
-              "bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 dark:focus:ring-gray-100",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-all duration-200"
-            )}
+            className="w-full py-3 rounded-xl bg-gray-900 text-white disabled:opacity-50"
           >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Creating Account...
-              </div>
-            ) : (
-              'Create Account'
-            )}
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
 
-          {/* Help Text */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Already have an account?{' '}
-              <a
-                href="/auth/login"
-                className="font-semibold underline hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-              >
-                Login here
-              </a>
-            </p>
-          </div>
+          <p className="text-center text-sm">
+            Already have an account?{' '}
+            <a href="/auth/login" className="underline font-semibold">
+              Login
+            </a>
+          </p>
         </form>
+      </div>
+    </div>
+  );
+}
+
+/* ================= REUSABLE INPUT ================= */
+function Input({ label, icon, ...props }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2">{label}</label>
+      <div className="relative">
+        <div className="absolute left-3 top-3">{icon}</div>
+        <input
+          {...props}
+          className="w-full pl-10 py-3 rounded-xl border"
+        />
+      </div>
+    </div>
+  );
+}
+
+function PasswordInput({ label, show, setShow, ...props }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2">{label}</label>
+      <div className="relative">
+        <input
+          {...props}
+          type={show ? 'text' : 'password'}
+          className="w-full px-4 py-3 rounded-xl border"
+        />
+        <button
+          type="button"
+          onClick={() => setShow(!show)}
+          className="absolute right-3 top-3"
+        >
+          {show ? <EyeOff /> : <Eye />}
+        </button>
       </div>
     </div>
   );

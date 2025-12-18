@@ -44,64 +44,42 @@ const handleLogin = async (e: React.FormEvent) => {
   setError('');
 
   try {
-    // Hardcoded credentials
-    if (email === 'imransir@gmail.com' && password === '123456') {
-      const authData: AuthCollege = {
-        email: 'imransir@gmail.com',
-        name: 'Imran Sir',
-        collegeId: 'hardcoded_access',
-        token: `college_${Date.now()}`,
-        timestamp: Date.now()
-      };
-      localStorage.setItem('auth_college', JSON.stringify(authData));
-      router.push('/College_Portfolio_Handler');
-      return;
-    }
+    const response = await fetch('/api/colleges/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim(), password: password.trim() })
+    });
 
-    // Retrieve stored admins
-    const collegeAdminStr = localStorage.getItem('college_admin');
-    if (!collegeAdminStr) {
-      setError('No admin credentials found. Please contact support.');
+    const result = await response.json();
+
+    if (!result.success) {
+      setError(result.message || "Login failed");
       setIsLoading(false);
       return;
     }
 
-    // Parse as array
-    const collegeAdmins: CollegeAdmin[] = JSON.parse(collegeAdminStr);
-    console.log('Stored admins:', collegeAdmins);
+    const authData: AuthCollege = {
+      email: result.data.email,
+      name: result.data.collegeName,
+      collegeId: result.data.collegeId,
+      token: `college_${Date.now()}`,
+      timestamp: Date.now()
+    };
 
-    // Trim inputs to prevent accidental whitespace errors
-    const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
+    // Save to localStorage
+    localStorage.setItem('auth_college', JSON.stringify(authData));
 
-    // Find matching admin
-    const matchingAdmin = collegeAdmins.find(
-      (admin) =>
-        admin.email.trim() === trimmedEmail &&
-        admin.password.trim() === trimmedPassword
-    );
+    // Redirect to portal
+    router.push('/College_Portfolio_Handler');
 
-    if (matchingAdmin) {
-      const authData: AuthCollege = {
-        email: matchingAdmin.email,
-        name: matchingAdmin.adminName, // Use correct property
-        collegeId: matchingAdmin.collegeId,
-        token: `college_${Date.now()}`,
-        timestamp: Date.now()
-      };
-
-      localStorage.setItem('auth_college', JSON.stringify(authData));
-      router.push('/College_Portfolio_Handler');
-    } else {
-      setError('Invalid email or password');
-    }
   } catch (err) {
+    console.error(err);
     setError('Login failed. Please try again.');
-    console.error('Login error:', err);
   } finally {
     setIsLoading(false);
   }
 };
+
 
 
   // Error popup component
@@ -239,12 +217,7 @@ const handleLogin = async (e: React.FormEvent) => {
             </p>
           </div>
 
-          {/* Demo Credentials Hint (Optional) */}
-          <div className="text-center">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Demo: imransir@gmail.com / 123456
-            </p>
-          </div>
+          
         </form>
       </div>
     </div>

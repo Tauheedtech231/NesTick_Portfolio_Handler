@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Palette, Download, Trash2, Check, X, User, Calendar, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
+import { Plus, Palette, Download, Trash2, Check, X, User, Calendar, AlertTriangle, CheckCircle, TrendingUp, Building2 } from 'lucide-react';
 
 import { MainLayout } from './components/layout/main-layout';
 import { StatsCard } from './components/dashboard/stats-card';
-import { College } from '@/app/types';
 
 // Import Recharts for professional charts
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -24,6 +23,22 @@ interface Toast {
   id: string;
   message: string;
   type: 'success' | 'error';
+}
+
+// College interface matching your backend
+interface College {
+  id: number;
+  name: string;
+  email: string;
+  website: string;
+  city: string;
+  country: string;
+  phone: string;
+  template_id: number | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  template_name?: string;
 }
 
 // Fixed Chart data interfaces
@@ -45,7 +60,8 @@ interface PieChartData {
   name: string;
   value: number;
   color: string;
-}
+}/* eslint-disable */
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -57,22 +73,34 @@ export default function DashboardPage() {
     show: false,
     request: null
   });
+  const [loading, setLoading] = useState(true);
 
   // Chart data states
   const [lineChartData, setLineChartData] = useState<ChartData[]>([]);
   const [statusData, setStatusData] = useState<PieChartData[]>([]);
 
-  // Load colleges from localStorage once on mount
+  // Fetch colleges from backend API
   useEffect(() => {
-    const stored = localStorage.getItem('colleges');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      setColleges(parsed);
-      generateChartData(parsed);
-    }
+    const fetchColleges = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/colleges');
+        if (!response.ok) throw new Error('Failed to fetch colleges');
+        const data = await response.json();
+        setColleges(data);
+        generateChartData(data);
+      } catch (error) {
+        console.error('Error fetching colleges:', error);
+        addToast('Failed to load college data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchColleges();
   }, []);
 
-  // Load delete requests from localStorage
+  // Load delete requests from localStorage (keeping this as is)
   useEffect(() => {
     const stored = localStorage.getItem('deleteRequests');
     if (stored) {
@@ -82,29 +110,50 @@ export default function DashboardPage() {
 
   // Generate chart data based on colleges
   const generateChartData = (collegesData: College[]) => {
-    // Generate sample monthly data (in a real app, you'd use actual creation dates)
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentMonth = new Date().getMonth();
+    if (!collegesData.length) return;
+
+    // Group colleges by month of creation
+    const monthlyData: Record<string, { total: number; active: number; inactive: number }> = {};
     
-    const chartData: ChartData[] = months.slice(0, currentMonth + 1).map((month, index) => {
-      // Simulate growth data - in real app, use actual college creation dates
-      const baseCount = Math.max(1, Math.floor(collegesData.length * (index + 1) / (currentMonth + 1)));
-      const activeCount = Math.floor(baseCount * 0.7); // 70% active
-      const inactiveCount = baseCount - activeCount;
+    collegesData.forEach(college => {
+      const date = new Date(college.created_at);
+      const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
       
-      return {
-        month,
-        colleges: baseCount,
-        active: activeCount,
-        inactive: inactiveCount
-      };
+      if (!monthlyData[monthYear]) {
+        monthlyData[monthYear] = { total: 0, active: 0, inactive: 0 };
+      }
+      
+      monthlyData[monthYear].total += 1;
+      if (college.is_active) {
+        monthlyData[monthYear].active += 1;
+      } else {
+        monthlyData[monthYear].inactive += 1;
+      }
     });
+
+    // Convert to array and sort by date
+    const chartData: ChartData[] = Object.entries(monthlyData)
+      .map(([monthYear, data]) => {
+        const [year, month] = monthYear.split('-');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return {
+          month: `${monthNames[parseInt(month) - 1]} ${year}`,
+          colleges: data.total,
+          active: data.active,
+          inactive: data.inactive
+        };
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.month);
+        const dateB = new Date(b.month);
+        return dateA.getTime() - dateB.getTime();
+      });
 
     setLineChartData(chartData);
 
     // Status distribution for pie chart
-    const active = collegesData.filter(c => c.status === 'active').length;
-    const inactive = collegesData.filter(c => c.status === 'inactive').length;
+    const active = collegesData.filter(c => c.is_active).length;
+    const inactive = collegesData.filter(c => !c.is_active).length;
     
     setStatusData([
       { name: 'Active', value: active, color: '#10B981' },
@@ -128,30 +177,48 @@ export default function DashboardPage() {
   };
 
   const total = colleges.length;
-  const active = colleges.filter((c) => c.status === 'active').length;
-  const inactive = colleges.filter((c) => c.status === 'inactive').length;
+  const active = colleges.filter((c) => c.is_active).length;
+  const inactive = colleges.filter((c) => !c.is_active).length;
   const pendingDeleteRequests = deleteRequests.filter(req => req.status === 'pending').length;
 
   const handleAdd = () => router.push('/Portfolio_Handler/colleges');
   const handleThemes = () => router.push('/Portfolio_Handler/themes');
 
-  const handleBackup = () => {
-    const data = {
-      colleges: localStorage.getItem('colleges'),
-      themes: localStorage.getItem('themes'),
-      announcements: localStorage.getItem('announcements'),
-      settings: localStorage.getItem('settings'),
-    };
+  const handleBackup = async () => {
+    try {
+      // Fetch all data from APIs for backup
+      const [collegesRes, templatesRes] = await Promise.all([
+        fetch('/api/colleges'),
+        fetch('/api/templates')
+      ]);
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
+      const collegesData = await collegesRes.json();
+      const templatesData = templatesRes.ok ? await templatesRes.json() : [];
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'portfolio-backup.json';
-    link.click();
+      const data = {
+        timestamp: new Date().toISOString(),
+        colleges: collegesData,
+        templates: templatesData.templates || templatesData,
+        deleteRequests: localStorage.getItem('deleteRequests') ? JSON.parse(localStorage.getItem('deleteRequests')!) : [],
+        settings: localStorage.getItem('settings') ? JSON.parse(localStorage.getItem('settings')!) : {}
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `portfolio-backup-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      addToast('Backup created successfully!', 'success');
+    } catch (error) {
+      console.error('Backup failed:', error);
+      addToast('Failed to create backup', 'error');
+    }
   };
 
   // Show approval confirmation modal
@@ -160,35 +227,50 @@ export default function DashboardPage() {
   };
 
   // Handle approving delete requests
-  const handleApproveDeleteRequest = () => {
+  const handleApproveDeleteRequest = async () => {
     if (!approveConfirmModal.request) return;
 
-    const requestId = approveConfirmModal.request.id;
-    
-    // Clear all data except deleteRequests
-    const savedDeleteRequests = localStorage.getItem('deleteRequests');
-    localStorage.clear();
-    
-    // Restore delete requests but mark this one as approved
-    if (savedDeleteRequests) {
-      const requests = JSON.parse(savedDeleteRequests);
-      const updatedRequests = requests.map((req: DeleteRequest) => 
-        req.id === requestId ? { ...req, status: 'approved' } : req
-      );
-      localStorage.setItem('deleteRequests', JSON.stringify(updatedRequests));
-      setDeleteRequests(updatedRequests);
+    try {
+      const requestId = approveConfirmModal.request.id;
+      
+      // First, delete all colleges from backend
+      const response = await fetch('/api/colleges', {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete colleges from backend');
+      }
+
+      // Clear all data except deleteRequests from localStorage
+      const savedDeleteRequests = localStorage.getItem('deleteRequests');
+      localStorage.clear();
+      
+      // Restore delete requests but mark this one as approved
+      if (savedDeleteRequests) {
+        const requests = JSON.parse(savedDeleteRequests);
+        const updatedRequests = requests.map((req: DeleteRequest) => 
+          req.id === requestId ? { ...req, status: 'approved' } : req
+        );
+        localStorage.setItem('deleteRequests', JSON.stringify(updatedRequests));
+        setDeleteRequests(updatedRequests);
+      }
+
+      // Update colleges state to empty
+      setColleges([]);
+      setLineChartData([]);
+      setStatusData([]);
+
+      // Close modal and show success toast
+      setApproveConfirmModal({ show: false, request: null });
+      addToast('✅ Data deletion approved and all colleges have been deleted!', 'success');
+      
+      // Close the delete requests modal if open
+      setShowDeleteRequests(false);
+    } catch (error) {
+      console.error('Error approving delete request:', error);
+      addToast('Failed to delete colleges from backend', 'error');
     }
-/* eslint-disable */
-
-    // Update colleges state to empty
-    setColleges([]);
-
-    // Close modal and show success toast
-    setApproveConfirmModal({ show: false, request: null });
-    addToast('✅ Data deletion approved and all data has been cleared!', 'success');
-    
-    // Close the delete requests modal if open
-    setShowDeleteRequests(false);
   };
 
   // Handle rejecting delete requests
@@ -254,6 +336,24 @@ export default function DashboardPage() {
     );
   };
 
+  // Refresh college data
+  const refreshCollegeData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/colleges');
+      if (!response.ok) throw new Error('Failed to fetch colleges');
+      const data = await response.json();
+      setColleges(data);
+      generateChartData(data);
+      addToast('College data refreshed successfully!', 'success');
+    } catch (error) {
+      console.error('Error refreshing colleges:', error);
+      addToast('Failed to refresh college data', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <MainLayout>
       {/* Toast Notifications */}
@@ -301,6 +401,23 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Dashboard
           </h1>
+          <button
+            onClick={refreshCollegeData}
+            disabled={loading}
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <span>Loading...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle size={18} />
+                <span>Refresh Data</span>
+              </>
+            )}
+          </button>
         </header>
 
         {/* Stats */}
@@ -309,26 +426,30 @@ export default function DashboardPage() {
             title="Total Colleges"
             value={total.toString()}
             description="All registered colleges"
-            trend="+2 this month"
+            icon={<Building2 className="text-blue-600" size={24} />}
+            trend="Real-time data from backend"
           />
           <StatsCard
             title="Active Colleges"
             value={active.toString()}
-            description="Currently active portfolios"
-            trend="+12% from last month"
+            description="Currently active"
+            icon={<CheckCircle className="text-green-600" size={24} />}
+            trend={`${total > 0 ? ((active / total) * 100).toFixed(1) : 0}% of total`}
           />
           <StatsCard
-            title="Disabled Colleges"
+            title="Inactive Colleges"
             value={inactive.toString()}
-            description="Inactive portfolios"
-            trend="-5% from last month"
+            description="Not active"
+            icon={<X className="text-red-600" size={24} />}
+            trend={`${total > 0 ? ((inactive / total) * 100).toFixed(1) : 0}% of total`}
           />
           <StatsCard
             title="Pending Deletions"
             value={pendingDeleteRequests.toString()}
             description="Awaiting approval"
-            trend="Needs attention"
+            icon={<AlertTriangle className="text-yellow-600" size={24} />}
             alert={pendingDeleteRequests > 0}
+            trend="Local storage only"
           />
         </section>
 
@@ -394,7 +515,7 @@ export default function DashboardPage() {
             </div>
           </motion.button>
 
-          {/* NEW: Manage Delete Requests */}
+          {/* Manage Delete Requests */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
@@ -436,161 +557,188 @@ export default function DashboardPage() {
           </motion.button>
         </section>
 
-        {/* NEW: Professional Charts Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Line Chart - College Growth Trend */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <TrendingUp size={20} />
-                  College Growth Trend
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Monthly college registration growth
-                </p>
+        {/* Professional Charts Section */}
+        {colleges.length > 0 ? (
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Line Chart - College Growth Trend */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <TrendingUp size={20} />
+                    College Growth Trend
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Monthly college registration growth
+                  </p>
+                </div>
+              </div>
+              <div className="h-80">
+                {lineChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={lineChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="#6B7280"
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke="#6B7280"
+                        fontSize={12}
+                      />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="colleges" 
+                        stroke="#3B82F6" 
+                        strokeWidth={2}
+                        dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, fill: '#1D4ED8' }}
+                        name="Total Colleges"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="active" 
+                        stroke="#10B981" 
+                        strokeWidth={2}
+                        strokeDasharray="3 3"
+                        dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                        name="Active Colleges"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
+                    No chart data available
+                  </div>
+                )}
               </div>
             </div>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lineChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="colleges" 
-                    stroke="#3B82F6" 
-                    strokeWidth={2}
-                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: '#1D4ED8' }}
-                    name="Total Colleges"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="active" 
-                    stroke="#10B981" 
-                    strokeWidth={2}
-                    strokeDasharray="3 3"
-                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                    name="Active Colleges"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
 
-          {/* Status Distribution Pie Chart */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Status Distribution
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Active vs Inactive colleges
-                </p>
+            {/* Status Distribution Pie Chart */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Status Distribution
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Active vs Inactive colleges
+                  </p>
+                </div>
+              </div>
+              <div className="h-80">
+                {statusData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData as unknown as { name?: string; value: number; color?: string }[]}
+                        nameKey="status"
+                        dataKey="value"
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={80}
+                        fill="#8884d8"
+                      >
+                        {statusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
+                    No data for status distribution
+                  </div>
+                )}
               </div>
             </div>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                <Pie
-  data={statusData as unknown as { name?: string; value: number; color?: string }[]}
-  nameKey="status"    // use the property in your objects for labels
-  dataKey="value"
-  cx="50%"
-  cy="50%"
-  labelLine={false}
-  label={renderCustomizedLabel}
-  outerRadius={80}
-  fill="#8884d8"
->
-  {statusData.map((entry, index) => (
-    <Cell key={`cell-${index}`} fill={entry.color} />
-  ))}
-</Pie>
-
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+          </section>
+        ) : !loading && (
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+            <Building2 size={48} className="mx-auto text-gray-400 dark:text-gray-600 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No College Data</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Start by adding your first college</p>
+            <button
+              onClick={handleAdd}
+              className="px-6 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Add College
+            </button>
           </div>
-        </section>
+        )}
 
         {/* Analytics Summary Cards */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              College Status Distribution
-            </h3>
-            <div className="space-y-4 text-gray-700 dark:text-gray-300">
-              <div className="flex justify-between items-center">
-                <span>Active Colleges</span>
-                <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                  <div
-                    className="h-2 rounded-full bg-green-500"
-                    style={{ width: `${total ? (active / total) * 100 : 0}%` }}
-                  />
+        {colleges.length > 0 && (
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                College Status Distribution
+              </h3>
+              <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                <div className="flex justify-between items-center">
+                  <span>Active Colleges</span>
+                  <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-green-500"
+                      style={{ width: `${total ? (active / total) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span>{active}</span>
                 </div>
-                <span>{active}</span>
-              </div>
 
-              <div className="flex justify-between items-center">
-                <span>Inactive Colleges</span>
-                <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                  <div
-                    className="h-2 rounded-full bg-red-500"
-                    style={{ width: `${total ? (inactive / total) * 100 : 0}%` }}
-                  />
+                <div className="flex justify-between items-center">
+                  <span>Inactive Colleges</span>
+                  <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-red-500"
+                      style={{ width: `${total ? (inactive / total) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span>{inactive}</span>
                 </div>
-                <span>{inactive}</span>
               </div>
             </div>
-          </div>
 
-          {/* Delete Requests Summary */}
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              Delete Requests Summary
-            </h3>
-            <div className="space-y-4 text-gray-700 dark:text-gray-300">
-              <div className="flex justify-between items-center">
-                <span>Pending Requests</span>
-                <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                  <div
-                    className="h-2 rounded-full bg-yellow-500"
-                    style={{ width: `${pendingDeleteRequests > 0 ? 100 : 0}%` }}
-                  />
+            {/* Delete Requests Summary */}
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                Delete Requests Summary
+              </h3>
+              <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                <div className="flex justify-between items-center">
+                  <span>Pending Requests</span>
+                  <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-yellow-500"
+                      style={{ width: `${pendingDeleteRequests > 0 ? 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className={pendingDeleteRequests > 0 ? 'text-yellow-600 font-semibold' : ''}>
+                    {pendingDeleteRequests}
+                  </span>
                 </div>
-                <span className={pendingDeleteRequests > 0 ? 'text-yellow-600 font-semibold' : ''}>
-                  {pendingDeleteRequests}
-                </span>
-              </div>
 
-              <div className="flex justify-between items-center">
-                <span>Total Requests</span>
-                <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                  <div
-                    className="h-2 rounded-full bg-blue-500"
-                    style={{ width: '100%' }}
-                  />
+                <div className="flex justify-between items-center">
+                  <span>Total Requests</span>
+                  <div className="w-32 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-blue-500"
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                  <span>{deleteRequests.length}</span>
                 </div>
-                <span>{deleteRequests.length}</span>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Delete Requests Modal */}
         {showDeleteRequests && (
@@ -757,8 +905,8 @@ export default function DashboardPage() {
                           Warning: This will permanently delete all data
                         </p>
                         <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                          • All colleges and their data<br/>
-                          • All themes and settings<br/>
+                          • All colleges from database ({colleges.length} colleges)<br/>
+                          • All themes and settings from localStorage<br/>
                           • All announcements<br/>
                           • This action cannot be reversed
                         </p>

@@ -9,8 +9,8 @@ interface Template {
   id: number;
   name: string;
 }
-/* eslint-disable */
 
+/* eslint-disable */
 interface PortalLayoutProps {
   logo?: string;
   children: React.ReactNode;
@@ -38,35 +38,46 @@ export function PortalLayout({
   const [templateName, setTemplateName] = useState<string>('Loading...');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // Fetch template data from /api/templates (example: first template)
   useEffect(() => {
-    async function fetchTemplate() {
+    async function fetchTemplateName() {
       try {
-        const res = await fetch('/api/templates');
-        if (!res.ok) throw new Error('Failed to fetch templates');
-
-        const templates: Template[] = await res.json();
-        if (templates.length === 0) {
-          setErrorMessage('No templates found.');
+        // Get logged in college email from localStorage
+        const authCollegeStr = localStorage.getItem('auth_college');
+        if (!authCollegeStr) {
           setTemplateName('Default Template');
           return;
         }
 
-        const currentTemplate = templates[0];
-        setTemplateName(currentTemplate.name);
+        const authCollege = JSON.parse(authCollegeStr);
+        const email = authCollege.email;
+
+        const res = await fetch(`/api/sections/template_info?email=${encodeURIComponent(email)}`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch template info');
+        }
+
+        const data = await res.json();
+        if (data.template_name) {
+          setTemplateName(data.template_name);
+
+          // Optionally, store template name in localStorage
+          localStorage.setItem('college_template_name', data.template_name);
+        } else {
+          setTemplateName('Default Template');
+        }
       } catch (err: any) {
         console.error(err);
-        setErrorMessage(err.message || 'Error fetching templates');
+        setErrorMessage(err.message || 'Error fetching template info');
         setTemplateName('Default Template');
       }
     }
 
-    fetchTemplate();
+    fetchTemplateName();
   }, []);
 
   return (
     <div className="flex min-h-screen bg-white text-black dark:bg-black dark:text-white transition-colors duration-500">
-      {/* 🔹 Sidebar */}
+      {/* Sidebar */}
       <div
         className={`fixed md:static inset-y-0 left-0 z-40 transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -80,7 +91,7 @@ export function PortalLayout({
         />
       </div>
 
-      {/* 🔹 Overlay for mobile */}
+      {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -88,12 +99,12 @@ export function PortalLayout({
         />
       )}
 
-      {/* 🔹 Main Content */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col transition-colors duration-500 md:ml-0">
         {/* Header */}
         <Header
           collegeName={templateName} // Template name in header
-          logo={logo}
+          
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
         />

@@ -6,25 +6,35 @@ const dbConfig = {
   user: "portfolio_user",
   password: "StrongPass123!",
   database: "portfolio_handler_db",
- 
 };
 
 export async function GET() {
+  let connection;
+
   try {
-    const connection = await mysql.createConnection(dbConfig);
+    // Connect to database
+    connection = await mysql.createConnection(dbConfig);
+
+    // Fetch full template info
     const [rows] = await connection.execute(
-      "SELECT id, name, description FROM templates"
+      `SELECT id, name, description, image, live_url, type, created_at
+       FROM templates
+       ORDER BY created_at DESC`
     );
+
+    // Close connection
     await connection.end();
 
-    return NextResponse.json(rows);
+    // Return full data
+    return NextResponse.json({ success: true, templates: rows });
+
   } catch (err) {
-    // 🔹 Print full error in server terminal
     console.error("MySQL Error:", err);
 
-    // 🔹 Send error to client
+    if (connection) await connection.end();
+
     return NextResponse.json(
-      { error: (err as Error).message },
+      { success: false, error: (err as Error).message },
       { status: 500 }
     );
   }

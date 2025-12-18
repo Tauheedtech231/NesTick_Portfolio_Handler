@@ -1,21 +1,25 @@
-// components/ThemeUploadForm.tsx
 'use client';
 /* eslint-disable */
 
 import { useState } from 'react';
-import { Theme, ThemeFormData } from '@/app/types';
-import { addThemeToLocalStorage } from '../../utils/themeStorage';
 import { CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function ThemeUploadForm() {
-  const [formData, setFormData] = useState<ThemeFormData>({
+interface TemplateFormData {
+  name: string;
+  description: string;
+  image: File | null;
+  liveUrl: string;
+  type: 'free' | 'paid';
+}
+
+export default function TemplateUploadForm() {
+  const [formData, setFormData] = useState<TemplateFormData>({
     name: '',
     description: '',
     image: null,
-    zipFile: null,
     liveUrl: '',
-    type: 'free', // Add type field with default value
+    type: 'free',
   });
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,20 +30,21 @@ export default function ThemeUploadForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: name === 'type' ? value as 'free' | 'paid' : value 
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, files } = e.target;
+    const { files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      setFormData((prev) => ({ ...prev, [name]: file }));
+      setFormData((prev) => ({ ...prev, image: file }));
 
-      if (name === 'image') {
-        const reader = new FileReader();
-        reader.onload = (e) => setImagePreview(e.target?.result as string);
-        reader.readAsDataURL(file);
-      }
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -59,46 +64,57 @@ export default function ThemeUploadForm() {
     setShowSuccess(false);
 
     try {
-      if (
-        !formData.name ||
-        !formData.description ||
-        !formData.image ||
-        !formData.zipFile
-      ) {
+      // Validation
+      if (!formData.name || !formData.description || !formData.image) {
         setErrorMessage('Please fill all required fields');
+        setIsSubmitting(false);
         return;
       }
 
+      // Convert image to base64
       const imageBase64 = await fileToBase64(formData.image);
 
-      const newTheme: Theme = {
-        id: crypto.randomUUID(),
+      // Prepare data for API
+      const templateData = {
         name: formData.name,
         description: formData.description,
         image: imageBase64,
-        zipFile: formData.zipFile.name,
-        liveUrl: formData.liveUrl || undefined,
-        type: formData.type, // Include the type
-        createdAt: new Date().toISOString(),
+        live_url: formData.liveUrl || null,
+        type: formData.type
       };
 
-      addThemeToLocalStorage(newTheme);
+      // Call API to create template
+      const response = await fetch('/api/templates/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(templateData),
+      });
 
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to create template');
+      }
+
+      // Reset form on success
       setFormData({
         name: '',
         description: '',
         image: null,
-        zipFile: null,
         liveUrl: '',
-        type: 'free', // Reset to default
+        type: 'free',
       });
       setImagePreview('');
       setShowSuccess(true);
 
       // Auto-hide success after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
-      setErrorMessage('❌ Error uploading theme');
+
+    } catch (error: any) {
+      console.error('Template upload error:', error);
+      setErrorMessage(error.message || '❌ Error uploading template');
     } finally {
       setIsSubmitting(false);
     }
@@ -107,7 +123,7 @@ export default function ThemeUploadForm() {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6 border border-gray-200 dark:border-gray-700 relative">
       <h2 className="text-xl font-semibold text-black dark:text-white mb-5">
-        Upload New Theme
+        Upload New Template
       </h2>
 
       {/* ✅ Success check animation */}
@@ -121,7 +137,7 @@ export default function ThemeUploadForm() {
             className="absolute top-4 right-4 flex items-center gap-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-2 rounded-lg shadow-md"
           >
             <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
-            <span className="font-medium text-sm">Theme Uploaded!</span>
+            <span className="font-medium text-sm">Template Uploaded!</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -136,7 +152,7 @@ export default function ThemeUploadForm() {
       <form onSubmit={handleSubmit} className="space-y-3 text-sm">
         <div>
           <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Theme Name *
+            Template Name *
           </label>
           <input
             type="text"
@@ -162,10 +178,10 @@ export default function ThemeUploadForm() {
           />
         </div>
 
-        {/* Add Theme Type Selection */}
+        {/* Template Type Selection */}
         <div>
           <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Theme Type *
+            Template Type *
           </label>
           <div className="flex gap-4">
             <label className="flex items-center">
@@ -218,20 +234,6 @@ export default function ThemeUploadForm() {
 
         <div>
           <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Theme ZIP File *
-          </label>
-          <input
-            type="file"
-            name="zipFile"
-            accept=".zip"
-            onChange={handleFileChange}
-            className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-black dark:text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-black hover:file:bg-gray-200"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
             Live Preview URL (Optional)
           </label>
           <input
@@ -239,7 +241,7 @@ export default function ThemeUploadForm() {
             name="liveUrl"
             value={formData.liveUrl}
             onChange={handleInputChange}
-            placeholder="https://demo.college-theme.com"
+            placeholder="https://demo.template.com"
             className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 text-sm text-black dark:text-white"
           />
         </div>
@@ -249,7 +251,7 @@ export default function ThemeUploadForm() {
           disabled={isSubmitting}
           className="w-full bg-black dark:bg-white text-white dark:text-black py-1.5 px-4 rounded-md text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white disabled:opacity-50 transition-colors"
         >
-          {isSubmitting ? 'Uploading...' : 'Upload Theme'}
+          {isSubmitting ? 'Uploading...' : 'Upload Template'}
         </button>
       </form>
     </div>

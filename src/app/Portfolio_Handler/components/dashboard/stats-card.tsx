@@ -1,12 +1,14 @@
 'use client';
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
 interface StatsCardProps {
   title: string;
   value: string;
   description: string;
   trend: string;
-   alert?: boolean; // optional prop
+   alert?: boolean;
+   icon?: ReactNode; // optional prop
 }
 
 export function StatsCard({ title, value, description, trend, }: StatsCardProps) {
