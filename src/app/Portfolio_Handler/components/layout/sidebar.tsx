@@ -18,7 +18,8 @@ import {
   Search,
   ChevronDown,
   FileText,
-  LucideIcon
+  LucideIcon,
+  User
 } from 'lucide-react';
 
 // Define proper TypeScript interfaces
@@ -50,10 +51,12 @@ const menuItems: MenuItem[] = [
     ]
   },
   { type: 'link', href: '/Portfolio_Handler/themes', icon: Palette, label: 'Templates' },
+  { type: 'link', href: '/Portfolio_Handler/credientials_manage', icon: User, label: 'Credentials' },
   { type: 'link', href: '/Portfolio_Handler/modules', icon: Layers, label: 'Modules' },
   { type: 'link', href: '/Portfolio_Handler/announcements', icon: Megaphone, label: 'Announcements' },
   { type: 'link', href: '/Portfolio_Handler/backup', icon: Database, label: 'Data & Backup' },
   { type: 'link', href: '/Portfolio_Handler/settings', icon: Settings, label: 'Settings' },
+
 ];
 
 export function Sidebar() {

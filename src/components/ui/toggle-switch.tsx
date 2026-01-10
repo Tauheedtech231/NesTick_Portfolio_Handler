@@ -5,16 +5,19 @@ import { motion } from 'framer-motion';
 interface ToggleSwitchProps {
   enabled: boolean;
   onChange: (enabled: boolean) => void;
+  disabled?: boolean; // ✅ add optional disabled prop
 }
 
-export function ToggleSwitch({ enabled, onChange }: ToggleSwitchProps) {
+export function ToggleSwitch({ enabled, onChange, disabled = false }: ToggleSwitchProps) {
   return (
     <button
       type="button"
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? 'bg-blue-600' : 'bg-gray-200'
-      }`}
-      onClick={() => onChange(!enabled)}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+        ${enabled ? 'bg-blue-600' : 'bg-gray-200'}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+      `}
+      onClick={() => !disabled && onChange(!enabled)} // ✅ prevent toggle if disabled
+      disabled={disabled} // ✅ native button disable
     >
       <motion.span
         initial={false}

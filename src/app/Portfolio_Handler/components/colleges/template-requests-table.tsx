@@ -7,7 +7,7 @@ import { useState } from 'react';
 interface TemplateRequest {
   id: string;
   name: string;
-  representativeName: string; // college name
+  representativeName: string;
   email: string;
   phone: string;
   plan: string;
@@ -35,7 +35,10 @@ export function TemplateRequestsTable({
 }: TemplateRequestsTableProps) {
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
 
-  const getStatusBadge = (status: 'pending' | 'approved' | 'rejected') => {
+  const getStatusBadge = (status: string) => {
+    // Default to 'pending' if status is undefined or invalid
+    const safeStatus = status || 'pending';
+    
     const statusConfig = {
       pending: { 
         color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', 
@@ -51,7 +54,9 @@ export function TemplateRequestsTable({
       }
     };
 
-    const config = statusConfig[status];
+    // Use the status if it exists in config, otherwise default to pending
+    const config = statusConfig[safeStatus as keyof typeof statusConfig] || statusConfig.pending;
+    
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
         {config.label}
@@ -59,7 +64,9 @@ export function TemplateRequestsTable({
     );
   };
 
-  const getPlanBadge = (plan: string) => {
+  const getPlanBadge = (plan: string | null | undefined) => {
+    const planValue = plan || 'basic';
+    
     const planConfig: Record<string, { color: string; label: string }> = {
       basic: { 
         color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', 
@@ -75,7 +82,7 @@ export function TemplateRequestsTable({
       }
     };
 
-    const config = planConfig[plan.toLowerCase()] || planConfig.basic;
+    const config = planConfig[planValue.toLowerCase()] || planConfig.basic;
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
         {config.label}
@@ -83,7 +90,10 @@ export function TemplateRequestsTable({
     );
   };
 
-  const getTypeBadge = (type: 'free' | 'paid') => {
+  const getTypeBadge = (type: string) => {
+    // Handle null/undefined type
+    const safeType = type || 'free';
+    
     const typeConfig = {
       free: { 
         color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -97,7 +107,7 @@ export function TemplateRequestsTable({
       }
     };
 
-    const config = typeConfig[type];
+    const config = typeConfig[safeType as keyof typeof typeConfig] || typeConfig.free;
     const Icon = config.icon;
     
     return (
@@ -110,14 +120,18 @@ export function TemplateRequestsTable({
 
   // Format date
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   const handleApprove = async (id: string) => {

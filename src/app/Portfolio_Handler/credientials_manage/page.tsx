@@ -508,14 +508,20 @@ export default function CredentialsManagePage() {
                                 )}
                               </div>
                             </div>
-                            <div className="flex gap-2">
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPlanBadgeColor(request.plan)}`}>
-                                {request.plan.charAt(0).toUpperCase() + request.plan.slice(1)}
-                              </span>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(request.type)}`}>
-                                {request.type.charAt(0).toUpperCase() + request.type.slice(1)}
-                              </span>
-                            </div>
+                           <div className="flex gap-2">
+  <span
+    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPlanBadgeColor(request.plan)}`}
+  >
+    {(request.plan ?? 'basic').charAt(0).toUpperCase() + (request.plan ?? 'basic').slice(1)}
+  </span>
+
+  <span
+    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(request.type)}`}
+  >
+    {(request.type ?? 'template').charAt(0).toUpperCase() + (request.type ?? 'template').slice(1)}
+  </span>
+</div>
+
                           </div>
                         </td>
                         <td className="py-4 px-4">
@@ -539,7 +545,7 @@ export default function CredentialsManagePage() {
                               <Mail size={14} />
                               Send Credentials
                             </button>
-                            <button
+                            {/* <button
                               onClick={() => {
                                 // View request details
                                 window.open(`/Portfolio_Handler/templates/requests?highlight=${request.id}`, '_blank');
@@ -549,7 +555,7 @@ export default function CredentialsManagePage() {
                                        hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
                             >
                               View Details
-                            </button>
+                            </button> */}
                           </div>
                         </td>
                       </motion.tr>
