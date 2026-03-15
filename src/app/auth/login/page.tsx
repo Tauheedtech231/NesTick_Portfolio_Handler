@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-/* eslint-disable */
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -12,14 +11,13 @@ export default function LoginPage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setMessage(''); // Clear message when user starts typing
+    setMessage('');
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const { email, password } = formData;
-    
-    // Basic validation
+
     if (!email || !password) {
       setMessage('Email and password are required');
       return;
@@ -29,12 +27,9 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Call the API for user login
       const response = await fetch('/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
@@ -42,52 +37,48 @@ export default function LoginPage() {
 
       if (!response.ok || !data.success) {
         setMessage(data.message || 'Login failed. Please try again.');
-        setIsLoading(false);
         return;
       }
 
-      // ✅ Login success - store user data
       const userData = {
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.full_name,
-        country: data.user.country,
-        type: 'user',
-        loginTime: new Date().toISOString()
+        id: data.admin.id,
+        email: data.admin.email,
+        type: 'admin',
+        loginTime: new Date().toISOString(),
       };
-      
-      // Store in localStorage for session management
-      localStorage.setItem('login_user', JSON.stringify(userData));
-      
-      // Show success message
+
+      // ✅ Safe localStorage check
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('login_user', JSON.stringify(userData));
+      }
+
       setMessage('Login successful! Redirecting...');
-      
-      // Redirect to homepage after 1 second
+
       setTimeout(() => {
-        window.location.href = '/';
+        if (typeof window !== 'undefined') window.location.href = '/';
       }, 1000);
 
     } catch (error) {
       console.error('Login error:', error);
       setMessage('Network error. Please check your connection and try again.');
+    } finally {
       setIsLoading(false);
     }
   }
 
-  // Message popup component - FIXED VERSION
   const MessagePopup = () => {
     if (!message) return null;
 
-    // Fixed the condition - using logical OR (||) instead of comparison operators
-    const isError = message.includes('Invalid') || 
-                   message.includes('No account') || 
-                   message.includes('failed') ||
-                   message.includes('verify') ||
-                   message.includes('required') ||
-                   message.includes('error') ||
-                   message.includes('connection');
-    
-    const isSuccess = message.includes('successful');
+    const msgLower = message.toLowerCase();
+    const isError = msgLower.includes('invalid') ||
+                    msgLower.includes('no account') ||
+                    msgLower.includes('failed') ||
+                    msgLower.includes('verify') ||
+                    msgLower.includes('required') ||
+                    msgLower.includes('error') ||
+                    msgLower.includes('connection');
+
+    const isSuccess = msgLower.includes('successful');
 
     return (
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in duration-300">
@@ -121,25 +112,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
       <MessagePopup />
-      
+
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto w-12 h-12 bg-gray-900 dark:bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
             <User className="w-6 h-6 text-white dark:text-gray-900" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Login
-          </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Sign in to your account
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Login</h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Sign in to your account</p>
         </div>
 
-        {/* Login Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
@@ -155,6 +141,7 @@ export default function LoginPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder="Enter your email"
                   className={cn(
                     "block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
                     "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
@@ -162,12 +149,10 @@ export default function LoginPage() {
                     "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
                     "transition-all duration-200"
                   )}
-                  placeholder="Enter your email"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
@@ -183,6 +168,7 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder="Enter your password"
                   className={cn(
                     "block w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-xl",
                     "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
@@ -190,7 +176,6 @@ export default function LoginPage() {
                     "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
                     "transition-all duration-200"
                   )}
-                  placeholder="Enter your password"
                 />
                 <button
                   type="button"
@@ -207,7 +192,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
@@ -225,23 +209,10 @@ export default function LoginPage() {
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Signing in...
               </div>
-            ) : (
-              'Login'
-            )}
+            ) : 'Login'}
           </button>
 
-          {/* Help Text */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Don't have an account?{' '}
-              <a
-                href="/auth/sign_up"
-                className="font-semibold underline hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-              >
-                Sign Up
-              </a>
-            </p>
-          </div>
+        
         </form>
       </div>
     </div>

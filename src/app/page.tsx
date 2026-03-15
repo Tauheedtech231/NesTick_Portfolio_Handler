@@ -198,9 +198,9 @@ export default function LandingPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Check if user is super admin
+  // Check if user is super admin (tauheeddeveloper13@gmail.com)
   const isSuperAdmin = () => {
-    return user && user.email === 'nestick@gmail.com';
+    return user && user.email === 'tauheeddeveloper13@gmail.com';
   };
 
   // Logout function
@@ -208,7 +208,7 @@ export default function LandingPage() {
     localStorage.removeItem('login_user');
     setUser(null);
     setIsDropdownOpen(false);
-    window.location.href = '/';
+    window.location.href = '/auth/login';
   };
 
   // Handle dashboard redirect for super admin
@@ -569,169 +569,193 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-500 font-sans overflow-x-hidden">
-      {/* Navbar (keep it here as it's part of the main layout) */}
-     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
-  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-    <div className="flex items-center justify-between">
-      {/* Logo */}
-      <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-          <span className="text-white dark:text-black font-bold text-sm">P</span>
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
+                <span className="text-white dark:text-black font-bold text-sm">P</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                Portfolio Handler
+              </span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1">
+              {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item)}
+                  className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
+                >
+                  <span className="font-medium text-sm uppercase tracking-wide">
+                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                  </span>
+                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
+                </button>
+              ))}
+            </div>
+
+            {/* Right Side Buttons */}
+            <div className="flex items-center space-x-3">
+              {user ? (
+                <div className="relative">
+                  {/* Profile Icon with User Email */}
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                  >
+                    <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
+                      <span className="text-white dark:text-black font-bold text-sm">
+                        {getUserEmail().charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="hidden lg:block text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[150px] truncate">
+                      {getUserEmail()}
+                    </span>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <>
+                      {/* Backdrop for clicking outside */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setIsDropdownOpen(false)}
+                      />
+                      
+                      {/* Dropdown Content */}
+                      <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+                        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">Signed in as</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{getUserEmail()}</p>
+                        </div>
+                        
+                        <div className="p-2">
+                          {/* Dashboard Button - Only for tauheeddeveloper13@gmail.com */}
+                          {user.email === 'tauheeddeveloper13@gmail.com' && (
+                            <button
+                              onClick={() => {
+                                window.location.href = '/Portfolio_Handler';
+                                setIsDropdownOpen(false);
+                              }}
+                              className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            >
+                              <LayoutDashboard className="w-4.5 h-4.5" />
+                              <span className="font-medium">Dashboard</span>
+                            </button>
+                          )}
+                          
+                          {/* Logout Button */}
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          >
+                            <LogOut className="w-4.5 h-4.5" />
+                            <span className="font-medium">Logout</span>
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Login Button Only - Sign Up Removed */}
+                  <button
+                    onClick={() => (window.location.href = '/auth/login')}
+                    className="bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
+                  >
+                    Login
+                  </button>
+                </>
+              )}
+
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                aria-label="Toggle menu"
+              >
+                <div className="w-6 h-6 flex flex-col justify-center space-y-1.5">
+                  <span
+                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
+                      isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+                    }`}
+                  ></span>
+                  <span
+                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
+                      isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
+                    }`}
+                  ></span>
+                  <span
+                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
+                      isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+                    }`}
+                  ></span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu Content */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
+              {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => {
+                    scrollToSection(item);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                >
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                </button>
+              ))}
+
+              {user ? (
+                <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                  {user.email === 'tauheeddeveloper13@gmail.com' && (
+                    <button
+                      onClick={() => {
+                        window.location.href = '/Portfolio_Handler';
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-center px-4 py-2 mb-2 text-sm
+                        bg-black text-white dark:bg-white dark:text-black
+                        hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
+                    >
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </button>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center px-4 py-2 text-sm
+                      bg-black text-white dark:bg-white dark:text-black
+                      hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => (window.location.href = '/auth/login')}
+                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
+                  >
+                    Login
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        <span className="text-xl font-bold text-gray-900 dark:text-white">
-          Portfolio Handler
-        </span>
-      </div>
-
-      {/* Desktop Navigation */}
-      <div className="hidden lg:flex items-center space-x-1">
-        {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
-          <button
-            key={item}
-            onClick={() => scrollToSection(item)}
-            className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
-          >
-            <span className="font-medium text-sm uppercase tracking-wide">
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </span>
-            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
-          </button>
-        ))}
-      </div>
-
-      {/* Right Side Buttons */}
-      <div className="flex items-center space-x-3">
-        {user ? (
-          <div className="hidden lg:flex items-center space-x-3">
-            {/* Dashboard Button - Only for nestick@gmail.com */}
-            {isSuperAdmin() && (
-              <button
-                onClick={handleDashboardRedirect}
-                className="flex items-center space-x-2 px-5.5 py-2.75 rounded-xl
-                  bg-black text-white dark:bg-white dark:text-black
-                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
-              >
-                <LayoutDashboard className="w-4.5 h-4.5" />
-                <span className="font-medium">Admin Dashboard</span>
-              </button>
-            )}
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-2 px-5.5 py-2.75 rounded-xl
-                bg-black text-white dark:bg-white dark:text-black
-                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all text-sm"
-              >
-              <LogOut className="w-4.5 h-4.5" />
-              <span className="font-medium">Logout</span>
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Login & Sign Up Buttons */}
-            <button
-              onClick={() => (window.location.href = '/auth/login')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => (window.location.href = '/auth/sign_up')}
-              className="hidden lg:block bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
-            >
-              Sign Up
-            </button>
-          </>
-        )}
-
-        {/* Mobile Menu Toggle */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
-          aria-label="Toggle menu"
-        >
-          <div className="w-6 h-6 flex flex-col justify-center space-y-1.5">
-            <span
-              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-              }`}
-            ></span>
-            <span
-              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
-                isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
-              }`}
-            ></span>
-            <span
-              className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-              }`}
-            ></span>
-          </div>
-        </button>
-      </div>
-    </div>
-
-    {/* Mobile Menu Content */}
-    {isMobileMenuOpen && (
-      <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
-        {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
-          <button
-            key={item}
-            onClick={() => {
-              scrollToSection(item);
-              setIsMobileMenuOpen(false);
-            }}
-            className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-          >
-            {item.charAt(0).toUpperCase() + item.slice(1)}
-          </button>
-        ))}
-
-        {user && (
-          <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-            {isSuperAdmin() && (
-              <button
-                onClick={handleDashboardRedirect}
-                className="w-full flex items-center justify-center px-4 py-2 mb-2 text-sm
-                  bg-black text-white dark:bg-white dark:text-black
-                  hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
-              >
-                <LayoutDashboard className="w-4 h-4 mr-2" />
-                Admin Dashboard
-              </button>
-            )}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center px-4 py-2 text-sm
-                bg-black text-white dark:bg-white dark:text-black
-                hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
-            >
-              <LogOut className="w-4 h-4 mr-2" /> Logout
-            </button>
-          </div>
-        )}
-
-        {!user && (
-          <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-            <button
-              onClick={() => (window.location.href = '/auth/login')}
-              className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => (window.location.href = '/auth/sign_up')}
-              className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
-            >
-              Sign Up
-            </button>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-</nav>
+      </nav>
 
       {/* Hero Section */}
       <HeroSection 
@@ -766,7 +790,7 @@ export default function LandingPage() {
         isDarkMode={isDarkMode}
       />
 
-      {/* Buy Now Modal (keep in main component) */}
+      {/* Buy Now Modal */}
       {isBuyNowModalOpen && selectedTemplate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
@@ -898,9 +922,9 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Success Popup (keep in main component) */}
+      {/* Success Popup */}
       {showSuccessPopup && (
-     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -15,7 +15,26 @@ import { CoursesSection } from '@/app/components/sections/CoursesSection';
 import { ContactSection } from '@/app/components/sections/ContactSection';
 /* eslint-disable */
 
-import { Lock, Bell, Eye, Grid3X3, Users, Calendar, Image, BookOpen, Phone } from 'lucide-react';
+import { 
+  Lock, 
+  Bell, 
+  Eye, 
+  Grid3X3, 
+  Users, 
+  Calendar, 
+  Image, 
+  BookOpen, 
+  Phone,
+  TrendingUp,
+  Clock,
+  Award,
+  Star,
+  Activity,
+  BarChart3,
+  PieChart,
+  Zap,
+  Sparkles
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DashboardProps {
@@ -50,6 +69,13 @@ export interface College {
   achievements?: any;
   courses?: any;
   contact?: any;
+  email?: string;
+  phone?: string;
+  website?: string;
+  city?: string;
+  country?: string;
+  template_id?: number;
+  template_name?: string;
 }
 
 interface AuthCollege {
@@ -61,7 +87,7 @@ interface AuthCollege {
   password: string;
 }
 
-// Add authentication check component
+// Authentication check component
 const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentCollegeId, setCurrentCollegeId] = useState<string | null>(null);
@@ -93,44 +119,208 @@ const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   if (isAuthenticated === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Checking authentication...</p>
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-gray-100 rounded-full animate-spin mx-auto mb-4"></div>
+            <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-500 animate-pulse" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">Checking authentication...</p>
         </div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
+    return null;
   }
 
   return <>{children}</>;
+};
+
+/* ========== BEAUTIFUL STATS CARDS ========== */
+const StatsCards: React.FC = () => {
+  const stats = [
+    {
+      id: 1,
+      title: 'Total Students',
+      value: '2,547',
+      change: '+12.5%',
+      icon: Users,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      textColor: 'text-blue-600 dark:text-blue-400',
+      borderColor: 'border-blue-200 dark:border-blue-800',
+      iconBg: 'bg-blue-100 dark:bg-blue-800',
+      chart: '↑',
+      period: 'vs last month'
+    },
+    {
+      id: 2,
+      title: 'Faculty Members',
+      value: '128',
+      change: '+4.2%',
+      icon: Users,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      textColor: 'text-purple-600 dark:text-purple-400',
+      borderColor: 'border-purple-200 dark:border-purple-800',
+      iconBg: 'bg-purple-100 dark:bg-purple-800',
+      chart: '↑',
+      period: 'vs last month'
+    },
+    {
+      id: 3,
+      title: 'Courses Offered',
+      value: '42',
+      change: '+8.3%',
+      icon: BookOpen,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      textColor: 'text-green-600 dark:text-green-400',
+      borderColor: 'border-green-200 dark:border-green-800',
+      iconBg: 'bg-green-100 dark:bg-green-800',
+      chart: '↑',
+      period: 'vs last month'
+    },
+    {
+      id: 4,
+      title: 'Events This Year',
+      value: '24',
+      change: '+32%',
+      icon: Calendar,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+      textColor: 'text-orange-600 dark:text-orange-400',
+      borderColor: 'border-orange-200 dark:border-orange-800',
+      iconBg: 'bg-orange-100 dark:bg-orange-800',
+      chart: '↑',
+      period: 'vs last year'
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {stats.map((stat, index) => {
+        const Icon = stat.icon;
+        
+        return (
+          <div
+            key={stat.id}
+            className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+          >
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-100 to-transparent dark:from-gray-800 dark:to-transparent rounded-bl-full opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            
+            {/* Animated sparkle effect */}
+            <Sparkles className="absolute top-4 right-4 w-4 h-4 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative z-10">
+              <div className="flex items-start justify-between mb-4">
+                <div className={cn("p-3 rounded-xl", stat.iconBg)}>
+                  <Icon className={cn("w-6 h-6", stat.textColor)} />
+                </div>
+                <span className={cn(
+                  "px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1",
+                  stat.change.startsWith('+') 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
+                )}>
+                  <TrendingUp className="w-3 h-3" />
+                  {stat.change}
+                </span>
+              </div>
+              
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                {stat.title}
+              </h3>
+              
+              <div className="flex items-baseline justify-between">
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {stat.value}
+                </p>
+                <Activity className="w-5 h-5 text-gray-300 dark:text-gray-600" />
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <p className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {stat.period}
+                </p>
+              </div>
+            </div>
+            
+            {/* Progress bar animation */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 dark:bg-gray-800">
+              <div 
+                className={cn("h-full bg-gradient-to-r", stat.color)} 
+                style={{ width: `${Math.random() * 40 + 60}%` }}
+              ></div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/* Quick Stats Row */
+const QuickStats: React.FC = () => {
+  const quickStats = [
+    { label: 'Placement Rate', value: '94%', icon: Award, color: 'text-yellow-600', bg: 'bg-yellow-100' },
+    { label: 'Student Satisfaction', value: '4.8/5', icon: Star, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { label: 'Research Papers', value: '156', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { label: 'Live Projects', value: '23', icon: Zap, color: 'text-green-600', bg: 'bg-green-100' },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {quickStats.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <div
+            key={index}
+            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:shadow-md transition-all duration-300"
+          >
+            <div className="flex items-center gap-3">
+              <div className={cn("p-2 rounded-lg", stat.bg)}>
+                <Icon className={cn("w-4 h-4", stat.color)} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{stat.value}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 /* Announcements Section */
 const AnnouncementsSection: React.FC<{ announcements: Announcement[] }> = ({ announcements }) => (
   <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
     <div className="flex items-center gap-3 mb-6">
-      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <Bell className="w-5 h-5 text-gray-900 dark:text-gray-100" />
+      <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-md">
+        <Bell className="w-5 h-5 text-white" />
       </div>
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Announcements</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">Latest updates from administration</p>
       </div>
       {announcements.length > 0 && (
-        <span className="ml-auto bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-2 py-1 rounded-full">
-          {announcements.length}
+        <span className="ml-auto bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-full font-medium shadow-sm">
+          {announcements.length} New
         </span>
       )}
     </div>
 
     {announcements.length === 0 ? (
-      <div className="text-center py-8">
-        <Bell className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
-        <p className="text-gray-500 dark:text-gray-500 text-sm">No announcements yet</p>
+      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+        <Bell className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No announcements yet</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Check back later for updates</p>
       </div>
     ) : (
       <div className="space-y-4">
@@ -138,34 +328,37 @@ const AnnouncementsSection: React.FC<{ announcements: Announcement[] }> = ({ ann
           <div
             key={announcement.id}
             className={cn(
-              'p-4 rounded-xl border transition-all duration-200 hover:shadow-sm cursor-pointer',
+              'p-5 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer',
               index === 0
-                ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'
-                : 'border-gray-200 dark:border-gray-700'
+                ? 'border-purple-200 dark:border-purple-800 bg-gradient-to-r from-purple-50 to-transparent dark:from-purple-900/20 dark:to-transparent'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
             )}
           >
-            <div className="flex items-start justify-between mb-2">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight">
+            <div className="flex items-start justify-between mb-3">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base leading-tight">
                 {announcement.title}
               </h4>
               {index === 0 && (
-                <span className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-2 py-1 rounded-full shrink-0 ml-2">
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-sm flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
                   New
                 </span>
               )}
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
               {announcement.message}
             </p>
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
                 {new Date(announcement.createdAt).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric'
                 })}
               </span>
-              <span>
+              <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
                 {new Date(announcement.createdAt).toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit'
@@ -180,105 +373,109 @@ const AnnouncementsSection: React.FC<{ announcements: Announcement[] }> = ({ ann
 );
 
 /* Status Card */
-const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string }> = ({ status, collegeName }) => (
-  <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-    <div className="flex items-center justify-between mb-4">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{collegeName}</h2>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">Principal Portal Dashboard</p>
-      </div>
-      <div
-        className={cn(
-          'px-3 py-1 rounded-full text-sm font-medium border transition-colors',
-          status === 'active'
-            ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-gray-900 dark:border-gray-100'
-            : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600'
-        )}
-      >
-        {status === 'active' ? 'Active' : 'Inactive'}
-      </div>
-    </div>
-
-    {status === 'inactive' && (
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3 text-gray-900 dark:text-gray-100">
-          <Lock className="w-4 h-4" />
-          <p className="text-sm font-medium">Portal Access Restricted</p>
+const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string; collegeDetails?: any }> = ({ 
+  status, 
+  collegeName,
+  collegeDetails 
+}) => (
+  <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 relative overflow-hidden">
+    {/* Background decoration */}
+    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-100 to-transparent dark:from-gray-800 dark:to-transparent rounded-bl-full opacity-50"></div>
+    
+    <div className="relative z-10">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-4">
+          <div className={cn(
+            "p-3 rounded-xl",
+            status === 'active' 
+              ? 'bg-gradient-to-br from-green-500 to-emerald-500' 
+              : 'bg-gradient-to-br from-gray-500 to-gray-600'
+          )}>
+            {status === 'active' ? (
+              <Zap className="w-6 h-6 text-white" />
+            ) : (
+              <Lock className="w-6 h-6 text-white" />
+            )}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{collegeName}</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
+              <span>Principal Portal Dashboard</span>
+              <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+              <span>ID: {collegeDetails?.id}</span>
+            </p>
+          </div>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 leading-relaxed">
-          Your college portal is currently locked. Please contact{' '}
-          <a
-            href="https://nesticktech.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium underline hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-          >
-            nesticktech.com
-          </a>{' '}
-          to enable access.
-        </p>
-      </div>
-    )}
-  </div>
-);
-
-/* Module Cards */
-const ModuleCards: React.FC<{ activeModules: (keyof College['modules'])[] }> = ({ activeModules }) => {
-  const moduleIcons = { about: Grid3X3, faculty: Users, events: Calendar, gallery: Image, courses: BookOpen, contact: Phone, achievements: Eye };
-  const moduleLabels = { about: 'About College', faculty: 'Faculty', events: 'Events', gallery: 'Gallery', courses: 'Courses', contact: 'Contact', achievements: 'Achievements' };
-
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <Grid3X3 className="w-5 h-5 text-gray-900 dark:text-gray-100" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Active Modules</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Manage your college portfolio sections</p>
+        <div
+          className={cn(
+            'px-4 py-2 rounded-full text-sm font-medium border-2 flex items-center gap-2',
+            status === 'active'
+              ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+              : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+          )}
+        >
+          {status === 'active' ? <Activity className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+          {status === 'active' ? 'Active' : 'Inactive'}
         </div>
       </div>
 
-      {activeModules.length === 0 ? (
-        <div className="text-center py-8">
-          <Grid3X3 className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-500 text-sm">No active modules configured</p>
+      {/* College Details */}
+      {collegeDetails && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          {collegeDetails.email && (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{collegeDetails.email}</p>
+            </div>
+          )}
+          {collegeDetails.phone && (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{collegeDetails.phone}</p>
+            </div>
+          )}
+          {collegeDetails.city && collegeDetails.country && (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{collegeDetails.city}, {collegeDetails.country}</p>
+            </div>
+          )}
+          {collegeDetails.template_name && (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Template</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{collegeDetails.template_name}</p>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {activeModules.map((module) => {
-            const IconComponent = moduleIcons[module];
-            return (
-              <div
-                key={module}
-                className={cn(
-                  'group p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer',
-                  'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-gray-900 dark:hover:border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
-                    <IconComponent className="w-4 h-4 text-gray-900 dark:text-gray-100" />
-                  </div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{moduleLabels[module]}</span>
-                </div>
-              </div>
-            );
-          })}
+      )}
+
+      {status === 'inactive' && (
+        <div className="mt-6 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+          <div className="flex items-center gap-3 text-red-700 dark:text-red-400">
+            <Lock className="w-5 h-5" />
+            <p className="text-sm font-medium">Portal Access Restricted</p>
+          </div>
+          <p className="text-red-600 dark:text-red-300 text-sm mt-2 leading-relaxed">
+            Your college portal is currently locked. Please contact{' '}
+            <a
+              href="https://nesticktech.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold underline hover:text-red-800 dark:hover:text-red-200 transition-colors"
+            >
+              nesticktech.com
+            </a>{' '}
+            to enable access.
+          </p>
         </div>
       )}
     </div>
-  );
-};
+  </div>
+);
 
 /* Section Components */
 const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
-  dashboard: () => (
-    <div className="text-gray-500 dark:text-gray-300 text-center py-16">
-      <Grid3X3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
-      <p className="text-sm">Dashboard Overview</p>
-    </div>
-  ),
+  dashboard: () => null, // Dashboard section ab show nahi hoga
   about: AboutSection,
   faculty: FacultySection,
   events: EventsSection,
@@ -294,13 +491,14 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
 };
 
 function DashboardContent({ initialData }: DashboardProps) {
-  const [activeSection, setActiveSection] = useState<SectionType>('dashboard');
+  const [activeSection, setActiveSection] = useState<SectionType>('about'); // Default about section
   const [collegeData, setCollegeData] = useState<CollegeData>(initialData);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [activeModules, setActiveModules] = useState<(keyof College['modules'])[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentCollegeId, setCurrentCollegeId] = useState<string | null>(null);
+  const [collegeDetails, setCollegeDetails] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     gsap.fromTo('.section-content', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
@@ -312,7 +510,6 @@ function DashboardContent({ initialData }: DashboardProps) {
       return;
     }
 
-    // Get collegeId from localStorage
     const authCollege = localStorage.getItem('auth_college');
     if (authCollege) {
       try {
@@ -327,34 +524,79 @@ function DashboardContent({ initialData }: DashboardProps) {
       setIsLoading(false);
       return;
     }
+  }, []);
 
-    // Load college data using dynamic collegeId
-    const rawColleges = localStorage.getItem('colleges');
-    const colleges: College[] = rawColleges ? JSON.parse(rawColleges) : [];
- 
-    const found = colleges.find((c) => c.id === currentCollegeId);
-
-    if (found) {
-      setCollegeData((prev) => ({
-        ...prev,
-        college: { ...prev.college, ...found },
-      }));
+  // Fetch real data from API
+  useEffect(() => {
+    async function fetchDashboardData() {
+      if (!currentCollegeId) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch(`/api/college/dashboard-data?collegeId=${currentCollegeId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log('Dashboard data:', data);
+          
+          setCollegeDetails(data.college);
+          
+          setCollegeData(prev => ({
+            ...prev,
+            college: {
+              ...prev.college,
+              id: data.college.id,
+              name: data.college.name,
+              status: data.college.status,
+              email: data.college.email,
+              phone: data.college.phone,
+              website: data.college.website,
+              city: data.college.city,
+              country: data.college.country,
+              template_id: data.college.template_id,
+              template_name: data.college.template_name
+            }
+          }));
+          
+          setAnnouncements(data.announcements);
+          
+          localStorage.setItem('college_data', JSON.stringify({
+            college: data.college,
+            announcements: data.announcements
+          }));
+        } else {
+          setError(data.error || 'Failed to load dashboard data');
+          loadFromLocalStorage();
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setError('Network error. Loading cached data...');
+        loadFromLocalStorage();
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    const sourceModules = found?.modules ?? (collegeData.college as any)?.modules ?? {};
-    const enabled = Object.keys(sourceModules).filter((k) => sourceModules[k as keyof typeof sourceModules]) as (keyof College['modules'])[];
-    setActiveModules(enabled);
+    function loadFromLocalStorage() {
+      const cached = localStorage.getItem('college_data');
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached);
+          setCollegeDetails(cachedData.college);
+          setCollegeData(prev => ({ 
+            ...prev, 
+            college: { ...prev.college, ...cachedData.college } 
+          }));
+          setAnnouncements(cachedData.announcements || []);
+        } catch (e) {
+          console.error('Error parsing cached data:', e);
+        }
+      }
+    }
 
-    const rawAnnouncements = localStorage.getItem('announcements');
-    const annArr: Announcement[] = rawAnnouncements ? JSON.parse(rawAnnouncements) : [];
-    const filtered = annArr.filter((a) => a.targetCollege === 'all' || a.targetCollege === currentCollegeId);
-    filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    setAnnouncements(filtered);
-
-    // Simulate loading delay for better UX
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    fetchDashboardData();
   }, [currentCollegeId]);
 
   const persistCollegeToLocal = (updatedCollege: College) => {
@@ -392,28 +634,51 @@ function DashboardContent({ initialData }: DashboardProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-gray-900 dark:border-gray-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-gray-100 rounded-full animate-spin mx-auto mb-4"></div>
+            <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-500 animate-pulse" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // If no collegeId found after loading
-  if (!currentCollegeId) {
+  // Error state
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-red-600 dark:text-red-400" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Bell className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">College Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Unable to load college information.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Something went wrong</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentCollegeId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Lock className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">College Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Unable to load college information.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
           >
             Retry
           </button>
@@ -422,16 +687,15 @@ function DashboardContent({ initialData }: DashboardProps) {
     );
   }
 
-  const collegeStatus = (collegeData.college as any)?.status || 'active';
-  const collegeName = collegeData.college?.name || 'College Portal';
+  const collegeStatus = collegeDetails?.status || (collegeData.college as any)?.status || 'active';
+  const collegeName = collegeDetails?.name || collegeData.college?.name || 'College Portal';
 
-  // Portal locked view
   if (collegeStatus === 'inactive') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-900">
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-8 h-8 text-gray-900 dark:text-gray-100" />
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-800 p-8 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Portal Locked</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
@@ -441,7 +705,7 @@ function DashboardContent({ initialData }: DashboardProps) {
             href="https://nesticktech.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
           >
             Contact Support
           </a>
@@ -460,28 +724,41 @@ function DashboardContent({ initialData }: DashboardProps) {
 
   return (
     <PortalLayout
-      // collegeName={collegeName}
       logo={collegeData.college?.logo || ''}
       onPreview={() => setIsPreviewOpen(true)}
       activeSection={activeSection}
       onSectionChange={(s) => setActiveSection(s)}
     >
-      {activeSection === 'dashboard' ? (
-        <div className="space-y-6">
-          <StatusCard status={collegeStatus} collegeName={collegeName} />
-          <AnnouncementsSection announcements={announcements} />
-          <ModuleCards activeModules={activeModules} />
+      {/* Dashboard content - Sirf stats aur announcements ab yahan dikhenge */}
+      <div className="space-y-8">
+        {/* Status Card */}
+        <StatusCard 
+          status={collegeStatus} 
+          collegeName={collegeName} 
+          collegeDetails={collegeDetails}
+        />
+        
+        {/* Beautiful Stats Cards */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-gray-500" />
+            College Overview
+          </h3>
+          <StatsCards />
         </div>
-      ) : (
-        <div className="section-content transition-all duration-300 ease-in-out">
-          <ActiveComponent
-            data={sectionData}
-            college={collegeData.college}
-            onUpdate={(data: any) => updateSectionData(activeSection, data)}
-            disabled={collegeStatus === 'inactive'}
-          />
+        
+        {/* Quick Stats Row */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <PieChart className="w-5 h-5 text-gray-500" />
+            Quick Insights
+          </h3>
+          <QuickStats />
         </div>
-      )}
+        
+        {/* Announcements */}
+        <AnnouncementsSection announcements={announcements} />
+      </div>
 
       <PreviewPane isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} data={collegeData} />
     </PortalLayout>

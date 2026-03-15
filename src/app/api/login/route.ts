@@ -1,98 +1,99 @@
-import { NextRequest, NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
+import { NextResponse } from "next/server";
+import mysql from "mysql2/promise";
+
 /* eslint-disable */
 
-// Database configuration
-const dbConfig = {
-  host: "72.61.117.188",
-  user: "portfolio_user",
-  password: "StrongPass123!",
-  database: "portfolio_handler_db",
-};
-
-export async function POST(request: NextRequest) {
-  let connection;
-  
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    console.log("---- Admin Login API Called ----");
 
-    // Validation
+    // Print ENV variables
+    console.log("ENV CHECK:");
+    console.log("DB_HOST:", process.env.DB_HOST);
+    console.log("DB_USER:", process.env.DB_USER);
+    console.log("DB_NAME:", process.env.DB_NAME);
+
+    const { email, password } = await req.json();
+
+    console.log("Request Data:", { email });
+
     if (!email || !password) {
+      console.log("Validation failed: missing email/password");
+
       return NextResponse.json(
-        { success: false, message: "Email and password are required" },
+        { success: false, message: "Email and password required" },
         { status: 400 }
       );
     }
 
-    // Connect to database
-    connection = await mysql.createConnection(dbConfig);
+    console.log("Connecting to MySQL...");
 
-    // Check if user exists
-    const [users] = await connection.execute(
-      'SELECT id, full_name, email, password, country, is_verified FROM users WHERE email = ?',
-      [email.toLowerCase()]
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST ,
+      user: process.env.DB_USER ,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: 3306,
+      connectTimeout: 10000
+    });
+
+    console.log("✅ MySQL Connected Successfully");
+
+    // Query admin
+    console.log("Running query...");
+    const [rows]: any = await connection.execute(
+      "SELECT * FROM admins WHERE email = ?",
+      [email]
     );
 
-    const userArray = users as any[];
+    console.log("Query result:", rows);
 
-    if (userArray.length === 0) {
-      return NextResponse.json(
-        { success: false, message: "No account found with this email" },
-        { status: 404 }
-      );
+    if (rows.length === 0) {
+      console.log("Admin not found");
+
+      return NextResponse.json({
+        success: false,
+        message: "Admin not found",
+      });
     }
 
-    const user = userArray[0];
+    const admin = rows[0];
 
-    // Check if user is verified
-    if (!user.is_verified) {
-      return NextResponse.json(
-        { success: false, message: "Please verify your email before logging in" },
-        { status: 401 }
-      );
+    console.log("Admin found:", admin.email);
+
+    if (admin.password !== password) {
+      console.log("Password mismatch");
+
+      return NextResponse.json({
+        success: false,
+        message: "Invalid password",
+      });
     }
 
-    // Verify password (plain text comparison - assuming passwords are stored in plain text for now)
-    // If you want to hash passwords, use bcrypt.compare
-    if (user.password !== password) {
-      return NextResponse.json(
-        { success: false, message: "Invalid password" },
-        { status: 401 }
-      );
-    }
+    console.log("✅ Admin login successful");
 
-    // Login successful
     return NextResponse.json({
       success: true,
-      message: "Login successful",
-      user: {
-        id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        country: user.country
-      }
+      admin: {
+        id: admin.id,
+        email: admin.email,
+      },
     });
 
   } catch (error: any) {
-    console.error('Login error:', error);
-    
-    // Handle specific database connection errors
-    if (error.code === 'ECONNREFUSED') {
-      return NextResponse.json(
-        { success: false, message: "Database connection failed. Please try again later." },
-        { status: 503 }
-      );
-    }
+    console.error("❌ Admin login error:");
+    console.error("Message:", error.message);
+    console.error("Code:", error.code);
+    console.error("Stack:", error.stack);
 
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      {
+        success: false,
+        message: "Server error",
+        error: error.message,
+        code: error.code
+      },
       { status: 500 }
     );
-  } finally {
-    // Close connection if it exists
-    if (connection) {
-      await connection.end();
-    }
   }
 }

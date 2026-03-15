@@ -2,10 +2,10 @@
 import mysql, { Pool } from 'mysql2/promise';
 
 const dbConfig = {
-  host: "72.61.117.188",
-  user: "portfolio_user",
-  password: "StrongPass123!",
-  database: "portfolio_handler_db",
+  host:process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   ssl: {

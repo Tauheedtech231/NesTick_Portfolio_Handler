@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 /* eslint-disable */
 const pool = mysql.createPool({
-  host: "72.61.117.188",
-  user: "portfolio_user",
-  password: "StrongPass123!",
-  database: "portfolio_handler_db",
+  host:process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

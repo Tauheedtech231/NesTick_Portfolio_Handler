@@ -1,4 +1,4 @@
-// app/api/announcements/route.ts
+// app/api/announcements/route.ts - FIXED VERSION
 import { getConnection } from '@/app/lib/db';
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   }
 }
 
-// GET: Fetch announcements (optional college filter + pagination)
+// ✅ FIXED GET: Fetch announcements with proper parameterized query
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -74,15 +74,27 @@ export async function GET(request: Request) {
       FROM announcements a
       LEFT JOIN colleges c ON a.college_id = c.id
     `;
+    
+    const params: any[] = [];
 
+    // ✅ Fix: Parameterized query use karo, direct concatenation nahi
     if (collegeIdStr) {
       const college_id = parseInt(collegeIdStr, 10);
-      query += ` WHERE a.college_id = ${college_id} OR a.college_id IS NULL`;
+      
+      // Check if valid number
+      if (!isNaN(college_id)) {
+        query += ` WHERE a.college_id = ? OR a.college_id IS NULL`;
+        params.push(college_id);
+      } else {
+        // Agar invalid number hai to sirf global announcements
+        query += ` WHERE a.college_id IS NULL`;
+      }
     }
 
     query += ' ORDER BY a.created_at DESC';
 
-    const [announcements] = await pool.execute<mysql.RowDataPacket[]>(query);
+    // ✅ Use params array for safe execution
+    const [announcements] = await pool.execute<mysql.RowDataPacket[]>(query, params);
 
     return NextResponse.json({
       success: true,
@@ -98,5 +110,3 @@ export async function GET(request: Request) {
     }, { status: 500 });
   }
 }
-
-
