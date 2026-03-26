@@ -1,15 +1,19 @@
+// app/page.tsx
 'use client';
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { LogOut, X, LayoutDashboard } from "lucide-react";
 /* eslint-disable */
 
 // Import components
 import HeroSection from "@/components/landing/HeroSection";
 import TemplatesSection from "@/components/landing/TemplatesSection";
 import OtherSections from "@/components/landing/OtherSections";
+import Footer from "@/components/landing/Footer";
+import PreviewModal from "@/components/landing/PreviewModal";
+import BuyNowModal from "@/components/landing/BuyNowModal";
+import Navbar from "@/components/landing/Navbar";
 
 // Import interfaces
 import type { Template, BuyNowFormData, ContactFormData } from "@/app/types/landing";
@@ -43,6 +47,15 @@ export default function LandingPage() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   
+  // Preview Modal State
+  const [previewModal, setPreviewModal] = useState({
+    isOpen: false,
+    imageUrl: '',
+    templateName: '',
+    description: '',
+    liveUrl: null as string | null,
+  });
+  
   const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
     name: '',
     college: '',
@@ -61,7 +74,7 @@ export default function LandingPage() {
   const featuresRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const featureCardsRef = useRef<HTMLDivElement[]>([]);
   const templateCardsRef = useRef<HTMLDivElement[]>([]);
   const formElementsRef = useRef<HTMLDivElement[]>([]);
@@ -198,11 +211,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Check if user is super admin (tauheeddeveloper13@gmail.com)
-  const isSuperAdmin = () => {
-    return user && user.email === 'tauheeddeveloper13@gmail.com';
-  };
-
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem('login_user');
@@ -236,28 +244,7 @@ export default function LandingPage() {
     }
   }, [isDarkMode, mounted]);
 
-  // Mobile menu animations
-  useEffect(() => {
-    if (mobileMenuRef.current && mounted) {
-      if (isMobileMenuOpen) {
-        gsap.to(mobileMenuRef.current, {
-          height: 'auto',
-          opacity: 1,
-          duration: 0.4,
-          ease: "power2.out"
-        });
-      } else {
-        gsap.to(mobileMenuRef.current, {
-          height: 0,
-          opacity: 0,
-          duration: 0.3,
-          ease: "power2.in"
-        });
-      }
-    }
-  }, [isMobileMenuOpen, mounted]);
-
-  // Smooth scrolling function
+  // Smooth scrolling function (for anchor links on same page)
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -306,6 +293,17 @@ export default function LandingPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Preview Modal Handler
+  const handlePreviewClick = (imageUrl: string, templateName: string, description: string, liveUrl?: string | null) => {
+    setPreviewModal({
+      isOpen: true,
+      imageUrl,
+      templateName,
+      description,
+      liveUrl: liveUrl || null,
+    });
   };
 
   // Buy Now Modal Handlers
@@ -383,7 +381,7 @@ export default function LandingPage() {
         throw new Error(data.message || 'Failed to submit request');
       }
 
-      // Show success popup with request ID
+      // Show success popup
       setSuccessMessage(`Request submitted successfully! Our team will contact you shortly.`);
       setShowSuccessPopup(true);
       setIsBuyNowModalOpen(false);
@@ -408,52 +406,18 @@ export default function LandingPage() {
     }
   };
 
-  const handlePreviewClick = (imageUrl: string, templateName: string, description: string) => {
-    // Create a modal for preview
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 z-[60] bg-black bg-opacity-75 flex items-center justify-center p-4';
-    modal.innerHTML = `
-      <div class="relative bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-        <div class="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center z-10">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white">${templateName}</h3>
-          <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div class="p-4">
-          <img src="${imageUrl}" alt="${templateName}" class="w-full h-auto rounded-lg mb-4 max-h-[60vh] object-contain" />
-          <p class="text-gray-600 dark:text-gray-300">${description}</p>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    modal.onclick = (e) => {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
-      }
-    };
-  };
-
-  // Get user display name
-  const getUserDisplayName = () => {
-    if (!user) return '';
-    return user.name || user.adminName || user.email || 'User';
-  };
-
   // Get user email
   const getUserEmail = () => {
     if (!user) return '';
     return user.email || '';
   };
 
-  // Enhanced animations with better performance
+  // Enhanced animations (only for sections, not navbar)
   useEffect(() => {
     if (!mounted) return;
 
     const ctx = gsap.context(() => {
-      // Hero section animation with stagger
+      // Hero section animation
       gsap.fromTo(heroRef.current, 
         { opacity: 0, y: 80 },
         { 
@@ -465,7 +429,7 @@ export default function LandingPage() {
         }
       );
 
-      // Features cards animation with staggered delay
+      // Features cards animation
       featureCardsRef.current.forEach((card, index) => {
         gsap.fromTo(card,
           { opacity: 0, y: 80, scale: 0.95 },
@@ -486,7 +450,7 @@ export default function LandingPage() {
         );
       });
 
-      // Template cards animation with parallax effect
+      // Template cards animation
       templateCardsRef.current.forEach((card, index) => {
         gsap.fromTo(card,
           { opacity: 0, scale: 0.9, rotationY: 10 },
@@ -570,192 +534,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-500 font-sans overflow-x-hidden">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-500 ease-in-out shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-black font-bold text-sm">P</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
-                Portfolio Handler
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-1">
-              {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(item)}
-                  className="relative px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ease-out group"
-                >
-                  <span className="font-medium text-sm uppercase tracking-wide">
-                    {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </span>
-                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-gray-900 dark:bg-white rounded-full transition-all duration-500 ease-out group-hover:w-full"></span>
-                </button>
-              ))}
-            </div>
-
-            {/* Right Side Buttons */}
-            <div className="flex items-center space-x-3">
-              {user ? (
-                <div className="relative">
-                  {/* Profile Icon with User Email */}
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
-                  >
-                    <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-                      <span className="text-white dark:text-black font-bold text-sm">
-                        {getUserEmail().charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span className="hidden lg:block text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[150px] truncate">
-                      {getUserEmail()}
-                    </span>
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
-                    <>
-                      {/* Backdrop for clicking outside */}
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setIsDropdownOpen(false)}
-                      />
-                      
-                      {/* Dropdown Content */}
-                      <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">Signed in as</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{getUserEmail()}</p>
-                        </div>
-                        
-                        <div className="p-2">
-                          {/* Dashboard Button - Only for tauheeddeveloper13@gmail.com */}
-                          {user.email === 'tauheeddeveloper13@gmail.com' && (
-                            <button
-                              onClick={() => {
-                                window.location.href = '/Portfolio_Handler';
-                                setIsDropdownOpen(false);
-                              }}
-                              className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                            >
-                              <LayoutDashboard className="w-4.5 h-4.5" />
-                              <span className="font-medium">Dashboard</span>
-                            </button>
-                          )}
-                          
-                          {/* Logout Button */}
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                          >
-                            <LogOut className="w-4.5 h-4.5" />
-                            <span className="font-medium">Logout</span>
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {/* Login Button Only - Sign Up Removed */}
-                  <button
-                    onClick={() => (window.location.href = '/auth/login')}
-                    className="bg-gray-900 text-white dark:bg-white dark:text-black px-5.5 py-2.75 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:bg-gray-800 dark:hover:bg-gray-100"
-                  >
-                    Login
-                  </button>
-                </>
-              )}
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
-                aria-label="Toggle menu"
-              >
-                <div className="w-6 h-6 flex flex-col justify-center space-y-1.5">
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                      isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-                    }`}
-                  ></span>
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
-                      isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
-                    }`}
-                  ></span>
-                  <span
-                    className={`w-6 h-0.5 bg-gray-700 dark:bg-gray-300 transition-all duration-300 transform ${
-                      isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-                    }`}
-                  ></span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Menu Content */}
-          {isMobileMenuOpen && (
-            <div className="lg:hidden mt-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3 rounded-xl shadow-lg">
-              {['home', 'features', 'templates', 'about', 'contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => {
-                    scrollToSection(item);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-gray-800 dark:text-gray-200 font-medium text-sm py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-                >
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </button>
-              ))}
-
-              {user ? (
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                  {user.email === 'tauheeddeveloper13@gmail.com' && (
-                    <button
-                      onClick={() => {
-                        window.location.href = '/Portfolio_Handler';
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-center px-4 py-2 mb-2 text-sm
-                        bg-black text-white dark:bg-white dark:text-black
-                        hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
-                    >
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </button>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center px-4 py-2 text-sm
-                      bg-black text-white dark:bg-white dark:text-black
-                      hover:bg-gray-800 dark:hover:bg-gray-200 transition-all rounded-lg"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => (window.location.href = '/auth/login')}
-                    className="w-full bg-gray-900 text-white dark:bg-white dark:text-black px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
-                  >
-                    Login
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </nav>
+      <Navbar
+        
+      />
 
       {/* Hero Section */}
       <HeroSection 
@@ -773,7 +554,7 @@ export default function LandingPage() {
         templateCardsRef={templateCardsRef}
       />
 
-      {/* Other Sections (Features, About, Contact, Footer) */}
+      {/* Other Sections (Features, About, Contact) */}
       <OtherSections
         featuresRef={featuresRef}
         aboutRef={aboutRef}
@@ -790,171 +571,66 @@ export default function LandingPage() {
         isDarkMode={isDarkMode}
       />
 
+      {/* Footer */}
+      <Footer />
+
+      {/* Preview Modal */}
+      <PreviewModal
+        isOpen={previewModal.isOpen}
+        onClose={() => setPreviewModal({ ...previewModal, isOpen: false })}
+        imageUrl={previewModal.imageUrl}
+        templateName={previewModal.templateName}
+        description={previewModal.description}
+        liveUrl={previewModal.liveUrl}
+      />
+
       {/* Buy Now Modal */}
-      {isBuyNowModalOpen && selectedTemplate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                {selectedTemplate.name} – Submit Request
-              </h3>
-              <button
-                onClick={() => setIsBuyNowModalOpen(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
-
-            <form onSubmit={handleBuyNowSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={buyNowFormData.name}
-                  onChange={handleBuyNowInputChange}
-                  onBlur={handleInputBlur}
-                  required
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.name && touchedFields.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  placeholder="Enter your full name"
-                />
-                {formErrors.name && touchedFields.name && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  College Name *
-                </label>
-                <input
-                  type="text"
-                  name="college"
-                  value={buyNowFormData.college}
-                  onChange={handleBuyNowInputChange}
-                  onBlur={handleInputBlur}
-                  required
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.college && touchedFields.college ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  placeholder="Enter your college name"
-                />
-                {formErrors.college && touchedFields.college && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.college}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={buyNowFormData.email}
-                  onChange={handleBuyNowInputChange}
-                  onBlur={handleInputBlur}
-                  required
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.email && touchedFields.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  placeholder="Enter your email"
-                />
-                {formErrors.email && touchedFields.email && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={buyNowFormData.phone}
-                  onChange={handleBuyNowInputChange}
-                  onBlur={handleInputBlur}
-                  required
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all ${
-                    formErrors.phone && touchedFields.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  placeholder="Enter your phone number"
-                />
-                {formErrors.phone && touchedFields.phone && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
-                )}
-              </div>
-
-              {selectedTemplate.type === 'paid' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Select Plan *
-                  </label>
-                  <select
-                    name="selectedPlan"
-                    value={buyNowFormData.selectedPlan}
-                    onChange={handleBuyNowInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white transition-all"
-                  >
-                    <option value="basic">Basic Plan - $49</option>
-                    <option value="professional">Professional Plan - $99</option>
-                    <option value="enterprise">Enterprise Plan - $199</option>
-                  </select>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Request'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <BuyNowModal
+        isOpen={isBuyNowModalOpen}
+        onClose={() => setIsBuyNowModalOpen(false)}
+        selectedTemplate={selectedTemplate}
+        formData={buyNowFormData}
+        formErrors={formErrors}
+        touchedFields={touchedFields}
+        isSubmitting={isSubmitting}
+        onInputChange={handleBuyNowInputChange}
+        onBlur={handleInputBlur}
+        onSubmit={handleBuyNowSubmit}
+      />
 
       {/* Success Popup */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 Request Submitted Successfully!
               </h3>
               
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
+              <p className="text-gray-400 mb-4">
                 {successMessage}
               </p>
 
-              <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
-                Our team at <strong>Nestick Tech</strong> will contact you shortly to discuss your requirements.
+              <p className="text-gray-400 mb-6 text-sm">
+                Our team at <strong className="text-[#38BDF8]">Nestick Tech</strong> will contact you shortly to discuss your requirements.
               </p>
 
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+              <div className="bg-[#0B0F19] rounded-lg p-4 mb-6">
                 <a 
                   href="https://nesticktech.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-lg block mb-2"
+                  className="text-[#38BDF8] hover:underline font-medium text-lg block mb-2"
                 >
                   https://nesticktech.com
                 </a>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-sm text-gray-400">
                   <strong>Contact:</strong> +92 319 3236529
                 </p>
               </div>
@@ -964,7 +640,7 @@ export default function LandingPage() {
                   setShowSuccessPopup(false);
                   setSuccessMessage('');
                 }}
-                className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 px-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
               >
                 Close
               </button>
