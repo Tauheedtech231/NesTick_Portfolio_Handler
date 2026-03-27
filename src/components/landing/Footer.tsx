@@ -1,4 +1,3 @@
-// components/landing/Footer.tsx
 'use client';
 
 import { Heart, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
@@ -7,13 +6,6 @@ import Link from 'next/link';
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
     <footer className="bg-[#0B0F19] border-t border-[#1E293B] pt-12 pb-6">
       <div className="container mx-auto max-w-6xl px-4 sm:px-6">
@@ -21,46 +13,56 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <Link href="/home" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">P</span>
               </div>
               <span className="text-xl font-bold text-white">Portfolio Handler</span>
-            </div>
+            </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
               Empowering educational institutions with modern portfolio management solutions. 
               Create, manage, and showcase student portfolios effortlessly.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
                 <Linkedin className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links - Features Removed */}
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'Features', 'Templates', 'About', 'Contact'].map((item) => (
-                <li key={item}>
-                  <button
-                    onClick={() => scrollToSection(item.toLowerCase())}
-                    className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm"
-                  >
-                    {item}
-                  </button>
-                </li>
-              ))}
+              <li>
+                <Link href="/home" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/templates" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Templates
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -68,10 +70,26 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">Resources</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">Terms of Service</a></li>
+              <li>
+                <a href="/docs" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a href="/help" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="/privacy" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
+                  Terms of Service
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -81,15 +99,19 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <Mail className="w-4 h-4 text-[#38BDF8] flex-shrink-0" />
-                <span>support@portfoliohandler.com</span>
+                <a href="mailto:support@portfoliohandler.com" className="hover:text-[#38BDF8] transition-colors">
+                  support@portfoliohandler.com
+                </a>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <Phone className="w-4 h-4 text-[#38BDF8] flex-shrink-0" />
-                <span>+92 319 3236529</span>
+                <a href="tel:+923193236529" className="hover:text-[#38BDF8] transition-colors">
+                  +92 319 3236529
+                </a>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <MapPin className="w-4 h-4 text-[#38BDF8] flex-shrink-0" />
-                <span>Pakistan</span>
+                <span>Karachi, Pakistan</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <Globe className="w-4 h-4 text-[#38BDF8] flex-shrink-0" />

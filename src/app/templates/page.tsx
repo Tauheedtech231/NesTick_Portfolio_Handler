@@ -1,13 +1,12 @@
-// app/templates/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
-import { Search, Sparkles, Eye, X } from 'lucide-react';
+import { Search, Sparkles, Eye, X, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+
 
 interface Template {
   id: number;
@@ -19,11 +18,31 @@ interface Template {
   created_at: string;
 }
 
+interface BuyNowFormData {
+  name: string;
+  college: string;
+  email: string;
+  phone: string;
+  selectedPlan: string;
+  templateName: string;
+  templateId: number;
+  templateType: 'free' | 'paid';
+}
+
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  
+  // Modal states
+  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Preview modal state
   const [previewModal, setPreviewModal] = useState({
     isOpen: false,
     imageUrl: '',
@@ -31,6 +50,67 @@ export default function TemplatesPage() {
     description: '',
     liveUrl: null as string | null,
   });
+
+  // Form data state
+  const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
+    name: '',
+    college: '',
+    email: '',
+    phone: '',
+    selectedPlan: 'basic',
+    templateName: '',
+    templateId: 0,
+    templateType: 'free',
+  });
+
+  // Form validation states
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+  };
+
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'email':
+        if (!value.trim()) return 'Email is required';
+        if (!validateEmail(value)) return 'Please enter a valid email';
+        return '';
+      case 'phone':
+        if (!value.trim()) return 'Phone number is required';
+        if (!validatePhone(value)) return 'Please enter a valid phone number';
+        return '';
+      case 'name':
+        if (!value.trim()) return 'Full name is required';
+        if (value.trim().length < 2) return 'Name must be at least 2 characters';
+        return '';
+      case 'college':
+        if (!value.trim()) return 'College name is required';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  // Check for duplicate email for free templates
+  const checkDuplicateRequest = async (email: string, templateId: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/templates/template-requests/check-duplicate?email=${encodeURIComponent(email)}&template_id=${templateId}`);
+      const data = await response.json();
+      return data.duplicate || false;
+    } catch (error) {
+      console.error('Error checking duplicate:', error);
+      return false;
+    }
+  };
 
   // Fetch templates from backend
   const fetchTemplates = async () => {
@@ -57,6 +137,138 @@ export default function TemplatesPage() {
     template.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Handle Buy Now click
+  const handleBuyNowClick = (template: Template) => {
+    setSelectedTemplate(template);
+    setBuyNowFormData({
+      name: '',
+      college: '',
+      email: '',
+      phone: '',
+      selectedPlan: 'basic',
+      templateName: template.name,
+      templateId: template.id,
+      templateType: template.type,
+    });
+    setFormErrors({});
+    setTouchedFields({});
+    setIsBuyNowModalOpen(true);
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setBuyNowFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      const error = validateField(name, value);
+      setFormErrors(prev => ({ ...prev, [name]: error }));
+    }
+  };
+
+  // Handle input blur for validation
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+    
+    const error = validateField(name, value);
+    setFormErrors(prev => ({ ...prev, [name]: error }));
+  };
+
+  // Handle form submission
+  const handleBuyNowSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    const errors: Record<string, string> = {};
+    ['name', 'college', 'email', 'phone'].forEach(key => {
+      const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData] as string);
+      if (error) errors[key] = error;
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      // Mark all fields as touched to show errors
+      const allTouched = ['name', 'college', 'email', 'phone'].reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setTouchedFields(allTouched);
+      return;
+    }
+
+    // Check for duplicate email for free templates
+    if (selectedTemplate?.type === 'free') {
+      const isDuplicate = await checkDuplicateRequest(buyNowFormData.email, selectedTemplate.id);
+      if (isDuplicate) {
+        setFormErrors(prev => ({ 
+          ...prev, 
+          email: 'You have already submitted a request for this template with this email.' 
+        }));
+        return;
+      }
+    }
+    
+    // Submit request to API
+    try {
+      setIsSubmitting(true);
+      
+      const requestData = {
+        template_id: selectedTemplate!.id,
+        name: buyNowFormData.name.trim(),
+        college: buyNowFormData.college.trim(),
+        email: buyNowFormData.email.toLowerCase().trim(),
+        phone: buyNowFormData.phone.trim(),
+        plan: selectedTemplate?.type === 'paid' ? buyNowFormData.selectedPlan : undefined,
+        type: selectedTemplate!.type
+      };
+
+      const response = await fetch('/api/templates/template-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to submit request');
+      }
+
+      // Show success popup
+      setSuccessMessage(`Request submitted successfully! Our team will contact you shortly.`);
+      setShowSuccessPopup(true);
+      setIsBuyNowModalOpen(false);
+      
+      // Reset form
+      setBuyNowFormData({
+        name: '',
+        college: '',
+        email: '',
+        phone: '',
+        selectedPlan: 'basic',
+        templateName: '',
+        templateId: 0,
+        templateType: 'free',
+      });
+      setFormErrors({});
+      setTouchedFields({});
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error('Submit request error:', error);
+      alert(error.message || 'Failed to submit request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handlePreviewClick = (imageUrl: string, templateName: string, description: string, liveUrl?: string | null) => {
     setPreviewModal({
       isOpen: true,
@@ -72,7 +284,7 @@ export default function TemplatesPage() {
   };
 
   // Animation variants
-  const containerVariants:Variants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -83,7 +295,7 @@ export default function TemplatesPage() {
     },
   };
 
-  const itemVariants:Variants = {
+  const itemVariants: Variants = {
     hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
@@ -97,7 +309,7 @@ export default function TemplatesPage() {
     },
   };
 
-  const heroVariants :Variants= {
+  const heroVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -108,7 +320,7 @@ export default function TemplatesPage() {
     },
   };
 
-  const fromLeftVariants:Variants = {
+  const fromLeftVariants: Variants = {
     hidden: { x: -50, opacity: 0 },
     visible: {
       x: 0,
@@ -122,7 +334,7 @@ export default function TemplatesPage() {
     },
   };
 
-  const fromRightVariants:Variants = {
+  const fromRightVariants: Variants = {
     hidden: { x: 50, opacity: 0 },
     visible: {
       x: 0,
@@ -136,7 +348,7 @@ export default function TemplatesPage() {
     },
   };
 
-  const fromBottomVariants:Variants = {
+  const fromBottomVariants: Variants = {
     hidden: { y: 50, opacity: 0 },
     visible: {
       y: 0,
@@ -281,16 +493,23 @@ export default function TemplatesPage() {
                         </span>
                       </div>
                       
-                      {/* Preview Overlay */}
-                      <button
-                        onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
-                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center"
-                      >
-                        <div className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                      {/* Preview Overlay - Now with two buttons */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center gap-3">
+                        <button
+                          onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
+                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20"
+                        >
                           <Eye size={12} />
-                          Quick Preview
-                        </div>
-                      </button>
+                          Preview
+                        </button>
+                        <button
+                          onClick={() => handleBuyNowClick(template)}
+                          className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        >
+                          <ShoppingCart size={12} />
+                          Buy Now
+                        </button>
+                      </div>
                     </div>
 
                     {/* Content area - Smaller padding */}
@@ -303,15 +522,24 @@ export default function TemplatesPage() {
                         {template.description}
                       </p>
 
-                      {/* CTA Button - Smaller */}
+                      {/* Price Badge */}
                       <div className="mt-auto pt-2">
-                        <Link
-                          href={`/templates/${template.id}`}
-                          className="w-full py-2 px-3 rounded-lg font-semibold text-xs transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40"
-                        >
-                          <Sparkles size={12} />
-                          View Details
-                        </Link>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-sm font-bold ${
+                            template.type === 'free' 
+                              ? 'text-green-400' 
+                              : 'text-transparent bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text'
+                          }`}>
+                            {template.type === 'free' ? 'Free' : 'Starting from $49'}
+                          </span>
+                          <button
+                            onClick={() => handleBuyNowClick(template)}
+                            className="py-1.5 px-3 rounded-lg font-semibold text-xs transition-all duration-300 hover:scale-105 flex items-center gap-1.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40"
+                          >
+                            <ShoppingCart size={10} />
+                            Buy Now
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -362,6 +590,192 @@ export default function TemplatesPage() {
                     Live Demo
                   </a>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Buy Now Modal */}
+        {isBuyNowModalOpen && selectedTemplate && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-[#0F172A] rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100 border border-[#1E293B]">
+              <div className="flex items-center justify-between p-5 border-b border-[#1E293B]">
+                <div>
+                  <h3 className="text-lg font-bold text-white">
+                    {selectedTemplate.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">Submit your request</p>
+                </div>
+                <button
+                  onClick={() => setIsBuyNowModalOpen(false)}
+                  className="p-1.5 hover:bg-[#1E293B] rounded-lg transition-colors"
+                >
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              <form onSubmit={handleBuyNowSubmit} className="p-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={buyNowFormData.name}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                      formErrors.name && touchedFields.name ? 'border-red-500' : 'border-[#1E293B]'
+                    }`}
+                    placeholder="Enter your full name"
+                  />
+                  {formErrors.name && touchedFields.name && (
+                    <p className="text-red-500 text-[10px] mt-1">{formErrors.name}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    College Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="college"
+                    value={buyNowFormData.college}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                      formErrors.college && touchedFields.college ? 'border-red-500' : 'border-[#1E293B]'
+                    }`}
+                    placeholder="Enter your college name"
+                  />
+                  {formErrors.college && touchedFields.college && (
+                    <p className="text-red-500 text-[10px] mt-1">{formErrors.college}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={buyNowFormData.email}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                      formErrors.email && touchedFields.email ? 'border-red-500' : 'border-[#1E293B]'
+                    }`}
+                    placeholder="Enter your email"
+                  />
+                  {formErrors.email && touchedFields.email && (
+                    <p className="text-red-500 text-[10px] mt-1">{formErrors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={buyNowFormData.phone}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                      formErrors.phone && touchedFields.phone ? 'border-red-500' : 'border-[#1E293B]'
+                    }`}
+                    placeholder="Enter your phone number"
+                  />
+                  {formErrors.phone && touchedFields.phone && (
+                    <p className="text-red-500 text-[10px] mt-1">{formErrors.phone}</p>
+                  )}
+                </div>
+
+                {selectedTemplate.type === 'paid' && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                      Select Plan *
+                    </label>
+                    <select
+                      name="selectedPlan"
+                      value={buyNowFormData.selectedPlan}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 text-sm border border-[#1E293B] rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all"
+                    >
+                      <option value="basic">Basic Plan - $49</option>
+                      <option value="professional">Professional Plan - $99</option>
+                      <option value="enterprise">Enterprise Plan - $199</option>
+                    </select>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Success Popup */}
+        {showSuccessPopup && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="bg-[#0F172A] rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100 border border-[#1E293B]">
+              <div className="text-center">
+                <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                
+                <h3 className="text-lg font-bold text-white mb-2">
+                  Request Submitted Successfully!
+                </h3>
+                
+                <p className="text-gray-400 text-sm mb-4">
+                  {successMessage}
+                </p>
+
+                <p className="text-gray-400 text-xs mb-5">
+                  Our team at <strong className="text-white">Nestick Tech</strong> will contact you shortly to discuss your requirements.
+                </p>
+
+                <div className="bg-[#0B0F19] rounded-lg p-3 mb-5">
+                  <a 
+                    href="https://nesticktech.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#38BDF8] hover:text-[#1D4ED8] font-medium text-sm block mb-1"
+                  >
+                    https://nesticktech.com
+                  </a>
+                  <p className="text-xs text-gray-500">
+                    <strong>Contact:</strong> +92 319 3236529
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setShowSuccessPopup(false);
+                    setSuccessMessage('');
+                  }}
+                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

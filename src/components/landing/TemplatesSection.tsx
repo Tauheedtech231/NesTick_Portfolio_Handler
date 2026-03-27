@@ -87,7 +87,7 @@ export default function TemplatesSection({
   return (
     <section
       id="templates"
-      className="py-20 md:py-28 px-4 sm:px-6 bg-[#0B0F19] relative overflow-hidden"
+      className="py-20 md:py-20 px-4 sm:px-6 bg-[#0B0F19] relative overflow-hidden"
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">

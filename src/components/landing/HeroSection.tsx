@@ -128,108 +128,100 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
   };
 
   return (
-    <section
-      id="home"
-      ref={heroRef}
-      className="relative h-[50%] md:min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#0B0F19] pt-24 md:pt-24 "
+<section
+  id="home"
+  ref={heroRef}
+  className="relative min-h-[50vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden bg-[#0B0F19] pt-20"
+>
+  {/* Three.js Network Background */}
+  <ThreeNetworkBackground />
+
+  {/* Gradient Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/80 via-[#0B0F19]/50 to-[#0B0F19] pointer-events-none" />
+
+  {/* Animated particles */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#1D4ED8]/5 rounded-full blur-3xl animate-pulse" />
+    <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#38BDF8]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+  </div>
+
+  {/* Content */}
+  <div className="relative z-10 container mx-auto max-w-5xl px-4 text-center">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col items-center justify-center text-center"
     >
-      {/* Three.js Network Background */}
-      <ThreeNetworkBackground />
+      {/* Badge */}
+      <motion.div
+        variants={badgeVariants}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4"
+      >
+        <GraduationCap className="w-4 h-4 text-[#38BDF8]" />
+        <span className="text-sm font-medium text-gray-300">
+          🎓 Connected College Portfolio Ecosystem
+        </span>
+      </motion.div>
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/80 via-[#0B0F19]/50 to-[#0B0F19] pointer-events-none" />
+      {/* Heading */}
+      <motion.h1
+        variants={itemVariants}
+        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 max-w-3xl"
+      >
+        <span className="block">Simplify College Portfolios</span>
+        <span className="block bg-gradient-to-r from-[#1D4ED8] via-[#38BDF8] to-[#1D4ED8] bg-clip-text text-transparent animate-gradient">
+          One Platform
+        </span>
+      </motion.h1>
 
-      {/* Animated particles overlay */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1D4ED8]/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#38BDF8]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+      {/* Subheading (gap reduced) */}
+      <div className="mb-5">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={currentTextIndex}
+            variants={rotatingTextVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="text-sm sm:text-base md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed"
+          >
+            {rotatingTexts[currentTextIndex]}
+          </motion.p>
+        </AnimatePresence>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 container mx-auto max-w-6xl px-4 sm:px-6 text-center">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center justify-center"
+      {/* Button (closer to text) */}
+      <motion.div
+        variants={itemVariants}
+        className="flex justify-center items-center"
+      >
+        <motion.button
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
+          onClick={() => scrollToSection("templates")}
+          className="group bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base shadow-xl hover:shadow-[#1D4ED8]/40 transition-all duration-300 flex items-center gap-2"
         >
-          {/* Top Center Badge - Above Heading */}
-          <motion.div
-            variants={badgeVariants}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm shadow-lg mb-4 md:mb-6"
-          >
-            <GraduationCap className="w-4 h-4 text-[#38BDF8]" />
-            <span className="text-sm font-medium text-gray-300">
-              🎓 Connected College Portfolio Ecosystem
-            </span>
-          </motion.div>
+          Get Started
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  </div>
 
-          {/* Original Heading - Preserved */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 md:mb-6 leading-tight"
-          >
-            Simplify College Portfolios{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1D4ED8] via-[#38BDF8] to-[#1D4ED8] bg-size-200 animate-gradient">
-              One Unified Platform
-            </span>
-          </motion.h1>
-
-          {/* Rotating Text with Enter/Exit Animation */}
-          <div className="min-h-[80px] md:min-h-[100px] mb-6 md:mb-8">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={currentTextIndex}
-                variants={rotatingTextVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light px-4"
-              >
-                {rotatingTexts[currentTextIndex]}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* Original Button - Preserved */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center mt-2 md:mt-4"
-          >
-            <motion.button
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-              onClick={() => scrollToSection("templates")}
-              className="group relative w-full sm:w-auto bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-6 py-3 md:px-8 md:py-4 mb-6 rounded-xl md:rounded-2xl font-semibold text-base md:text-lg transition-all duration-500 shadow-2xl hover:shadow-[#1D4ED8]/40 overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Get Started
-                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#38BDF8] to-[#1D4ED8] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      <style jsx>{`
-        @keyframes gradient {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s ease infinite;
-        }
-        .bg-size-200 {
-          background-size: 200% 200%;
-        }
-      `}</style>
-    </section>
+  {/* Gradient Animation */}
+  <style jsx>{`
+    @keyframes gradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .animate-gradient {
+      background-size: 200% auto;
+      animation: gradient 3s ease infinite;
+    }
+  `}</style>
+</section>
+   
   );
 }

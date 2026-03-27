@@ -111,64 +111,59 @@ export default function AboutPage() {
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20">
         {/* Hero Section with 3D Particles - No Scroll Indicator */}
-        <section
-          ref={heroRef}
-          className="relative overflow-hidden  flex items-center justify-center"
-        >
-          {/* 3D Particles Background */}
-          <ParticlesBackground />
+     <section
+  ref={heroRef}
+  className="relative overflow-hidden flex items-center justify-center"
+>
+  {/* 3D Particles Background */}
+  <ParticlesBackground />
 
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/80 via-[#0B0F19]/50 to-[#0B0F19] pointer-events-none" />
+  {/* Gradient Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/80 via-[#0B0F19]/50 to-[#0B0F19] pointer-events-none" />
 
-          {/* Floating Orbs */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#1D4ED8]/5 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#38BDF8]/5 rounded-full blur-3xl animate-pulse delay-1000" />
-          </div>
+  {/* Floating Orbs */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#1D4ED8]/5 rounded-full blur-3xl animate-pulse" />
+    <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#38BDF8]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+  </div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            {/* Heading - From Left */}
-            <motion.div
-              initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
-              variants={fadeInLeftVariants}
-              className="mb-5"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
-                <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
-                <span className="text-xs   font-medium text-gray-300">About us</span>
-              </div>
+  <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    
+    {/* Badge + Heading */}
+    <motion.div
+      initial="hidden"
+      animate={heroInView ? "visible" : "hidden"}
+      variants={fadeInLeftVariants}
+      className="mb-5"
+    >
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
+        <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
+        <span className="text-xs font-medium text-gray-300">About Us</span>
+      </div>
 
-              {/* Hero Heading - 2 words per line */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">
-                {/* Line 1 */}
-                <span className="block">
-                  Shaping{' '}
-                  <span className="bg-gradient-to-r from-[#1D4ED8] via-[#38BDF8] to-[#1D4ED8] bg-clip-text text-transparent">
-                    Digital
-                  </span>
-                </span>
-                {/* Line 2 */}
-                <span className="block">Futures Since</span>
-                {/* Line 3 */}
-                <span className="block">2020</span>
-              </h1>
-            </motion.div>
+      {/* ✅ Updated Heading */}
+      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight tracking-tight max-w-3xl mx-auto">
+        <span className="block">
+          Building{' '}
+          <span className="bg-gradient-to-r from-[#1D4ED8] via-[#38BDF8] to-[#1D4ED8] bg-clip-text text-transparent">
+            Digital Futures
+          </span>
+        </span>
+        <span className="block">Since 2020</span>
+      </h1>
+    </motion.div>
 
-            {/* Subheading - From Bottom */}
-            <motion.p
-              initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
-              variants={fromBottomVariants}
-              className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto"
-            >
-              We&apos;re on a mission to revolutionize how educational institutions manage and showcase 
-              student portfolios. Our platform brings simplicity, elegance, and efficiency to 
-              portfolio management.
-            </motion.p>
-          </div>
-        </section>
+    {/* ✅ Short Subheading */}
+    <motion.p
+      initial="hidden"
+      animate={heroInView ? "visible" : "hidden"}
+      variants={fromBottomVariants}
+      className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto"
+    >
+      Helping institutions manage and showcase student portfolios — simply and efficiently.
+    </motion.p>
+  </div>
+</section>
 
         {/* Mission & Vision Section - Reduced font */}
         <section ref={missionRef} className="py-10 md:py-12">
@@ -298,7 +293,7 @@ export default function AboutPage() {
         </section>
 
         {/* College Feedback Section */}
-        <section ref={feedbackRef} className="py-12">
+        <section ref={feedbackRef} >
           <CollegeFeedback />
         </section>
       </main>
