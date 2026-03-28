@@ -171,7 +171,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       >
         <span className="block">Simplify College Portfolios</span>
         <span className="block bg-gradient-to-r from-[#1D4ED8] via-[#38BDF8] to-[#1D4ED8] bg-clip-text text-transparent animate-gradient">
-          One Platform
+           In One Platform
         </span>
       </motion.h1>
 
