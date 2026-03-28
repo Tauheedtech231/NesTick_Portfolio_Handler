@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, Globe } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -10,7 +10,7 @@ export default function Footer() {
     <footer className="bg-[#0B0F19] border-t border-[#1E293B] pt-12 pb-6">
       <div className="container mx-auto max-w-6xl px-4 sm:px-6">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {/* Company Info */}
           <div>
             <Link href="/home" className="flex items-center gap-2 mb-4">
@@ -23,23 +23,9 @@ export default function Footer() {
               Empowering educational institutions with modern portfolio management solutions. 
               Create, manage, and showcase student portfolios effortlessly.
             </p>
-            <div className="flex gap-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#38BDF8] transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-            </div>
           </div>
 
-          {/* Quick Links - Features Removed */}
+          {/* Quick Links */}
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
@@ -62,33 +48,6 @@ export default function Footer() {
                 <Link href="/contact" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
                   Contact
                 </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="/docs" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href="/help" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="/privacy" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="/terms" className="text-gray-400 hover:text-[#38BDF8] transition-colors text-sm">
-                  Terms of Service
-                </a>
               </li>
             </ul>
           </div>

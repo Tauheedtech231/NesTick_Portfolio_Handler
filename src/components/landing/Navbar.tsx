@@ -1,4 +1,3 @@
-// components/landing/Navbar.tsx
 'use client';
 
 import { useEffect, useRef, useState } from "react";
@@ -49,22 +48,37 @@ export default function Navbar() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Mobile menu animations
+  // Mobile menu animations - Smooth slide from top
   useEffect(() => {
     if (mobileMenuRef.current) {
       if (isMobileMenuOpen) {
-        gsap.to(mobileMenuRef.current, {
-          height: 'auto',
-          opacity: 1,
-          duration: 0.4,
-          ease: "power2.out"
-        });
+        // Animate in - slide down with bounce effect
+        gsap.fromTo(mobileMenuRef.current,
+          { 
+            y: -20, 
+            opacity: 0,
+            display: "block"
+          },
+          { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.5,
+            ease: "back.out(0.6)",
+            clearProps: "display"
+          }
+        );
       } else {
+        // Animate out - slide up
         gsap.to(mobileMenuRef.current, {
-          height: 0,
+          y: -20,
           opacity: 0,
-          duration: 0.3,
-          ease: "power2.in"
+          duration: 0.4,
+          ease: "power2.in",
+          onComplete: () => {
+            if (mobileMenuRef.current) {
+              gsap.set(mobileMenuRef.current, { display: "none" });
+            }
+          }
         });
       }
     }
@@ -90,7 +104,6 @@ export default function Navbar() {
 
   const navItems = [
     { name: 'Home', path: '/' },
-    
     { name: 'Templates', path: '/templates' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
@@ -173,7 +186,7 @@ export default function Navbar() {
                       className="fixed inset-0 z-40" 
                       onClick={() => setIsDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-64 bg-[#0F172A] rounded-xl shadow-lg border border-[#1E293B] z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-64 bg-[#0F172A] rounded-xl shadow-lg border border-[#1E293B] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-4 py-3 border-b border-[#1E293B]">
                         <p className="text-sm font-medium text-white">Signed in as</p>
                         <p className="text-sm text-gray-400 truncate">{getUserEmail()}</p>
@@ -211,24 +224,30 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Toggle with Animated Icon */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8]/30 transition-all duration-300"
+              className="lg:hidden p-2.5 rounded-xl bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8]/30 transition-all duration-300 relative overflow-hidden"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5 text-gray-400" />
-              ) : (
-                <Menu className="w-5 h-5 text-gray-400" />
-              )}
+              <div className="relative z-10">
+                {isMobileMenuOpen ? (
+                  <X className="w-5 h-5 text-gray-400 transition-transform duration-300 rotate-0" />
+                ) : (
+                  <Menu className="w-5 h-5 text-gray-400 transition-transform duration-300" />
+                )}
+              </div>
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu Content */}
-        {isMobileMenuOpen && (
-          <div ref={mobileMenuRef} className="lg:hidden mt-3 bg-[#0F172A] border border-[#1E293B] rounded-xl shadow-lg overflow-hidden">
+        {/* Mobile Menu Content - Smooth Slide Animation */}
+        <div 
+          ref={mobileMenuRef} 
+          className="lg:hidden mt-3 overflow-hidden"
+          style={{ display: 'none' }}
+        >
+          <div className="bg-[#0F172A] border border-[#1E293B] rounded-xl shadow-lg">
             <div className="px-4 py-4 space-y-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.path;
@@ -236,7 +255,7 @@ export default function Navbar() {
                   <button
                     key={item.name}
                     onClick={() => handleNavigation(item.path)}
-                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all ${
+                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-300 ${
                       isActive 
                         ? 'bg-gradient-to-r from-[#1D4ED8]/20 to-[#38BDF8]/20 text-[#38BDF8]' 
                         : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
@@ -256,7 +275,7 @@ export default function Navbar() {
                       handleDashboardRedirect();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all duration-300"
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard
@@ -267,7 +286,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
@@ -278,14 +297,14 @@ export default function Navbar() {
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all"
+                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all duration-300"
                 >
                   Login
                 </Link>
               </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

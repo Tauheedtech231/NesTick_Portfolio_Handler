@@ -156,9 +156,9 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       {/* Badge */}
       <motion.div
         variants={badgeVariants}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4 mt-[1rem]"
       >
-        <GraduationCap className="w-4 h-4 text-[#38BDF8]" />
+        <GraduationCap className="w-[8px] h-[8px] sm:w-[16px]  text-[#38BDF8]" />
         <span className="text-sm font-medium text-gray-300">
           🎓 Connected College Portfolio Ecosystem
         </span>
@@ -201,7 +201,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           whileHover="hover"
           whileTap="tap"
           onClick={() => scrollToSection("templates")}
-          className="group bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base shadow-xl hover:shadow-[#1D4ED8]/40 transition-all duration-300 flex items-center gap-2"
+          className="group bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base shadow-xl hover:shadow-[#1D4ED8]/40 mb-2 transition-all duration-300 flex items-center gap-2"
         >
           Get Started
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
