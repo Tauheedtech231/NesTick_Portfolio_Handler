@@ -17,6 +17,7 @@ import Navbar from "@/components/landing/Navbar";
 
 // Import interfaces
 import type { Template, BuyNowFormData, ContactFormData } from "@/app/types/landing";
+import PartnerProductSection from "@/components/PartnerProductSection";
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -543,6 +544,7 @@ export default function LandingPage() {
         scrollToSection={scrollToSection}
         heroRef={heroRef}
       />
+      <PartnerProductSection />
 
       {/* Templates Section */}
       <TemplatesSection
@@ -559,11 +561,11 @@ export default function LandingPage() {
         featuresRef={featuresRef}
         aboutRef={aboutRef}
         contactRef={contactRef}
-        contactFormData={contactFormData}
-        isSubmitting={isSubmitting}
-        submitStatus={submitStatus}
-        handleContactInputChange={handleContactInputChange}
-        handleContactSubmit={handleContactSubmit}
+      
+        
+      
+        
+      
         scrollToSection={scrollToSection}
         addToRefs={addToRefs}
         featureCardsRef={featureCardsRef}

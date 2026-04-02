@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, Variants } from 'framer-motion';
-import { Search, Sparkles, Eye, X, ShoppingCart } from 'lucide-react';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { Search, Sparkles, Eye, X, ShoppingCart, Info, CheckCircle, Filter } from 'lucide-react';
 import Image from 'next/image';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-
 
 interface Template {
   id: number;
@@ -29,11 +28,92 @@ interface BuyNowFormData {
   templateType: 'free' | 'paid';
 }
 
+// Template features based on template name
+const getTemplateFeatures = (templateName: string): string[] => {
+  const featuresMap: { [key: string]: string[] } = {
+    "Modern Professional": [
+      "Clean and corporate design",
+      "Fully responsive layout",
+      "SEO optimized structure",
+      "Easy customization options",
+      "Contact form integration",
+      "Project showcase gallery",
+      "Client testimonials section",
+      "Blog integration ready"
+    ],
+    "Creative Arts": [
+      "Vibrant visual design",
+      "Portfolio grid layout",
+      "Animated transitions",
+      "Social media integration",
+      "Blog section included",
+      "Multi-color schemes",
+      "Video background support",
+      "Custom font integration"
+    ],
+    "Academic Classic": [
+      "Research paper showcase",
+      "Publication timeline",
+      "Citation management",
+      "CV/Resume section",
+      "Conference listings",
+      "Academic achievements",
+      "Grant proposals section",
+      "Peer review integration"
+    ],
+    "Tech Startup": [
+      "SaaS focused design",
+      "Pricing tables included",
+      "Team member profiles",
+      "Case study layouts",
+      "Newsletter integration",
+      "Analytics dashboard",
+      "API documentation ready",
+      "Dark mode support"
+    ],
+    "E-commerce": [
+      "Product catalog layout",
+      "Shopping cart integration",
+      "Payment gateway ready",
+      "Order tracking system",
+      "Customer review section",
+      "Wishlist functionality",
+      "Inventory management",
+      "Discount coupon system"
+    ],
+    "Personal Blog": [
+      "Magazine style layout",
+      "Comment system ready",
+      "Social sharing buttons",
+      "Author bio section",
+      "Related posts widget",
+      "Newsletter signup",
+      "Category filtering",
+      "Search optimization"
+    ]
+  };
+
+  const defaultFeatures = [
+    "Modern responsive design",
+    "Easy to customize",
+    "Fast loading performance",
+    "Cross-browser compatible",
+    "Mobile-first approach",
+    "Clean code structure",
+    "SEO friendly markup",
+    "Regular updates included"
+  ];
+
+  return featuresMap[templateName] || defaultFeatures;
+};
+
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [selectedType, setSelectedType] = useState<'all' | 'free' | 'paid'>('all');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   // Modal states
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
@@ -49,6 +129,12 @@ export default function TemplatesPage() {
     templateName: '',
     description: '',
     liveUrl: null as string | null,
+  });
+
+  // Details modal state
+  const [detailsModal, setDetailsModal] = useState({
+    isOpen: false,
+    template: null as Template | null,
   });
 
   // Form data state
@@ -131,11 +217,14 @@ export default function TemplatesPage() {
     fetchTemplates();
   }, []);
 
-  // Filter templates based on search
-  const filteredTemplates = templates.filter(template =>
-    template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    template.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter templates based on search and type
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = searchQuery === '' || 
+      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = selectedType === 'all' || template.type === selectedType;
+    return matchesSearch && matchesType;
+  });
 
   // Handle Buy Now click
   const handleBuyNowClick = (template: Template) => {
@@ -155,6 +244,14 @@ export default function TemplatesPage() {
     setIsBuyNowModalOpen(true);
   };
 
+  // Handle Details click
+  const handleDetailsClick = (template: Template) => {
+    setDetailsModal({
+      isOpen: true,
+      template: template,
+    });
+  };
+
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -163,7 +260,6 @@ export default function TemplatesPage() {
       [name]: value
     }));
 
-    // Clear error when user starts typing
     if (formErrors[name]) {
       const error = validateField(name, value);
       setFormErrors(prev => ({ ...prev, [name]: error }));
@@ -174,7 +270,6 @@ export default function TemplatesPage() {
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTouchedFields(prev => ({ ...prev, [name]: true }));
-    
     const error = validateField(name, value);
     setFormErrors(prev => ({ ...prev, [name]: error }));
   };
@@ -183,7 +278,6 @@ export default function TemplatesPage() {
   const handleBuyNowSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
     const errors: Record<string, string> = {};
     ['name', 'college', 'email', 'phone'].forEach(key => {
       const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData] as string);
@@ -192,7 +286,6 @@ export default function TemplatesPage() {
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      // Mark all fields as touched to show errors
       const allTouched = ['name', 'college', 'email', 'phone'].reduce((acc, key) => {
         acc[key] = true;
         return acc;
@@ -201,7 +294,6 @@ export default function TemplatesPage() {
       return;
     }
 
-    // Check for duplicate email for free templates
     if (selectedTemplate?.type === 'free') {
       const isDuplicate = await checkDuplicateRequest(buyNowFormData.email, selectedTemplate.id);
       if (isDuplicate) {
@@ -213,7 +305,6 @@ export default function TemplatesPage() {
       }
     }
     
-    // Submit request to API
     try {
       setIsSubmitting(true);
       
@@ -241,12 +332,10 @@ export default function TemplatesPage() {
         throw new Error(data.message || 'Failed to submit request');
       }
 
-      // Show success popup
       setSuccessMessage(`Request submitted successfully! Our team will contact you shortly.`);
       setShowSuccessPopup(true);
       setIsBuyNowModalOpen(false);
       
-      // Reset form
       setBuyNowFormData({
         name: '',
         college: '',
@@ -363,15 +452,38 @@ export default function TemplatesPage() {
     },
   };
 
+  const modalVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.95, y: 20 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 300,
+        damping: 25,
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.95, 
+      y: 20,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+
   return (
     <>
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20">
-        {/* Hero Section - Reduced padding */}
+        {/* Hero Section */}
         <section className="relative overflow-hidden py-10 md:py-12 lg:py-16">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-20 left-10 w-72 h-72 bg-[#1D4ED8]/5 rounded-full blur-3xl" />
             <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#38BDF8]/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl" />
           </div>
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -381,52 +493,103 @@ export default function TemplatesPage() {
               animate="visible"
               className="text-center max-w-4xl mx-auto"
             >
-              {/* Badge - Smaller */}
               <motion.div variants={fromBottomVariants} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
                 <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
                 <span className="text-xs font-medium text-gray-300">Our Templates</span>
               </motion.div>
 
-              {/* Heading - Smaller font */}
               <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
                 Beautiful{' '}
-                <span className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text text-transparent">
+                <span className="text-[#FFD700]">
                   Portfolio Templates
                 </span>
               </motion.h1>
 
-              {/* Description - Smaller font */}
               <motion.p variants={fromRightVariants} className="text-base md:text-lg text-gray-400 mb-6 max-w-3xl mx-auto">
                 Choose from our collection of professionally designed templates. Each template is fully customizable to match your institution&apos;s brand and requirements.
               </motion.p>
 
-              {/* Search Bar - Smaller */}
+              {/* Search and Filter Bar */}
               <motion.div variants={fromBottomVariants} className="max-w-2xl mx-auto">
                 <div className="relative">
                   <div className={`absolute inset-0 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-xl opacity-0 transition-opacity duration-300 ${isSearchFocused ? 'opacity-20' : ''}`} />
-                  <div className="relative flex items-center">
-                    <Search className="absolute left-4 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search templates by name or description..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => setIsSearchFocused(true)}
-                      onBlur={() => setIsSearchFocused(false)}
-                      className="w-full bg-[#0F172A] border border-[#1E293B] rounded-xl py-3 pl-10 pr-10 text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#38BDF8] transition-colors duration-300"
-                    />
-                    {searchQuery && (
-                      <button
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-3 p-1 rounded-full hover:bg-[#1E293B] transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5 text-gray-400" />
-                      </button>
-                    )}
+                  <div className="relative flex items-center gap-2">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search templates by name or description..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)}
+                        onBlur={() => setIsSearchFocused(false)}
+                        className="w-full bg-[#0F172A] border border-[#1E293B] rounded-xl py-3 pl-10 pr-10 text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#38BDF8] transition-colors duration-300"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-[#1E293B] transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5 text-gray-400" />
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Filter Button */}
+                    <button
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                      className="px-4 py-3 bg-[#0F172A] border border-[#1E293B] rounded-xl text-gray-400 hover:text-white hover:border-[#38BDF8] transition-all duration-300 flex items-center gap-2"
+                    >
+                      <Filter className="w-4 h-4" />
+                      <span className="text-sm hidden sm:inline">Filter</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Results Count - Smaller */}
+                {/* Filter Options */}
+                <AnimatePresence>
+                  {isFilterOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="mt-3 p-2 bg-[#0F172A] border border-[#1E293B] rounded-xl flex gap-2"
+                    >
+                      <button
+                        onClick={() => setSelectedType('all')}
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          selectedType === 'all'
+                            ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        All Templates
+                      </button>
+                      <button
+                        onClick={() => setSelectedType('free')}
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          selectedType === 'free'
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        Free
+                      </button>
+                      <button
+                        onClick={() => setSelectedType('paid')}
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          selectedType === 'paid'
+                            ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        Premium
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Results Count */}
                 <div className="flex justify-between items-center mt-3">
                   <p className="text-xs text-gray-500">
                     {filteredTemplates.length} {filteredTemplates.length === 1 ? 'template' : 'templates'} available
@@ -437,7 +600,7 @@ export default function TemplatesPage() {
           </div>
         </section>
 
-        {/* Templates Grid - Reduced top padding */}
+        {/* Templates Grid */}
         <section className="py-8 md:py-10 lg:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {loadingTemplates ? (
@@ -461,9 +624,8 @@ export default function TemplatesPage() {
                     key={template.id}
                     variants={itemVariants}
                     whileHover={{ y: -4 }}
-                    className="group bg-[#0F172A] border border-[#1E293B] rounded-xl overflow-hidden transition-all duration-500 hover:border-[#38BDF8]/50 hover:shadow-xl hover:shadow-[#1D4ED8]/10 flex flex-col h-full"
+                    className="group bg-[#0F172A] border border-[#1E293B] rounded-xl overflow-hidden transition-all duration-500 hover:border-[#FFD700]/50 hover:shadow-xl hover:shadow-[#FFD700]/10 flex flex-col h-full"
                   >
-                    {/* Image Container - Smaller height */}
                     <div className="h-48 relative overflow-hidden flex-shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent z-10" />
                       <Image
@@ -477,7 +639,6 @@ export default function TemplatesPage() {
                         }}
                       />
                       
-                      {/* Badges - Smaller */}
                       <div className="absolute top-3 left-3 flex gap-1.5 z-20">
                         <span className="text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/20">
                           Portfolio Template
@@ -493,7 +654,6 @@ export default function TemplatesPage() {
                         </span>
                       </div>
                       
-                      {/* Preview Overlay - Now with two buttons */}
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center gap-3">
                         <button
                           onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
@@ -501,6 +661,13 @@ export default function TemplatesPage() {
                         >
                           <Eye size={12} />
                           Preview
+                        </button>
+                        <button
+                          onClick={() => handleDetailsClick(template)}
+                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20"
+                        >
+                          <Info size={12} />
+                          Details
                         </button>
                         <button
                           onClick={() => handleBuyNowClick(template)}
@@ -512,9 +679,8 @@ export default function TemplatesPage() {
                       </div>
                     </div>
 
-                    {/* Content area - Smaller padding */}
                     <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-[#38BDF8] transition-colors duration-300">
+                      <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-[#FFD700] transition-colors duration-300">
                         {template.name}
                       </h3>
                       
@@ -522,7 +688,6 @@ export default function TemplatesPage() {
                         {template.description}
                       </p>
 
-                      {/* Price Badge */}
                       <div className="mt-auto pt-2">
                         <div className="flex items-center justify-between">
                           <span className={`text-sm font-bold ${
@@ -543,8 +708,7 @@ export default function TemplatesPage() {
                       </div>
                     </div>
 
-                    {/* Bottom Glow Line */}
-                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1D4ED8] via-[#FFD700] to-[#38BDF8] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </motion.div>
                 ))}
               </motion.div>
@@ -554,7 +718,7 @@ export default function TemplatesPage() {
                   <Search className="w-6 h-6 text-gray-500" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">No templates found</h3>
-                <p className="text-gray-400 text-sm">Try adjusting your search to find what you&apos;re looking for.</p>
+                <p className="text-gray-400 text-sm">Try adjusting your search or filter to find what you&apos;re looking for.</p>
               </div>
             )}
           </div>
@@ -594,6 +758,124 @@ export default function TemplatesPage() {
             </div>
           </div>
         )}
+
+        {/* Details Modal */}
+        <AnimatePresence>
+          {detailsModal.isOpen && detailsModal.template && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setDetailsModal({ isOpen: false, template: null })}>
+              <motion.div
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="relative bg-gradient-to-br from-[#0F172A] to-[#0B0F19] rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#FFD700]/30 shadow-2xl shadow-[#FFD700]/20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="sticky top-0 bg-[#0F172A]/95 backdrop-blur-sm border-b border-[#FFD700]/20 p-5">
+                  <button
+                    onClick={() => setDetailsModal({ isOpen: false, template: null })}
+                    className="absolute right-4 top-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 text-gray-400 hover:text-white"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  <h3 className="text-2xl font-bold text-white pr-8">
+                    {detailsModal.template.name}
+                  </h3>
+                  <div className="flex gap-2 mt-2">
+                    <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                      detailsModal.template.type === 'free' 
+                        ? 'bg-green-500/80' 
+                        : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]'
+                    }`}>
+                      {detailsModal.template.type === 'free' ? 'Free Template' : 'Premium Template'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <div className="relative h-48 md:h-64 rounded-xl overflow-hidden mb-6">
+                    <Image
+                      src={detailsModal.template.image}
+                      alt={detailsModal.template.name}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] to-transparent" />
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-[#FFD700] mb-2">Description</h4>
+                    <p className="text-gray-300 leading-relaxed">
+                      {detailsModal.template.description}
+                    </p>
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-[#FFD700] mb-3">Key Features</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {getTemplateFeatures(detailsModal.template.name).map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-gray-300">
+                          <CheckCircle className="w-4 h-4 text-[#FFD700]" />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 rounded-xl p-4 mb-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Template ID</p>
+                        <p className="text-sm text-white">#{detailsModal.template.id}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Created</p>
+                        <p className="text-sm text-white">
+                          {new Date(detailsModal.template.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Type</p>
+                        <p className="text-sm text-white capitalize">{detailsModal.template.type}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Compatibility</p>
+                        <p className="text-sm text-white">All Devices</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setDetailsModal({ isOpen: false, template: null });
+                        handlePreviewClick(detailsModal.template!.image, detailsModal.template!.name, detailsModal.template!.description, detailsModal.template!.live_url);
+                      }}
+                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15"
+                    >
+                      <Eye size={16} />
+                      Preview Template
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDetailsModal({ isOpen: false, template: null });
+                        handleBuyNowClick(detailsModal.template!);
+                      }}
+                      className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 ${
+                        detailsModal.template.type === 'free'
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40'
+                          : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40'
+                      }`}
+                    >
+                      <Sparkles size={16} />
+                      {detailsModal.template.type === 'free' ? 'Use Template Free' : 'Buy Premium Template'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Buy Now Modal */}
         {isBuyNowModalOpen && selectedTemplate && (

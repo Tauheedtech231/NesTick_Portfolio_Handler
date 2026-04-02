@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -106,7 +106,6 @@ export default function Navbar() {
     { name: 'Home', path: '/' },
     { name: 'Templates', path: '/templates' },
     { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
   ];
 
   const handleNavigation = (path: string) => {
@@ -123,13 +122,13 @@ export default function Navbar() {
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo with Golden Background */}
           <Link 
             href="/" 
             className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity group"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <span className="text-white font-bold text-sm">P</span>
+            <div className="w-8 h-8 bg-[#FFD700] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-[#FFD700]/30">
+              <span className="text-black font-bold text-sm">P</span>
             </div>
             <span className="text-xl font-bold text-white">
               Portfolio Handler
@@ -163,6 +162,15 @@ export default function Navbar() {
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-3">
+            {/* Feedback Button - Full Golden */}
+            <Link
+              href="/feedback"
+              className="hidden sm:flex items-center gap-2 bg-[#FFD700] text-black px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90 hover:scale-105 hover:shadow-lg hover:shadow-[#FFD700]/30"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Feedback
+            </Link>
+
             {user ? (
               <div className="relative">
                 <button
@@ -216,12 +224,14 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link
-                href="/auth/login"
-                className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-[#1D4ED8]/30"
-              >
-                Login
-              </Link>
+              <>
+                <Link
+                  href="/auth/login"
+                  className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-[#1D4ED8]/30"
+                >
+                  Login
+                </Link>
+              </>
             )}
 
             {/* Mobile Menu Toggle with Animated Icon */}
@@ -265,6 +275,16 @@ export default function Navbar() {
                   </button>
                 );
               })}
+              
+              {/* Mobile Feedback Button */}
+              <Link
+                href="/feedback"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full mt-2 bg-[#FFD700] text-black px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Feedback
+              </Link>
             </div>
 
             {user ? (
