@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, User, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, Sparkles, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -113,9 +113,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] px-4 py-8 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#1D4ED8]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#38BDF8]/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#1D4ED8]/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse" />
       </div>
 
       <MessagePopup />
@@ -123,18 +123,26 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto w-14 h-14 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#1D4ED8]/20">
-            <Sparkles className="w-7 h-7 text-white" />
+          <div className="relative mx-auto w-16 h-16 mb-4">
+            <div className="absolute inset-0 bg-[#FFD700] rounded-2xl blur-xl opacity-50 animate-pulse"></div>
+            <div className="relative w-16 h-16 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 rounded-2xl flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
+              <Sparkles className="w-8 h-8 text-black" />
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-          <p className="mt-2 text-gray-400">Sign in to your Portfolio Handler account</p>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent">
+            Welcome Back
+          </h2>
+          <p className="mt-2 text-gray-400 text-sm">
+            Sign in to your Portfolio Handler account
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
+            {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">
                 Email Address
               </label>
               <div className="relative">
@@ -150,18 +158,19 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="Enter your email"
                   className={cn(
-                    "block w-full pl-10 pr-3 py-3 border rounded-xl",
-                    "bg-[#0F172A] border-[#1E293B] text-white",
-                    "placeholder:text-gray-500",
-                    "focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent",
-                    "transition-all duration-200"
+                    "block w-full pl-10 pr-3 py-3 rounded-xl",
+                    "bg-[#0F172A] border border-[#1E293B] text-white",
+                    "placeholder:text-gray-600 text-sm",
+                    "focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]",
+                    "transition-all duration-300"
                   )}
                 />
               </div>
             </div>
 
+            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -177,11 +186,11 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="Enter your password"
                   className={cn(
-                    "block w-full pl-10 pr-12 py-3 border rounded-xl",
-                    "bg-[#0F172A] border-[#1E293B] text-white",
-                    "placeholder:text-gray-500",
-                    "focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent",
-                    "transition-all duration-200"
+                    "block w-full pl-10 pr-12 py-3 rounded-xl",
+                    "bg-[#0F172A] border border-[#1E293B] text-white",
+                    "placeholder:text-gray-600 text-sm",
+                    "focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]",
+                    "transition-all duration-300"
                   )}
                 />
                 <button
@@ -190,38 +199,50 @@ export default function LoginPage() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-500 hover:text-[#38BDF8] transition-colors" />
+                    <EyeOff className="h-5 w-5 text-gray-500 hover:text-[#FFD700] transition-colors" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-500 hover:text-[#38BDF8] transition-colors" />
+                    <Eye className="h-5 w-5 text-gray-500 hover:text-[#FFD700] transition-colors" />
                   )}
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Login Button */}
           <button
             type="submit"
             disabled={isLoading}
             className={cn(
-              "w-full flex justify-center py-3 px-4 border border-transparent rounded-xl",
-              "text-sm font-medium text-white",
-              "bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]",
-              "hover:scale-105 hover:shadow-lg hover:shadow-[#1D4ED8]/30",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0B0F19] focus:ring-[#38BDF8]",
+              "w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl",
+              "text-sm font-semibold text-black",
+              "bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90",
+              "shadow-lg shadow-[#FFD700]/30",
+              "hover:scale-105 hover:shadow-xl hover:shadow-[#FFD700]/40",
+              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0B0F19] focus:ring-[#FFD700]",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
               "transition-all duration-300"
             )}
           >
             {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <>
+                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                 Signing in...
-              </div>
-            ) : 'Login'}
+              </>
+            ) : (
+              <>
+                <LogIn size={16} />
+                Login
+              </>
+            )}
           </button>
         </form>
 
-       
+        {/* Footer */}
+        <div className="text-center">
+          <p className="text-xs text-gray-600">
+            Secure login powered by Portfolio Handler
+          </p>
+        </div>
       </div>
     </div>
   );

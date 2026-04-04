@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 import { useState } from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Upload, X, Image as ImageIcon, Link, FileText, Tag, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TemplateFormData {
@@ -64,17 +64,14 @@ export default function TemplateUploadForm() {
     setShowSuccess(false);
 
     try {
-      // Validation
       if (!formData.name || !formData.description || !formData.image) {
         setErrorMessage('Please fill all required fields');
         setIsSubmitting(false);
         return;
       }
 
-      // Convert image to base64
       const imageBase64 = await fileToBase64(formData.image);
 
-      // Prepare data for API
       const templateData = {
         name: formData.name,
         description: formData.description,
@@ -83,7 +80,6 @@ export default function TemplateUploadForm() {
         type: formData.type
       };
 
-      // Call API to create template
       const response = await fetch('/api/templates/add', {
         method: 'POST',
         headers: {
@@ -98,7 +94,6 @@ export default function TemplateUploadForm() {
         throw new Error(data.message || 'Failed to create template');
       }
 
-      // Reset form on success
       setFormData({
         name: '',
         description: '',
@@ -109,7 +104,6 @@ export default function TemplateUploadForm() {
       setImagePreview('');
       setShowSuccess(true);
 
-      // Auto-hide success after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
 
     } catch (error: any) {
@@ -120,138 +114,224 @@ export default function TemplateUploadForm() {
     }
   };
 
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md p-6 border border-gray-200 dark:border-gray-700 relative">
-      <h2 className="text-xl font-semibold text-black dark:text-white mb-5">
-        Upload New Template
-      </h2>
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview('');
+  };
 
-      {/* ✅ Success check animation */}
+  return (
+    <div className="bg-[#0F172A] rounded-2xl shadow-xl border border-[#1E293B] overflow-hidden">
+      {/* Header */}
+      <div className="relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
+        <div className="p-6 border-b border-[#1E293B]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
+              <Sparkles className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">
+                Upload New Template
+              </h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Add a new portfolio template to the collection
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Success Animation */}
       <AnimatePresence>
         {showSuccess && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            transition={{ duration: 0.4 }}
-            className="absolute top-4 right-4 flex items-center gap-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-2 rounded-lg shadow-md"
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="mx-6 mt-6 flex items-center gap-2 bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl"
           >
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-300" />
-            <span className="font-medium text-sm">Template Uploaded!</span>
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-medium text-sm">Template uploaded successfully!</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ❌ Error message */}
-      {errorMessage && (
-        <div className="p-2 text-sm rounded mb-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-          {errorMessage}
-        </div>
-      )}
+      {/* Error Message */}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mx-6 mt-6 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm"
+          >
+            {errorMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <form onSubmit={handleSubmit} className="space-y-3 text-sm">
-        <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Template Name *
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 text-sm text-black dark:text-white"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Description *
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={3}
-            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 text-sm text-black dark:text-white"
-            required
-          />
-        </div>
-
-        {/* Template Type Selection */}
-        <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Template Type *
-          </label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="type"
-                value="free"
-                checked={formData.type === 'free'}
-                onChange={handleInputChange}
-                className="mr-2 text-black dark:text-white focus:ring-black dark:focus:ring-white"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Free</span>
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Template Name */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">
+              Template Name *
             </label>
-            <label className="flex items-center">
+            <div className="relative">
+              <Tag size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <input
-                type="radio"
-                name="type"
-                value="paid"
-                checked={formData.type === 'paid'}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
-                className="mr-2 text-black dark:text-white focus:ring-black dark:focus:ring-white"
+                placeholder="Enter template name"
+                className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-600 text-sm focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-all duration-300"
+                required
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Paid</span>
+            </div>
+          </div>
+
+          {/* Template Type */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">
+              Template Type *
             </label>
+            <div className="flex gap-4 h-[42px] items-center">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="type"
+                  value="free"
+                  checked={formData.type === 'free'}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 accent-[#FFD700]"
+                />
+                <span className={`text-sm ${formData.type === 'free' ? 'text-[#FFD700]' : 'text-gray-400'} group-hover:text-white transition-colors`}>
+                  Free
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="type"
+                  value="paid"
+                  checked={formData.type === 'paid'}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 accent-[#FFD700]"
+                />
+                <span className={`text-sm ${formData.type === 'paid' ? 'text-[#FFD700]' : 'text-gray-400'} group-hover:text-white transition-colors`}>
+                  Paid
+                </span>
+              </label>
+            </div>
           </div>
         </div>
 
+        {/* Description */}
         <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-gray-400 mb-1.5">
+            Description *
+          </label>
+          <div className="relative">
+            <FileText size={16} className="absolute left-3 top-3 text-gray-500" />
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={4}
+              placeholder="Describe the template features and benefits..."
+              className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-600 text-sm focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-all duration-300 resize-none"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Image Upload */}
+        <div>
+          <label className="block text-xs font-medium text-gray-400 mb-1.5">
             Preview Image *
           </label>
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-black dark:text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-black hover:file:bg-gray-200"
-            required
-          />
-          {imagePreview && (
-            <div className="mt-2">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-28 h-28 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm"
-              />
-            </div>
-          )}
+          <div className={`relative ${imagePreview ? 'border-2 border-[#FFD700]/30 rounded-xl overflow-hidden' : ''}`}>
+            {!imagePreview ? (
+              <label className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-[#1E293B] bg-[#0B0F19] cursor-pointer hover:border-[#FFD700]/50 transition-all duration-300 group">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload size={24} className="text-gray-500 group-hover:text-[#FFD700] transition-colors mb-2" />
+                  <p className="text-xs text-gray-500 group-hover:text-gray-400">
+                    <span className="font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">PNG, JPG, WEBP (Max 5MB)</p>
+                </div>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  required
+                />
+              </label>
+            ) : (
+              <div className="relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-xl"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-500/90 hover:bg-red-600 text-white transition-all duration-300"
+                >
+                  <X size={16} />
+                </button>
+                <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg bg-black/70 text-white text-xs">
+                  Preview Image
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Live Preview URL */}
         <div>
-          <label className="block font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Live Preview URL (Optional)
+          <label className="block text-xs font-medium text-gray-400 mb-1.5">
+            Live Preview URL <span className="text-gray-600">(Optional)</span>
           </label>
-          <input
-            type="url"
-            name="liveUrl"
-            value={formData.liveUrl}
-            onChange={handleInputChange}
-            placeholder="https://demo.template.com"
-            className="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-gray-800 text-sm text-black dark:text-white"
-          />
+          <div className="relative">
+            <Link size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <input
+              type="url"
+              name="liveUrl"
+              value={formData.liveUrl}
+              onChange={handleInputChange}
+              placeholder="https://demo.template.com"
+              className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-600 text-sm focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-all duration-300"
+            />
+          </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-black dark:bg-white text-white dark:text-black py-1.5 px-4 rounded-md text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white disabled:opacity-50 transition-colors"
+          className="w-full bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold py-3 px-4 rounded-xl text-sm shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
         >
-          {isSubmitting ? 'Uploading...' : 'Upload Template'}
+          {isSubmitting ? (
+            <>
+              <svg className="animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Uploading...
+            </>
+          ) : (
+            <>
+              <Upload size={16} />
+              Upload Template
+            </>
+          )}
         </button>
       </form>
     </div>

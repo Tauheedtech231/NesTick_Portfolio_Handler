@@ -9,11 +9,6 @@ import {
   Send, 
   CheckCircle, 
   XCircle,
-  ThumbsUp,
-  Smile,
-  Award,
-  Users,
-  TrendingUp,
   Heart,
   Mail,
   User,
@@ -21,9 +16,11 @@ import {
   Calendar,
   Quote,
   MessageCircle,
-  Save,
   History,
-  Trash2
+  Edit2,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
@@ -38,10 +35,75 @@ interface FeedbackFormData {
   feedback: string;
   suggestions: string;
   date: string;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
+// Dummy feedback data for slider
+const DUMMY_FEEDBACKS: FeedbackFormData[] = [
+  {
+    id: 'dummy-1',
+    name: 'Dr. Sarah Johnson',
+    email: 'sarah.johnson@university.edu',
+    role: 'College Administrator',
+    institution: 'Stanford University',
+    rating: 5,
+    feedback: 'Portfolio Handler has revolutionized how we manage student portfolios. The interface is intuitive and the analytics are spot-on!',
+    suggestions: 'Would love to see more integration options with existing LMS platforms.',
+    date: '2024-12-15T10:30:00Z',
+    status: 'approved'
+  },
+  {
+    id: 'dummy-2',
+    name: 'Prof. Michael Chen',
+    email: 'm.chen@techinstitute.edu',
+    role: 'Faculty Member',
+    institution: 'MIT',
+    rating: 5,
+    feedback: 'Excellent platform for tracking student progress. The customization options are fantastic.',
+    suggestions: 'Adding a mobile app would make it even better.',
+    date: '2024-12-10T14:20:00Z',
+    status: 'approved'
+  },
+  {
+    id: 'dummy-3',
+    name: 'Emily Rodriguez',
+    email: 'emily.r@students.ucla.edu',
+    role: 'Student',
+    institution: 'UCLA',
+    rating: 4,
+    feedback: 'Great tool for showcasing my projects! The templates are beautiful and easy to use.',
+    suggestions: 'More template options for creative portfolios would be nice.',
+    date: '2024-12-05T09:15:00Z',
+    status: 'approved'
+  },
+  {
+    id: 'dummy-4',
+    name: 'David Kim',
+    email: 'd.kim@harvard.edu',
+    role: 'IT Manager',
+    institution: 'Harvard University',
+    rating: 5,
+    feedback: 'Secure, reliable, and feature-rich. Our team loves the collaboration features.',
+    suggestions: 'API documentation could be more detailed.',
+    date: '2024-11-28T16:45:00Z',
+    status: 'approved'
+  },
+  {
+    id: 'dummy-5',
+    name: 'Lisa Thompson',
+    email: 'l.thompson@columbia.edu',
+    role: 'Department Head',
+    institution: 'Columbia University',
+    rating: 5,
+    feedback: 'Outstanding platform that has improved our department\'s efficiency significantly.',
+    suggestions: 'Real-time collaboration features would be a game-changer.',
+    date: '2024-11-20T11:00:00Z',
+    status: 'approved'
+  }
+];
+
 export default function FeedbackPage() {
-  const [formData, setFormData] = useState<Omit<FeedbackFormData, 'id' | 'date'>>({
+  const [formData, setFormData] = useState<Omit<FeedbackFormData, 'id' | 'date' | 'status'>>({
     name: '',
     email: '',
     role: '',
@@ -55,6 +117,10 @@ export default function FeedbackPage() {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [savedFeedbacks, setSavedFeedbacks] = useState<FeedbackFormData[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<FeedbackFormData>>({});
 
   const heroRef = useRef(null);
   const formRef = useRef(null);
@@ -62,18 +128,32 @@ export default function FeedbackPage() {
 
   // Load feedbacks from localStorage on mount
   useEffect(() => {
-    const storedFeedbacks = localStorage.getItem('userFeedbacks');
-    if (storedFeedbacks) {
-      setSavedFeedbacks(JSON.parse(storedFeedbacks));
-    }
+    const loadFeedbacks = () => {
+      try {
+        const storedFeedbacks = localStorage.getItem('userFeedbacks');
+        if (storedFeedbacks) {
+          setSavedFeedbacks(JSON.parse(storedFeedbacks));
+        } else {
+          localStorage.setItem('userFeedbacks', JSON.stringify(DUMMY_FEEDBACKS));
+          setSavedFeedbacks(DUMMY_FEEDBACKS);
+        }
+      } catch (error) {
+        console.error('Error loading feedbacks:', error);
+        setSavedFeedbacks(DUMMY_FEEDBACKS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFeedbacks();
   }, []);
 
   // Save feedbacks to localStorage whenever they change
   useEffect(() => {
-    if (savedFeedbacks.length > 0) {
+    if (!isLoading && savedFeedbacks.length > 0) {
       localStorage.setItem('userFeedbacks', JSON.stringify(savedFeedbacks));
     }
-  }, [savedFeedbacks]);
+  }, [savedFeedbacks, isLoading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -89,20 +169,19 @@ export default function FeedbackPage() {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     try {
-      // Create new feedback object
       const newFeedback: FeedbackFormData = {
         ...formData,
-        id: Date.now().toString(),
-        date: new Date().toISOString()
+        id: `feedback-${Date.now()}`,
+        date: new Date().toISOString(),
+        status: 'pending'
       };
 
-      // Save to localStorage
       const updatedFeedbacks = [newFeedback, ...savedFeedbacks];
       setSavedFeedbacks(updatedFeedbacks);
-      localStorage.setItem('userFeedbacks', JSON.stringify(updatedFeedbacks));
 
-      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -131,14 +210,54 @@ export default function FeedbackPage() {
     }
   };
 
-  const deleteFeedback = (id: string) => {
-    const updated = savedFeedbacks.filter(f => f.id !== id);
-    setSavedFeedbacks(updated);
-    if (updated.length === 0) {
-      localStorage.removeItem('userFeedbacks');
-    } else {
-      localStorage.setItem('userFeedbacks', JSON.stringify(updated));
+  const startEditing = (feedback: FeedbackFormData) => {
+    setEditingId(feedback.id);
+    setEditFormData({
+      name: feedback.name,
+      email: feedback.email,
+      role: feedback.role,
+      institution: feedback.institution,
+      rating: feedback.rating,
+      feedback: feedback.feedback,
+      suggestions: feedback.suggestions
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditFormData({});
+  };
+
+  const saveEdit = (id: string) => {
+    const updatedFeedbacks = savedFeedbacks.map(f => 
+      f.id === id ? { 
+        ...f, 
+        ...editFormData,
+        date: new Date().toISOString()
+      } as FeedbackFormData : f
+    );
+    setSavedFeedbacks(updatedFeedbacks);
+    setEditingId(null);
+    setEditFormData({});
+  };
+
+  const handleEditRatingClick = (rating: number) => {
+    setEditFormData(prev => ({ ...prev, rating }));
+  };
+
+  const resetToDummyData = () => {
+    if (confirm('Reset to dummy data? This will replace all your current feedback data.')) {
+      setSavedFeedbacks(DUMMY_FEEDBACKS);
+      localStorage.setItem('userFeedbacks', JSON.stringify(DUMMY_FEEDBACKS));
     }
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % DUMMY_FEEDBACKS.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + DUMMY_FEEDBACKS.length) % DUMMY_FEEDBACKS.length);
   };
 
   const ratingLabels = {
@@ -173,56 +292,20 @@ export default function FeedbackPage() {
     }
   };
 
-  const fadeInLeftVariants: Variants = {
-    hidden: { x: -50, opacity: 0 },
-    visible: { 
-      x: 0, 
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 60,
-        damping: 12,
-        duration: 0.6,
-      }
-    }
-  };
-
-  const fadeInRightVariants: Variants = {
-    hidden: { x: 50, opacity: 0 },
-    visible: { 
-      x: 0, 
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 60,
-        damping: 12,
-        duration: 0.6,
-      }
-    }
-  };
-
-  const stats = [
-    { icon: Users, label: "Active Users", value: "500+", color: "#FFD700" },
-    { icon: ThumbsUp, label: "Satisfaction Rate", value: "98%", color: "#FFD700" },
-    { icon: TrendingUp, label: "Monthly Feedback", value: "150+", color: "#FFD700" },
-    { icon: Award, label: "Avg Rating", value: "4.8", color: "#FFD700" }
-  ];
-
   return (
     <>
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20 overflow-hidden">
         {/* Hero Section */}
-        <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[45vh]">
+        <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[40vh]">
           {/* Animated Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F19] via-[#0F172A] to-[#0B0F19]" />
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse delay-1000" />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse" />
           </div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 text-center">
             <motion.div
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
@@ -248,41 +331,103 @@ export default function FeedbackPage() {
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-8 px-4 sm:px-6">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {stats.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-[#0F172A] border border-[#1E293B] rounded-xl p-4 text-center hover:border-[#FFD700]/30 transition-all duration-300 group"
+        {/* Feedback Slider Section - Full Width */}
+        <section className="py-12 w-full bg-gradient-to-r from-[#0F172A] to-[#0B0F19]">
+          <div className="w-full px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-center mb-8"
+              >
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  What Our Users Say
+                </h2>
+                <p className="text-gray-400">Real feedback from our community</p>
+              </motion.div>
+
+              <div className="relative">
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 z-10 bg-[#1E293B] hover:bg-[#FFD700] text-white hover:text-black rounded-full p-2 transition-all duration-300"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <div className="overflow-hidden px-4">
+                  <div 
+                    className="flex transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[#FFD700]/10 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
-                      <Icon className="w-5 h-5 text-[#FFD700]" />
-                    </div>
-                    <p className="text-xl font-bold text-white">{stat.value}</p>
-                    <p className="text-xs text-gray-400">{stat.label}</p>
-                  </motion.div>
-                );
-              })}
+                    {DUMMY_FEEDBACKS.map((feedback, index) => (
+                      <div
+                        key={feedback.id}
+                        className="w-full flex-shrink-0 px-4"
+                      >
+                        <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 md:p-8 hover:border-[#FFD700]/30 transition-all duration-300">
+                          <Quote className="w-10 h-10 text-[#FFD700] mb-4 opacity-50" />
+                          <p className="text-gray-300 text-base md:text-lg italic mb-6">
+                            &quot;{feedback.feedback}&quot;
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-semibold text-white">{feedback.name}</h4>
+                              <p className="text-sm text-gray-400">{feedback.role} at {feedback.institution}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${
+                                    i < feedback.rating
+                                      ? 'fill-[#FFD700] text-[#FFD700]'
+                                      : 'text-gray-600'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 z-10 bg-[#1E293B] hover:bg-[#FFD700] text-white hover:text-black rounded-full p-2 transition-all duration-300"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Dots indicator */}
+              <div className="flex justify-center gap-2 mt-6">
+                {DUMMY_FEEDBACKS.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      currentSlide === index
+                        ? 'w-8 bg-[#FFD700]'
+                        : 'w-2 bg-gray-600 hover:bg-gray-500'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Feedback Form Section */}
-        <section ref={formRef} className="py-12 px-4 sm:px-6">
-          <div className="container mx-auto max-w-5xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Side - Form */}
+        {/* Feedback Form Section - Full Width */}
+        <section ref={formRef} className="py-16 w-full">
+          <div className="w-full px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              {/* Single Column - Form Only */}
               <motion.div
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
                 className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 md:p-8"
@@ -378,7 +523,7 @@ export default function FeedbackPage() {
                     <label className="block text-xs font-medium text-gray-300 mb-1.5">
                       Rating *
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {[1, 2, 3, 4, 5].map((rating) => (
                         <button
                           key={rating}
@@ -436,7 +581,7 @@ export default function FeedbackPage() {
                     />
                   </div>
 
-                  {/* Submit Button - Full Golden */}
+                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -474,111 +619,195 @@ export default function FeedbackPage() {
                 </form>
               </motion.div>
 
-              {/* Right Side - Quote & History Toggle */}
-              <motion.div
-                initial={{ x: 50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="space-y-6"
-              >
-                {/* Quote Card */}
-                <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] border border-[#FFD700]/20 rounded-2xl p-6 text-center">
-                  <Quote className="w-10 h-10 text-[#FFD700] mx-auto mb-4 opacity-50" />
-                  <p className="text-gray-300 italic text-sm">
-                    &quot;Your feedback is the compass that guides our journey towards excellence. 
-                    Every suggestion helps us build a better platform for educational institutions worldwide.&quot;
-                  </p>
-                  <div className="mt-4 flex items-center justify-center gap-1">
-                    <Heart className="w-4 h-4 text-[#FFD700]" />
-                    <span className="text-xs text-gray-500">Team Portfolio Handler</span>
-                  </div>
-                </div>
-
-                {/* History Toggle Button */}
-                {savedFeedbacks.length > 0 && (
-                  <button
-                    onClick={() => setShowHistory(!showHistory)}
-                    className="w-full bg-[#0F172A] border border-[#FFD700]/30 text-[#FFD700] py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/10 flex items-center justify-center gap-2"
-                  >
-                    <History className="w-4 h-4" />
-                    {showHistory ? 'Hide' : 'Show'} Your Feedback History ({savedFeedbacks.length})
-                  </button>
-                )}
-
-                {/* Clear History Button */}
-                {savedFeedbacks.length > 0 && (
-                  <button
-                    onClick={clearAllFeedbacks}
-                    className="w-full bg-red-500/10 border border-red-500/30 text-red-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-red-500/20 flex items-center justify-center gap-2"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Clear All History
-                  </button>
-                )}
-              </motion.div>
-            </div>
-
-            {/* Feedback History Section */}
-            {showHistory && savedFeedbacks.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-8"
-              >
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <History className="w-5 h-5 text-[#FFD700]" />
-                  Your Feedback History
-                </h3>
-                <div className="space-y-4">
-                  {savedFeedbacks.map((feedback) => (
-                    <div
-                      key={feedback.id}
-                      className="bg-[#0F172A] border border-[#1E293B] rounded-xl p-4 hover:border-[#FFD700]/30 transition-all duration-300"
+              {/* Feedback History Section */}
+              {savedFeedbacks.length > 0 && (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center mb-4">
+                    <button
+                      onClick={() => setShowHistory(!showHistory)}
+                      className="bg-[#0F172A] border border-[#FFD700]/30 text-[#FFD700] py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/10 flex items-center gap-2"
                     >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-white">{feedback.name}</span>
-                            <span className="text-xs text-gray-500">•</span>
-                            <span className="text-xs text-gray-500">{feedback.role}</span>
-                            <span className="text-xs text-gray-500">•</span>
-                            <span className="text-xs text-gray-500">{feedback.institution}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-3 h-3 ${
-                                  star <= feedback.rating
-                                    ? 'fill-[#FFD700] text-[#FFD700]'
-                                    : 'text-gray-600'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => deleteFeedback(feedback.id)}
-                          className="text-gray-500 hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <p className="text-gray-400 text-sm mb-2">{feedback.feedback}</p>
-                      {feedback.suggestions && (
-                        <p className="text-gray-500 text-xs italic">
-                          Suggestion: {feedback.suggestions}
-                        </p>
-                      )}
-                      <p className="text-gray-600 text-xs mt-2">
-                        {new Date(feedback.date).toLocaleDateString()}
-                      </p>
+                      <History className="w-4 h-4" />
+                      {showHistory ? 'Hide' : 'Show'} Your Feedback History ({savedFeedbacks.length})
+                    </button>
+                    
+                    <div className="flex gap-2">
+                      <button
+                        onClick={clearAllFeedbacks}
+                        className="bg-red-500/10 border border-red-500/30 text-red-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-red-500/20 flex items-center gap-2"
+                      >
+                        Clear All History
+                      </button>
+                      <button
+                        onClick={resetToDummyData}
+                        className="bg-blue-500/10 border border-blue-500/30 text-blue-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-blue-500/20 flex items-center gap-2"
+                      >
+                        Reset to Sample Data
+                      </button>
                     </div>
-                  ))}
+                  </div>
+
+                  {showHistory && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-4 max-h-96 overflow-y-auto pr-2"
+                    >
+                      {savedFeedbacks.map((feedback) => (
+                        <div
+                          key={feedback.id}
+                          className="bg-[#0F172A] border border-[#1E293B] rounded-xl p-4 hover:border-[#FFD700]/30 transition-all duration-300"
+                        >
+                          {editingId === feedback.id ? (
+                            // Edit Mode
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs text-gray-400 mb-1">Name</label>
+                                  <input
+                                    type="text"
+                                    value={editFormData.name || ''}
+                                    onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs text-gray-400 mb-1">Email</label>
+                                  <input
+                                    type="email"
+                                    value={editFormData.email || ''}
+                                    onChange={(e) => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs text-gray-400 mb-1">Role</label>
+                                  <select
+                                    value={editFormData.role || ''}
+                                    onChange={(e) => setEditFormData(prev => ({ ...prev, role: e.target.value }))}
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  >
+                                    {roleOptions.map(role => (
+                                      <option key={role} value={role}>{role}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-xs text-gray-400 mb-1">Institution</label>
+                                  <input
+                                    type="text"
+                                    value={editFormData.institution || ''}
+                                    onChange={(e) => setEditFormData(prev => ({ ...prev, institution: e.target.value }))}
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Rating</label>
+                                <div className="flex items-center gap-1">
+                                  {[1, 2, 3, 4, 5].map((rating) => (
+                                    <button
+                                      key={rating}
+                                      type="button"
+                                      onClick={() => handleEditRatingClick(rating)}
+                                      className="focus:outline-none"
+                                    >
+                                      <Star
+                                        className={`w-5 h-5 ${
+                                          rating <= (editFormData.rating || 0)
+                                            ? 'fill-[#FFD700] text-[#FFD700]'
+                                            : 'text-gray-600 fill-none'
+                                        }`}
+                                      />
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Feedback</label>
+                                <textarea
+                                  value={editFormData.feedback || ''}
+                                  onChange={(e) => setEditFormData(prev => ({ ...prev, feedback: e.target.value }))}
+                                  rows={2}
+                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-400 mb-1">Suggestions</label>
+                                <textarea
+                                  value={editFormData.suggestions || ''}
+                                  onChange={(e) => setEditFormData(prev => ({ ...prev, suggestions: e.target.value }))}
+                                  rows={2}
+                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                />
+                              </div>
+                              <div className="flex justify-end gap-2 pt-2">
+                                <button
+                                  onClick={cancelEditing}
+                                  className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 flex items-center gap-1"
+                                >
+                                  <X className="w-3 h-3" />
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={() => saveEdit(feedback.id)}
+                                  className="px-3 py-1.5 rounded-lg bg-[#FFD700] text-black text-sm hover:bg-[#FFD700]/90 flex items-center gap-1"
+                                >
+                                  <CheckCircle className="w-3 h-3" />
+                                  Save Changes
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            // View Mode
+                            <>
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span className="font-semibold text-white">{feedback.name}</span>
+                                    <span className="text-xs text-gray-500">•</span>
+                                    <span className="text-xs text-gray-500">{feedback.role}</span>
+                                    <span className="text-xs text-gray-500">•</span>
+                                    <span className="text-xs text-gray-500">{feedback.institution}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <Star
+                                        key={star}
+                                        className={`w-3 h-3 ${
+                                          star <= feedback.rating
+                                            ? 'fill-[#FFD700] text-[#FFD700]'
+                                            : 'text-gray-600'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => startEditing(feedback)}
+                                  className="text-gray-500 hover:text-[#FFD700] transition-colors"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <p className="text-gray-400 text-sm mb-2">{feedback.feedback}</p>
+                              {feedback.suggestions && (
+                                <p className="text-gray-500 text-xs italic">
+                                  Suggestion: {feedback.suggestions}
+                                </p>
+                              )}
+                              <p className="text-gray-600 text-xs mt-2">
+                                {new Date(feedback.date).toLocaleDateString()}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
                 </div>
-              </motion.div>
-            )}
+              )}
+            </div>
           </div>
         </section>
       </main>

@@ -10,16 +10,16 @@ import {
   Building2,
   Palette,
   Layers,
-  Database,
   Megaphone,
-  Settings,
   ChevronLeft,
   ChevronRight,
   Search,
   ChevronDown,
   FileText,
   LucideIcon,
-  User
+  User,
+  Sparkles,
+  LogOut
 } from 'lucide-react';
 
 // Define proper TypeScript interfaces
@@ -54,9 +54,6 @@ const menuItems: MenuItem[] = [
   { type: 'link', href: '/Portfolio_Handler/credientials_manage', icon: User, label: 'Credentials' },
   { type: 'link', href: '/Portfolio_Handler/modules', icon: Layers, label: 'Modules' },
   { type: 'link', href: '/Portfolio_Handler/announcements', icon: Megaphone, label: 'Announcements' },
-  { type: 'link', href: '/Portfolio_Handler/backup', icon: Database, label: 'Data & Backup' },
-  { type: 'link', href: '/Portfolio_Handler/settings', icon: Settings, label: 'Settings' },
-
 ];
 
 export function Sidebar() {
@@ -64,21 +61,43 @@ export function Sidebar() {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const [adminName, setAdminName] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   useEffect(() => {
-    const admin = localStorage.getItem('superAdminTest');
-    if (admin) {
+    // Get current logged-in user from localStorage
+    const loginUser = localStorage.getItem('login_user');
+    if (loginUser) {
       try {
-        const parsed = JSON.parse(admin);
+        const parsed = JSON.parse(loginUser);
         setAdminEmail(parsed.email);
+        // Extract name from email or use default
+        const nameFromEmail = parsed.email?.split('@')[0] || 'Admin';
+        setAdminName(nameFromEmail);
       } catch {
-        console.error("Invalid admin data in localStorage");
+        console.error("Invalid user data in localStorage");
       }
     }
+  }, []);
+
+  useEffect(() => {
+    // Check initial theme
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkMode(isDark);
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(() => {
+      const isDarkNow = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDarkNow);
+    });
+    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
   }, []);
 
   const filteredMenu = menuItems.filter((item) =>
@@ -107,59 +126,91 @@ export function Sidebar() {
     return item.type === 'link';
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('login_user');
+    localStorage.removeItem('superAdminTest');
+    router.push('/');
+  };
+
   return (
     <motion.aside
       initial={{ x: -60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={`${collapsed ? 'w-20' : 'w-64'}
-        bg-white dark:bg-gray-900
-        border-r border-gray-200 dark:border-gray-700
-        min-h-screen shadow-md flex flex-col justify-between
-        transition-all duration-500`}
+        ${isDarkMode 
+          ? 'bg-gradient-to-b from-[#0B0F19] to-[#0F172A] border-[#1E293B]' 
+          : 'bg-gradient-to-b from-gray-50 to-white border-gray-200'
+        }
+        border-r min-h-screen shadow-xl flex flex-col justify-between
+        transition-all duration-500 relative`}
     >
+      {/* Decorative gradient line at top */}
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent`} />
+
       <div className="p-4 flex flex-col h-full">
 
         {/* ==== Header ==== */}
         <div className="flex items-center justify-between mb-6">
-          {/* Desktop: Left heading */}
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight hidden lg:block">
-            Admin Portal
-          </h1>
+          {/* Logo Section */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-black" />
+            </div>
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <h1 className="text-xl font-extrabold bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent tracking-tight">
+                    Portfolio
+                  </h1>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-          {/* Mobile: Right heading */}
-          <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight block lg:hidden ml-auto">
-            Admin Portal
-          </h1>
-
-          {/* Desktop: Collapse Arrow */}
+          {/* Collapse Button */}
           <button
             onClick={toggleSidebar}
-            className="hidden lg:flex text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors ml-auto"
+            className={`flex p-2 rounded-lg transition-all duration-300 ${
+              isDarkMode 
+                ? 'text-gray-400 hover:text-[#FFD700] hover:bg-[#1E293B]' 
+                : 'text-gray-600 hover:text-[#FFD700] hover:bg-gray-200'
+            }`}
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
 
-        {/* ==== Rounded Search Bar ==== */}
+        {/* ==== Search Bar ==== */}
         {!collapsed && (
           <div className="relative mb-6">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search menu..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 transition-all"
+              className={`w-full px-4 py-2 rounded-xl border outline-none transition-all duration-300 text-sm ${
+                isDarkMode
+                  ? 'bg-[#0B0F19] border-[#1E293B] text-white placeholder:text-gray-500 focus:border-[#FFD700]'
+                  : 'bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FFD700]'
+              }`}
             />
             <Search
-              size={18}
-              className="absolute right-4 top-2.5 text-gray-500 dark:text-gray-400"
+              size={16}
+              className={`absolute right-3 top-2.5 ${
+                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+              }`}
             />
           </div>
         )}
 
         {/* ==== Navigation ==== */}
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1 flex-1">
           {filteredMenu.map((item) => {
             // Check if item is dropdown
             if (isDropdown(item)) {
@@ -170,20 +221,24 @@ export function Sidebar() {
                 <div key={item.label} className="flex flex-col">
                   <button
                     onClick={() => !collapsed ? handleDropdownToggle(item.label) : router.push(item.children[0].href)}
-                    className={`group flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-300
+                    className={`group flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
                       ${
                         isActive
-                          ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+                          ? `bg-gradient-to-r from-[#FFD700]/10 to-transparent border-l-2 border-[#FFD700] text-[#FFD700]`
+                          : isDarkMode
+                            ? 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
+                            : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                       }`}
                   >
                     <div className="flex items-center gap-3">
                       <item.icon
                         size={20}
-                        className={`transition-transform duration-300 ${
+                        className={`transition-all duration-300 ${
                           isActive
-                            ? 'scale-110 text-gray-900 dark:text-white'
-                            : 'group-hover:scale-110 text-gray-600 dark:text-gray-300'
+                            ? 'text-[#FFD700]'
+                            : isDarkMode
+                              ? 'text-gray-500 group-hover:text-[#FFD700]'
+                              : 'text-gray-500 group-hover:text-[#FFD700]'
                         }`}
                       />
                       <AnimatePresence initial={false}>
@@ -201,10 +256,10 @@ export function Sidebar() {
                     </div>
                     {!collapsed && (
                       <ChevronDown
-                        size={16}
+                        size={14}
                         className={`transform transition-transform duration-300 ${
                           isOpen ? 'rotate-180' : ''
-                        }`}
+                        } ${isActive ? 'text-[#FFD700]' : isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
                       />
                     )}
                   </button>
@@ -217,7 +272,7 @@ export function Sidebar() {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="ml-8 mt-1 space-y-1 overflow-hidden"
+                        className="ml-9 mt-1 space-y-1 overflow-hidden"
                       >
                         {item.children.map((child) => {
                           const isChildActive = pathname === child.href;
@@ -225,20 +280,18 @@ export function Sidebar() {
                             <Link
                               key={child.href}
                               href={child.href}
-                              className={`flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
                                 ${
                                   isChildActive
-                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-l-4 border-gray-900 dark:border-white'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+                                    ? 'bg-[#FFD700]/10 text-[#FFD700] border-l-2 border-[#FFD700]'
+                                    : isDarkMode
+                                      ? 'text-gray-500 hover:bg-[#1E293B] hover:text-gray-300'
+                                      : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700'
                                 }`}
                             >
                               <child.icon
-                                size={16}
-                                className={`${
-                                  isChildActive
-                                    ? 'text-gray-900 dark:text-white'
-                                    : 'text-gray-500 dark:text-gray-400'
-                                }`}
+                                size={14}
+                                className={isChildActive ? 'text-[#FFD700]' : 'text-gray-500'}
                               />
                               <span>{child.label}</span>
                             </Link>
@@ -258,19 +311,23 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-300
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
                     ${
                       isActive
-                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-l-4 border-gray-900 dark:border-white'
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+                        ? 'bg-gradient-to-r from-[#FFD700]/10 to-transparent border-l-2 border-[#FFD700] text-[#FFD700]'
+                        : isDarkMode
+                          ? 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
+                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                     }`}
                 >
                   <item.icon
                     size={20}
-                    className={`transition-transform duration-300 ${
+                    className={`transition-all duration-300 ${
                       isActive
-                        ? 'scale-110 text-gray-900 dark:text-white'
-                        : 'group-hover:scale-110 text-gray-600 dark:text-gray-300'
+                        ? 'text-[#FFD700]'
+                        : isDarkMode
+                          ? 'text-gray-500 group-hover:text-[#FFD700]'
+                          : 'text-gray-500 group-hover:text-[#FFD700]'
                     }`}
                   />
                   <AnimatePresence initial={false}>
@@ -295,15 +352,47 @@ export function Sidebar() {
 
         {/* ==== Admin Details at Bottom ==== */}
         {!collapsed && (
-          <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-300 mb-1">
-              Admin Info
-            </h3>
-            {adminEmail ? (
-              <p className="text-xs text-gray-600 dark:text-gray-400">{adminEmail}</p>
-            ) : (
-              <p className="text-xs text-gray-500 dark:text-gray-500">No admin found</p>
-            )}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className={`mt-auto pt-4 border-t ${
+              isDarkMode ? 'border-[#1E293B]' : 'border-gray-200'
+            }`}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 flex items-center justify-center border border-[#FFD700]/30">
+                <User className="w-5 h-5 text-[#FFD700]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-semibold truncate ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {adminName || 'Admin User'}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {adminEmail || 'admin@portfolio.com'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 hover:text-red-300 transition-all duration-300 group"
+            >
+              <LogOut size={16} className="group-hover:scale-110 transition-transform" />
+              Logout
+            </button>
+          </motion.div>
+        )}
+
+        {/* Collapsed Admin Avatar */}
+        {collapsed && (
+          <div className={`mt-auto pt-4 border-t ${
+            isDarkMode ? 'border-[#1E293B]' : 'border-gray-200'
+          }`}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 flex items-center justify-center border border-[#FFD700]/30 mx-auto">
+              <User className="w-5 h-5 text-[#FFD700]" />
+            </div>
           </div>
         )}
       </div>

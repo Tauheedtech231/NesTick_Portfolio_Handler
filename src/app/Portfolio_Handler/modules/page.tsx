@@ -5,7 +5,7 @@ import { MainLayout } from '../components/layout/main-layout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
-import { Plus, X, AlertTriangle, CheckCircle, Building2, RefreshCw, Key, Save } from 'lucide-react';
+import { Plus, X, AlertTriangle, CheckCircle, Building2, RefreshCw, Key, Save, Sparkles } from 'lucide-react';
 /* eslint-disable */
 
 // Types
@@ -51,6 +51,21 @@ export default function ModulesPage() {
     is_active: 1
   });
   const [isAddingSection, setIsAddingSection] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Theme detection
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkMode(isDark);
+    
+    const observer = new MutationObserver(() => {
+      const isDarkNow = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDarkNow);
+    });
+    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Fetch colleges from API
   const fetchColleges = async () => {
@@ -62,7 +77,6 @@ export default function ModulesPage() {
       const data = await response.json();
       setColleges(data.data || data);
       
-      // Select first college by default if available
       if (data.data?.length > 0 && !selectedCollegeId) {
         setSelectedCollegeId(data.data[0].id.toString());
         setSelectedCollege(data.data[0]);
@@ -83,7 +97,6 @@ export default function ModulesPage() {
     
     setLoading(true);
     try {
-      // Use the college's template_id from the backend
       const templateId = college.template_id;
       
       if (!templateId) {
@@ -96,14 +109,12 @@ export default function ModulesPage() {
       }
       const result = await response.json();
       
-      // Check if result.data is an array, otherwise use result
       const sectionsData = Array.isArray(result.data) ? result.data : 
                           Array.isArray(result) ? result : [];
       
       setSections(sectionsData);
     } catch (error: any) {
       console.error('Error fetching sections:', error);
-      // Don't show error if there are no sections - this is normal
       if (error.message !== 'No sections found for this college and template') {
         addToast(error.message || 'Failed to load sections', 'error');
       }
@@ -113,7 +124,6 @@ export default function ModulesPage() {
     }
   };
 
-  // Refresh sections for current college
   const refreshSections = () => {
     if (selectedCollege) {
       fetchSections(selectedCollege);
@@ -121,7 +131,6 @@ export default function ModulesPage() {
     }
   };
 
-  // Toggle section activation (enable/disable)
   const toggleSection = async (sectionId: number, currentActive: number) => {
     if (updatingSection === sectionId) return;
     
@@ -144,7 +153,6 @@ export default function ModulesPage() {
 
       const result = await response.json();
 
-      // Update local state immediately
       setSections(prev => 
         prev.map(section => 
           section.id === sectionId 
@@ -169,7 +177,6 @@ export default function ModulesPage() {
     }
   };
 
-  // Add new section
   const addNewSection = async () => {
     if (!selectedCollege || !selectedCollege.template_id) {
       addToast('Please select a college with assigned template', 'error');
@@ -203,12 +210,10 @@ export default function ModulesPage() {
         throw new Error(result.message || 'Failed to add section');
       }
 
-      // Add new section to list
       if (result.data) {
         setSections(prev => [result.data, ...prev]);
       }
 
-      // Reset form
       setNewSectionForm({
         section_name: '',
         is_active: 1
@@ -224,11 +229,9 @@ export default function ModulesPage() {
     }
   };
 
-  // Count active and inactive sections
   const activeCount = sections.filter(s => s.is_active === 1).length;
   const inactiveCount = sections.filter(s => s.is_active === 0).length;
 
-  // Toast notification system
   const addToast = (message: string, type: 'success' | 'error' = 'success') => {
     const id = Date.now().toString();
     const newToast: Toast = { id, message, type };
@@ -243,7 +246,6 @@ export default function ModulesPage() {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  // Handle college selection
   const handleCollegeSelect = (collegeId: string) => {
     setSelectedCollegeId(collegeId);
     const college = colleges.find(c => c.id.toString() === collegeId);
@@ -254,7 +256,6 @@ export default function ModulesPage() {
     }
   };
 
-  // Effects
   useEffect(() => {
     fetchColleges();
   }, []);
@@ -268,7 +269,6 @@ export default function ModulesPage() {
     }
   }, [selectedCollegeId, colleges]);
 
-  // Common sections that can be added
   const commonSections = [
     'About Us',
     'Faculty',
@@ -286,6 +286,12 @@ export default function ModulesPage() {
     'News'
   ];
 
+  const bgColor = isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50';
+  const cardBg = isDarkMode ? 'bg-[#0F172A]' : 'bg-white';
+  const borderColor = isDarkMode ? 'border-[#1E293B]' : 'border-gray-200';
+  const textColor = isDarkMode ? 'text-white' : 'text-gray-900';
+  const textSecondary = isDarkMode ? 'text-gray-400' : 'text-gray-600';
+
   return (
     <MainLayout>
       {/* Toast Notifications */}
@@ -296,27 +302,26 @@ export default function ModulesPage() {
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center space-x-3 px-6 py-4 rounded-lg shadow-lg border ${
+            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
               toast.type === 'success' 
-                ? 'bg-green-50 border-green-200 text-green-800' 
-                : 'bg-red-50 border-red-200 text-red-800'
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle size={20} className="text-green-600" />
+              <CheckCircle size={18} className="text-green-600 dark:text-green-400" />
             ) : (
-              <X size={20} className="text-red-600" />
+              <X size={18} className="text-red-600 dark:text-red-400" />
             )}
-            <span className="font-medium">{toast.message}</span>
-            <button
-              onClick={() => removeToast(toast.id)}
-              className={`p-1 rounded-full hover:bg-opacity-20 ${
-                toast.type === 'success' 
-                  ? 'hover:bg-green-600 text-green-600' 
-                  : 'hover:bg-red-600 text-red-600'
-              }`}
-            >
-              <X size={16} />
+            <span className={`text-sm font-medium ${
+              toast.type === 'success' 
+                ? 'text-green-800 dark:text-green-300' 
+                : 'text-red-800 dark:text-red-300'
+            }`}>
+              {toast.message}
+            </span>
+            <button onClick={() => removeToast(toast.id)}>
+              <X size={14} className="text-gray-500 hover:text-gray-700 dark:text-gray-400" />
             </button>
           </motion.div>
         ))}
@@ -325,35 +330,37 @@ export default function ModulesPage() {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
+        className={`min-h-screen ${bgColor} p-6 space-y-6 transition-colors duration-300`}
       >
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white ">
               College Template Sections
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className={`${textSecondary} mt-2 text-sm`}>
               Manage content sections for college portfolio templates
             </p>
           </div>
           <div className="flex space-x-3">
+            {/* Refresh Button - Navy Blue */}
             <button
               onClick={refreshSections}
               disabled={!selectedCollege}
-              className="px-4 py-2 bg-gray-900 hover:bg-gray-700 text-white font-medium rounded-lg 
-                         transition-all duration-300 transform hover:scale-105 dark:bg-gray-100 dark:text-gray-900 
-                         dark:hover:bg-gray-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2.5 bg-[#1E293B] hover:bg-[#334155] text-white font-medium rounded-xl 
+                         transition-all duration-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCw size={18} />
               <span>Refresh</span>
             </button>
+            
+            {/* Add Section Button - Golden */}
             <button
               onClick={() => setShowAddSectionForm(true)}
               disabled={!selectedCollege || !selectedCollege.template_id}
-              className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                         transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                         dark:hover:bg-gray-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-xl 
+                         shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-105
+                         transition-all duration-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus size={18} />
               <span>Add Section</span>
@@ -362,17 +369,17 @@ export default function ModulesPage() {
         </div>
 
         {/* College selector */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className={`${cardBg} p-6 rounded-2xl border ${borderColor}`}>
+          <label className={`block text-sm font-medium ${textSecondary} mb-2`}>
             Select College
           </label>
           <select
             value={selectedCollegeId}
             onChange={(e) => handleCollegeSelect(e.target.value)}
-            className="w-full md:w-96 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300 focus:border-transparent 
-                       transition-all duration-300 appearance-none cursor-pointer"
+            className={`w-full md:w-96 px-4 py-3 border ${borderColor} rounded-xl
+                       ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                       focus:ring-2 focus:ring-[#FFD700] focus:border-transparent 
+                       transition-all duration-300 appearance-none cursor-pointer`}
             disabled={colleges.length === 0}
           >
             <option value="">{colleges.length === 0 ? 'Loading colleges...' : 'Select a college'}</option>
@@ -383,31 +390,31 @@ export default function ModulesPage() {
             ))}
           </select>
           {selectedCollege && (
-            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <div className={`mt-4 p-4 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50'} rounded-xl`}>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">College Name</p>
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">{selectedCollege.name}</p>
+                  <p className={`text-xs font-medium ${textSecondary}`}>College Name</p>
+                  <p className={`text-sm font-semibold ${textColor}`}>{selectedCollege.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Status</p>
-                  <p className={`text-base font-semibold ${
+                  <p className={`text-xs font-medium ${textSecondary}`}>Status</p>
+                  <p className={`text-sm font-semibold ${
                     selectedCollege.status === 'active' 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-red-600 dark:text-red-400'
+                      ? 'text-green-500' 
+                      : 'text-red-500'
                   }`}>
                     {selectedCollege.status}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Template ID</p>
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">
+                  <p className={`text-xs font-medium ${textSecondary}`}>Template ID</p>
+                  <p className={`text-sm font-semibold ${textColor}`}>
                     {selectedCollege.template_id ? `#${selectedCollege.template_id}` : 'Not Assigned'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">College ID</p>
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">#{selectedCollege.id}</p>
+                  <p className={`text-xs font-medium ${textSecondary}`}>College ID</p>
+                  <p className={`text-sm font-semibold ${textColor}`}>#{selectedCollege.id}</p>
                 </div>
               </div>
             </div>
@@ -419,22 +426,22 @@ export default function ModulesPage() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700"
+            className={`${cardBg} p-6 rounded-2xl border ${borderColor}`}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <Plus className="text-gray-600 dark:text-gray-400" /> Add New Section
+              <h3 className={`text-xl font-semibold ${textColor} flex items-center gap-2`}>
+                <Sparkles className="text-[#FFD700]" size={20} /> Add New Section
               </h3>
               <button
                 onClick={() => setShowAddSectionForm(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-[#1E293B]' : 'hover:bg-gray-100'}`}
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className={textSecondary} />
               </button>
             </div>
             
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${textSecondary} mb-2`}>
                 Section Name *
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -442,9 +449,9 @@ export default function ModulesPage() {
                   type="text"
                   value={newSectionForm.section_name}
                   onChange={(e) => setNewSectionForm({...newSectionForm, section_name: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                             focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
+                  className={`w-full px-4 py-3 border ${borderColor} rounded-xl 
+                             ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                             focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300`}
                   placeholder="Enter section name (e.g., About Us)"
                 />
                 <div className="flex items-center space-x-4">
@@ -456,25 +463,23 @@ export default function ModulesPage() {
                         is_active: newSectionForm.is_active === 1 ? 0 : 1
                       })}
                     />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm font-medium ${textSecondary}`}>
                       {newSectionForm.is_active === 1 ? 'Active' : 'Inactive'}
                     </span>
                   </label>
                 </div>
               </div>
               
-              {/* Common sections suggestions */}
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Common Sections:</p>
+                <p className={`text-sm font-medium ${textSecondary} mb-2`}>Common Sections:</p>
                 <div className="flex flex-wrap gap-2">
                   {commonSections.map((section) => (
                     <button
                       key={section}
                       type="button"
                       onClick={() => setNewSectionForm({...newSectionForm, section_name: section})}
-                      className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 
-                                 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 
-                                 dark:hover:bg-gray-700 transition-colors"
+                      className={`px-3 py-1.5 text-sm border ${borderColor} 
+                                 ${textSecondary} rounded-lg ${isDarkMode ? 'hover:bg-[#1E293B]' : 'hover:bg-gray-100'} transition-colors`}
                     >
                       {section}
                     </button>
@@ -483,23 +488,23 @@ export default function ModulesPage() {
               </div>
             </div>
             
-            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
               <div className="flex items-center space-x-2 mb-2">
-                <Key size={16} className="text-blue-600 dark:text-blue-400" />
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-300">Section will be added to:</p>
+                <Key size={16} className="text-blue-400" />
+                <p className="text-sm font-medium text-blue-400">Section will be added to:</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                 <div className="flex items-center space-x-2">
-                  <span className="text-blue-700 dark:text-blue-400">College:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{selectedCollege.name}</span>
+                  <span className="text-blue-400">College:</span>
+                  <span className={`font-semibold ${textColor}`}>{selectedCollege.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-blue-700 dark:text-blue-400">Template ID:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{selectedCollege.template_id}</span>
+                  <span className="text-blue-400">Template ID:</span>
+                  <span className={`font-semibold ${textColor}`}>{selectedCollege.template_id}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-blue-700 dark:text-blue-400">College ID:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{selectedCollege.id}</span>
+                  <span className="text-blue-400">College ID:</span>
+                  <span className={`font-semibold ${textColor}`}>{selectedCollege.id}</span>
                 </div>
               </div>
             </div>
@@ -507,21 +512,21 @@ export default function ModulesPage() {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowAddSectionForm(false)}
-                className="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 
-                           rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                className={`px-5 py-2.5 border ${borderColor} ${textSecondary} rounded-xl 
+                           ${isDarkMode ? 'hover:bg-[#1E293B]' : 'hover:bg-gray-100'} transition-colors duration-200`}
               >
                 Cancel
               </button>
               <button
                 onClick={addNewSection}
                 disabled={isAddingSection || !newSectionForm.section_name.trim()}
-                className="px-6 py-2.5 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                           transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                           dark:hover:bg-gray-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-xl 
+                           shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-105
+                           transition-all duration-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isAddingSection ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                     <span>Adding...</span>
                   </>
                 ) : (
@@ -539,14 +544,14 @@ export default function ModulesPage() {
         {selectedCollege ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             {!selectedCollege.template_id ? (
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-6">
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6">
                 <div className="flex items-start space-x-3">
-                  <AlertTriangle className="text-yellow-600 dark:text-yellow-500 mt-1" size={24} />
+                  <AlertTriangle className="text-yellow-500 mt-1" size={24} />
                   <div>
-                    <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                    <h3 className="text-lg font-semibold text-yellow-500 mb-2">
                       No Template Assigned
                     </h3>
-                    <p className="text-yellow-700 dark:text-yellow-300">
+                    <p className="text-yellow-400">
                       This college does not have a template assigned. Please assign a template in the college settings 
                       to manage sections.
                     </p>
@@ -554,23 +559,23 @@ export default function ModulesPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
+                <div className={`${isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50'} px-6 py-4 border-b ${borderColor}`}>
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      <h2 className={`text-xl font-semibold ${textColor}`}>
                         {selectedCollege.name} - Template Sections
                       </h2>
                       <div className="flex items-center space-x-4 mt-1">
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        <p className={`${textSecondary} text-sm`}>
                           Template #{selectedCollege.template_id} • 
-                          <span className="font-medium text-gray-900 dark:text-white ml-1">
+                          <span className={`font-medium ${textColor} ml-1`}>
                             {sections.length} section(s) ({activeCount} active, {inactiveCount} inactive)
                           </span>
                         </p>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className={`text-sm ${textSecondary}`}>
                       Toggle to enable/disable sections
                     </div>
                   </div>
@@ -578,33 +583,33 @@ export default function ModulesPage() {
 
                 {loading ? (
                   <div className="p-12 text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-gray-300"></div>
-                    <p className="text-gray-500 dark:text-gray-400 mt-4">Loading sections...</p>
+                    <div className="w-8 h-8 border-3 border-[#1E293B] border-t-[#FFD700] rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className={textSecondary}>Loading sections...</p>
                   </div>
                 ) : sections.length === 0 ? (
                   <div className="p-12 text-center">
-                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Building2 size={40} className="text-gray-400 dark:text-gray-500" />
+                    <div className={`w-20 h-20 ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-100'} rounded-full flex items-center justify-center mx-auto mb-4 border ${borderColor}`}>
+                      <Building2 size={40} className="text-gray-500" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className={`text-lg font-semibold ${textColor} mb-2`}>
                       No Sections Found
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                    <p className={`${textSecondary} max-w-md mx-auto mb-6`}>
                       This college doesn't have any sections configured for Template #{selectedCollege.template_id}. 
                       Click "Add Section" to create new sections.
                     </p>
                     <button
                       onClick={() => setShowAddSectionForm(true)}
-                      className="px-6 py-3 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                                 transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                                 dark:hover:bg-gray-200 flex items-center space-x-2 mx-auto"
+                      className="px-6 py-3 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-xl 
+                                 shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-105
+                                 transition-all duration-300 flex items-center space-x-2 mx-auto"
                     >
                       <Plus size={18} />
                       <span>Add First Section</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <div className={`divide-y ${borderColor}`}>
                     {sections.map((section, index) => (
                       <motion.div
                         key={section.id}
@@ -613,8 +618,8 @@ export default function ModulesPage() {
                         transition={{ delay: index * 0.05 }}
                         className={`flex items-center justify-between p-6 transition-colors duration-200 ${
                           section.is_active === 1 
-                            ? 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50' 
-                            : 'bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/40'
+                            ? `${cardBg} ${isDarkMode ? 'hover:bg-[#1E293B]/50' : 'hover:bg-gray-100'}` 
+                            : `${isDarkMode ? 'bg-[#0B0F19]/50' : 'bg-gray-50'} ${isDarkMode ? 'hover:bg-[#1E293B]/30' : 'hover:bg-gray-100'}`
                         }`}
                       >
                         <div className="flex-1">
@@ -624,25 +629,25 @@ export default function ModulesPage() {
                                 ? 'bg-green-500' 
                                 : 'bg-gray-400'
                             }`} />
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                            <h3 className={`text-lg font-medium ${textColor}`}>
                               {section.section_name}
                             </h3>
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            <span className={`px-2 py-1 text-xs font-medium rounded-lg ${
                               section.is_active === 1
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                                ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                                : 'bg-gray-500/10 text-gray-400 border border-gray-500/30'
                             }`}>
                               {section.is_active === 1 ? 'Active' : 'Inactive'}
                             </span>
-                            <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
+                            <span className={`text-xs px-2 py-1 rounded-lg ${isDarkMode ? 'bg-[#0B0F19] text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
                               ID: {section.id}
                             </span>
                           </div>
                           
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm ml-6">
                             <div className="flex items-center space-x-2">
-                              <span className="text-gray-500 dark:text-gray-400">Created:</span>
-                              <span className="text-gray-700 dark:text-gray-300">
+                              <span className={textSecondary}>Created:</span>
+                              <span className={textColor}>
                                 {new Date(section.created_at).toLocaleDateString('en-US', {
                                   year: 'numeric',
                                   month: 'short',
@@ -651,8 +656,8 @@ export default function ModulesPage() {
                               </span>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="text-gray-500 dark:text-gray-400">Updated:</span>
-                              <span className="text-gray-700 dark:text-gray-300">
+                              <span className={textSecondary}>Updated:</span>
+                              <span className={textColor}>
                                 {new Date(section.updated_at).toLocaleDateString('en-US', {
                                   year: 'numeric',
                                   month: 'short',
@@ -661,21 +666,21 @@ export default function ModulesPage() {
                               </span>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="text-gray-500 dark:text-gray-400">Template:</span>
-                              <span className="text-gray-700 dark:text-gray-300">#{section.template_id}</span>
+                              <span className={textSecondary}>Template:</span>
+                              <span className={textColor}>#{section.template_id}</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center space-x-4">
                           <div className="text-right">
-                            <span className="block text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <span className={`block text-xs font-medium ${textSecondary}`}>
                               Status
                             </span>
                             <span className={`text-sm ${
                               section.is_active === 1
-                                ? 'text-green-600 dark:text-green-400'
-                                : 'text-gray-600 dark:text-gray-400'
+                                ? 'text-green-500'
+                                : textSecondary
                             }`}>
                               {section.is_active === 1 ? 'Enabled' : 'Disabled'}
                             </span>
@@ -689,7 +694,7 @@ export default function ModulesPage() {
                             />
                             {updatingSection === section.id && (
                               <div className="absolute -right-6 top-1/2 transform -translate-y-1/2">
-                                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 dark:border-t-gray-300 rounded-full animate-spin"></div>
+                                <div className="w-4 h-4 border-2 border-gray-300 border-t-[#FFD700] rounded-full animate-spin"></div>
                               </div>
                             )}
                           </div>
@@ -705,13 +710,13 @@ export default function ModulesPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm text-center border border-gray-200 dark:border-gray-700"
+            className={`${cardBg} p-8 rounded-2xl text-center border ${borderColor}`}
           >
-            <Building2 size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <Building2 size={48} className="mx-auto text-gray-500 mb-4" />
+            <h3 className={`text-lg font-semibold ${textColor} mb-2`}>
               No College Selected
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className={textSecondary}>
               Please select a college to manage its template sections.
             </p>
           </motion.div>

@@ -424,7 +424,7 @@ export default function CollegesPage() {
               whileTap={{ scale: 0.97 }}
               onClick={openAddModal}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl 
-                         bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 
+                         bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-[#0B0F19] dark:bg-gray-100  dark:text-gray-900 
                          shadow-sm hover:opacity-90 transition-all duration-300"
             >
               <Plus size={18} />
@@ -495,11 +495,11 @@ export default function CollegesPage() {
               <select
                 value={status}
                 onChange={e => setStatus(e.target.value as any)}
-                className="bg-transparent outline-none w-full"
+                className="  outline-none w-full"
               >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="all" className='text-[#0B0F19]'>All Status</option>
+                <option value="active" className='text-[#0B0F19]'>Active</option>
+                <option value="inactive" className='text-[#0B0F19]'>Inactive</option>
               </select>
             </div>
           </div>
@@ -647,7 +647,7 @@ export default function CollegesPage() {
                   {!search && status === 'all' && (
                     <button
                       onClick={openAddModal}
-                      className="mt-4 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-opacity"
+                      className="mt-4 px-4 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-[#0B0F19]   rounded-lg hover:opacity-90 transition-opacity"
                     >
                       Add College
                     </button>
@@ -845,7 +845,7 @@ export default function CollegesPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:opacity-90 transition-opacity flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-[#0B0F19] dark:bg-gray-100  dark:text-gray-900 hover:opacity-90 transition-opacity flex items-center gap-2"
                     >
                       <Save size={18} />
                       {modalType === 'add' ? 'Add College' : 'Update College'}

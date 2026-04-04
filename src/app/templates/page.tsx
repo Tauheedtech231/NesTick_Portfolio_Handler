@@ -6,6 +6,7 @@ import { Search, Sparkles, Eye, X, ShoppingCart, Info, CheckCircle, Filter } fro
 import Image from 'next/image';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import StudentFeedback from '@/components/CollegeFeedback';
 
 interface Template {
   id: number;
@@ -1063,6 +1064,7 @@ export default function TemplatesPage() {
           </div>
         )}
       </main>
+      <StudentFeedback/>
       <Footer />
     </>
   );

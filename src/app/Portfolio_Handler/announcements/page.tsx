@@ -17,7 +17,8 @@ import {
   MessageSquare,
   Calendar,
   Globe,
-  Search
+  Search,
+  Sparkles
 } from 'lucide-react';
 
 interface Announcement {
@@ -64,6 +65,21 @@ export default function AnnouncementsPage() {
     college_id: null
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Theme detection
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkMode(isDark);
+    
+    const observer = new MutationObserver(() => {
+      const isDarkNow = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDarkNow);
+    });
+    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Fetch colleges
   const fetchColleges = async () => {
@@ -144,10 +160,8 @@ export default function AnnouncementsPage() {
         throw new Error(result.message || 'Failed to save announcement');
       }
 
-      // Refresh announcements
       await fetchAnnouncements();
       
-      // Reset form
       setFormData({ title: '', message: '', college_id: null });
       setShowAnnouncementForm(false);
       setEditingAnnouncement(null);
@@ -181,7 +195,6 @@ export default function AnnouncementsPage() {
         throw new Error(result.message || 'Failed to delete announcement');
       }
 
-      // Refresh announcements
       await fetchAnnouncements();
       
       setAnnouncementToDelete(null);
@@ -248,6 +261,12 @@ export default function AnnouncementsPage() {
     fetchAnnouncements();
   }, [selectedCollege]);
 
+  const bgColor = isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50';
+  const cardBg = isDarkMode ? 'bg-[#0F172A]' : 'bg-white';
+  const borderColor = isDarkMode ? 'border-[#1E293B]' : 'border-gray-200';
+  const textColor = isDarkMode ? 'text-white' : 'text-gray-900';
+  const textSecondary = isDarkMode ? 'text-gray-400' : 'text-gray-600';
+
   return (
     <MainLayout>
       {/* Toast Notifications */}
@@ -258,27 +277,26 @@ export default function AnnouncementsPage() {
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center space-x-3 px-6 py-4 rounded-lg shadow-lg border ${
+            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
               toast.type === 'success' 
-                ? 'bg-green-50 border-green-200 text-green-800' 
-                : 'bg-red-50 border-red-200 text-red-800'
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle size={20} className="text-green-600" />
+              <CheckCircle size={18} className="text-green-600 dark:text-green-400" />
             ) : (
-              <X size={20} className="text-red-600" />
+              <X size={18} className="text-red-600 dark:text-red-400" />
             )}
-            <span className="font-medium">{toast.message}</span>
-            <button
-              onClick={() => removeToast(toast.id)}
-              className={`p-1 rounded-full hover:bg-opacity-20 ${
-                toast.type === 'success' 
-                  ? 'hover:bg-green-600 text-green-600' 
-                  : 'hover:bg-red-600 text-red-600'
-              }`}
-            >
-              <X size={16} />
+            <span className={`text-sm font-medium ${
+              toast.type === 'success' 
+                ? 'text-green-800 dark:text-green-300' 
+                : 'text-red-800 dark:text-red-300'
+            }`}>
+              {toast.message}
+            </span>
+            <button onClick={() => removeToast(toast.id)}>
+              <X size={14} className="text-gray-500 hover:text-gray-700 dark:text-gray-400" />
             </button>
           </motion.div>
         ))}
@@ -291,46 +309,47 @@ export default function AnnouncementsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setAnnouncementToDelete(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700"
+              className={`${cardBg} rounded-2xl shadow-xl w-full max-w-md border ${borderColor}`}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
-                    <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
+                  <div className="p-2 bg-red-500/10 rounded-full border border-red-500/30">
+                    <AlertTriangle className="text-red-400" size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className={`text-lg font-semibold ${textColor}`}>
                       Delete Announcement
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className={`text-sm ${textSecondary}`}>
                       This action cannot be undone
                     </p>
                   </div>
                 </div>
                 
-                <p className="text-gray-700 dark:text-gray-300 mb-6">
-                  Are you sure you want to delete the announcement <strong>"{announcementToDelete.title}"</strong>?
+                <p className={`${textSecondary} mb-6`}>
+                  Are you sure you want to delete the announcement <strong className={textColor}>"{announcementToDelete.title}"</strong>?
                 </p>
 
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setAnnouncementToDelete(null)}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white 
-                             border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 
-                             transition-colors duration-200"
+                    className={`px-4 py-2 rounded-xl text-sm font-medium ${textSecondary} hover:text-white 
+                             border ${borderColor} hover:bg-[#1E293B] transition-all duration-200`}
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg 
-                             transition-colors duration-200 flex items-center space-x-2"
+                    className="px-6 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl 
+                             hover:bg-red-500/20 transition-all duration-200 flex items-center space-x-2"
                   >
                     <Trash2 size={16} />
                     <span>Delete</span>
@@ -342,127 +361,134 @@ export default function AnnouncementsPage() {
         )}
       </AnimatePresence>
 
-      {/* Announcement Form Modal */}
+      {/* Announcement Form Modal - Fixed with reduced height and gaps */}
       <AnimatePresence>
         {showAnnouncementForm && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={resetForm}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-200 dark:border-gray-700 my-8"
+              className={`${cardBg} rounded-2xl shadow-xl w-full max-w-lg border ${borderColor}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
-                  </h3>
+              {/* Header - Fixed position, not sticky */}
+              <div className={`px-6 py-4 border-b ${borderColor}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className={`text-lg font-semibold ${textColor} flex items-center gap-2`}>
+                      <Sparkles className="text-[#FFD700]" size={18} />
+                      {editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
+                    </h3>
+                  </div>
                   <button
                     onClick={resetForm}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    className={`p-1.5 rounded-lg ${isDarkMode ? 'hover:bg-[#1E293B]' : 'hover:bg-gray-100'} transition-colors`}
                   >
-                    <X size={20} className="text-gray-500" />
+                    <X size={18} className={textSecondary} />
                   </button>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Title *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                               focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
-                      placeholder="Enter announcement title"
-                      maxLength={255}
-                      required
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formData.title.length}/255 characters
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                               focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
-                      placeholder="Enter announcement message"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Target College
-                    </label>
-                    <select
-                      value={formData.college_id || ''}
-                      onChange={(e) => setFormData({
-                        ...formData, 
-                        college_id: e.target.value ? parseInt(e.target.value) : null
-                      })}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                               focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
-                    >
-                      <option value="">All Colleges (Global Announcement)</option>
-                      {colleges.map((college) => (
-                        <option key={college.id} value={college.id}>
-                          {college.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Select specific college or leave empty for global announcement
-                    </p>
-                  </div>
-
-                  <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      type="button"
-                      onClick={resetForm}
-                      className="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 
-                               rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="px-6 py-2.5 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                               transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                               dark:hover:bg-gray-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin"></div>
-                          <span>Saving...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>{editingAnnouncement ? 'Update' : 'Create'} Announcement</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
               </div>
+
+              {/* Form with reduced spacing */}
+              <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-1`}>
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    className={`w-full px-3 py-2 text-sm border ${borderColor} rounded-lg 
+                             ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                             focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300`}
+                    placeholder="Enter announcement title"
+                    maxLength={255}
+                    required
+                  />
+                  <p className={`text-xs ${textSecondary} mt-0.5`}>
+                    {formData.title.length}/255 characters
+                  </p>
+                </div>
+
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-1`}>
+                    Message *
+                  </label>
+                  <textarea
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    rows={4}
+                    className={`w-full px-3 py-2 text-sm border ${borderColor} rounded-lg 
+                             ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                             focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300 resize-none`}
+                    placeholder="Enter announcement message"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-1`}>
+                    Target College
+                  </label>
+                  <select
+                    value={formData.college_id || ''}
+                    onChange={(e) => setFormData({
+                      ...formData, 
+                      college_id: e.target.value ? parseInt(e.target.value) : null
+                    })}
+                    className={`w-full px-3 py-2 text-sm border ${borderColor} rounded-lg 
+                             ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                             focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300`}
+                  >
+                    <option value="">All Colleges (Global Announcement)</option>
+                    {colleges.map((college) => (
+                      <option key={college.id} value={college.id}>
+                        {college.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className={`text-xs ${textSecondary} mt-0.5`}>
+                    Select specific college or leave empty for global announcement
+                  </p>
+                </div>
+
+                <div className={`flex justify-end gap-3 pt-3 border-t ${borderColor}`}>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-medium ${textSecondary} 
+                             border ${borderColor} hover:bg-[#1E293B] hover:text-white transition-all duration-200`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-5 py-1.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-lg 
+                             text-sm shadow-md shadow-[#FFD700]/30 hover:shadow-lg hover:shadow-[#FFD700]/40 hover:scale-105
+                             transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{editingAnnouncement ? 'Update' : 'Create'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}
@@ -471,33 +497,35 @@ export default function AnnouncementsPage() {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="min-h-screen bg-white dark:bg-gray-900 p-6 space-y-6 transition-colors duration-300"
+        className={`min-h-screen ${bgColor} p-6 space-y-6 transition-colors duration-300`}
       >
-        {/* Header */}
+        {/* Header - White heading */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
               Announcements
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className={`${textSecondary} mt-2 text-sm`}>
               Create and manage announcements for colleges
             </p>
           </div>
           <div className="flex space-x-3">
+            {/* Refresh Button - Navy Blue */}
             <button
               onClick={fetchAnnouncements}
-              className="px-4 py-2 bg-gray-900 hover:bg-gray-700 text-white font-medium rounded-lg 
-                       transition-all duration-300 transform hover:scale-105 dark:bg-gray-100 dark:text-gray-900 
-                       dark:hover:bg-gray-300 flex items-center space-x-2"
+              className="px-4 py-2.5 bg-[#1E293B] hover:bg-[#334155] text-white font-medium rounded-xl 
+                       transition-all duration-300 flex items-center space-x-2"
             >
               <RefreshCw size={18} />
               <span>Refresh</span>
             </button>
+            
+            {/* New Announcement Button - Golden */}
             <button
               onClick={() => setShowAnnouncementForm(true)}
-              className="px-4 py-2 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                       transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                       dark:hover:bg-gray-200 flex items-center space-x-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-xl 
+                       shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-105
+                       transition-all duration-300 flex items-center space-x-2"
             >
               <Plus size={18} />
               <span>New Announcement</span>
@@ -506,36 +534,36 @@ export default function AnnouncementsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className={`${cardBg} p-6 rounded-2xl border ${borderColor}`}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${textSecondary} mb-2`}>
                 Search Announcements
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by title, message, or college..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                           focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
+                  className={`w-full pl-10 pr-4 py-3 border ${borderColor} rounded-xl 
+                           ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                           focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300`}
                 />
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${textSecondary} mb-2`}>
                 Filter by College
               </label>
               <select
                 value={selectedCollege}
                 onChange={(e) => setSelectedCollege(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                         focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-300"
+                className={`w-full px-4 py-3 border ${borderColor} rounded-xl 
+                         ${isDarkMode ? 'bg-[#0B0F19] text-white' : 'bg-gray-50 text-gray-900'}
+                         focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-300`}
               >
                 <option value="all">All Announcements</option>
                 <option value="global">Global Announcements Only</option>
@@ -548,9 +576,9 @@ export default function AnnouncementsPage() {
             </div>
             
             <div className="flex items-end">
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg w-full">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Showing</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
+              <div className={`${isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-100'} p-4 rounded-xl w-full border ${borderColor}`}>
+                <p className={`text-xs font-medium ${textSecondary}`}>Showing</p>
+                <p className={`text-xl font-bold ${textColor}`}>
                   {filteredAnnouncements.length} announcement(s)
                 </p>
               </div>
@@ -559,12 +587,12 @@ export default function AnnouncementsPage() {
         </div>
 
         {/* Announcements List */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
+          <div className={`${isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50'} px-6 py-4 border-b ${borderColor}`}>
+            <h2 className={`text-xl font-semibold ${textColor}`}>
               Announcements List
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className={`${textSecondary} text-sm`}>
               {selectedCollege === 'all' 
                 ? 'All announcements (global and college-specific)' 
                 : selectedCollege === 'global'
@@ -575,16 +603,16 @@ export default function AnnouncementsPage() {
 
           {loading ? (
             <div className="p-12 text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-gray-300"></div>
-              <p className="text-gray-500 dark:text-gray-400 mt-4">Loading announcements...</p>
+              <div className="w-8 h-8 border-3 border-[#1E293B] border-t-[#FFD700] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className={textSecondary}>Loading announcements...</p>
             </div>
           ) : filteredAnnouncements.length === 0 ? (
             <div className="p-12 text-center">
-              <MessageSquare size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <MessageSquare size={48} className="mx-auto text-gray-500 mb-4" />
+              <h3 className={`text-lg font-semibold ${textColor} mb-2`}>
                 No Announcements Found
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+              <p className={`${textSecondary} max-w-md mx-auto mb-6`}>
                 {searchQuery || selectedCollege !== 'all'
                   ? 'No announcements match your filters. Try adjusting your search criteria.'
                   : 'No announcements have been created yet. Click "New Announcement" to create your first one.'}
@@ -592,9 +620,9 @@ export default function AnnouncementsPage() {
               {!searchQuery && selectedCollege === 'all' && (
                 <button
                   onClick={() => setShowAnnouncementForm(true)}
-                  className="px-6 py-3 bg-black hover:bg-gray-800 text-white font-medium rounded-lg 
-                           transition-all duration-300 transform hover:scale-105 dark:bg-white dark:text-black 
-                           dark:hover:bg-gray-200 flex items-center space-x-2 mx-auto"
+                  className="px-6 py-3 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black font-semibold rounded-xl 
+                           shadow-lg shadow-[#FFD700]/30 hover:shadow-xl hover:shadow-[#FFD700]/40 hover:scale-105
+                           transition-all duration-300 flex items-center space-x-2 mx-auto"
                 >
                   <Plus size={18} />
                   <span>Create First Announcement</span>
@@ -602,46 +630,44 @@ export default function AnnouncementsPage() {
               )}
             </div>
           ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className={`divide-y ${borderColor}`}>
               {filteredAnnouncements.map((announcement, index) => (
                 <motion.div
                   key={announcement.id}
                   initial={{ opacity: 0, x: -15 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                  className={`p-6 ${isDarkMode ? 'hover:bg-[#1E293B]/50' : 'hover:bg-gray-50'} transition-colors duration-200`}
                 >
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-start space-x-3 mb-3">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                          <MessageSquare size={20} className="text-blue-600 dark:text-blue-400" />
+                        <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/30">
+                          <MessageSquare size={18} className="text-blue-400" />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className={`text-lg font-semibold ${textColor}`}>
                               {announcement.title}
                             </h3>
-                            <div className="flex items-center space-x-2">
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                announcement.college_id 
-                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              }`}>
-                                {announcement.college_id 
-                                  ? announcement.college_name || 'Specific College'
-                                  : 'Global'}
-                              </span>
-                            </div>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-lg ${
+                              announcement.college_id 
+                                ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                                : 'bg-green-500/10 text-green-400 border border-green-500/30'
+                            }`}>
+                              {announcement.college_id 
+                                ? announcement.college_name || 'Specific College'
+                                : 'Global'}
+                            </span>
                           </div>
                           
-                          <p className="text-gray-600 dark:text-gray-300 mt-2 whitespace-pre-line">
+                          <p className={`${textSecondary} mt-2 whitespace-pre-line text-sm`}>
                             {truncateText(announcement.message, 300)}
                           </p>
                           
-                          <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-gray-500">
                             <div className="flex items-center space-x-2">
-                              <Calendar size={14} />
+                              <Calendar size={12} />
                               <span>Created: {formatDate(announcement.created_at)}</span>
                             </div>
                             {announcement.updated_at !== announcement.created_at && (
@@ -653,13 +679,13 @@ export default function AnnouncementsPage() {
                             {announcement.college_id ? (
                               <div className="flex items-center space-x-2">
                                 <span>•</span>
-                                <Building2 size={14} />
+                                <Building2 size={12} />
                                 <span>{announcement.college_name}</span>
                               </div>
                             ) : (
                               <div className="flex items-center space-x-2">
                                 <span>•</span>
-                                <Globe size={14} />
+                                <Globe size={12} />
                                 <span>All Colleges</span>
                               </div>
                             )}
@@ -671,19 +697,17 @@ export default function AnnouncementsPage() {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleEdit(announcement)}
-                        className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 
-                                 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-colors"
                         title="Edit announcement"
                       >
-                        <Edit size={18} />
+                        <Edit size={16} />
                       </button>
                       <button
                         onClick={() => setAnnouncementToDelete(announcement)}
-                        className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 
-                                 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
                         title="Delete announcement"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
