@@ -90,7 +90,7 @@ function Slider({ items, direction, speed = 50 }: SliderProps) {
     <div className="relative overflow-hidden">
       <div
         ref={sliderRef}
-        className="flex gap-6 md:gap-8 will-change-transform"
+        className="flex gap-4 md:gap-6 will-change-transform"
         style={{ width: 'fit-content' }}
       >
         {duplicatedItems.map((item, idx) => (
@@ -107,21 +107,21 @@ export default function PartnerProductSection() {
   const productItems = products.map((product) => (
     <div
       key={product}
-      className="group relative px-4 py-1.5 md:px-5 md:py-2 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 hover:border-[#FFD700] transition-all duration-300 cursor-pointer whitespace-nowrap"
+      className="group relative px-3 py-1 md:px-4 md:py-1.5 bg-[#0F172A]/80 backdrop-blur-md rounded-lg border border-[#1E293B] hover:border-[#E8CA5E] transition-all duration-300 cursor-pointer whitespace-nowrap"
     >
-      <span className="text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent group-hover:from-[#FFD700] group-hover:to-[#FFD700] transition-all duration-300">
+      <span className="text-sm md:text-base lg:text-lg font-bold bg-gradient-to-r from-gray-300 to-gray-400 bg-clip-text text-transparent group-hover:from-[#E8CA5E] group-hover:to-[#A57F2A] transition-all duration-300">
         {product}
       </span>
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#FFD700]/0 via-[#FFD700]/10 to-[#FFD700]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/10 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   ));
 
   const partnerItems = partnerLogos.map((partner) => (
     <div
       key={partner.id}
-      className="group relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center transition-all duration-300 cursor-pointer"
+      className="group relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-300 cursor-pointer"
     >
-      <div className="relative w-10 h-10 md:w-12 md:h-12 grayscale group-hover:grayscale-0 transition-all duration-300 group-hover:scale-110">
+      <div className="relative w-8 h-8 md:w-10 md:h-10 grayscale group-hover:grayscale-0 transition-all duration-300 group-hover:scale-110">
         <Image
           src={partner.image}
           alt={partner.name}
@@ -133,32 +133,32 @@ export default function PartnerProductSection() {
   ));
 
   return (
-    <section className="relative py-6 md:py-8 overflow-hidden">
-      {/* Smooth Continuous Changing Background */}
+    <section className="relative py-4 md:py-6 overflow-hidden">
+      {/* Smooth Continuous Changing Background with Brand Colors */}
       <div className="absolute inset-0 bg-gradient-moving" />
       
       {/* Subtle overlay for smooth blending */}
-      <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-[#0B0F19]/50 pointer-events-none" />
 
-      {/* Blended Border - Top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent" />
+      {/* Blended Border - Top with Brand Colors */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/40 to-transparent" />
       
-      {/* Blended Border - Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#FFD700]/40 to-transparent" />
+      {/* Blended Border - Bottom with Brand Colors */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/40 to-transparent" />
 
       {/* Edge Fade Masks */}
       <div className="relative z-10 container mx-auto px-4">
         {/* Partners Slider - Right to Left */}
-        <div className="mb-4 md:mb-5 relative">
-          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
+        <div className="mb-3 md:mb-4 relative">
+          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
           <Slider items={partnerItems} direction="left" speed={35} />
         </div>
 
         {/* Products Slider - Left to Right */}
         <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-black via-black/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-black via-black/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
           <Slider items={productItems} direction="right" speed={40} />
         </div>
       </div>
@@ -185,17 +185,16 @@ export default function PartnerProductSection() {
         .bg-gradient-moving {
           background: linear-gradient(
             270deg,
-            #0B1C3D 0%,
-            #1a2f4e 15%,
-            #FFD700 30%,
-            #0B1C3D 45%,
-            #FFD700 60%,
-            #1a2f4e 75%,
-            #0B1C3D 90%,
-            #000000 100%
+            #0B0F19 0%,
+            #1F4381 20%,
+            #E8CA5E 35%,
+            #0B0F19 50%,
+            #00E0FF 65%,
+            #1F4381 80%,
+            #0B0F19 100%
           );
           background-size: 400% 400%;
-          animation: smoothGradient 10s ease infinite;
+          animation: smoothGradient 12s ease infinite;
         }
       `}</style>
     </section>

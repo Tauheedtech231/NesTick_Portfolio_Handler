@@ -19,7 +19,11 @@ import {
   LucideIcon,
   User,
   Sparkles,
-  LogOut
+  LogOut,
+  Crown,
+  Settings,
+  HelpCircle,
+  Bell
 } from 'lucide-react';
 
 // Define proper TypeScript interfaces
@@ -64,7 +68,6 @@ export function Sidebar() {
   const [adminName, setAdminName] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
@@ -82,22 +85,6 @@ export function Sidebar() {
         console.error("Invalid user data in localStorage");
       }
     }
-  }, []);
-
-  useEffect(() => {
-    // Check initial theme
-    const isDark = document.documentElement.classList.contains('dark');
-    setIsDarkMode(isDark);
-    
-    // Listen for theme changes
-    const observer = new MutationObserver(() => {
-      const isDarkNow = document.documentElement.classList.contains('dark');
-      setIsDarkMode(isDarkNow);
-    });
-    
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    
-    return () => observer.disconnect();
   }, []);
 
   const filteredMenu = menuItems.filter((item) =>
@@ -138,24 +125,29 @@ export function Sidebar() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={`${collapsed ? 'w-20' : 'w-64'}
-        ${isDarkMode 
-          ? 'bg-gradient-to-b from-[#0B0F19] to-[#0F172A] border-[#1E293B]' 
-          : 'bg-gradient-to-b from-gray-50 to-white border-gray-200'
-        }
-        border-r min-h-screen shadow-xl flex flex-col justify-between
-        transition-all duration-500 relative`}
+        bg-gradient-to-b from-[#0B0F19] to-[#0F172A] border-r border-[#E8CA5E]/20
+        min-h-screen shadow-2xl flex flex-col justify-between
+        transition-all duration-500 relative overflow-hidden`}
     >
-      {/* Decorative gradient line at top */}
-      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent`} />
+      {/* Decorative gradient lines */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E]" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] opacity-30" />
+      
+      {/* Animated background glow */}
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#E8CA5E]/5 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#00E0FF]/5 rounded-full blur-3xl animate-pulse delay-1000" />
 
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-4 flex flex-col h-full relative z-10">
 
         {/* ==== Header ==== */}
         <div className="flex items-center justify-between mb-6">
           {/* Logo Section */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-black" />
+            <div className="relative">
+              <div className="absolute inset-0 rounded-lg blur-md opacity-60 bg-[#E8CA5E]" />
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center shadow-lg shadow-[#E8CA5E]/30">
+                <Crown className="w-4 h-4 text-[#1F4381]" />
+              </div>
             </div>
             <AnimatePresence initial={false}>
               {!collapsed && (
@@ -165,9 +157,12 @@ export function Sidebar() {
                   exit={{ opacity: 0, x: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <h1 className="text-xl font-extrabold bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent tracking-tight">
-                    Portfolio
-                  </h1>
+                  <div>
+                    <h1 className="text-lg font-extrabold bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent tracking-tight">
+                      Neezamiya
+                    </h1>
+                    <p className="text-[10px] text-gray-500 -mt-1">Admin Portal</p>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -176,11 +171,7 @@ export function Sidebar() {
           {/* Collapse Button */}
           <button
             onClick={toggleSidebar}
-            className={`flex p-2 rounded-lg transition-all duration-300 ${
-              isDarkMode 
-                ? 'text-gray-400 hover:text-[#FFD700] hover:bg-[#1E293B]' 
-                : 'text-gray-600 hover:text-[#FFD700] hover:bg-gray-200'
-            }`}
+            className="flex p-2 rounded-lg transition-all duration-300 text-gray-400 hover:text-[#E8CA5E] hover:bg-[#1E293B]"
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
@@ -189,22 +180,17 @@ export function Sidebar() {
         {/* ==== Search Bar ==== */}
         {!collapsed && (
           <div className="relative mb-6">
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#E8CA5E]/20 to-[#00E0FF]/20 blur-md opacity-0 focus-within:opacity-100 transition-opacity duration-300" />
             <input
               type="text"
               placeholder="Search menu..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`w-full px-4 py-2 rounded-xl border outline-none transition-all duration-300 text-sm ${
-                isDarkMode
-                  ? 'bg-[#0B0F19] border-[#1E293B] text-white placeholder:text-gray-500 focus:border-[#FFD700]'
-                  : 'bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-[#FFD700]'
-              }`}
+              className="w-full px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1E293B] text-white placeholder:text-gray-500 focus:outline-none focus:border-[#00E0FF] transition-all duration-300 text-sm relative z-10"
             />
             <Search
               size={16}
-              className={`absolute right-3 top-2.5 ${
-                isDarkMode ? 'text-gray-500' : 'text-gray-400'
-              }`}
+              className="absolute right-3 top-2.5 text-gray-500 z-10"
             />
           </div>
         )}
@@ -224,10 +210,8 @@ export function Sidebar() {
                     className={`group flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
                       ${
                         isActive
-                          ? `bg-gradient-to-r from-[#FFD700]/10 to-transparent border-l-2 border-[#FFD700] text-[#FFD700]`
-                          : isDarkMode
-                            ? 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
-                            : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                          ? 'bg-gradient-to-r from-[#E8CA5E]/10 to-transparent border-l-2 border-[#E8CA5E] text-[#E8CA5E]'
+                          : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -235,10 +219,8 @@ export function Sidebar() {
                         size={20}
                         className={`transition-all duration-300 ${
                           isActive
-                            ? 'text-[#FFD700]'
-                            : isDarkMode
-                              ? 'text-gray-500 group-hover:text-[#FFD700]'
-                              : 'text-gray-500 group-hover:text-[#FFD700]'
+                            ? 'text-[#E8CA5E]'
+                            : 'text-gray-500 group-hover:text-[#00E0FF]'
                         }`}
                       />
                       <AnimatePresence initial={false}>
@@ -259,7 +241,7 @@ export function Sidebar() {
                         size={14}
                         className={`transform transition-transform duration-300 ${
                           isOpen ? 'rotate-180' : ''
-                        } ${isActive ? 'text-[#FFD700]' : isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                        } ${isActive ? 'text-[#E8CA5E]' : 'text-gray-500'}`}
                       />
                     )}
                   </button>
@@ -283,15 +265,13 @@ export function Sidebar() {
                               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
                                 ${
                                   isChildActive
-                                    ? 'bg-[#FFD700]/10 text-[#FFD700] border-l-2 border-[#FFD700]'
-                                    : isDarkMode
-                                      ? 'text-gray-500 hover:bg-[#1E293B] hover:text-gray-300'
-                                      : 'text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                                    ? 'bg-gradient-to-r from-[#00E0FF]/10 to-transparent text-[#00E0FF] border-l-2 border-[#00E0FF]'
+                                    : 'text-gray-500 hover:bg-[#1E293B] hover:text-gray-300'
                                 }`}
                             >
                               <child.icon
                                 size={14}
-                                className={isChildActive ? 'text-[#FFD700]' : 'text-gray-500'}
+                                className={isChildActive ? 'text-[#00E0FF]' : 'text-gray-500'}
                               />
                               <span>{child.label}</span>
                             </Link>
@@ -314,20 +294,16 @@ export function Sidebar() {
                   className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
                     ${
                       isActive
-                        ? 'bg-gradient-to-r from-[#FFD700]/10 to-transparent border-l-2 border-[#FFD700] text-[#FFD700]'
-                        : isDarkMode
-                          ? 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
-                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                        ? 'bg-gradient-to-r from-[#E8CA5E]/10 to-transparent border-l-2 border-[#E8CA5E] text-[#E8CA5E]'
+                        : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
                     }`}
                 >
                   <item.icon
                     size={20}
                     className={`transition-all duration-300 ${
                       isActive
-                        ? 'text-[#FFD700]'
-                        : isDarkMode
-                          ? 'text-gray-500 group-hover:text-[#FFD700]'
-                          : 'text-gray-500 group-hover:text-[#FFD700]'
+                        ? 'text-[#E8CA5E]'
+                        : 'text-gray-500 group-hover:text-[#00E0FF]'
                     }`}
                   />
                   <AnimatePresence initial={false}>
@@ -356,28 +332,27 @@ export function Sidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`mt-auto pt-4 border-t ${
-              isDarkMode ? 'border-[#1E293B]' : 'border-gray-200'
-            }`}
+            className="mt-auto pt-4 border-t border-[#1E293B]"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 flex items-center justify-center border border-[#FFD700]/30">
-                <User className="w-5 h-5 text-[#FFD700]" />
+              <div className="relative">
+                <div className="absolute inset-0 rounded-xl blur-sm bg-[#E8CA5E]/50 opacity-50" />
+                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8CA5E]/20 to-[#00E0FF]/10 flex items-center justify-center border border-[#E8CA5E]/30">
+                  <User className="w-5 h-5 text-[#E8CA5E]" />
+                </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold truncate ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>
+                <p className="text-sm font-semibold truncate text-white">
                   {adminName || 'Admin User'}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
-                  {adminEmail || 'admin@portfolio.com'}
+                  {adminEmail || 'admin@neeZamiya.com'}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 hover:text-red-300 transition-all duration-300 group"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-[#E8CA5E]/10 to-[#A57F2A]/5 border border-[#E8CA5E]/30 text-[#E8CA5E] text-sm font-medium hover:bg-gradient-to-r hover:from-[#E8CA5E]/20 hover:to-[#A57F2A]/10 hover:border-[#E8CA5E]/50 transition-all duration-300 group"
             >
               <LogOut size={16} className="group-hover:scale-110 transition-transform" />
               Logout
@@ -387,11 +362,12 @@ export function Sidebar() {
 
         {/* Collapsed Admin Avatar */}
         {collapsed && (
-          <div className={`mt-auto pt-4 border-t ${
-            isDarkMode ? 'border-[#1E293B]' : 'border-gray-200'
-          }`}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 flex items-center justify-center border border-[#FFD700]/30 mx-auto">
-              <User className="w-5 h-5 text-[#FFD700]" />
+          <div className="mt-auto pt-4 border-t border-[#1E293B]">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-xl blur-sm bg-[#E8CA5E]/50 opacity-50" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8CA5E]/20 to-[#00E0FF]/10 flex items-center justify-center border border-[#E8CA5E]/30 mx-auto">
+                <User className="w-5 h-5 text-[#E8CA5E]" />
+              </div>
             </div>
           </div>
         )}

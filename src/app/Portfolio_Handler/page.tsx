@@ -7,7 +7,8 @@ import {
   Plus, Palette, Download, Trash2, Check, X, User, Calendar, 
   AlertTriangle, CheckCircle, TrendingUp, Building2, RefreshCw,
   Activity, Zap, Shield, BarChart3, PieChart as PieChartIcon,
-  Loader2, Bell, Clock, MoreVertical, Search, Sparkles, Crown
+  Loader2, Bell, Clock, MoreVertical, Search, Sparkles, Crown,
+  LayoutDashboard, Users, School, Award, Globe, Target, Eye
 } from 'lucide-react';
 /* eslint-disable */
 import { MainLayout } from './components/layout/main-layout';
@@ -58,12 +59,22 @@ interface PieChartData {
   color: string;
 }
 
-// Define proper type for Recharts pie chart data
-interface RechartsPieData {
-  name: string;
-  value: number;
-  color: string;
-}
+// Custom Tooltip Component
+const CustomTooltip = ({ active, payload, label, isDarkMode }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="p-3 rounded-xl shadow-xl border border-[#E8CA5E]/30 bg-[#0F172A]/95 backdrop-blur-sm">
+        <p className="font-semibold text-sm text-[#E8CA5E] mb-1">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} style={{ color: entry.color }} className="text-xs">
+            {entry.name}: {entry.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -82,7 +93,7 @@ export default function DashboardPage() {
 
   // Chart data states
   const [lineChartData, setLineChartData] = useState<ChartData[]>([]);
-  const [statusData, setStatusData] = useState<RechartsPieData[]>([]);
+  const [statusData, setStatusData] = useState<PieChartData[]>([]);
 
   // Theme detection
   useEffect(() => {
@@ -167,8 +178,8 @@ export default function DashboardPage() {
     const inactive = collegesData.filter(c => !c.is_active).length;
     
     setStatusData([
-      { name: 'Active', value: active, color: '#10B981' },
-      { name: 'Inactive', value: inactive, color: '#EF4444' }
+      { name: 'Active', value: active, color: '#00E0FF' },
+      { name: 'Inactive', value: inactive, color: '#E8CA5E' }
     ]);
   };
 
@@ -250,7 +261,7 @@ export default function DashboardPage() {
       setStatusData([]);
 
       setApproveConfirmModal({ show: false, request: null });
-      addToast('✅ Data deletion approved successfully!', 'success');
+      addToast('Data deletion approved successfully!', 'success');
       setShowDeleteRequests(false);
     } catch (error) {
       console.error('Error approving delete request:', error);
@@ -262,7 +273,7 @@ export default function DashboardPage() {
     const updatedRequests = deleteRequests.filter(req => req.id !== requestId);
     setDeleteRequests(updatedRequests);
     localStorage.setItem('deleteRequests', JSON.stringify(updatedRequests));
-    addToast('❌ Delete request rejected', 'success');
+    addToast('Delete request rejected', 'success');
   };
 
   const formatDate = (dateString: string) => {
@@ -292,32 +303,47 @@ export default function DashboardPage() {
     }
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className={`p-3 rounded-lg shadow-lg border ${
-          isDarkMode 
-            ? 'bg-gray-800 border-gray-700' 
-            : 'bg-white border-gray-200'
-        }`}>
-          <p className={`font-semibold text-sm mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color }} className="text-xs">
-              {entry.name}: {entry.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Convert data for pie chart to match Recharts expected format
   const pieChartData = statusData.map(item => ({
     name: item.name,
     value: item.value,
     color: item.color
   }));
+
+  // Premium Stats Data
+  const premiumStats = [
+    { 
+      title: "Total Colleges", 
+      value: total.toString(), 
+      icon: School, 
+      gradient: "from-[#1F4381] to-[#00E0FF]",
+      trend: "+12% this month",
+      bgGlow: "#1F4381"
+    },
+    { 
+      title: "Active Institutions", 
+      value: active.toString(), 
+      icon: Building2, 
+      gradient: "from-[#00E0FF] to-[#E8CA5E]",
+      trend: `${activePercentage}% of total`,
+      bgGlow: "#00E0FF"
+    },
+    { 
+      title: "Pending Requests", 
+      value: pendingDeleteRequests.toString(), 
+      icon: Bell, 
+      gradient: "from-[#E8CA5E] to-[#A57F2A]",
+      trend: "Awaiting approval",
+      bgGlow: "#E8CA5E"
+    },
+    { 
+      title: "Success Rate", 
+      value: `${activePercentage}%`, 
+      icon: Award, 
+      gradient: "from-[#1F4381] to-[#E8CA5E]",
+      trend: "Active colleges ratio",
+      bgGlow: "#E8CA5E"
+    }
+  ];
 
   return (
     <MainLayout>
@@ -326,29 +352,25 @@ export default function DashboardPage() {
         {toasts.map((toast) => (
           <motion.div
             key={toast.id}
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
+            initial={{ opacity: 0, x: 50, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 50, scale: 0.9 }}
+            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border ${
               toast.type === 'success' 
-                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
-                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-            }`}
+                ? 'bg-gradient-to-r from-[#00E0FF]/10 to-[#E8CA5E]/10 border-[#00E0FF]/30' 
+                : 'bg-gradient-to-r from-red-500/10 to-red-600/10 border-red-500/30'
+            } backdrop-blur-md`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle size={18} className="text-green-600 dark:text-green-400" />
+              <CheckCircle size={18} className="text-[#00E0FF]" />
             ) : (
-              <X size={18} className="text-red-600 dark:text-red-400" />
+              <X size={18} className="text-red-400" />
             )}
-            <span className={`text-sm font-medium ${
-              toast.type === 'success' 
-                ? 'text-green-800 dark:text-green-300' 
-                : 'text-red-800 dark:text-red-300'
-            }`}>
+            <span className={`text-sm font-medium ${toast.type === 'success' ? 'text-white' : 'text-red-300'}`}>
               {toast.message}
             </span>
             <button onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}>
-              <X size={14} className="text-gray-500 hover:text-gray-700 dark:text-gray-400" />
+              <X size={14} className="text-gray-400 hover:text-white transition-colors" />
             </button>
           </motion.div>
         ))}
@@ -357,183 +379,208 @@ export default function DashboardPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 transition-colors duration-300"
+        transition={{ duration: 0.5 }}
+        className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8"
       >
-        {/* Header with Welcome Admin and Search */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="relative">
-                <div className="absolute -top-2 -left-2 w-12 h-12 bg-gradient-to-r from-[#FFD700] to-[#FFA500] rounded-full blur-xl opacity-60 animate-pulse" />
-                <Crown size={32} className="text-[#FFD700] relative z-10" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] bg-clip-text text-transparent animate-gradient">
-                Welcome back, Admin!
-              </h1>
-              <Sparkles size={24} className="text-[#FFD700] animate-pulse" />
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 ml-12">
-              Here's what's happening with your platform today
-            </p>
-          </div>
+        {/* Premium Header Section */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1F4381]/20 via-[#00E0FF]/10 to-[#E8CA5E]/20 border border-[#E8CA5E]/30 p-6 backdrop-blur-sm">
+          {/* Animated background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#E8CA5E]/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#00E0FF]/10 rounded-full blur-3xl animate-pulse delay-1000" />
           
-          {/* Cool Search Input */}
-          <div className="relative w-full lg:w-96">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="relative">
+                  <div className="absolute -top-2 -left-2 w-12 h-12 bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] rounded-full blur-xl opacity-60 animate-pulse" />
+                  <Crown size={32} className="text-[#E8CA5E] relative z-10" />
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] bg-clip-text text-transparent animate-gradient">
+                  Dashboard
+                </h1>
+                <Sparkles size={24} className="text-[#E8CA5E] animate-pulse" />
+              </div>
+              <p className="text-sm text-gray-400 ml-12">
+                Welcome back! Here's what's happening with your platform today
+              </p>
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search colleges, themes, or settings..."
-              className={`w-full pl-10 pr-4 py-2.5 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/50 ${
-                isDarkMode
-                  ? 'bg-[#0F172A] border-[#1E293B] text-white placeholder-gray-500 focus:border-[#FFD700]'
-                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-[#FFD700]'
-              }`}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                <X size={16} className="text-gray-400 hover:text-gray-600 transition-colors" />
-              </button>
-            )}
-            {/* Animated border glow on focus */}
-            <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 focus-within:opacity-100 transition-opacity duration-300">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FFD700]/20 to-[#FFA500]/20 blur-md" />
+            
+            {/* Premium Search Bar */}
+            <div className="relative w-full lg:w-96">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search size={18} className="text-[#E8CA5E]" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search colleges, themes, or settings..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0F172A]/80 border border-[#1E293B] text-white placeholder-gray-500 focus:outline-none focus:border-[#00E0FF] transition-all duration-300 backdrop-blur-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  <X size={16} className="text-gray-400 hover:text-white transition-colors" />
+                </button>
+              )}
+              <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 focus-within:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#E8CA5E]/20 to-[#00E0FF]/20 blur-md" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-          <StatsCard
-            title="Total Colleges"
-            value={total.toString()}
-            description="All registered colleges"
-            icon={<Building2 size={24} />}
-            trend="Real-time data"
-          />
-          <StatsCard
-            title="Active Colleges"
-            value={active.toString()}
-            description="Currently active"
-            icon={<CheckCircle size={24} />}
-            trend={`${activePercentage}% of total`}
-          />
-          <StatsCard
-            title="Inactive Colleges"
-            value={inactive.toString()}
-            description="Not active"
-            icon={<X size={24} />}
-            trend={`${total > 0 ? ((inactive / total) * 100).toFixed(1) : 0}% of total`}
-          />
+        {/* Premium Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          {premiumStats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] hover:border-[#00E0FF]/50 transition-all duration-300"
+              >
+                {/* Glow effect on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                
+                <div className="relative p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.gradient} flex items-center justify-center shadow-lg`}>
+                      <Icon size={20} className="text-white" />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-white">{stat.value}</div>
+                      <div className="text-xs text-gray-500 mt-1">{stat.trend}</div>
+                    </div>
+                  </div>
+                  <h3 className="text-sm font-medium text-gray-400">{stat.title}</h3>
+                  <div className="mt-2 h-1 w-full bg-[#1E293B] rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${index === 0 ? (total > 0 ? 100 : 0) : index === 1 ? activePercentage : index === 2 ? (pendingDeleteRequests > 0 ? 100 : 0) : activePercentage}%` }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className={`h-full rounded-full bg-gradient-to-r ${stat.gradient}`}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* Quick Actions */}
+        {/* Premium Quick Actions */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { icon: Plus, label: 'Add College', desc: 'Register new college', onClick: handleAdd, color: 'from-blue-500 to-blue-600' },
-            { icon: Palette, label: 'Manage Themes', desc: 'Customize appearance', onClick: handleThemes, color: 'from-purple-500 to-purple-600' },
-            { icon: Download, label: 'Backup Data', desc: 'Export all data', onClick: handleBackup, color: 'from-green-500 to-green-600' },
-            { icon: Trash2, label: 'Delete Requests', desc: `${pendingDeleteRequests} pending`, onClick: () => setShowDeleteRequests(true), color: 'from-red-500 to-red-600', alert: pendingDeleteRequests > 0 }
+            { icon: Plus, label: 'Add College', desc: 'Register new institution', onClick: handleAdd, color: "from-[#1F4381] to-[#00E0FF]" },
+            { icon: Palette, label: 'Manage Themes', desc: 'Customize appearance', onClick: handleThemes, color: "from-[#E8CA5E] to-[#A57F2A]" },
+            { icon: Download, label: 'Backup Data', desc: 'Export all data', onClick: handleBackup, color: "from-[#00E0FF] to-[#1F4381]" },
+            { icon: Trash2, label: 'Delete Requests', desc: `${pendingDeleteRequests} pending`, onClick: () => setShowDeleteRequests(true), color: "from-[#E8CA5E] to-[#A57F2A]", alert: pendingDeleteRequests > 0 }
           ].map((action, index) => (
             <motion.button
               key={action.label}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={action.onClick}
-              className={`group relative p-4 rounded-2xl transition-all duration-300 ${
-                isDarkMode
-                  ? 'bg-[#0F172A] border border-[#1E293B] hover:border-[#FFD700]/50'
-                  : 'bg-white border border-gray-200 hover:border-[#FFD700]/50'
-              } ${action.alert ? 'ring-2 ring-red-500/50' : ''}`}
+              className={`group relative p-4 rounded-2xl transition-all duration-300 bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] hover:border-[#00E0FF]/50 overflow-hidden ${action.alert ? 'ring-2 ring-[#E8CA5E]/50' : ''}`}
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${action.color} flex items-center justify-center shadow-lg`}>
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${action.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   <action.icon size={18} className="text-white" />
                 </div>
                 <div className="text-left">
-                  <h3 className={`font-semibold text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className="font-semibold text-sm text-white">
                     {action.label}
                   </h3>
-                  <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <p className="text-xs text-gray-500">
                     {action.desc}
                   </p>
                 </div>
               </div>
               {action.alert && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#E8CA5E] rounded-full animate-pulse" />
               )}
             </motion.button>
           ))}
         </div>
 
-        {/* Charts Section */}
+        {/* Premium Charts Section */}
         {colleges.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Line Chart */}
+            {/* Area Chart - Growth Trend */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`p-6 rounded-2xl border ${
-                isDarkMode ? 'bg-[#0F172A] border-[#1E293B]' : 'bg-white border-gray-200'
-              }`}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] hover:border-[#00E0FF]/30 transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className={`font-semibold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    <TrendingUp size={20} className="text-[#FFD700]" />
+                  <h3 className="font-semibold text-lg flex items-center gap-2 text-white">
+                    <TrendingUp size={20} className="text-[#00E0FF]" />
                     Growth Trend
                   </h3>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <p className="text-sm text-gray-500">
                     Monthly college registration growth
                   </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-[#00E0FF]" />
+                    <span className="text-xs text-gray-400">Active</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-[#E8CA5E]" />
+                    <span className="text-xs text-gray-400">Total</span>
+                  </div>
                 </div>
               </div>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={lineChartData}>
                     <defs>
-                      <linearGradient id="colorColleges" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FFD700" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#FFD700" stopOpacity={0}/>
+                      <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#E8CA5E" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#E8CA5E" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00E0FF" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#00E0FF" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1E293B' : '#E5E7EB'} />
-                    <XAxis dataKey="month" stroke={isDarkMode ? '#6B7280' : '#9CA3AF'} fontSize={12} />
-                    <YAxis stroke={isDarkMode ? '#6B7280' : '#9CA3AF'} fontSize={12} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Area type="monotone" dataKey="colleges" stroke="#FFD700" fill="url(#colorColleges)" name="Total Colleges" />
-                    <Line type="monotone" dataKey="active" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} name="Active" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                    <YAxis stroke="#6B7280" fontSize={12} />
+                    <Tooltip content={(props) => <CustomTooltip {...props} isDarkMode={isDarkMode} />} />
+                    <Area type="monotone" dataKey="colleges" stroke="#E8CA5E" fill="url(#colorTotal)" name="Total Colleges" strokeWidth={2} />
+                    <Area type="monotone" dataKey="active" stroke="#00E0FF" fill="url(#colorActive)" name="Active Colleges" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </motion.div>
 
-            {/* Pie Chart - Fixed TypeScript Error */}
+            {/* Pie Chart - Status Distribution */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`p-6 rounded-2xl border ${
-                isDarkMode ? 'bg-[#0F172A] border-[#1E293B]' : 'bg-white border-gray-200'
-              }`}
+              transition={{ delay: 0.3 }}
+              className="p-6 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] hover:border-[#00E0FF]/30 transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className={`font-semibold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    <PieChartIcon size={20} className="text-[#FFD700]" />
+                  <h3 className="font-semibold text-lg flex items-center gap-2 text-white">
+                    <PieChartIcon size={20} className="text-[#E8CA5E]" />
                     Status Distribution
                   </h3>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <p className="text-sm text-gray-500">
                     Active vs Inactive colleges
                   </p>
                 </div>
@@ -550,7 +597,7 @@ export default function DashboardPage() {
                         const safePercent = percent || 0;
                         return `${name}: ${(safePercent * 100).toFixed(0)}%`;
                       }}
-                      outerRadius={80}
+                      outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
                       nameKey="name"
@@ -559,10 +606,20 @@ export default function DashboardPage() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={(props) => <CustomTooltip {...props} isDarkMode={isDarkMode} />} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+              <div className="mt-4 flex justify-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#00E0FF]" />
+                  <span className="text-sm text-gray-400">Active: {active}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#E8CA5E]" />
+                  <span className="text-sm text-gray-400">Inactive: {inactive}</span>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -570,83 +627,89 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`p-8 rounded-2xl border text-center ${
-              isDarkMode ? 'bg-[#0F172A] border-[#1E293B]' : 'bg-white border-gray-200'
-            }`}
+            className="p-12 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] text-center"
           >
-            <Building2 size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-r from-[#1F4381]/20 to-[#E8CA5E]/20 flex items-center justify-center mb-4">
+              <School size={40} className="text-[#E8CA5E]" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
               No College Data
             </h3>
-            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              Start by adding your first college
+            <p className="text-sm text-gray-500 mb-6">
+              Start by adding your first college to see analytics
             </p>
             <button
               onClick={handleAdd}
-              className="px-6 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black rounded-xl font-semibold hover:shadow-lg transition-all"
+              className="px-6 py-2.5 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-xl font-semibold hover:shadow-lg hover:shadow-[#E8CA5E]/30 transition-all duration-300"
             >
-              Add College
+              + Add College
             </button>
           </motion.div>
         )}
 
-        {/* Analytics Summary */}
+        {/* Performance Summary Card */}
         {colleges.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className={`p-6 rounded-2xl border ${
-                isDarkMode ? 'bg-[#0F172A] border-[#1E293B]' : 'bg-white border-gray-200'
-              }`}
-            >
-              <h3 className={`font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                <Activity size={18} className="text-[#FFD700]" />
-                College Status Distribution
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Active Colleges</span>
-                    <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>{active}</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(active / total) * 100}%` }}
-                      transition={{ duration: 1, ease: "easeOut" }}
-                      className="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
-                    />
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="p-6 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] hover:border-[#00E0FF]/30 transition-all duration-300"
+          >
+            <h3 className="font-semibold mb-4 flex items-center gap-2 text-white">
+              <Activity size={18} className="text-[#E8CA5E]" />
+              Performance Summary
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-400">Active Colleges</span>
+                  <span className="text-[#00E0FF] font-semibold">{active}</span>
                 </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Inactive Colleges</span>
-                    <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>{inactive}</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(inactive / total) * 100}%` }}
-                      transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                      className="h-full rounded-full bg-gradient-to-r from-red-500 to-red-400"
-                    />
-                  </div>
+                <div className="w-full h-2 rounded-full bg-[#1E293B] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(active / total) * 100}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="h-full rounded-full bg-gradient-to-r from-[#00E0FF] to-[#E8CA5E]"
+                  />
                 </div>
               </div>
-            </motion.div>
-          </div>
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-gray-400">Inactive Colleges</span>
+                  <span className="text-[#E8CA5E] font-semibold">{inactive}</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-[#1E293B] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(inactive / total) * 100}%` }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                    className="h-full rounded-full bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A]"
+                  />
+                </div>
+              </div>
+              <div className="pt-3 mt-2 border-t border-[#1E293B]">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Total Institutions</span>
+                  <span className="text-white font-semibold">{total}</span>
+                </div>
+                <div className="flex justify-between text-sm mt-2">
+                  <span className="text-gray-400">Success Rate</span>
+                  <span className="text-[#E8CA5E] font-semibold">{activePercentage}%</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         )}
 
-        {/* Delete Requests Modal */}
+        {/* Delete Requests Modal - Premium Styled */}
         <AnimatePresence>
           {showDeleteRequests && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
               onClick={() => setShowDeleteRequests(false)}
             >
               <motion.div
@@ -654,27 +717,23 @@ export default function DashboardPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className={`rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden border ${
-                  isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                }`}
+                className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30"
               >
-                <div className={`p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <div className="p-6 border-b border-[#1E293B]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-xl">
-                        <Trash2 className="text-red-600 dark:text-red-400" size={20} />
+                      <div className="p-2 bg-[#E8CA5E]/10 rounded-xl">
+                        <Trash2 className="text-[#E8CA5E]" size={20} />
                       </div>
-                      <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <h3 className="text-xl font-semibold text-white">
                         Delete Requests
                       </h3>
                     </div>
                     <button
                       onClick={() => setShowDeleteRequests(false)}
-                      className={`p-1 rounded-lg transition-colors ${
-                        isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                      }`}
+                      className="p-1 rounded-lg hover:bg-[#1E293B] transition-colors"
                     >
-                      <X size={20} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
+                      <X size={20} className="text-gray-400" />
                     </button>
                   </div>
                 </div>
@@ -682,10 +741,11 @@ export default function DashboardPage() {
                 <div className="p-6 overflow-y-auto max-h-[60vh] space-y-4">
                   {deleteRequests.filter(req => req.status === 'pending').length === 0 ? (
                     <div className="text-center py-8">
-                      <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
-                      <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        No pending requests
-                      </p>
+                      <div className="w-16 h-16 mx-auto rounded-full bg-[#00E0FF]/10 flex items-center justify-center mb-4">
+                        <CheckCircle size={32} className="text-[#00E0FF]" />
+                      </div>
+                      <p className="text-lg text-white">No pending requests</p>
+                      <p className="text-sm text-gray-500">All clear!</p>
                     </div>
                   ) : (
                     deleteRequests.filter(req => req.status === 'pending').map((request) => (
@@ -693,21 +753,19 @@ export default function DashboardPage() {
                         key={request.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className={`p-4 rounded-xl border ${
-                          isDarkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'
-                        }`}
+                        className="p-4 rounded-xl bg-[#0F172A]/50 border border-[#1E293B] hover:border-[#E8CA5E]/30 transition-all duration-300"
                       >
                         <div className="flex flex-col sm:flex-row justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-3">
-                              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                <User size={16} className="text-red-600 dark:text-red-400" />
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#E8CA5E]/20 to-[#00E0FF]/20 flex items-center justify-center">
+                                <User size={16} className="text-[#E8CA5E]" />
                               </div>
                               <div>
-                                <h4 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <h4 className="font-semibold text-white">
                                   {request.userName}
                                 </h4>
-                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                <p className="text-sm text-gray-400">
                                   {request.contactNumber}
                                 </p>
                               </div>
@@ -720,17 +778,13 @@ export default function DashboardPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => showApproveConfirmation(request)}
-                              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition"
+                              className="px-4 py-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-300"
                             >
                               Approve
                             </button>
                             <button
                               onClick={() => handleRejectDeleteRequest(request.id)}
-                              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                isDarkMode
-                                  ? 'bg-gray-600 hover:bg-gray-500 text-gray-200'
-                                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                              }`}
+                              className="px-4 py-2 bg-[#1E293B] hover:bg-[#2D3A4E] text-gray-300 rounded-lg text-sm font-medium transition"
                             >
                               Reject
                             </button>
@@ -745,49 +799,47 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
 
-        {/* Approval Confirmation Modal */}
+        {/* Approval Confirmation Modal - Premium Styled */}
         <AnimatePresence>
           {approveConfirmModal.show && approveConfirmModal.request && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]"
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
             >
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className={`rounded-2xl shadow-xl w-full max-w-md overflow-hidden border ${
-                  isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                }`}
+                className="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30"
               >
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
-                      <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
+                    <div className="p-2 bg-[#E8CA5E]/10 rounded-full">
+                      <AlertTriangle className="text-[#E8CA5E]" size={24} />
                     </div>
                     <div>
-                      <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <h3 className="text-lg font-semibold text-white">
                         Confirm Deletion
                       </h3>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <p className="text-sm text-gray-400">
                         This action cannot be undone
                       </p>
                     </div>
                   </div>
                   
-                  <div className={`mb-6 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800`}>
-                    <p className={`font-semibold text-red-800 dark:text-red-300`}>
+                  <div className="mb-6 p-3 rounded-lg bg-gradient-to-r from-[#E8CA5E]/10 to-[#00E0FF]/10 border border-[#E8CA5E]/30">
+                    <p className="font-semibold text-[#E8CA5E]">
                       {approveConfirmModal.request.userName}
                     </p>
-                    <p className={`text-sm text-red-600 dark:text-red-400`}>
+                    <p className="text-sm text-gray-400">
                       {approveConfirmModal.request.contactNumber}
                     </p>
                   </div>
 
-                  <div className={`p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 mb-6`}>
-                    <p className={`text-xs ${isDarkMode ? 'text-yellow-300' : 'text-yellow-800'}`}>
+                  <div className="p-3 rounded-lg bg-[#E8CA5E]/5 border border-[#E8CA5E]/20 mb-6">
+                    <p className="text-xs text-gray-400">
                       ⚠️ This will permanently delete all colleges, themes, and settings
                     </p>
                   </div>
@@ -795,17 +847,13 @@ export default function DashboardPage() {
                   <div className="flex justify-end gap-3">
                     <button
                       onClick={() => setApproveConfirmModal({ show: false, request: null })}
-                      className={`px-4 py-2 rounded-lg font-medium transition ${
-                        isDarkMode
-                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-200'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
+                      className="px-4 py-2 rounded-lg font-medium transition bg-[#1E293B] hover:bg-[#2D3A4E] text-gray-300"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleApproveDeleteRequest}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center gap-2"
+                      className="px-4 py-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg font-medium transition hover:shadow-lg flex items-center gap-2"
                     >
                       <Trash2 size={16} />
                       Delete All
@@ -817,6 +865,17 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      <style jsx global>{`
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+          background-size: 200% auto;
+          animation: gradient 3s ease infinite;
+        }
+      `}</style>
     </MainLayout>
   );
 }

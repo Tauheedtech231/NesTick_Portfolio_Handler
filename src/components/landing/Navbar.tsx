@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { LogOut, LayoutDashboard, Menu, X, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -97,6 +98,18 @@ export default function Navbar() {
     router.push('/Portfolio_Handler');
   };
 
+  // Handle logo click - redirect to designer portal
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Check if user is logged in and has access to designer portal
+    if (user) {
+      router.push('/designer-portal');
+    } else {
+      // If not logged in, redirect to login page
+      router.push('/auth/login');
+    }
+  };
+
   const getUserEmail = () => {
     if (!user) return '';
     return user.email || '';
@@ -104,6 +117,7 @@ export default function Navbar() {
 
   const navItems = [
     { name: 'Home', path: '/' },
+    { name: 'Vision', path: '/vision' },
     { name: 'Templates', path: '/templates' },
     { name: 'About', path: '/about' },
   ];
@@ -117,23 +131,35 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
       isScrolled 
-        ? 'bg-[#0B0F19]/95 backdrop-blur-lg border-b border-[#1E293B] shadow-lg' 
-        : 'bg-[#0B0F19]/90 backdrop-blur-sm border-b border-[#1E293B]/50'
+        ? 'bg-[#1F4381]/95 backdrop-blur-lg border-b border-[#00E0FF]/20 shadow-lg' 
+        : 'bg-[#1F4381]/90 backdrop-blur-sm border-b border-[#00E0FF]/10'
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo with Golden Background */}
-          <Link 
-            href="/" 
+          {/* Logo with Brand Colors - Redirects to Designer Portal */}
+          <div 
+            onClick={handleLogoClick}
             className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity group"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleLogoClick(e as unknown as React.MouseEvent);
+              }
+            }}
           >
-            <div className="w-8 h-8 bg-[#FFD700] rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-[#FFD700]/30">
-              <span className="text-black font-bold text-sm">P</span>
+            <div className="relative w-8 h-8 overflow-hidden rounded-lg group-hover:scale-105 transition-transform shadow-lg" style={{ boxShadow: '0 0 15px rgba(0, 224, 255, 0.3)' }}>
+              <Image
+                src="/logo.jpg"
+                alt="Logo"
+                fill
+                className="object-cover"
+              />
             </div>
-            <span className="text-xl font-bold text-white">
+            <span className="text-xl font-bold bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
               Portfolio Handler
             </span>
-          </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
@@ -145,14 +171,14 @@ export default function Navbar() {
                   onClick={() => handleNavigation(item.path)}
                   className={`relative px-4 py-2 transition-all duration-300 ease-out group ${
                     isActive 
-                      ? 'text-[#38BDF8]' 
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-[#00E0FF]' 
+                      : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   <span className="font-medium text-sm uppercase tracking-wide">
                     {item.name}
                   </span>
-                  <span className={`absolute left-0 bottom-0 h-[2px] bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-full transition-all duration-500 ease-out ${
+                  <span className={`absolute left-0 bottom-0 h-[2px] bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] rounded-full transition-all duration-500 ease-out ${
                     isActive ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}></span>
                 </button>
@@ -162,10 +188,11 @@ export default function Navbar() {
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-3">
-            {/* Feedback Button - Full Golden */}
+            {/* Feedback Button - Gold */}
             <Link
               href="/feedback"
-              className="hidden sm:flex items-center gap-2 bg-[#FFD700] text-black px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90 hover:scale-105 hover:shadow-lg hover:shadow-[#FFD700]/30"
+              className="hidden sm:flex items-center gap-2 bg-[#E8CA5E] text-[#1F4381] px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#A57F2A] hover:text-white hover:scale-105 hover:shadow-lg"
+              style={{ boxShadow: '0 0 15px rgba(232, 202, 94, 0.3)' }}
             >
               <MessageCircle className="w-4 h-4" />
               Feedback
@@ -175,10 +202,10 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8]/30 transition-all duration-300"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#1F4381]/50 border border-[#00E0FF]/30 hover:border-[#00E0FF] transition-all duration-300"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] rounded-lg flex items-center justify-center">
+                    <span className="text-[#1F4381] font-bold text-sm">
                       {getUserEmail().charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -194,26 +221,39 @@ export default function Navbar() {
                       className="fixed inset-0 z-40" 
                       onClick={() => setIsDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-64 bg-[#0F172A] rounded-xl shadow-lg border border-[#1E293B] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-4 py-3 border-b border-[#1E293B]">
+                    <div className="absolute right-0 mt-2 w-64 bg-[#1F4381] rounded-xl shadow-lg border border-[#00E0FF]/30 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-4 py-3 border-b border-[#00E0FF]/20">
                         <p className="text-sm font-medium text-white">Signed in as</p>
-                        <p className="text-sm text-gray-400 truncate">{getUserEmail()}</p>
+                        <p className="text-sm text-gray-300 truncate">{getUserEmail()}</p>
                       </div>
                       
                       <div className="p-2">
+                        {/* Designer Portal Link - For all logged in users */}
+                        <button
+                          onClick={() => {
+                            router.push('/designer-portal');
+                            setIsDropdownOpen(false);
+                          }}
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          <span className="font-medium">Designer Portal</span>
+                        </button>
+                        
+                        {/* Super Admin Dashboard - Only for specific email */}
                         {user.email === 'tauheeddeveloper13@gmail.com' && (
                           <button
                             onClick={handleDashboardRedirect}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1E293B] rounded-lg transition-colors"
+                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
                           >
                             <LayoutDashboard className="w-4 h-4" />
-                            <span className="font-medium">Dashboard</span>
+                            <span className="font-medium">Admin Dashboard</span>
                           </button>
                         )}
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#1E293B] rounded-lg transition-colors"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           <span className="font-medium">Logout</span>
@@ -227,7 +267,8 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-[#1D4ED8]/30"
+                  className="bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+                  style={{ boxShadow: '0 0 15px rgba(79, 2, 129, 0.3)' }}
                 >
                   Login
                 </Link>
@@ -237,14 +278,14 @@ export default function Navbar() {
             {/* Mobile Menu Toggle with Animated Icon */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8]/30 transition-all duration-300 relative overflow-hidden"
+              className="lg:hidden p-2.5 rounded-xl bg-[#1F4381]/50 border border-[#00E0FF]/30 hover:border-[#00E0FF] transition-all duration-300 relative overflow-hidden"
               aria-label="Toggle menu"
             >
               <div className="relative z-10">
                 {isMobileMenuOpen ? (
-                  <X className="w-5 h-5 text-gray-400 transition-transform duration-300 rotate-0" />
+                  <X className="w-5 h-5 text-gray-300 transition-transform duration-300 rotate-0" />
                 ) : (
-                  <Menu className="w-5 h-5 text-gray-400 transition-transform duration-300" />
+                  <Menu className="w-5 h-5 text-gray-300 transition-transform duration-300" />
                 )}
               </div>
             </button>
@@ -257,7 +298,7 @@ export default function Navbar() {
           className="lg:hidden mt-3 overflow-hidden"
           style={{ display: 'none' }}
         >
-          <div className="bg-[#0F172A] border border-[#1E293B] rounded-xl shadow-lg">
+          <div className="bg-[#1F4381] border border-[#00E0FF]/30 rounded-xl shadow-lg">
             <div className="px-4 py-4 space-y-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.path;
@@ -267,8 +308,8 @@ export default function Navbar() {
                     onClick={() => handleNavigation(item.path)}
                     className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-300 ${
                       isActive 
-                        ? 'bg-gradient-to-r from-[#1D4ED8]/20 to-[#38BDF8]/20 text-[#38BDF8]' 
-                        : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
+                        ? 'bg-[#00E0FF]/20 text-[#00E0FF]' 
+                        : 'text-gray-300 hover:bg-[#00E0FF]/10 hover:text-white'
                     }`}
                   >
                     {item.name}
@@ -280,7 +321,7 @@ export default function Navbar() {
               <Link
                 href="/feedback"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full mt-2 bg-[#FFD700] text-black px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90"
+                className="flex items-center justify-center gap-2 w-full mt-2 bg-[#E8CA5E] text-[#1F4381] px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-[#A57F2A] hover:text-white"
               >
                 <MessageCircle className="w-4 h-4" />
                 Feedback
@@ -288,36 +329,50 @@ export default function Navbar() {
             </div>
 
             {user ? (
-              <div className="border-t border-[#1E293B] px-4 py-4 space-y-2">
+              <div className="border-t border-[#00E0FF]/20 px-4 py-4 space-y-2">
+                {/* Designer Portal - Mobile */}
+                <button
+                  onClick={() => {
+                    router.push('/designer-portal');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#00E0FF] to-[#1F4381] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Designer Portal
+                </button>
+                
+                {/* Super Admin Dashboard - Mobile */}
                 {user.email === 'tauheeddeveloper13@gmail.com' && (
                   <button
                     onClick={() => {
                       handleDashboardRedirect();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
                   >
                     <LayoutDashboard className="w-4 h-4" />
-                    Dashboard
+                    Admin Dashboard
                   </button>
                 )}
+                
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-all duration-300"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="border-t border-[#1E293B] px-4 py-4">
+              <div className="border-t border-[#00E0FF]/20 px-4 py-4">
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white rounded-lg hover:scale-105 transition-all duration-300"
+                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300"
                 >
                   Login
                 </Link>

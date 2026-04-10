@@ -165,11 +165,11 @@ export default function TemplatesSection({
         id="templates"
         className="py-20 md:py-20 px-4 sm:px-6 bg-[#0B0F19] relative overflow-hidden"
       >
-        {/* Background decorative elements */}
+        {/* Background decorative elements with brand colors */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 -left-40 w-80 h-80 bg-[#1D4ED8]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 -right-40 w-80 h-80 bg-[#38BDF8]/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 -left-40 w-80 h-80 bg-[#1F4381]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 -right-40 w-80 h-80 bg-[#00E0FF]/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#E8CA5E]/5 rounded-full blur-3xl" />
         </div>
 
         {/* Grid pattern overlay */}
@@ -183,20 +183,20 @@ export default function TemplatesSection({
             animate="visible"
             className="mb-12 md:mb-16 text-left"
           >
-            <div className="inline-flex items-center gap-2 px-2 py-2 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
-              <Sparkles className="w-4 h-4 text-[#38BDF8]" />
+            <div className="inline-flex items-center gap-2 px-2 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
+              <Sparkles className="w-4 h-4 text-[#00E0FF]" />
               <span className="text-sm font-medium text-gray-300">
                 🎨 Ready-to-Use Portfolio Templates
               </span>
             </div>
-          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4">
-  <span className="text-white">
-    Beautiful
-  </span>{' '}
-  <span className="text-[#FFD700]">
-    Portfolio Templates
-  </span>
-</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4">
+              <span className="text-white">
+                Beautiful
+              </span>{' '}
+              <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
+                Portfolio Templates
+              </span>
+            </h2>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
               {templates.length > 0
                 ? "Professionally designed templates for every academic discipline"
@@ -207,9 +207,9 @@ export default function TemplatesSection({
           {loadingTemplates ? (
             <div className="flex justify-center items-center py-12">
               <div className="relative">
-                <div className="w-12 h-12 border-4 border-[#1D4ED8]/20 border-t-[#1D4ED8] rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-[#1F4381]/20 border-t-[#E8CA5E] rounded-full animate-spin" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-[#38BDF8] animate-pulse" />
+                  <Sparkles className="w-4 h-4 text-[#00E0FF] animate-pulse" />
                 </div>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function TemplatesSection({
                     ref={el => addToRefs(el, templateCardsRef)}
                     variants={itemVariants}
                     whileHover={{ y: -8 }}
-                    className="group bg-[#0F172A] border border-[#1E293B] rounded-2xl overflow-hidden transition-all duration-500 hover:border-[#FFD700]/50 hover:shadow-2xl hover:shadow-[#FFD700]/10 flex flex-col h-full"
+                    className="group bg-[#0F172A] border border-[#1E293B] rounded-2xl overflow-hidden transition-all duration-500 hover:border-[#00E0FF]/50 hover:shadow-2xl hover:shadow-[#00E0FF]/10 flex flex-col h-full"
                   >
                     {/* Image Container */}
                     <div className="h-48 relative overflow-hidden flex-shrink-0">
@@ -253,7 +253,7 @@ export default function TemplatesSection({
                           className={`text-xs font-semibold text-white px-2 py-1 rounded-full backdrop-blur-sm ${
                             template.type === 'free' 
                               ? 'bg-green-500/80 border border-green-400/30' 
-                              : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] border border-[#38BDF8]/30'
+                              : 'bg-gradient-to-r from-[#1F4381] to-[#00E0FF] border border-[#00E0FF]/30'
                           }`}
                         >
                           {template.type === 'free' ? 'Free' : 'Premium'}
@@ -265,7 +265,7 @@ export default function TemplatesSection({
                         onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
                         className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center"
                       >
-                        <div className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-5 py-2 rounded-xl font-semibold text-sm flex items-center gap-2 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                        <div className="bg-gradient-to-r from-[#1F4381] to-[#00E0FF] text-white px-5 py-2 rounded-xl font-semibold text-sm flex items-center gap-2 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg">
                           <Eye size={14} />
                           Quick Preview
                         </div>
@@ -274,7 +274,7 @@ export default function TemplatesSection({
 
                     {/* Content area */}
                     <div className="p-5 flex flex-col flex-grow">
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#FFD700] transition-colors duration-300">
+                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#00E0FF] transition-colors duration-300">
                         {template.name}
                       </h3>
                       
@@ -286,7 +286,7 @@ export default function TemplatesSection({
                       <div className="mt-auto pt-3 flex gap-2">
                         <button
                           onClick={() => handleDetailsClick(template)}
-                          className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15"
+                          className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#00E0FF] hover:bg-white/15"
                         >
                           <Info size={14} />
                           Details
@@ -296,7 +296,7 @@ export default function TemplatesSection({
                           className={`flex-1 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 ${
                             template.type === 'free'
                               ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40'
-                              : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40'
+                              : 'bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] shadow-lg shadow-[#E8CA5E]/20 hover:shadow-[#E8CA5E]/40'
                           }`}
                         >
                           <Sparkles size={14} />
@@ -305,27 +305,27 @@ export default function TemplatesSection({
                       </div>
                     </div>
 
-                    {/* Bottom Glow Line */}
-                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1D4ED8] via-[#FFD700] to-[#38BDF8] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                    {/* Bottom Glow Line with brand colors */}
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1F4381] via-[#E8CA5E] to-[#00E0FF] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </motion.div>
                 ))}
               </motion.div>
 
               {/* View More Button */}
-         {!showAll && templates.length > 3 && (
-  <div className="flex justify-center mt-12">
-    <motion.button
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      onClick={handleViewMore}
-      className="group inline-flex items-center gap-2 px-8 py-3 bg-[#FFD700] text-black font-semibold rounded-xl hover:shadow-lg hover:shadow-yellow-500/30 transition-all duration-300 hover:scale-105"
-    >
-      <span>View More Templates</span>
-      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-black" />
-    </motion.button>
-  </div>
-)}
+              {!showAll && templates.length > 3 && (
+                <div className="flex justify-center mt-12">
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    onClick={handleViewMore}
+                    className="group inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] font-semibold rounded-xl hover:shadow-lg hover:shadow-[#E8CA5E]/30 transition-all duration-300 hover:scale-105"
+                  >
+                    <span>View More Templates</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </motion.button>
+                </div>
+              )}
             </>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -372,7 +372,7 @@ export default function TemplatesSection({
                         className={`text-xs font-semibold text-white px-2 py-1 rounded-full backdrop-blur-sm ${
                           template.type === 'free' 
                             ? 'bg-green-500/80' 
-                            : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]'
+                            : 'bg-gradient-to-r from-[#1F4381] to-[#00E0FF]'
                         }`}
                       >
                         {template.type === 'free' ? 'Free' : 'Premium'}
@@ -416,11 +416,11 @@ export default function TemplatesSection({
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative bg-gradient-to-br from-[#0F172A] to-[#0B0F19] rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#FFD700]/30 shadow-2xl shadow-[#FFD700]/20"
+              className="relative bg-gradient-to-br from-[#0F172A] to-[#0B0F19] rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#00E0FF]/30 shadow-2xl shadow-[#00E0FF]/20"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="sticky top-0 bg-[#0F172A]/95 backdrop-blur-sm border-b border-[#FFD700]/20 p-6">
+              <div className="sticky top-0 bg-[#0F172A]/95 backdrop-blur-sm border-b border-[#00E0FF]/20 p-6">
                 <button
                   onClick={closeModal}
                   className="absolute right-4 top-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 text-gray-400 hover:text-white"
@@ -434,7 +434,7 @@ export default function TemplatesSection({
                   <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
                     selectedTemplate.type === 'free' 
                       ? 'bg-green-500/80' 
-                      : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]'
+                      : 'bg-gradient-to-r from-[#1F4381] to-[#00E0FF]'
                   }`}>
                     {selectedTemplate.type === 'free' ? 'Free Template' : 'Premium Template'}
                   </span>
@@ -456,7 +456,7 @@ export default function TemplatesSection({
 
                 {/* Description */}
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-[#FFD700] mb-2">Description</h4>
+                  <h4 className="text-lg font-semibold text-[#00E0FF] mb-2">Description</h4>
                   <p className="text-gray-300 leading-relaxed">
                     {selectedTemplate.description}
                   </p>
@@ -464,11 +464,11 @@ export default function TemplatesSection({
 
                 {/* Key Features */}
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-[#FFD700] mb-3">Key Features</h4>
+                  <h4 className="text-lg font-semibold text-[#E8CA5E] mb-3">Key Features</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {getTemplateFeatures(selectedTemplate.name).map((feature, idx) => (
                       <div key={idx} className="flex items-center gap-2 text-gray-300">
-                        <CheckCircle className="w-4 h-4 text-[#FFD700]" />
+                        <CheckCircle className="w-4 h-4 text-[#E8CA5E]" />
                         <span className="text-sm">{feature}</span>
                       </div>
                     ))}
@@ -506,7 +506,7 @@ export default function TemplatesSection({
                       closeModal();
                       handlePreviewClick(selectedTemplate.image, selectedTemplate.name, selectedTemplate.description, selectedTemplate.live_url);
                     }}
-                    className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15"
+                    className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#00E0FF] hover:bg-white/15"
                   >
                     <Eye size={16} />
                     Preview Template
@@ -519,7 +519,7 @@ export default function TemplatesSection({
                     className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 ${
                       selectedTemplate.type === 'free'
                         ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40'
-                        : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40'
+                        : 'bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] shadow-lg shadow-[#E8CA5E]/20 hover:shadow-[#E8CA5E]/40'
                     }`}
                   >
                     <Sparkles size={16} />

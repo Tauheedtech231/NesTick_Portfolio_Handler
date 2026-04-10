@@ -2,7 +2,7 @@
 'use client';
 
 import { motion, Variants } from 'framer-motion';
-import { ArrowRight, GraduationCap, Sparkles } from 'lucide-react';
+import { ArrowRight, GraduationCap, Sparkles, Globe2, Compass } from 'lucide-react';
 import Hero3DBackground from '../Hero3DBackground';
 
 interface HeroSectionProps {
@@ -83,18 +83,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       ref={heroRef}
       className="relative min-h-[50vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden pt-20"
     >
-      {/* 3D Interactive Background */}
+      {/* 3D Interactive Background - Galaxy/Baghdad Concept */}
       <Hero3DBackground />
 
       {/* Gradient Overlay for better text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/60 via-transparent to-[#0B0F19] pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19]/40 via-transparent to-[#0B0F19]/40 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1F4381]/40 via-transparent to-[#0B0F19] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#1F4381]/30 via-transparent to-[#1F4381]/30 pointer-events-none" />
 
-      {/* Animated particles overlay with golden accent */}
+      {/* Animated particles with brand colors */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1D4ED8]/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#38BDF8]/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse delay-500" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1F4381]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#00E0FF]/20 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#E8CA5E]/10 rounded-full blur-3xl animate-pulse delay-500" />
+        {/* Star-like particles for galaxy effect */}
+        <div className="absolute top-10 left-10 w-1 h-1 bg-[#E8CA5E] rounded-full opacity-70 animate-ping" />
+        <div className="absolute top-20 right-20 w-1.5 h-1.5 bg-[#00E0FF] rounded-full opacity-60 animate-pulse" />
+        <div className="absolute bottom-32 left-1/4 w-0.5 h-0.5 bg-[#E8CA5E] rounded-full opacity-80 animate-ping delay-300" />
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-[#1F4381] rounded-full opacity-50 animate-pulse delay-700" />
+        <div className="absolute bottom-1/4 right-1/4 w-1 h-1 bg-[#00E0FF] rounded-full opacity-60 animate-ping delay-500" />
       </div>
 
       {/* Content */}
@@ -105,53 +111,84 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           animate="visible"
           className="flex flex-col items-center justify-center text-center"
         >
-          {/* Badge with golden border */}
+          {/* Badge with brand colors */}
           <motion.div
             variants={badgeVariants}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1D4ED8]/20 backdrop-blur-md border border-[#FFD700]/40 shadow-lg shadow-[#FFD700]/10 mb-4 mt-[1rem]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/30 backdrop-blur-md border border-[#E8CA5E]/40 shadow-lg shadow-[#E8CA5E]/10 mb-4 mt-[1rem]"
           >
-            <Sparkles className="w-4 h-4 text-[#FFD700]" />
-            <GraduationCap className="w-4 h-4 text-[#38BDF8]" />
+            <Compass className="w-4 h-4 text-[#00E0FF]" />
+            <Globe2 className="w-4 h-4 text-[#E8CA5E]" />
             <span className="text-sm font-medium text-gray-200">
-              🎓 Connected College Portfolio Ecosystem
+              🌌 Galaxy of Educational Portfolios | Baghdad Heritage of Knowledge
             </span>
           </motion.div>
 
-          {/* Heading with golden gradient */}
+          {/* Heading with brand gradient */}
           <motion.h1
             variants={itemVariants}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 max-w-3xl"
           >
-            <span className="block">Simplify College Portfolios</span>
-            <span className="block bg-gradient-to-r from-[#FFD700] via-[#38BDF8] to-[#FFD700] bg-clip-text text-transparent animate-gradient">
-              In One Platform
+            <span className="block">Journey Through the</span>
+            <span className="block bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] bg-clip-text text-transparent animate-gradient">
+              Galaxy of College Portfolios
             </span>
           </motion.h1>
 
-          {/* Subheading - Hardcoded with subtle golden glow */}
+          {/* Subheading with brand accent glow */}
           <motion.p
             variants={itemVariants}
             className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed backdrop-blur-sm mb-5"
           >
-            Build, Manage & Showcase Your College Portfolio - A centralized platform where institutions can create, customize, and control their digital presence with ease.
+            Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
+            A centralized constellation where institutions create, customize, and control their digital 
+            presence across the universe of learning.
           </motion.p>
 
-          {/* Button with golden accent */}
-<motion.div
-  variants={itemVariants}
-  className="flex justify-center items-center"
->
-  <motion.button
-    variants={buttonVariants}
-    whileHover="hover"
-    whileTap="tap"
-    onClick={() => scrollToSection("templates")}
-    className="group bg-[#FFD700] text-black px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base mb-4 shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 flex items-center gap-2 backdrop-blur-sm"
-  >
-    Get Started
-    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-black" />
-  </motion.button>
-</motion.div>
+          {/* CTA Buttons with brand colors */}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col mb-4 sm:flex-row justify-center items-center gap-4"
+          >
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => scrollToSection("templates")}
+              className="group bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base shadow-2xl hover:shadow-[#E8CA5E]/50 transition-all duration-300 flex items-center gap-2"
+            >
+              Explore the Galaxy
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+            
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => scrollToSection("about")}
+              className="group bg-transparent border-2 border-[#00E0FF] text-[#00E0FF] px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:bg-[#00E0FF]/10 hover:shadow-lg hover:shadow-[#00E0FF]/30 flex items-center gap-2"
+            >
+              Discover Our Legacy
+              <Compass className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            </motion.button>
+          </motion.div>
+
+          {/* Scroll indicator with brand color */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.6 }}
+            className="absolute bottom-[-80px] left-1/2 transform -translate-x-1/2 hidden md:flex flex-col items-center gap-2 cursor-pointer"
+            onClick={() => scrollToSection("features")}
+          >
+            <span className="text-xs text-gray-400">Scroll to explore</span>
+            <div className="w-5 h-8 border-2 border-[#00E0FF]/50 rounded-full flex justify-center">
+              <motion.div
+                animate={{ y: [0, 12, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                className="w-1 h-2 bg-[#E8CA5E] rounded-full mt-1"
+              />
+            </div>
+          </motion.div>
         </motion.div>
       </div>
 
