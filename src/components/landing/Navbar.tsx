@@ -136,10 +136,10 @@ export default function Navbar() {
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo with Brand Colors - Redirects to Designer Portal */}
+          {/* Logo with Brand Colors - Bigger Logo */}
           <div 
             onClick={handleLogoClick}
-            className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity group"
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity group"
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -148,7 +148,8 @@ export default function Navbar() {
               }
             }}
           >
-            <div className="relative w-8 h-8 overflow-hidden rounded-lg group-hover:scale-105 transition-transform shadow-lg" style={{ boxShadow: '0 0 15px rgba(0, 224, 255, 0.3)' }}>
+            {/* Bigger Logo Image */}
+            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-110 transition-all duration-300 shadow-lg shadow-[#00E0FF]/20">
               <Image
                 src="/logo.jpg"
                 alt="Logo"
@@ -156,12 +157,13 @@ export default function Navbar() {
                 className="object-cover"
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
+            {/* Stylish Company Name */}
+            <span className="text-xl md:text-2xl font-bold font-serif tracking-tight bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">
               Portfolio Handler
             </span>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Stylish Font */}
           <div className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => {
               const isActive = pathname === item.path;
@@ -175,7 +177,7 @@ export default function Navbar() {
                       : 'text-gray-300 hover:text-white'
                   }`}
                 >
-                  <span className="font-medium text-sm uppercase tracking-wide">
+                  <span className="font-semibold text-sm uppercase tracking-wide font-sans">
                     {item.name}
                   </span>
                   <span className={`absolute left-0 bottom-0 h-[2px] bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] rounded-full transition-all duration-500 ease-out ${
@@ -188,11 +190,11 @@ export default function Navbar() {
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-3">
-            {/* Feedback Button - Gold */}
+            {/* Feedback Button - Stylish */}
             <Link
               href="/feedback"
-              className="hidden sm:flex items-center gap-2 bg-[#E8CA5E] text-[#1F4381] px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#A57F2A] hover:text-white hover:scale-105 hover:shadow-lg"
-              style={{ boxShadow: '0 0 15px rgba(232, 202, 94, 0.3)' }}
+              className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#E8CA5E]/30"
+              style={{ boxShadow: '0 0 15px rgba(232, 202, 94, 0.2)' }}
             >
               <MessageCircle className="w-4 h-4" />
               Feedback
@@ -209,7 +211,7 @@ export default function Navbar() {
                       {getUserEmail().charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="hidden lg:block text-sm font-medium text-gray-300 max-w-[150px] truncate">
+                  <span className="hidden lg:block text-sm font-medium text-gray-300 max-w-[150px] truncate font-sans">
                     {getUserEmail()}
                   </span>
                 </button>
@@ -223,8 +225,8 @@ export default function Navbar() {
                     />
                     <div className="absolute right-0 mt-2 w-64 bg-[#1F4381] rounded-xl shadow-lg border border-[#00E0FF]/30 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-4 py-3 border-b border-[#00E0FF]/20">
-                        <p className="text-sm font-medium text-white">Signed in as</p>
-                        <p className="text-sm text-gray-300 truncate">{getUserEmail()}</p>
+                        <p className="text-sm font-semibold text-white font-sans">Signed in as</p>
+                        <p className="text-sm text-gray-300 truncate font-light">{getUserEmail()}</p>
                       </div>
                       
                       <div className="p-2">
@@ -234,29 +236,29 @@ export default function Navbar() {
                             router.push('/designer-portal');
                             setIsDropdownOpen(false);
                           }}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          <span className="font-medium">Designer Portal</span>
+                          <span>Designer Portal</span>
                         </button>
                         
                         {/* Super Admin Dashboard - Only for specific email */}
                         {user.email === 'tauheeddeveloper13@gmail.com' && (
                           <button
                             onClick={handleDashboardRedirect}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
+                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                           >
                             <LayoutDashboard className="w-4 h-4" />
-                            <span className="font-medium">Admin Dashboard</span>
+                            <span>Admin Dashboard</span>
                           </button>
                         )}
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                         >
                           <LogOut className="w-4 h-4" />
-                          <span className="font-medium">Logout</span>
+                          <span>Logout</span>
                         </button>
                       </div>
                     </div>
@@ -267,7 +269,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+                  className="bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-[#4F0281]/30"
                   style={{ boxShadow: '0 0 15px rgba(79, 2, 129, 0.3)' }}
                 >
                   Login
@@ -306,7 +308,7 @@ export default function Navbar() {
                   <button
                     key={item.name}
                     onClick={() => handleNavigation(item.path)}
-                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-300 ${
+                    className={`block w-full text-left font-semibold text-sm py-2.5 px-3 rounded-lg transition-all duration-300 ${
                       isActive 
                         ? 'bg-[#00E0FF]/20 text-[#00E0FF]' 
                         : 'text-gray-300 hover:bg-[#00E0FF]/10 hover:text-white'
@@ -321,7 +323,7 @@ export default function Navbar() {
               <Link
                 href="/feedback"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full mt-2 bg-[#E8CA5E] text-[#1F4381] px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-[#A57F2A] hover:text-white"
+                className="flex items-center justify-center gap-2 w-full mt-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4" />
                 Feedback
@@ -361,7 +363,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
@@ -372,7 +374,7 @@ export default function Navbar() {
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300"
+                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
                 >
                   Login
                 </Link>
@@ -381,6 +383,18 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        
+        .animate-gradient {
+          background-size: 200% auto;
+          animation: gradient 3s ease infinite;
+        }
+      `}</style>
     </nav>
   );
 }

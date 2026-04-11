@@ -222,7 +222,7 @@ export default function StudentFeedback() {
       .slice(0, 2);
   };
 
-  return (
+ return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-start lg:justify-center bg-[#0B0F19] py-12 lg:py-8 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F19] via-[#0F172A] to-[#0B0F19]" />
@@ -238,24 +238,24 @@ export default function StudentFeedback() {
         <div className="text-center max-w-2xl px-4 mb-8 lg:mb-12 mt-8 lg:mt-0">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/30 backdrop-blur-sm mb-4 lg:mb-6">
             <School className="w-3.5 h-3.5 text-[#FFD700]" />
-            <span className="text-xs font-medium text-gray-300">
+            <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">
               College Portfolio Management
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-serif">
             Portfolio Handler
           </h2>
-          <p className="mt-3 lg:mt-4 text-sm sm:text-base lg:text-lg text-gray-400">
+          <p className="mt-3 lg:mt-4 text-sm sm:text-base lg:text-lg text-gray-400 font-light tracking-wide">
             Trusted by leading educational institutions for portfolio management
           </p>
           
           {/* Stats Badge */}
           <div className="flex justify-center gap-4 mt-4">
-            <div className="flex items-center gap-1 text-xs text-gray-400">
+            <div className="flex items-center gap-1 text-xs text-gray-400 font-sans tracking-wide">
               <Users className="w-3 h-3 text-[#FFD700]" />
               <span>{allFeedbacks.length}+ Feedbacks</span>
             </div>
-            <div className="flex items-center gap-1 text-xs text-gray-400">
+            <div className="flex items-center gap-1 text-xs text-gray-400 font-sans tracking-wide">
               <Star className="w-3 h-3 text-[#FFD700]" />
               <span>
                 {allFeedbacks.length > 0 
@@ -351,7 +351,7 @@ export default function StudentFeedback() {
                           sizes={isDesktop ? "90px" : "70px"}
                         />
                         {/* Initials overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-bold text-lg">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-bold text-lg font-sans tracking-wide">
                           {getInitials(feedback.name)}
                         </div>
                         <div className="absolute inset-0 rounded-full border-2 border-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -414,22 +414,22 @@ export default function StudentFeedback() {
                       className="object-cover opacity-80"
                       sizes="112px"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 text-white font-bold text-2xl">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 text-white font-bold text-2xl font-sans tracking-wide">
                       {getInitials(selected.name)}
                     </div>
                   </div>
                 </div>
 
                 {/* Content */}
-                <h3 className="text-2xl font-bold text-white mb-1">
+                <h3 className="text-2xl font-bold text-white mb-1 font-serif tracking-tight">
                   {selected.name}
                 </h3>
-                <p className="text-[#FFD700] font-medium text-sm mb-2">
+                <p className="text-[#FFD700] font-medium text-sm mb-2 font-sans tracking-wide">
                   {selected.role}
                 </p>
                 <div className="flex items-center justify-center gap-1 mb-3">
                   <School className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs">
+                  <p className="text-gray-400 text-xs font-light tracking-wide">
                     {selected.institution}
                   </p>
                 </div>
@@ -451,20 +451,20 @@ export default function StudentFeedback() {
                 {/* Quote icon */}
                 <Quote className="w-8 h-8 text-[#FFD700]/30 mx-auto mb-3" />
 
-                <p className="text-gray-300 leading-relaxed mb-4 relative text-sm">
+                <p className="text-gray-300 leading-relaxed mb-4 relative text-sm font-light tracking-wide">
                   &quot;{selected.feedback}&quot;
                 </p>
 
                 {selected.suggestions && selected.suggestions.trim() !== '' && (
                   <div className="mt-3 p-3 bg-[#1E293B] rounded-lg">
-                    <p className="text-xs text-gray-400 mb-1">💡 Suggestion:</p>
-                    <p className="text-xs text-gray-300">{selected.suggestions}</p>
+                    <p className="text-xs text-gray-400 mb-1 font-sans tracking-wide">💡 Suggestion:</p>
+                    <p className="text-xs text-gray-300 font-light tracking-wide">{selected.suggestions}</p>
                   </div>
                 )}
 
                 <div className="flex items-center justify-center gap-1 mt-3">
                   <Calendar className="w-3 h-3 text-gray-500" />
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-gray-500 text-xs font-light tracking-wide">
                     {new Date(selected.date).toLocaleDateString()}
                   </p>
                 </div>

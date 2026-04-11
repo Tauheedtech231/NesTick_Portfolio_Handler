@@ -177,32 +177,69 @@ export default function TemplatesSection({
 
         <div className="container mx-auto max-w-6xl relative z-10">
           {/* Section Header */}
-          <motion.div 
-            variants={headerVariants}
-            initial="hidden"
-            animate="visible"
-            className="mb-12 md:mb-16 text-left"
-          >
-            <div className="inline-flex items-center gap-2 px-2 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
-              <Sparkles className="w-4 h-4 text-[#00E0FF]" />
-              <span className="text-sm font-medium text-gray-300">
-                🎨 Ready-to-Use Portfolio Templates
-              </span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4">
-              <span className="text-white">
-                Beautiful
-              </span>{' '}
-              <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
-                Portfolio Templates
-              </span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
-              {templates.length > 0
-                ? "Professionally designed templates for every academic discipline"
-                : loadingTemplates ? "Loading templates..." : "No templates uploaded yet. Upload templates from the admin panel to see them here."}
-            </p>
-          </motion.div>
+        <motion.div 
+  variants={headerVariants}
+  initial="hidden"
+  animate="visible"
+  className="mb-12 md:mb-16 text-center md:text-left"
+>
+  <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-5 mx-auto md:mx-0 w-fit">
+    <Sparkles className="w-4 h-4 text-[#00E0FF]" />
+    <span className="text-sm font-medium bg-gradient-to-r from-gray-200 to-gray-300 bg-clip-text text-transparent">
+      ✨ Ready-to-Use Portfolio Templates
+    </span>
+  </div>
+  
+  {/* Stylish Heading with decorative elements */}
+  <div className="relative">
+    {/* Decorative line - left side (desktop only) */}
+    <div className="absolute -left-6 top-1/2 -translate-y-1/2 hidden lg:block w-10 h-px bg-gradient-to-r from-transparent to-[#E8CA5E]/40" />
+    
+    <h2 className="text-3xl sm:text-4xl md:text-4xl  font-bold mb-4 font-serif tracking-tight">
+      <span className="text-white relative inline-block">
+        Beautiful
+        {/* Decorative underline swoosh */}
+        <svg className="absolute -bottom-3 left-0 w-full h-3" viewBox="0 0 200 10" preserveAspectRatio="none">
+          <path 
+            d="M0,7 Q50,10 100,7 T200,7" 
+            stroke="#00E0FF" 
+            strokeWidth="1.5" 
+            fill="none" 
+            opacity="0.4"
+            className="group-hover:opacity-100 transition-opacity"
+          />
+        </svg>
+      </span>{' '}
+      <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient relative inline-block">
+        Portfolio Templates
+        {/* Soft glow effect */}
+        <span className="absolute inset-0 bg-gradient-to-r from-[#E8CA5E]/20 via-[#F5D76E]/20 to-[#A57F2A]/20 blur-xl -z-10" />
+      </span>
+    </h2>
+    
+    {/* Decorative line - right side (desktop only) */}
+    <div className="absolute -right-6 top-1/2 -translate-y-1/2 hidden lg:block w-10 h-px bg-gradient-to-l from-transparent to-[#00E0FF]/40" />
+  </div>
+  
+  <p className="text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto md:mx-0 leading-relaxed font-light">
+    {templates.length > 0
+      ? "Professionally designed templates for every academic discipline"
+      : loadingTemplates ? "Loading templates..." : "No templates uploaded yet. Upload templates from the admin panel to see them here."}
+  </p>
+</motion.div>
+
+{/* Add these styles to your global CSS or component */}
+<style jsx>{`
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient 3s ease infinite;
+  }
+`}</style>
 
           {loadingTemplates ? (
             <div className="flex justify-center items-center py-12">

@@ -2,8 +2,9 @@
 'use client';
 
 import { motion, Variants } from 'framer-motion';
-import { ArrowRight, GraduationCap, Sparkles, Globe2, Compass } from 'lucide-react';
+import { ArrowRight, Compass, Globe2, Star, Moon, Rocket } from 'lucide-react';
 import Hero3DBackground from '../Hero3DBackground';
+import { useEffect, useState } from 'react';
 
 interface HeroSectionProps {
   scrollToSection: (sectionId: string) => void;
@@ -11,57 +12,107 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ scrollToSection, heroRef }: HeroSectionProps) {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
+        staggerChildren: 0.15,
+        delayChildren: 0.2,
       },
     },
   };
 
-  const itemVariants: Variants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 15,
-        duration: 0.6,
-      },
-    },
-  };
-
+  // Badge - Top to Bottom
   const badgeVariants: Variants = {
-    hidden: { y: -20, opacity: 0, scale: 0.9 },
+    hidden: { y: -50, opacity: 0, scale: 0.8 },
     visible: {
       y: 0,
       opacity: 1,
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 100,
+        stiffness: 150,
         damping: 15,
+        delay: 0.1,
+      },
+    },
+  };
+
+  // First Heading - Left to Right
+  const headingLeftVariants: Variants = {
+    hidden: { x: -100, opacity: 0, filter: 'blur(10px)' },
+    visible: {
+      x: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 20,
+        duration: 0.8,
         delay: 0.2,
       },
     },
   };
 
+  // Second Heading - Right to Left
+  const headingRightVariants: Variants = {
+    hidden: { x: 100, opacity: 0, filter: 'blur(10px)' },
+    visible: {
+      x: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 20,
+        duration: 0.8,
+        delay: 0.3,
+      },
+    },
+  };
+
+  // Subheading - Left to Right
+  const subheadingVariants: Variants = {
+    hidden: { x: -80, opacity: 0, filter: 'blur(8px)' },
+    visible: {
+      x: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: {
+        type: 'spring',
+        stiffness: 90,
+        damping: 18,
+        duration: 0.7,
+        delay: 0.4,
+      },
+    },
+  };
+
+  // Buttons - Bottom to Top
   const buttonVariants: Variants = {
-    hidden: { y: 20, opacity: 0, scale: 0.95 },
+    hidden: { y: 50, opacity: 0, scale: 0.9 },
     visible: {
       y: 0,
       opacity: 1,
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 80,
-        damping: 12,
-        delay: 0.4,
+        stiffness: 100,
+        damping: 15,
+        delay: 0.5,
       },
     },
     hover: {
@@ -69,7 +120,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       transition: {
         type: 'spring',
         stiffness: 400,
-        damping: 10,
+        damping: 12,
       },
     },
     tap: {
@@ -77,87 +128,136 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     },
   };
 
+  const floatingIconsVariants: Variants = {
+    hidden: { opacity: 0, scale: 0 },
+    visible: (i: number) => ({
+      opacity: 0.5,
+      scale: 1,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.5,
+        type: 'spring',
+      },
+    }),
+    float: (i: number) => ({
+      y: [0, -15, 0],
+      x: [0, i % 2 === 0 ? 10 : -10, 0],
+      rotate: [0, i * 8, 0],
+      transition: {
+        duration: 4 + i,
+        repeat: Infinity,
+        ease: 'easeInOut',
+        delay: i * 0.5,
+      },
+    }),
+  };
+
   return (
     <section
       id="home"
       ref={heroRef}
-      className="relative min-h-[50vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden pt-20"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#07080F] via-[#0B0F19] to-[#07080F]"
     >
-      {/* 3D Interactive Background - Galaxy/Baghdad Concept */}
+      {/* 3D Background */}
       <Hero3DBackground />
 
-      {/* Gradient Overlay for better text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1F4381]/40 via-transparent to-[#0B0F19] pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#1F4381]/30 via-transparent to-[#1F4381]/30 pointer-events-none" />
-
-      {/* Animated particles with brand colors */}
+      {/* Soft gradient overlays - No visible borders */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07080F] via-transparent to-[#1F4381]/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E8CA5E]/5 via-transparent to-transparent pointer-events-none" />
+      
+      {/* Animated floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1F4381]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#00E0FF]/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#E8CA5E]/10 rounded-full blur-3xl animate-pulse delay-500" />
-        {/* Star-like particles for galaxy effect */}
-        <div className="absolute top-10 left-10 w-1 h-1 bg-[#E8CA5E] rounded-full opacity-70 animate-ping" />
-        <div className="absolute top-20 right-20 w-1.5 h-1.5 bg-[#00E0FF] rounded-full opacity-60 animate-pulse" />
-        <div className="absolute bottom-32 left-1/4 w-0.5 h-0.5 bg-[#E8CA5E] rounded-full opacity-80 animate-ping delay-300" />
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-[#1F4381] rounded-full opacity-50 animate-pulse delay-700" />
-        <div className="absolute bottom-1/4 right-1/4 w-1 h-1 bg-[#00E0FF] rounded-full opacity-60 animate-ping delay-500" />
+        {[...Array(isMobile ? 20 : 40)].map((_, i) => (
+          <motion.div
+            key={i}
+            custom={i}
+            variants={floatingIconsVariants}
+            initial="hidden"
+            animate={["visible", "float"]}
+            className="absolute"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          >
+            {i % 3 === 0 ? (
+              <Star className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-[#E8CA5E] opacity-40" />
+            ) : i % 3 === 1 ? (
+              <Moon className="w-1.5 h-1.5 sm:w-2 sm:h-2 text-[#00E0FF] opacity-30" />
+            ) : (
+              <Rocket className="w-1 h-1 sm:w-1.5 sm:h-1.5 text-[#1F4381] opacity-50" />
+            )}
+          </motion.div>
+        ))}
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto max-w-5xl px-4 text-center">
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="flex flex-col items-center justify-center text-center"
         >
-          {/* Badge with brand colors */}
+          {/* Elegant Badge - Top to Bottom with margin */}
           <motion.div
             variants={badgeVariants}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/30 backdrop-blur-md border border-[#E8CA5E]/40 shadow-lg shadow-[#E8CA5E]/10 mb-4 mt-[1rem]"
+            className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full bg-gradient-to-r from-[#1F4381]/20 via-[#1F4381]/10 to-transparent backdrop-blur-md border border-[#E8CA5E]/20 shadow-lg mb-6 sm:mb-8 mt-8 sm:mt-12"
           >
-            <Compass className="w-4 h-4 text-[#00E0FF]" />
-            <Globe2 className="w-4 h-4 text-[#E8CA5E]" />
-            <span className="text-sm font-medium text-gray-200">
-              🌌 Galaxy of Educational Portfolios | Baghdad Heritage of Knowledge
+            <div className="flex gap-1">
+              <Compass className="w-3 h-3 sm:w-4 sm:h-4 text-[#00E0FF] animate-pulse" />
+              <Globe2 className="w-3 h-3 sm:w-4 sm:h-4 text-[#E8CA5E] animate-spin-slow" />
+            </div>
+            <span className="text-[10px] sm:text-xs md:text-sm font-medium bg-gradient-to-r from-gray-200 to-gray-300 bg-clip-text text-transparent">
+              🌟 Galaxy of Educational Excellence
             </span>
           </motion.div>
 
-          {/* Heading with brand gradient */}
+          {/* First Heading - Left to Right */}
           <motion.h1
-            variants={itemVariants}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-3 max-w-3xl"
+            variants={headingLeftVariants}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl  font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl"
           >
-            <span className="block">Journey Through the</span>
-            <span className="block bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] bg-clip-text text-transparent animate-gradient">
+            <span className="block text-white font-serif tracking-tight">
+              Journey Through the
+            </span>
+          </motion.h1>
+
+          {/* Second Heading - Right to Left */}
+          <motion.h1
+            variants={headingRightVariants}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl  font-bold leading-[1.2] sm:leading-[1.3] mb-5 sm:mb-7 max-w-5xl"
+          >
+            <span className="block bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] bg-clip-text text-transparent bg-300% animate-gradient font-serif font-bold">
               Galaxy of College Portfolios
             </span>
           </motion.h1>
 
-          {/* Subheading with brand accent glow */}
+          {/* Elegant Subheading - Left to Right */}
           <motion.p
-            variants={itemVariants}
-            className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed backdrop-blur-sm mb-5"
+            variants={subheadingVariants}
+            className="text-xs sm:text-sm md:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed sm:leading-relaxed backdrop-blur-sm px-2 mb-8 sm:mb-10 font-light tracking-wide"
           >
             Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
             A centralized constellation where institutions create, customize, and control their digital 
             presence across the universe of learning.
           </motion.p>
 
-          {/* CTA Buttons with brand colors */}
+          {/* CTA Buttons - Bottom to Top */}
           <motion.div
-            variants={itemVariants}
-            className="flex flex-col mb-4 sm:flex-row justify-center items-center gap-4"
+            variants={buttonVariants}
+            className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 w-full sm:w-auto px-4 sm:px-0"
           >
             <motion.button
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
               onClick={() => scrollToSection("templates")}
-              className="group bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base shadow-2xl hover:shadow-[#E8CA5E]/50 transition-all duration-300 flex items-center gap-2"
+              className="group w-full sm:w-auto bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-2xl hover:shadow-[#E8CA5E]/40 transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden"
             >
-              Explore the Galaxy
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <span className="relative z-10">Explore the Galaxy</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#A57F2A] to-[#E8CA5E] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.button>
             
             <motion.button
@@ -165,41 +265,59 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               whileHover="hover"
               whileTap="tap"
               onClick={() => scrollToSection("about")}
-              className="group bg-transparent border-2 border-[#00E0FF] text-[#00E0FF] px-6 py-3 md:px-7 md:py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 hover:bg-[#00E0FF]/10 hover:shadow-lg hover:shadow-[#00E0FF]/30 flex items-center gap-2"
+              className="group w-full sm:w-auto bg-transparent border-2 border-[#00E0FF]/60 text-[#00E0FF] px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 hover:bg-[#00E0FF]/10 hover:shadow-lg hover:shadow-[#00E0FF]/20 flex items-center justify-center gap-2 backdrop-blur-sm"
             >
               Discover Our Legacy
               <Compass className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             </motion.button>
           </motion.div>
-
-          {/* Scroll indicator with brand color */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.6 }}
-            className="absolute bottom-[-80px] left-1/2 transform -translate-x-1/2 hidden md:flex flex-col items-center gap-2 cursor-pointer"
-            onClick={() => scrollToSection("features")}
-          >
-            <span className="text-xs text-gray-400">Scroll to explore</span>
-            <div className="w-5 h-8 border-2 border-[#00E0FF]/50 rounded-full flex justify-center">
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                className="w-1 h-2 bg-[#E8CA5E] rounded-full mt-1"
-              />
-            </div>
-          </motion.div>
         </motion.div>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes gradient {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
+        
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
         .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s ease infinite;
+          background-size: 300% auto;
+          animation: gradient 4s ease infinite;
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 8s linear infinite;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: #0B0F19;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #E8CA5E, #00E0FF);
+          border-radius: 3px;
+        }
+        
+        /* Smooth font rendering */
+        * {
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Elegant text selection */
+        ::selection {
+          background: linear-gradient(135deg, #E8CA5E40, #00E0FF40);
+          color: #E8CA5E;
         }
       `}</style>
     </section>

@@ -239,6 +239,9 @@ export default function OtherSections({
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#00E0FF]/5 rounded-full blur-3xl" />
         </div>
 
+        {/* Blended Border - Top */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/20 to-transparent" />
+
         <div className="container mx-auto max-w-6xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -246,17 +249,28 @@ export default function OtherSections({
             viewport={{ once: true }}
             className="text-center mb-16 md:mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8CA5E] border border-[#E8CA5E]/30 backdrop-blur-sm mb-4">
-              <Sparkles className="w-4 h-4 text-[#1F4381]" />
-              <span className="text-sm font-medium text-[#1F4381]">Powerful Features</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
+              <Sparkles className="w-4 h-4 text-[#00E0FF]" />
+              <span className="text-sm font-medium text-gray-300">Powerful Features</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold text-white mb-4">
-              Comprehensive{' '}
-              <span className="bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] bg-clip-text text-transparent">
-                System Features
-              </span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+            
+            {/* Stylish Heading */}
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4 font-serif tracking-tight">
+                <span className="text-white relative inline-block">
+                  Comprehensive
+                  <svg className="absolute -bottom-2 left-0 w-full h-2" viewBox="0 0 200 8" preserveAspectRatio="none">
+                    <path d="M0,5 Q50,8 100,5 T200,5" stroke="#00E0FF" strokeWidth="1.5" fill="none" opacity="0.3" />
+                  </svg>
+                </span>{' '}
+                <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient relative inline-block">
+                  System Features
+                  <span className="absolute inset-0 bg-gradient-to-r from-[#E8CA5E]/20 via-[#F5D76E]/20 to-[#A57F2A]/20 blur-xl -z-10" />
+                </span>
+              </h2>
+            </div>
+            
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light">
               A complete solution for managing educational portfolios with multi-level architecture
             </p>
           </motion.div>
@@ -276,7 +290,7 @@ export default function OtherSections({
                   variants={itemVariants}
                   ref={(el) => addToRefs(el, featureCardsRef)}
                   whileHover={{ y: -8 }}
-                  className="group relative bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 md:p-8 transition-all duration-500 hover:border-[#00E0FF]/50 hover:shadow-2xl hover:shadow-[#00E0FF]/10 overflow-hidden"
+                  className="group relative bg-[#0F172A]/80 backdrop-blur-sm border border-[#1E293B]/30 rounded-2xl p-6 md:p-8 transition-all duration-500 hover:border-[#00E0FF]/30 hover:shadow-2xl hover:shadow-[#00E0FF]/5 overflow-hidden"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                   
@@ -299,17 +313,23 @@ export default function OtherSections({
                     </div>
                   </div>
                   
-                  {/* Bottom Glow Line with brand colors */}
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1F4381] via-[#E8CA5E] to-[#00E0FF] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  {/* Bottom Glow Line - Blended */}
+                  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/40 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                 </motion.div>
               );
             })}
           </motion.div>
         </div>
+        
+        {/* Blended Border - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00E0FF]/20 to-transparent" />
       </section>
 
       {/* Packages Section */}
       <section className="py-20 px-4 sm:px-6 bg-[#0F172A]/30 relative overflow-hidden">
+        {/* Blended Border - Top */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/20 to-transparent" />
+        
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#E8CA5E]/5 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#1F4381]/5 rounded-full blur-3xl animate-pulse delay-1000" />
@@ -317,26 +337,34 @@ export default function OtherSections({
 
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-12 md:mb-16">
-            {/* Left Side - Heading */}
+            {/* Left Side - Stylish Heading */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="text-center lg:text-left"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/30 backdrop-blur-sm mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
                 <Rocket className="w-4 h-4 text-[#E8CA5E]" />
                 <span className="text-sm font-medium text-gray-300">Pricing Plans</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4">
-                <span className="text-white">
-                  Choose Your
-                </span>{' '}
-                <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
-                  Perfect Plan
-                </span>
-              </h2>
-              <p className="text-lg md:text-xl text-gray-400 max-w-2xl lg:max-w-full">
+              
+              <div className="relative">
+                <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4 font-serif tracking-tight">
+                  <span className="text-white relative inline-block">
+                    Choose Your
+                    <svg className="absolute -bottom-2 left-0 w-full h-2" viewBox="0 0 200 8" preserveAspectRatio="none">
+                      <path d="M0,5 Q50,8 100,5 T200,5" stroke="#00E0FF" strokeWidth="1.5" fill="none" opacity="0.3" />
+                    </svg>
+                  </span>{' '}
+                  <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient relative inline-block">
+                    Perfect Plan
+                    <span className="absolute inset-0 bg-gradient-to-r from-[#E8CA5E]/20 via-[#F5D76E]/20 to-[#A57F2A]/20 blur-xl -z-10" />
+                  </span>
+                </h2>
+              </div>
+              
+              <p className="text-lg md:text-xl text-gray-400 max-w-2xl lg:max-w-full font-light">
                 Flexible pricing options tailored to fit your institution&apos;s needs and scale
               </p>
             </motion.div>
@@ -361,10 +389,10 @@ export default function OtherSections({
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   whileHover={{ y: -10 }}
-                  className={`relative bg-[#0F172A] border rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl ${
+                  className={`relative bg-[#0F172A]/80 backdrop-blur-sm border rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-2xl ${
                     pkg.popular 
-                      ? 'border-[#E8CA5E]/50 shadow-[#E8CA5E]/20 shadow-xl' 
-                      : 'border-[#1E293B] hover:border-[#00E0FF]/30'
+                      ? 'border-[#E8CA5E]/30 shadow-[#E8CA5E]/10 shadow-xl' 
+                      : 'border-[#1E293B]/30 hover:border-[#00E0FF]/20'
                   }`}
                 >
                   {pkg.popular && (
@@ -408,7 +436,7 @@ export default function OtherSections({
                     className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
                       pkg.popular
                         ? 'bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#0B0F19] hover:shadow-lg hover:shadow-[#E8CA5E]/25'
-                        : 'bg-[#1E293B] text-white hover:bg-[#2D3A4E]'
+                        : 'bg-[#1E293B]/50 text-white hover:bg-[#2D3A4E]'
                     }`}
                   >
                     {pkg.price === "Custom" ? "Contact Sales" : "Get Started"}
@@ -433,14 +461,20 @@ export default function OtherSections({
             </p>
           </motion.div>
         </div>
+        
+        {/* Blended Border - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00E0FF]/20 to-transparent" />
       </section>
 
       {/* About Section */}
       <section
         id="about"
         ref={aboutRef}
-        className="py-20 md:py-28 px-4 sm:px-6 bg-[#0B0F19] relative overflow-hidden border-t border-[#1E293B]"
+        className="py-20 md:py-28 px-4 sm:px-6 bg-[#0B0F19] relative overflow-hidden"
       >
+        {/* Blended Border - Top */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/20 to-transparent" />
+        
         <div className="container mx-auto max-w-6xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -448,17 +482,28 @@ export default function OtherSections({
             viewport={{ once: true }}
             className="text-center mb-12 md:mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8CA5E] border border-[#E8CA5E]/30 backdrop-blur-sm mb-4">
-              <Building2 className="w-4 h-4 text-[#1F4381]" />
-              <span className="text-sm font-medium text-[#1F4381]">Three-Tier Architecture</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
+              <Building2 className="w-4 h-4 text-[#00E0FF]" />
+              <span className="text-sm font-medium text-gray-300">Three-Tier Architecture</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold text-white mb-6">
-              Streamlined{' '}
-              <span className="bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] bg-clip-text text-transparent">
-                Portfolio Management
-              </span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-4xl mx-auto">
+            
+            {/* Stylish Heading */}
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-6 font-serif tracking-tight">
+                <span className="text-white relative inline-block">
+                  Streamlined
+                  <svg className="absolute -bottom-2 left-0 w-full h-2" viewBox="0 0 200 8" preserveAspectRatio="none">
+                    <path d="M0,5 Q50,8 100,5 T200,5" stroke="#00E0FF" strokeWidth="1.5" fill="none" opacity="0.3" />
+                  </svg>
+                </span>{' '}
+                <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient relative inline-block">
+                  Portfolio Management
+                  <span className="absolute inset-0 bg-gradient-to-r from-[#E8CA5E]/20 via-[#F5D76E]/20 to-[#A57F2A]/20 blur-xl -z-10" />
+                </span>
+              </h2>
+            </div>
+            
+            <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-4xl mx-auto font-light">
               The College Portfolio Handler System centralizes digital portfolios for educational institutions, 
               providing a comprehensive platform to create, manage, and showcase student achievements professionally 
               across multiple colleges and departments.
@@ -473,7 +518,7 @@ export default function OtherSections({
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-2">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center gap-2 font-serif">
                 <Zap className="w-6 h-6 text-[#00E0FF]" />
                 How It Works
               </h3>
@@ -500,9 +545,9 @@ export default function OtherSections({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-8 hover:border-[#00E0FF]/30 transition-all duration-300"
+              className="bg-[#0F172A]/80 backdrop-blur-sm border border-[#1E293B]/30 rounded-2xl p-8 hover:border-[#00E0FF]/20 transition-all duration-300"
             >
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2 font-serif">
                 <BarChart3 className="w-6 h-6 text-[#E8CA5E]" />
                 System Impact & Reach
               </h3>
@@ -510,7 +555,7 @@ export default function OtherSections({
                 {stats.map((stat) => {
                   const Icon = stat.icon;
                   return (
-                    <div key={stat.label} className="flex items-center p-4 bg-[#0B0F19] rounded-xl group hover:bg-[#1E293B] transition-all duration-300">
+                    <div key={stat.label} className="flex items-center p-4 bg-[#0B0F19]/50 rounded-xl group hover:bg-[#1E293B]/50 transition-all duration-300">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center mr-4">
                         <Icon className="w-6 h-6 text-[#E8CA5E]" />
                       </div>
@@ -534,18 +579,18 @@ export default function OtherSections({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-16 bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-2xl p-8 md:p-12 border border-[#1E293B] hover:border-[#00E0FF]/30 transition-all duration-300"
+            className="mt-16 bg-gradient-to-br from-[#0F172A]/80 to-[#1E293B]/50 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-[#1E293B]/30 hover:border-[#00E0FF]/20 transition-all duration-300"
           >
             <div className="text-center mb-10">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-serif">
                 <span className="text-white">
                   Three-Tier
                 </span>{' '}
-                <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">
                   Portal Architecture
                 </span>
               </h3>
-              <p className="text-gray-400 max-w-3xl mx-auto">
+              <p className="text-gray-400 max-w-3xl mx-auto font-light">
                 Our system is built on a robust multi-portal architecture designed for maximum efficiency and security
               </p>
             </div>
@@ -556,7 +601,7 @@ export default function OtherSections({
                 return (
                   <div
                     key={portal.title}
-                    className="bg-[#0B0F19] rounded-2xl p-6 border border-[#1E293B] transition-all duration-300 hover:scale-105 hover:border-[#00E0FF]/40 hover:shadow-lg hover:shadow-[#00E0FF]/10"
+                    className="bg-[#0B0F19]/50 rounded-2xl p-6 border border-[#1E293B]/30 transition-all duration-300 hover:scale-105 hover:border-[#00E0FF]/30 hover:shadow-lg hover:shadow-[#00E0FF]/5"
                   >
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-[${portal.color}]/20 to-[${portal.color}]/10 flex items-center justify-center mb-4`}>
                       <Icon className="w-6 h-6" style={{ color: portal.color }} />
@@ -577,6 +622,9 @@ export default function OtherSections({
             </div>
           </motion.div>
         </div>
+        
+        {/* Blended Border - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00E0FF]/20 to-transparent" />
       </section>
     </>
   );

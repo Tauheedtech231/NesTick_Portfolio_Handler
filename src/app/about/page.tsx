@@ -240,7 +240,7 @@ export default function AboutPage() {
     { year: "2026", title: "Future Ready", description: "Launching next-gen AI analytics & immersive portfolio experiences.", icon: Infinity },
   ];
 
-  return (
+return (
     <>
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20 overflow-hidden">
@@ -263,13 +263,13 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-4">
                 <Sparkles className="w-3.5 h-3.5 text-[#00E0FF]" />
-                <span className="text-xs font-medium text-gray-300">About Us</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">About Us</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight tracking-tight max-w-3xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight max-w-3xl mx-auto font-serif tracking-tight">
                 <span className="block">
                   Building{' '}
-                  <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">
                     Digital Futures
                   </span>
                 </span>
@@ -281,7 +281,7 @@ export default function AboutPage() {
               initial="hidden"
               animate={heroInView ? "visible" : "hidden"}
               variants={fromBottomVariants}
-              className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto"
+              className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto font-light tracking-wide"
             >
               Helping institutions manage and showcase student portfolios — simply and efficiently.
             </motion.p>
@@ -306,9 +306,9 @@ export default function AboutPage() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#1F4381] to-[#00E0FF] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Target className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-white">Our Mission</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white font-serif tracking-tight">Our Mission</h2>
                   </div>
-                  <p className="text-gray-400 leading-relaxed text-base md:text-lg">
+                  <p className="text-gray-400 leading-relaxed text-base md:text-lg font-light tracking-wide">
                     To empower educational institutions with cutting-edge portfolio management technology 
                     that simplifies administration, enhances student visibility, and creates lasting digital 
                     legacies for academic achievements.
@@ -333,9 +333,9 @@ export default function AboutPage() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#1F4381] to-[#00E0FF] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Eye className="w-6 h-6 text-white" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-white">Our Vision</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white font-serif tracking-tight">Our Vision</h2>
                   </div>
-                  <p className="text-gray-400 leading-relaxed text-base md:text-lg">
+                  <p className="text-gray-400 leading-relaxed text-base md:text-lg font-light tracking-wide">
                     To become the global standard for educational portfolio management, connecting 
                     institutions, students, and opportunities through innovative technology that 
                     showcases potential and celebrates achievement.
@@ -360,12 +360,12 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-3">
                 <Rocket className="w-3.5 h-3.5 text-[#00E0FF]" />
-                <span className="text-xs font-medium text-gray-300">Our Journey</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">Our Journey</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
-                The Story of <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">Growth & Innovation</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 font-serif tracking-tight">
+                The Story of <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">Growth & Innovation</span>
               </h2>
-              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
+              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide">
                 From humble beginnings to transforming portfolio management across institutions worldwide.
               </p>
             </motion.div>
@@ -407,12 +407,12 @@ export default function AboutPage() {
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                               <Icon className="w-4 h-4 text-[#00E0FF]" />
                             </div>
-                            <span className="text-sm font-bold text-[#E8CA5E]">{milestone.year}</span>
+                            <span className="text-sm font-bold text-[#E8CA5E] font-sans">{milestone.year}</span>
                           </div>
-                          <h3 className={`text-base md:text-lg font-bold text-white mb-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}>
+                          <h3 className={`text-base md:text-lg font-bold text-white mb-1 font-sans tracking-wide ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}>
                             {milestone.title}
                           </h3>
-                          <p className={`text-gray-400 text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed`}>
+                          <p className={`text-gray-400 text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed font-light`}>
                             {milestone.description}
                           </p>
                         </motion.div>
@@ -443,15 +443,15 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20">
                 <Infinity className="w-4 h-4 text-[#E8CA5E]" />
-                <span className="text-xs text-gray-400">And beyond... The journey continues</span>
+                <span className="text-xs text-gray-400 font-sans tracking-wide">And beyond... The journey continues</span>
               </div>
             </motion.div>
           </div>
         </section>
+        
         <PartnerSection onPartnerSubmit={(data) => {
-  console.log('New partner application:', data);
-  // You can add additional logic here like sending to API
-}} />
+          console.log('New partner application:', data);
+        }} />
 
         {/* Team Structure Tree */}
         <section ref={teamRef} className="py-12 md:py-16 overflow-hidden">
@@ -465,12 +465,12 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-3">
                 <Users className="w-3.5 h-3.5 text-[#00E0FF]" />
-                <span className="text-xs font-medium text-gray-300">Our Team</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">Our Team</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
-                Team <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">Structure</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 font-serif tracking-tight">
+                Team <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">Structure</span>
               </h2>
-              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
+              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide">
                 Meet the passionate team behind Portfolio Handler
               </p>
             </motion.div>
@@ -507,8 +507,8 @@ export default function AboutPage() {
                           />
                         </div>
                         <div>
-                          <p className="text-base font-bold text-white">{teamMembers[0].name}</p>
-                          <p className="text-xs text-[#E8CA5E]">{teamMembers[0].role}</p>
+                          <p className="text-base font-bold text-white font-sans tracking-wide">{teamMembers[0].name}</p>
+                          <p className="text-xs text-[#E8CA5E] font-medium tracking-wide">{teamMembers[0].role}</p>
                         </div>
                         <Crown className="w-5 h-5 text-[#E8CA5E]" />
                       </div>
@@ -593,8 +593,8 @@ export default function AboutPage() {
                               />
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-white">{member.name}</p>
-                              <p className="text-[10px]" style={{ color: member.color.includes('E8CA5E') ? '#E8CA5E' : member.color.includes('1F4381') ? '#1F4381' : '#00E0FF' }}>{member.role}</p>
+                              <p className="text-xs font-semibold text-white font-sans tracking-wide">{member.name}</p>
+                              <p className="text-[10px] font-medium tracking-wide" style={{ color: member.color.includes('E8CA5E') ? '#E8CA5E' : member.color.includes('1F4381') ? '#1F4381' : '#00E0FF' }}>{member.role}</p>
                             </div>
                           </div>
                         </div>
@@ -664,8 +664,8 @@ export default function AboutPage() {
                             />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-white">{member.name}</p>
-                            <p className="text-[10px]" style={{ color: member.color.includes('E8CA5E') ? '#E8CA5E' : member.color.includes('1F4381') ? '#1F4381' : '#00E0FF' }}>{member.role}</p>
+                            <p className="text-xs font-semibold text-white font-sans tracking-wide">{member.name}</p>
+                            <p className="text-[10px] font-medium tracking-wide" style={{ color: member.color.includes('E8CA5E') ? '#E8CA5E' : member.color.includes('1F4381') ? '#1F4381' : '#00E0FF' }}>{member.role}</p>
                           </div>
                         </div>
                       </div>
@@ -688,12 +688,12 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/20 backdrop-blur-sm mb-3">
                 <Mail className="w-3.5 h-3.5 text-[#00E0FF]" />
-                <span className="text-xs font-medium text-gray-300">Get In Touch</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">Get In Touch</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
-                Let&apos;s <span className="bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">Connect</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 font-serif tracking-tight">
+                Let&apos;s <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">Connect</span>
               </h2>
-              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
+              <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide">
                 Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond within 24 hours.
               </p>
             </motion.div>
@@ -706,7 +706,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-6 md:p-8 shadow-2xl"
               >
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2 font-serif tracking-tight">
                   <Sparkles className="w-5 h-5 text-[#E8CA5E]" />
                   Contact Information
                 </h3>
@@ -721,15 +721,15 @@ export default function AboutPage() {
                         <item.icon className="w-5 h-5 text-[#00E0FF]" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xs font-medium text-gray-400 mb-0.5">{item.label}</h3>
+                        <h3 className="text-xs font-medium text-gray-400 mb-0.5 font-sans tracking-wide">{item.label}</h3>
                         {item.href ? (
-                          <a href={item.href} className="text-white text-sm font-semibold hover:text-[#00E0FF] transition-colors block">
+                          <a href={item.href} className="text-white text-sm font-semibold hover:text-[#00E0FF] transition-colors block font-sans">
                             {item.value}
                           </a>
                         ) : (
-                          <p className="text-white text-sm font-semibold">{item.value}</p>
+                          <p className="text-white text-sm font-semibold font-sans">{item.value}</p>
                         )}
-                        <p className="text-gray-500 text-xs mt-1">{item.description}</p>
+                        <p className="text-gray-500 text-xs mt-1 font-light">{item.description}</p>
                       </div>
                     </div>
                   ))}
@@ -743,14 +743,14 @@ export default function AboutPage() {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-6 md:p-8 shadow-2xl"
               >
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2 font-serif tracking-tight">
                   <Mail className="w-5 h-5 text-[#00E0FF]" />
                   Send us a Message
                 </h3>
                 
                 <form onSubmit={handleContactSubmit} className="space-y-5">
                   <div>
-                    <label htmlFor="name" className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label htmlFor="name" className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Full Name *
                     </label>
                     <input
@@ -761,12 +761,12 @@ export default function AboutPage() {
                       onChange={handleContactInputChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors font-sans"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label htmlFor="email" className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Email Address *
                     </label>
                     <input
@@ -777,12 +777,12 @@ export default function AboutPage() {
                       onChange={handleContactInputChange}
                       required
                       placeholder="Enter your email address"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors font-sans"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="subject" className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label htmlFor="subject" className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Subject *
                     </label>
                     <select
@@ -791,7 +791,7 @@ export default function AboutPage() {
                       value={contactFormData.subject}
                       onChange={handleContactInputChange}
                       required
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#00E0FF] transition-colors"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#00E0FF] transition-colors font-sans"
                     >
                       <option value="">Select a subject</option>
                       <option value="General Inquiry">General Inquiry</option>
@@ -803,7 +803,7 @@ export default function AboutPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label htmlFor="message" className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Message *
                     </label>
                     <textarea
@@ -814,14 +814,14 @@ export default function AboutPage() {
                       required
                       rows={4}
                       placeholder="Tell us about your inquiry..."
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors resize-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] transition-colors resize-none font-sans"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-[#1F4381] to-[#00E0FF] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-[#1F4381]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-[#1F4381] to-[#00E0FF] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-[#1F4381]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 font-sans"
                   >
                     {isSubmitting ? (
                       <>
@@ -842,14 +842,14 @@ export default function AboutPage() {
                   {submitStatus === 'success' && (
                     <div className="p-2.5 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-green-400" />
-                      <p className="text-green-400 text-xs">Thank you! We'll get back to you soon.</p>
+                      <p className="text-green-400 text-xs font-sans">Thank you! We'll get back to you soon.</p>
                     </div>
                   )}
 
                   {submitStatus === 'error' && (
                     <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-2">
                       <XCircle className="w-3.5 h-3.5 text-red-400" />
-                      <p className="text-red-400 text-xs">Failed to send. Please try again.</p>
+                      <p className="text-red-400 text-xs font-sans">Failed to send. Please try again.</p>
                     </div>
                   )}
                 </form>

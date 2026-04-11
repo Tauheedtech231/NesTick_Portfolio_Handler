@@ -107,12 +107,12 @@ export default function PartnerProductSection() {
   const productItems = products.map((product) => (
     <div
       key={product}
-      className="group relative px-3 py-1 md:px-4 md:py-1.5 bg-[#0F172A]/80 backdrop-blur-md rounded-lg border border-[#1E293B] hover:border-[#E8CA5E] transition-all duration-300 cursor-pointer whitespace-nowrap"
+      className="group relative px-3 py-1 md:px-4 md:py-1.5 bg-[#0F172A]/40 backdrop-blur-sm rounded-lg border border-transparent hover:border-[#E8CA5E]/30 transition-all duration-300 cursor-pointer whitespace-nowrap"
     >
       <span className="text-sm md:text-base lg:text-lg font-bold bg-gradient-to-r from-gray-300 to-gray-400 bg-clip-text text-transparent group-hover:from-[#E8CA5E] group-hover:to-[#A57F2A] transition-all duration-300">
         {product}
       </span>
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/10 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/5 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   ));
 
@@ -134,19 +134,13 @@ export default function PartnerProductSection() {
 
   return (
     <section className="relative py-4 md:py-6 overflow-hidden">
-      {/* Smooth Continuous Changing Background with Brand Colors */}
+      {/* Smooth Continuous Changing Background - Intact */}
       <div className="absolute inset-0 bg-gradient-moving" />
       
-      {/* Subtle overlay for smooth blending */}
-      <div className="absolute inset-0 bg-[#0B0F19]/50 pointer-events-none" />
+      {/* Subtle overlay for blending - No borders */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/20 via-transparent to-[#0B0F19]/20 pointer-events-none" />
 
-      {/* Blended Border - Top with Brand Colors */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/40 to-transparent" />
-      
-      {/* Blended Border - Bottom with Brand Colors */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8CA5E]/40 to-transparent" />
-
-      {/* Edge Fade Masks */}
+      {/* Edge Fade Masks - Only these remain for smooth edges */}
       <div className="relative z-10 container mx-auto px-4">
         {/* Partners Slider - Right to Left */}
         <div className="mb-3 md:mb-4 relative">

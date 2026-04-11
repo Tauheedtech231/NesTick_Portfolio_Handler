@@ -292,7 +292,7 @@ export default function FeedbackPage() {
     }
   };
 
-  return (
+return (
     <>
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20 overflow-hidden">
@@ -313,17 +313,17 @@ export default function FeedbackPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/30 backdrop-blur-sm mb-4">
                 <Sparkles className="w-3.5 h-3.5 text-[#FFD700]" />
-                <span className="text-xs font-medium text-gray-300">We Value Your Opinion</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">We Value Your Opinion</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight font-serif tracking-tight">
                 Share Your{' '}
-                <span className="bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent animate-gradient">
                   Feedback
                 </span>
               </h1>
 
-              <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-gray-400 max-w-2xl mx-auto font-light tracking-wide">
                 Your feedback helps us improve and serve you better. 
                 Share your experience with Portfolio Handler.
               </p>
@@ -341,10 +341,10 @@ export default function FeedbackPage() {
                 viewport={{ once: true }}
                 className="text-center mb-8"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 font-serif tracking-tight">
                   What Our Users Say
                 </h2>
-                <p className="text-gray-400">Real feedback from our community</p>
+                <p className="text-gray-400 font-light tracking-wide">Real feedback from our community</p>
               </motion.div>
 
               <div className="relative">
@@ -367,13 +367,13 @@ export default function FeedbackPage() {
                       >
                         <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 md:p-8 hover:border-[#FFD700]/30 transition-all duration-300">
                           <Quote className="w-10 h-10 text-[#FFD700] mb-4 opacity-50" />
-                          <p className="text-gray-300 text-base md:text-lg italic mb-6">
+                          <p className="text-gray-300 text-base md:text-lg italic mb-6 font-light tracking-wide">
                             &quot;{feedback.feedback}&quot;
                           </p>
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="font-semibold text-white">{feedback.name}</h4>
-                              <p className="text-sm text-gray-400">{feedback.role} at {feedback.institution}</p>
+                              <h4 className="font-semibold text-white font-sans tracking-wide">{feedback.name}</h4>
+                              <p className="text-sm text-gray-400 font-light">{feedback.role} at {feedback.institution}</p>
                             </div>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
@@ -432,7 +432,7 @@ export default function FeedbackPage() {
                 transition={{ duration: 0.6 }}
                 className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 md:p-8"
               >
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2 font-serif tracking-tight">
                   <MessageCircle className="w-5 h-5 text-[#FFD700]" />
                   Tell Us About Your Experience
                 </h2>
@@ -440,7 +440,7 @@ export default function FeedbackPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Full Name *
                     </label>
                     <div className="relative">
@@ -452,14 +452,14 @@ export default function FeedbackPage() {
                         onChange={handleInputChange}
                         required
                         placeholder="Enter your full name"
-                        className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors"
+                        className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors font-sans"
                       />
                     </div>
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Email Address *
                     </label>
                     <div className="relative">
@@ -471,7 +471,7 @@ export default function FeedbackPage() {
                         onChange={handleInputChange}
                         required
                         placeholder="Enter your email address"
-                        className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors"
+                        className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors font-sans"
                       />
                     </div>
                   </div>
@@ -479,7 +479,7 @@ export default function FeedbackPage() {
                   {/* Role and Institution - 2 columns */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                      <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                         Role *
                       </label>
                       <div className="relative">
@@ -489,7 +489,7 @@ export default function FeedbackPage() {
                           value={formData.role}
                           onChange={handleInputChange}
                           required
-                          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#FFD700] transition-colors"
+                          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#FFD700] transition-colors font-sans"
                         >
                           <option value="">Select role</option>
                           {roleOptions.map(role => (
@@ -500,7 +500,7 @@ export default function FeedbackPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                      <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                         Institution Name *
                       </label>
                       <div className="relative">
@@ -512,7 +512,7 @@ export default function FeedbackPage() {
                           onChange={handleInputChange}
                           required
                           placeholder="Your college/university"
-                          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors"
+                          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors font-sans"
                         />
                       </div>
                     </div>
@@ -520,7 +520,7 @@ export default function FeedbackPage() {
 
                   {/* Rating */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Rating *
                     </label>
                     <div className="flex items-center gap-2 flex-wrap">
@@ -543,7 +543,7 @@ export default function FeedbackPage() {
                         </button>
                       ))}
                       {formData.rating > 0 && (
-                        <span className="text-sm text-[#FFD700] ml-2">
+                        <span className="text-sm text-[#FFD700] ml-2 font-sans tracking-wide">
                           {ratingLabels[formData.rating as keyof typeof ratingLabels]}
                         </span>
                       )}
@@ -552,7 +552,7 @@ export default function FeedbackPage() {
 
                   {/* Feedback */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Your Feedback *
                     </label>
                     <textarea
@@ -562,13 +562,13 @@ export default function FeedbackPage() {
                       required
                       rows={4}
                       placeholder="Tell us about your experience with Portfolio Handler..."
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors resize-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors resize-none font-sans"
                     />
                   </div>
 
                   {/* Suggestions */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Suggestions for Improvement
                     </label>
                     <textarea
@@ -577,7 +577,7 @@ export default function FeedbackPage() {
                       onChange={handleInputChange}
                       rows={3}
                       placeholder="Any suggestions to help us serve you better?"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors resize-none"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#FFD700] transition-colors resize-none font-sans"
                     />
                   </div>
 
@@ -585,7 +585,7 @@ export default function FeedbackPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#FFD700] text-black py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90 hover:scale-105 hover:shadow-lg hover:shadow-[#FFD700]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                    className="w-full bg-[#FFD700] text-black py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/90 hover:scale-105 hover:shadow-lg hover:shadow-[#FFD700]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 font-sans tracking-wide"
                   >
                     {isSubmitting ? (
                       <>
@@ -606,14 +606,14 @@ export default function FeedbackPage() {
                   {submitStatus === 'success' && (
                     <div className="p-2.5 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-green-400" />
-                      <p className="text-green-400 text-xs">Thank you! Your feedback has been saved.</p>
+                      <p className="text-green-400 text-xs font-sans tracking-wide">Thank you! Your feedback has been saved.</p>
                     </div>
                   )}
 
                   {submitStatus === 'error' && (
                     <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-2">
                       <XCircle className="w-3.5 h-3.5 text-red-400" />
-                      <p className="text-red-400 text-xs">Failed to save feedback. Please try again.</p>
+                      <p className="text-red-400 text-xs font-sans tracking-wide">Failed to save feedback. Please try again.</p>
                     </div>
                   )}
                 </form>
@@ -622,10 +622,10 @@ export default function FeedbackPage() {
               {/* Feedback History Section */}
               {savedFeedbacks.length > 0 && (
                 <div className="mt-8">
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
                     <button
                       onClick={() => setShowHistory(!showHistory)}
-                      className="bg-[#0F172A] border border-[#FFD700]/30 text-[#FFD700] py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/10 flex items-center gap-2"
+                      className="bg-[#0F172A] border border-[#FFD700]/30 text-[#FFD700] py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-[#FFD700]/10 flex items-center gap-2 font-sans tracking-wide"
                     >
                       <History className="w-4 h-4" />
                       {showHistory ? 'Hide' : 'Show'} Your Feedback History ({savedFeedbacks.length})
@@ -634,13 +634,13 @@ export default function FeedbackPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={clearAllFeedbacks}
-                        className="bg-red-500/10 border border-red-500/30 text-red-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-red-500/20 flex items-center gap-2"
+                        className="bg-red-500/10 border border-red-500/30 text-red-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-red-500/20 flex items-center gap-2 font-sans tracking-wide"
                       >
                         Clear All History
                       </button>
                       <button
                         onClick={resetToDummyData}
-                        className="bg-blue-500/10 border border-blue-500/30 text-blue-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-blue-500/20 flex items-center gap-2"
+                        className="bg-blue-500/10 border border-blue-500/30 text-blue-400 py-2 px-4 rounded-xl text-xs transition-all duration-300 hover:bg-blue-500/20 flex items-center gap-2 font-sans tracking-wide"
                       >
                         Reset to Sample Data
                       </button>
@@ -663,29 +663,29 @@ export default function FeedbackPage() {
                             <div className="space-y-3">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-xs text-gray-400 mb-1">Name</label>
+                                  <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Name</label>
                                   <input
                                     type="text"
                                     value={editFormData.name || ''}
                                     onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
-                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-xs text-gray-400 mb-1">Email</label>
+                                  <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Email</label>
                                   <input
                                     type="email"
                                     value={editFormData.email || ''}
                                     onChange={(e) => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
-                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-xs text-gray-400 mb-1">Role</label>
+                                  <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Role</label>
                                   <select
                                     value={editFormData.role || ''}
                                     onChange={(e) => setEditFormData(prev => ({ ...prev, role: e.target.value }))}
-                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                   >
                                     {roleOptions.map(role => (
                                       <option key={role} value={role}>{role}</option>
@@ -693,17 +693,17 @@ export default function FeedbackPage() {
                                   </select>
                                 </div>
                                 <div>
-                                  <label className="block text-xs text-gray-400 mb-1">Institution</label>
+                                  <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Institution</label>
                                   <input
                                     type="text"
                                     value={editFormData.institution || ''}
                                     onChange={(e) => setEditFormData(prev => ({ ...prev, institution: e.target.value }))}
-                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                    className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                   />
                                 </div>
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-400 mb-1">Rating</label>
+                                <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Rating</label>
                                 <div className="flex items-center gap-1">
                                   {[1, 2, 3, 4, 5].map((rating) => (
                                     <button
@@ -724,34 +724,34 @@ export default function FeedbackPage() {
                                 </div>
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-400 mb-1">Feedback</label>
+                                <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Feedback</label>
                                 <textarea
                                   value={editFormData.feedback || ''}
                                   onChange={(e) => setEditFormData(prev => ({ ...prev, feedback: e.target.value }))}
                                   rows={2}
-                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-400 mb-1">Suggestions</label>
+                                <label className="block text-xs text-gray-400 mb-1 font-sans tracking-wide">Suggestions</label>
                                 <textarea
                                   value={editFormData.suggestions || ''}
                                   onChange={(e) => setEditFormData(prev => ({ ...prev, suggestions: e.target.value }))}
                                   rows={2}
-                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm"
+                                  className="w-full px-3 py-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-white text-sm font-sans"
                                 />
                               </div>
                               <div className="flex justify-end gap-2 pt-2">
                                 <button
                                   onClick={cancelEditing}
-                                  className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 flex items-center gap-1"
+                                  className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 flex items-center gap-1 font-sans"
                                 >
                                   <X className="w-3 h-3" />
                                   Cancel
                                 </button>
                                 <button
                                   onClick={() => saveEdit(feedback.id)}
-                                  className="px-3 py-1.5 rounded-lg bg-[#FFD700] text-black text-sm hover:bg-[#FFD700]/90 flex items-center gap-1"
+                                  className="px-3 py-1.5 rounded-lg bg-[#FFD700] text-black text-sm hover:bg-[#FFD700]/90 flex items-center gap-1 font-sans tracking-wide"
                                 >
                                   <CheckCircle className="w-3 h-3" />
                                   Save Changes
@@ -764,11 +764,11 @@ export default function FeedbackPage() {
                               <div className="flex justify-between items-start mb-3">
                                 <div>
                                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <span className="font-semibold text-white">{feedback.name}</span>
+                                    <span className="font-semibold text-white font-sans tracking-wide">{feedback.name}</span>
                                     <span className="text-xs text-gray-500">•</span>
-                                    <span className="text-xs text-gray-500">{feedback.role}</span>
+                                    <span className="text-xs text-gray-500 font-light">{feedback.role}</span>
                                     <span className="text-xs text-gray-500">•</span>
-                                    <span className="text-xs text-gray-500">{feedback.institution}</span>
+                                    <span className="text-xs text-gray-500 font-light">{feedback.institution}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     {[1, 2, 3, 4, 5].map((star) => (
@@ -790,13 +790,13 @@ export default function FeedbackPage() {
                                   <Edit2 className="w-4 h-4" />
                                 </button>
                               </div>
-                              <p className="text-gray-400 text-sm mb-2">{feedback.feedback}</p>
+                              <p className="text-gray-400 text-sm mb-2 font-light tracking-wide">{feedback.feedback}</p>
                               {feedback.suggestions && (
-                                <p className="text-gray-500 text-xs italic">
+                                <p className="text-gray-500 text-xs italic font-light">
                                   Suggestion: {feedback.suggestions}
                                 </p>
                               )}
-                              <p className="text-gray-600 text-xs mt-2">
+                              <p className="text-gray-600 text-xs mt-2 font-light">
                                 {new Date(feedback.date).toLocaleDateString()}
                               </p>
                             </>

@@ -475,7 +475,7 @@ export default function TemplatesPage() {
     }
   };
 
-  return (
+return (
     <>
       <Navbar />
       <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20">
@@ -496,17 +496,17 @@ export default function TemplatesPage() {
             >
               <motion.div variants={fromBottomVariants} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
                 <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
-                <span className="text-xs font-medium text-gray-300">Our Templates</span>
+                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">Our Templates</span>
               </motion.div>
 
-              <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+              <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 font-serif tracking-tight">
                 Beautiful{' '}
-                <span className="text-[#FFD700]">
+                <span className="bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent animate-gradient">
                   Portfolio Templates
                 </span>
               </motion.h1>
 
-              <motion.p variants={fromRightVariants} className="text-base md:text-lg text-gray-400 mb-6 max-w-3xl mx-auto">
+              <motion.p variants={fromRightVariants} className="text-base md:text-lg text-gray-400 mb-6 max-w-3xl mx-auto font-light tracking-wide">
                 Choose from our collection of professionally designed templates. Each template is fully customizable to match your institution&apos;s brand and requirements.
               </motion.p>
 
@@ -524,7 +524,7 @@ export default function TemplatesPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => setIsSearchFocused(true)}
                         onBlur={() => setIsSearchFocused(false)}
-                        className="w-full bg-[#0F172A] border border-[#1E293B] rounded-xl py-3 pl-10 pr-10 text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#38BDF8] transition-colors duration-300"
+                        className="w-full bg-[#0F172A] border border-[#1E293B] rounded-xl py-3 pl-10 pr-10 text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#38BDF8] transition-colors duration-300 font-sans"
                       />
                       {searchQuery && (
                         <button
@@ -539,7 +539,7 @@ export default function TemplatesPage() {
                     {/* Filter Button */}
                     <button
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="px-4 py-3 bg-[#0F172A] border border-[#1E293B] rounded-xl text-gray-400 hover:text-white hover:border-[#38BDF8] transition-all duration-300 flex items-center gap-2"
+                      className="px-4 py-3 bg-[#0F172A] border border-[#1E293B] rounded-xl text-gray-400 hover:text-white hover:border-[#38BDF8] transition-all duration-300 flex items-center gap-2 font-sans"
                     >
                       <Filter className="w-4 h-4" />
                       <span className="text-sm hidden sm:inline">Filter</span>
@@ -558,7 +558,7 @@ export default function TemplatesPage() {
                     >
                       <button
                         onClick={() => setSelectedType('all')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
                           selectedType === 'all'
                             ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -568,7 +568,7 @@ export default function TemplatesPage() {
                       </button>
                       <button
                         onClick={() => setSelectedType('free')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
                           selectedType === 'free'
                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -578,7 +578,7 @@ export default function TemplatesPage() {
                       </button>
                       <button
                         onClick={() => setSelectedType('paid')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
                           selectedType === 'paid'
                             ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -592,7 +592,7 @@ export default function TemplatesPage() {
 
                 {/* Results Count */}
                 <div className="flex justify-between items-center mt-3">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 font-sans tracking-wide">
                     {filteredTemplates.length} {filteredTemplates.length === 1 ? 'template' : 'templates'} available
                   </p>
                 </div>
@@ -641,11 +641,11 @@ export default function TemplatesPage() {
                       />
                       
                       <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                        <span className="text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/20">
+                        <span className="text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/20 font-sans tracking-wide">
                           Portfolio Template
                         </span>
                         <span
-                          className={`text-[10px] font-semibold text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
+                          className={`text-[10px] font-semibold text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm font-sans tracking-wide ${
                             template.type === 'free' 
                               ? 'bg-green-500/80 border border-green-400/30' 
                               : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] border border-[#38BDF8]/30'
@@ -658,21 +658,21 @@ export default function TemplatesPage() {
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center gap-3">
                         <button
                           onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
-                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20"
+                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20 font-sans"
                         >
                           <Eye size={12} />
                           Preview
                         </button>
                         <button
                           onClick={() => handleDetailsClick(template)}
-                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20"
+                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20 font-sans"
                         >
                           <Info size={12} />
                           Details
                         </button>
                         <button
                           onClick={() => handleBuyNowClick(template)}
-                          className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg hover:shadow-xl"
+                          className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg hover:shadow-xl font-sans tracking-wide"
                         >
                           <ShoppingCart size={12} />
                           Buy Now
@@ -681,17 +681,17 @@ export default function TemplatesPage() {
                     </div>
 
                     <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-[#FFD700] transition-colors duration-300">
+                      <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-[#FFD700] transition-colors duration-300 font-sans tracking-wide">
                         {template.name}
                       </h3>
                       
-                      <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+                      <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2 font-light tracking-wide">
                         {template.description}
                       </p>
 
                       <div className="mt-auto pt-2">
                         <div className="flex items-center justify-between">
-                          <span className={`text-sm font-bold ${
+                          <span className={`text-sm font-bold font-sans tracking-wide ${
                             template.type === 'free' 
                               ? 'text-green-400' 
                               : 'text-transparent bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text'
@@ -700,7 +700,7 @@ export default function TemplatesPage() {
                           </span>
                           <button
                             onClick={() => handleBuyNowClick(template)}
-                            className="py-1.5 px-3 rounded-lg font-semibold text-xs transition-all duration-300 hover:scale-105 flex items-center gap-1.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40"
+                            className="py-1.5 px-3 rounded-lg font-semibold text-xs transition-all duration-300 hover:scale-105 flex items-center gap-1.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40 font-sans tracking-wide"
                           >
                             <ShoppingCart size={10} />
                             Buy Now
@@ -718,8 +718,8 @@ export default function TemplatesPage() {
                 <div className="w-16 h-16 mx-auto mb-3 bg-[#0F172A] rounded-full flex items-center justify-center border border-[#1E293B]">
                   <Search className="w-6 h-6 text-gray-500" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-1">No templates found</h3>
-                <p className="text-gray-400 text-sm">Try adjusting your search or filter to find what you&apos;re looking for.</p>
+                <h3 className="text-lg font-bold text-white mb-1 font-serif tracking-tight">No templates found</h3>
+                <p className="text-gray-400 text-sm font-light tracking-wide">Try adjusting your search or filter to find what you&apos;re looking for.</p>
               </div>
             )}
           </div>
@@ -735,8 +735,8 @@ export default function TemplatesPage() {
                     <Eye className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">{previewModal.templateName}</h3>
-                    <p className="text-xs text-gray-400">Template Preview</p>
+                    <h3 className="text-lg font-bold text-white font-serif tracking-tight">{previewModal.templateName}</h3>
+                    <p className="text-xs text-gray-400 font-light">Template Preview</p>
                   </div>
                 </div>
                 <button onClick={closePreviewModal} className="p-1.5 rounded-full hover:bg-[#1E293B] transition-colors">
@@ -747,10 +747,10 @@ export default function TemplatesPage() {
                 <div className="relative w-full h-80 rounded-lg overflow-hidden mb-4 bg-[#1E293B]">
                   <Image src={previewModal.imageUrl} alt={previewModal.templateName} fill className="object-contain" />
                 </div>
-                <h4 className="text-white font-semibold text-base mb-1">About this template</h4>
-                <p className="text-gray-400 text-sm leading-relaxed mb-4">{previewModal.description}</p>
+                <h4 className="text-white font-semibold text-base mb-1 font-sans tracking-wide">About this template</h4>
+                <p className="text-gray-400 text-sm leading-relaxed mb-4 font-light tracking-wide">{previewModal.description}</p>
                 {previewModal.liveUrl && (
-                  <a href={previewModal.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white font-semibold text-sm rounded-lg hover:shadow-lg transition-all duration-300">
+                  <a href={previewModal.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white font-semibold text-sm rounded-lg hover:shadow-lg transition-all duration-300 font-sans tracking-wide">
                     <Eye size={14} />
                     Live Demo
                   </a>
@@ -779,11 +779,11 @@ export default function TemplatesPage() {
                   >
                     <X className="w-5 h-5" />
                   </button>
-                  <h3 className="text-2xl font-bold text-white pr-8">
+                  <h3 className="text-2xl font-bold text-white pr-8 font-serif tracking-tight">
                     {detailsModal.template.name}
                   </h3>
                   <div className="flex gap-2 mt-2">
-                    <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full ${
+                    <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full font-sans tracking-wide ${
                       detailsModal.template.type === 'free' 
                         ? 'bg-green-500/80' 
                         : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]'
@@ -805,19 +805,19 @@ export default function TemplatesPage() {
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-[#FFD700] mb-2">Description</h4>
-                    <p className="text-gray-300 leading-relaxed">
+                    <h4 className="text-lg font-semibold text-[#FFD700] mb-2 font-sans tracking-wide">Description</h4>
+                    <p className="text-gray-300 leading-relaxed font-light tracking-wide">
                       {detailsModal.template.description}
                     </p>
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-[#FFD700] mb-3">Key Features</h4>
+                    <h4 className="text-lg font-semibold text-[#FFD700] mb-3 font-sans tracking-wide">Key Features</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {getTemplateFeatures(detailsModal.template.name).map((feature, idx) => (
                         <div key={idx} className="flex items-center gap-2 text-gray-300">
                           <CheckCircle className="w-4 h-4 text-[#FFD700]" />
-                          <span className="text-sm">{feature}</span>
+                          <span className="text-sm font-light tracking-wide">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -826,22 +826,22 @@ export default function TemplatesPage() {
                   <div className="bg-white/5 rounded-xl p-4 mb-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Template ID</p>
-                        <p className="text-sm text-white">#{detailsModal.template.id}</p>
+                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Template ID</p>
+                        <p className="text-sm text-white font-sans">#{detailsModal.template.id}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Created</p>
-                        <p className="text-sm text-white">
+                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Created</p>
+                        <p className="text-sm text-white font-sans">
                           {new Date(detailsModal.template.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Type</p>
-                        <p className="text-sm text-white capitalize">{detailsModal.template.type}</p>
+                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Type</p>
+                        <p className="text-sm text-white capitalize font-sans">{detailsModal.template.type}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Compatibility</p>
-                        <p className="text-sm text-white">All Devices</p>
+                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Compatibility</p>
+                        <p className="text-sm text-white font-sans">All Devices</p>
                       </div>
                     </div>
                   </div>
@@ -852,7 +852,7 @@ export default function TemplatesPage() {
                         setDetailsModal({ isOpen: false, template: null });
                         handlePreviewClick(detailsModal.template!.image, detailsModal.template!.name, detailsModal.template!.description, detailsModal.template!.live_url);
                       }}
-                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15"
+                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15 font-sans tracking-wide"
                     >
                       <Eye size={16} />
                       Preview Template
@@ -862,7 +862,7 @@ export default function TemplatesPage() {
                         setDetailsModal({ isOpen: false, template: null });
                         handleBuyNowClick(detailsModal.template!);
                       }}
-                      className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 ${
+                      className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 font-sans tracking-wide ${
                         detailsModal.template.type === 'free'
                           ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40'
                           : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40'
@@ -884,10 +884,10 @@ export default function TemplatesPage() {
             <div className="bg-[#0F172A] rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100 border border-[#1E293B]">
               <div className="flex items-center justify-between p-5 border-b border-[#1E293B]">
                 <div>
-                  <h3 className="text-lg font-bold text-white">
+                  <h3 className="text-lg font-bold text-white font-serif tracking-tight">
                     {selectedTemplate.name}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-0.5">Submit your request</p>
+                  <p className="text-xs text-gray-400 mt-0.5 font-light">Submit your request</p>
                 </div>
                 <button
                   onClick={() => setIsBuyNowModalOpen(false)}
@@ -899,7 +899,7 @@ export default function TemplatesPage() {
 
               <form onSubmit={handleBuyNowSubmit} className="p-5 space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                     Full Name *
                   </label>
                   <input
@@ -909,18 +909,18 @@ export default function TemplatesPage() {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
                       formErrors.name && touchedFields.name ? 'border-red-500' : 'border-[#1E293B]'
                     }`}
                     placeholder="Enter your full name"
                   />
                   {formErrors.name && touchedFields.name && (
-                    <p className="text-red-500 text-[10px] mt-1">{formErrors.name}</p>
+                    <p className="text-red-500 text-[10px] mt-1 font-sans">{formErrors.name}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                     College Name *
                   </label>
                   <input
@@ -930,18 +930,18 @@ export default function TemplatesPage() {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
                       formErrors.college && touchedFields.college ? 'border-red-500' : 'border-[#1E293B]'
                     }`}
                     placeholder="Enter your college name"
                   />
                   {formErrors.college && touchedFields.college && (
-                    <p className="text-red-500 text-[10px] mt-1">{formErrors.college}</p>
+                    <p className="text-red-500 text-[10px] mt-1 font-sans">{formErrors.college}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                     Email Address *
                   </label>
                   <input
@@ -951,18 +951,18 @@ export default function TemplatesPage() {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
                       formErrors.email && touchedFields.email ? 'border-red-500' : 'border-[#1E293B]'
                     }`}
                     placeholder="Enter your email"
                   />
                   {formErrors.email && touchedFields.email && (
-                    <p className="text-red-500 text-[10px] mt-1">{formErrors.email}</p>
+                    <p className="text-red-500 text-[10px] mt-1 font-sans">{formErrors.email}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                     Phone Number *
                   </label>
                   <input
@@ -972,19 +972,19 @@ export default function TemplatesPage() {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all ${
+                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
                       formErrors.phone && touchedFields.phone ? 'border-red-500' : 'border-[#1E293B]'
                     }`}
                     placeholder="Enter your phone number"
                   />
                   {formErrors.phone && touchedFields.phone && (
-                    <p className="text-red-500 text-[10px] mt-1">{formErrors.phone}</p>
+                    <p className="text-red-500 text-[10px] mt-1 font-sans">{formErrors.phone}</p>
                   )}
                 </div>
 
                 {selectedTemplate.type === 'paid' && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
                       Select Plan *
                     </label>
                     <select
@@ -992,7 +992,7 @@ export default function TemplatesPage() {
                       value={buyNowFormData.selectedPlan}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 text-sm border border-[#1E293B] rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all"
+                      className="w-full px-3 py-2 text-sm border border-[#1E293B] rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans"
                     >
                       <option value="basic">Basic Plan - $49</option>
                       <option value="professional">Professional Plan - $99</option>
@@ -1004,7 +1004,7 @@ export default function TemplatesPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 mt-2 disabled:opacity-50 disabled:cursor-not-allowed font-sans tracking-wide"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}
                 </button>
@@ -1024,16 +1024,16 @@ export default function TemplatesPage() {
                   </svg>
                 </div>
                 
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-white mb-2 font-serif tracking-tight">
                   Request Submitted Successfully!
                 </h3>
                 
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-gray-400 text-sm mb-4 font-light tracking-wide">
                   {successMessage}
                 </p>
 
-                <p className="text-gray-400 text-xs mb-5">
-                  Our team at <strong className="text-white">Nestick Tech</strong> will contact you shortly to discuss your requirements.
+                <p className="text-gray-400 text-xs mb-5 font-light">
+                  Our team at <strong className="text-white font-sans">Nestick Tech</strong> will contact you shortly to discuss your requirements.
                 </p>
 
                 <div className="bg-[#0B0F19] rounded-lg p-3 mb-5">
@@ -1041,11 +1041,11 @@ export default function TemplatesPage() {
                     href="https://nesticktech.com" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-[#38BDF8] hover:text-[#1D4ED8] font-medium text-sm block mb-1"
+                    className="text-[#38BDF8] hover:text-[#1D4ED8] font-medium text-sm block mb-1 font-sans tracking-wide"
                   >
                     https://nesticktech.com
                   </a>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 font-sans">
                     <strong>Contact:</strong> +92 319 3236529
                   </p>
                 </div>
@@ -1055,7 +1055,7 @@ export default function TemplatesPage() {
                     setShowSuccessPopup(false);
                     setSuccessMessage('');
                   }}
-                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105"
+                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 font-sans tracking-wide"
                 >
                   Close
                 </button>

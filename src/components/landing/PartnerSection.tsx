@@ -16,14 +16,10 @@ import {
   XCircle,
   Award,
   Users,
-  
   Sparkles,
   FileText,
-  User,
-  Briefcase,
-  Calendar,
-  Download,
-  Eye
+  Eye,
+  Download
 } from 'lucide-react';
 
 interface PartnerFormData {
@@ -62,7 +58,7 @@ const countries = [
 
 export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
   const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   
   const [formData, setFormData] = useState<PartnerFormData>({
     id: '',
@@ -158,7 +154,6 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     try {
@@ -169,10 +164,8 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
         status: 'pending'
       };
 
-      // Save to localStorage
       saveToLocalStorage(newPartner);
       
-      // Call parent callback if provided
       if (onPartnerSubmit) {
         onPartnerSubmit(newPartner);
       }
@@ -180,7 +173,6 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
       setSubmitStatus('success');
       setShowSuccessModal(true);
       
-      // Reset form
       setFormData({
         id: '',
         organizationName: '',
@@ -194,7 +186,6 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
         status: 'pending'
       });
       
-      // Auto hide success modal after 5 seconds
       setTimeout(() => {
         setShowSuccessModal(false);
       }, 5000);
@@ -225,140 +216,137 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-24 relative overflow-hidden">
+    <section ref={sectionRef} className="py-12 md:py-24 px-4 sm:px-6 relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#E8CA5E]/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#00E0FF]/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1F4381]/5 rounded-full blur-3xl animate-pulse delay-500" />
+        <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#E8CA5E]/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#00E0FF]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-[#1F4381]/5 rounded-full blur-3xl animate-pulse delay-500" />
       </div>
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(232,202,94,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(232,202,94,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Section */}
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header Section - Mobile Responsive */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-10 md:mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/30 backdrop-blur-sm mb-4">
-            <Handshake className="w-4 h-4 text-[#E8CA5E]" />
-            <span className="text-sm font-medium text-gray-300">Join Our Network</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F4381]/10 border border-[#E8CA5E]/30 backdrop-blur-sm mb-4">
+            <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#E8CA5E]" />
+            <span className="text-xs md:text-sm font-medium text-gray-300 font-sans tracking-wide">Join Our Network</span>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight">
             <span className="text-white">Become a </span>
             <span className="bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] bg-clip-text text-transparent animate-gradient">
               Strategic Partner
             </span>
           </h2>
           
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto px-4 font-light tracking-wide">
             Join hands with us to revolutionize educational portfolio management across the globe.
             Together, we can create a lasting impact on millions of students.
           </p>
         </motion.div>
 
-        {/* Stats Section */}
+        {/* Stats Section - Mobile Responsive Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8 md:mb-12"
         >
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={index}
-                className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-4 text-center hover:border-[#00E0FF]/30 transition-all duration-300 group"
+                className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-xl md:rounded-2xl p-3 md:p-4 text-center hover:border-[#00E0FF]/30 transition-all duration-300 group"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Icon className="w-6 h-6 text-[#E8CA5E]" />
+                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-r from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center mx-auto mb-2 md:mb-3 group-hover:scale-110 transition-transform">
+                  <Icon className="w-4 h-4 md:w-6 md:h-6 text-[#E8CA5E]" />
                 </div>
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs text-gray-400">{stat.label}</div>
+                <div className="text-lg md:text-2xl font-bold text-white font-sans tracking-tight">{stat.value}</div>
+                <div className="text-[10px] md:text-xs text-gray-400 font-sans">{stat.label}</div>
               </div>
             );
           })}
         </motion.div>
 
-        {/* Benefits Grid */}
+        {/* Benefits Grid - Mobile Responsive */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12"
         >
           {partnershipBenefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (
               <div
                 key={index}
-                className="group bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-6 hover:border-[#00E0FF]/40 hover:shadow-xl hover:shadow-[#00E0FF]/10 transition-all duration-300"
+                className="group bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-xl md:rounded-2xl p-4 md:p-6 hover:border-[#00E0FF]/40 hover:shadow-xl hover:shadow-[#00E0FF]/10 transition-all duration-300"
               >
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Icon className="w-7 h-7" style={{ color: benefit.color }} />
+                <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl bg-gradient-to-br from-[#1F4381]/20 to-[#E8CA5E]/10 flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                  <Icon className="w-5 h-5 md:w-7 md:h-7" style={{ color: benefit.color }} />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">{benefit.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{benefit.description}</p>
+                <h3 className="text-base md:text-lg font-bold text-white mb-1 md:mb-2 font-sans tracking-wide">{benefit.title}</h3>
+                <p className="text-gray-400 text-xs md:text-sm leading-relaxed font-light">{benefit.description}</p>
               </div>
             );
           })}
         </motion.div>
 
-        {/* Main Form Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Main Form Section - Mobile Responsive */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Left Side - Partnership Info */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-6 md:p-8"
+            className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-xl md:rounded-2xl p-5 md:p-8"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-[#1F4381]" />
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
+                <Building2 className="w-5 h-5 md:w-6 md:h-6 text-[#1F4381]" />
               </div>
-              <h3 className="text-xl font-bold text-white">Why Partner With Us?</h3>
+              <h3 className="text-lg md:text-xl font-bold text-white font-serif tracking-tight">Why Partner With Us?</h3>
             </div>
 
-            <div className="space-y-6">
-              <p className="text-gray-400 leading-relaxed">
-                We're building the future of educational technology, and we're looking for passionate partners 
-                who share our vision. Whether you're an educational institution, a tech company, or an investor, 
-                there's a place for you in our ecosystem.
+            <div className="space-y-4 md:space-y-6">
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed font-light tracking-wide">
+                We&apos;re building the future of educational technology, and we&apos;re looking for passionate partners 
+                who share our vision. Whether you&apos;re an educational institution, a tech company, or an investor, 
+                there&apos;s a place for you in our ecosystem.
               </p>
 
-              <div className="p-5 bg-gradient-to-r from-[#E8CA5E]/10 to-[#00E0FF]/10 border-l-4 border-[#E8CA5E] rounded-r-xl">
-                <p className="text-gray-300 text-sm italic leading-relaxed">
-                  "Together, we can bridge the gap between traditional education and digital innovation, 
-                  making quality portfolio management accessible to every student across the globe."
+              <div className="p-4 md:p-5 bg-gradient-to-r from-[#E8CA5E]/10 to-[#00E0FF]/10 border-l-4 border-[#E8CA5E] rounded-r-xl">
+                <p className="text-gray-300 text-xs md:text-sm italic leading-relaxed font-light">
+                  &quot;Together, we can bridge the gap between traditional education and digital innovation, 
+                  making quality portfolio management accessible to every student across the globe.&quot;
                 </p>
                 <div className="flex items-center gap-2 mt-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-[#1F4381]" />
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-[#1F4381]" />
                   </div>
                   <div>
-                    <p className="text-[#E8CA5E] text-xs font-semibold">Neezamiya Team</p>
-                    <p className="text-gray-500 text-[10px]">Building the Future of Education</p>
+                    <p className="text-[#E8CA5E] text-[10px] md:text-xs font-semibold">Neezamiya Team</p>
+                    <p className="text-gray-500 text-[8px] md:text-[10px]">Building the Future of Education</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h4 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#00E0FF]" />
+                <h4 className="text-white font-semibold text-xs md:text-sm mb-2 md:mb-3 flex items-center gap-2 font-sans">
+                  <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#00E0FF]" />
                   Partnership Types:
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {organizationTypes.map((type, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1.5 rounded-full bg-[#1F4381]/20 border border-[#00E0FF]/20 text-[#00E0FF] text-xs font-medium hover:bg-[#1F4381]/40 transition-all duration-300"
+                      className="px-2 py-0.5 md:px-3 md:py-1.5 rounded-full bg-[#1F4381]/20 border border-[#00E0FF]/20 text-[#00E0FF] text-[10px] md:text-xs font-medium hover:bg-[#1F4381]/40 transition-all duration-300"
                     >
                       {type}
                     </span>
@@ -366,12 +354,11 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                 </div>
               </div>
 
-              {/* Recent Partners Button */}
               <button
                 onClick={() => setShowRecentModal(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1F4381]/20 border border-[#00E0FF]/30 text-[#00E0FF] text-sm font-medium hover:bg-[#1F4381]/40 transition-all duration-300 group"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#1F4381]/20 border border-[#00E0FF]/30 text-[#00E0FF] text-xs md:text-sm font-medium hover:bg-[#1F4381]/40 transition-all duration-300 group"
               >
-                <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:scale-110 transition-transform" />
                 View Recent Partners
               </button>
             </div>
@@ -382,21 +369,21 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-2xl p-6 md:p-8"
+            className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#1E293B] rounded-xl md:rounded-2xl p-5 md:p-8"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#00E0FF] to-[#1F4381] flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-r from-[#00E0FF] to-[#1F4381] flex items-center justify-center">
+                  <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Partner Application</h3>
+                <h3 className="text-lg md:text-xl font-bold text-white font-serif tracking-tight">Partner Application</h3>
               </div>
-              <div className="text-xs text-gray-500">All fields are required *</div>
+              <div className="text-[10px] md:text-xs text-gray-500 font-sans">All fields are required *</div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                   Organization Name *
                 </label>
                 <input
@@ -406,12 +393,12 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   onChange={handleInputChange}
                   required
                   placeholder="Enter your organization name"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                  className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                   Contact Person *
                 </label>
                 <input
@@ -421,13 +408,13 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   onChange={handleInputChange}
                   required
                   placeholder="Full name of contact person"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                  className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                     Email Address *
                   </label>
                   <input
@@ -437,11 +424,11 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     onChange={handleInputChange}
                     required
                     placeholder="contact@organization.com"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                     Phone Number *
                   </label>
                   <input
@@ -451,14 +438,14 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     onChange={handleInputChange}
                     required
                     placeholder="+92 300 1234567"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                     Organization Type *
                   </label>
                   <select
@@ -466,7 +453,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     value={formData.organizationType}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                   >
                     <option value="">Select type</option>
                     {organizationTypes.map((type, idx) => (
@@ -475,7 +462,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                  <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                     Country *
                   </label>
                   <select
@@ -483,7 +470,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     value={formData.country}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300"
+                    className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 font-sans"
                   >
                     <option value="">Select country</option>
                     {countries.map((country, idx) => (
@@ -494,7 +481,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                <label className="block text-[10px] md:text-xs font-medium text-gray-300 mb-1 font-sans tracking-wide">
                   Message / Partnership Interest *
                 </label>
                 <textarea
@@ -504,18 +491,18 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   required
                   rows={4}
                   placeholder="Tell us about your organization and how you'd like to partner with us..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 resize-none"
+                  className="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg md:rounded-xl bg-[#0B0F19] border border-[#1E293B] text-white placeholder:text-gray-500 text-xs md:text-sm focus:outline-none focus:border-[#00E0FF] focus:ring-1 focus:ring-[#00E0FF] transition-all duration-300 resize-none font-sans"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-[#E8CA5E]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 group"
+                className="w-full bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] py-2.5 md:py-3 px-4 rounded-lg md:rounded-xl font-semibold text-xs md:text-sm transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-[#E8CA5E]/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 group font-sans"
               >
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin h-4 w-4 text-[#1F4381]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-3.5 w-3.5 md:h-4 md:w-4 text-[#1F4381]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -524,15 +511,15 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                 ) : (
                   <>
                     Submit Partnership Request
-                    <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Send className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </button>
 
               {submitStatus === 'error' && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-2">
-                  <XCircle className="w-4 h-4 text-red-400" />
-                  <p className="text-red-400 text-xs">Failed to submit. Please try again.</p>
+                <div className="p-2 md:p-3 bg-red-500/10 border border-red-500/30 rounded-lg md:rounded-xl flex items-center gap-2">
+                  <XCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-400" />
+                  <p className="text-red-400 text-[10px] md:text-xs font-sans">Failed to submit. Please try again.</p>
                 </div>
               )}
             </form>
@@ -540,20 +527,20 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
         </div>
       </div>
 
-      {/* Success Modal */}
+      {/* Success Modal - Mobile Responsive */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30 rounded-2xl p-8 max-w-md mx-4 text-center animate-scaleIn">
-            <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
-              <CheckCircle className="w-8 h-8 text-green-400" />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
+          <div className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30 rounded-xl md:rounded-2xl p-5 md:p-8 max-w-md w-full mx-4 text-center animate-scaleIn">
+            <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-3 md:mb-4">
+              <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Application Submitted!</h3>
-            <p className="text-gray-400 text-sm mb-4">
+            <h3 className="text-lg md:text-xl font-bold text-white mb-2 font-serif">Application Submitted!</h3>
+            <p className="text-gray-400 text-xs md:text-sm mb-4 font-light">
               Thank you for your interest in partnering with Neezamiya. Our team will review your application and contact you within 48 hours.
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="px-6 py-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg font-semibold text-sm hover:scale-105 transition-transform"
+              className="px-5 py-2 md:px-6 md:py-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg font-semibold text-xs md:text-sm hover:scale-105 transition-transform font-sans"
             >
               Close
             </button>
@@ -561,50 +548,50 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
         </div>
       )}
 
-      {/* Recent Partners Modal */}
-      {showRecentModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn" onClick={() => setShowRecentModal(false)}>
-          <div className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30 rounded-2xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden animate-scaleIn" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-[#1E293B] flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
-                  <Users className="w-5 h-5 text-[#1F4381]" />
+      {/* Recent Partners Modal - Mobile Responsive */}
+      {/* {showRecentModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4" onClick={() => setShowRecentModal(false)}>
+          <div className="bg-gradient-to-br from-[#0F172A] to-[#0B0F19] border border-[#E8CA5E]/30 rounded-xl md:rounded-2xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden animate-scaleIn" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 md:p-6 border-b border-[#1E293B] flex items-center justify-between">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center">
+                  <Users className="w-4 h-4 md:w-5 md:h-5 text-[#1F4381]" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Recent Partners</h3>
+                <h3 className="text-base md:text-xl font-bold text-white font-serif tracking-tight">Recent Partners</h3>
               </div>
               <button
                 onClick={() => setShowRecentModal(false)}
-                className="p-2 rounded-lg hover:bg-[#1E293B] transition-colors"
+                className="p-1.5 md:p-2 rounded-lg hover:bg-[#1E293B] transition-colors"
               >
-                <XCircle className="w-5 h-5 text-gray-400" />
+                <XCircle className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto max-h-[60vh] space-y-4">
+            <div className="p-4 md:p-6 overflow-y-auto max-h-[60vh] space-y-3 md:space-y-4">
               {recentPartners.length === 0 ? (
-                <div className="text-center py-8">
-                  <Handshake className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400">No partners yet. Be the first to apply!</p>
+                <div className="text-center py-6 md:py-8">
+                  <Handshake className="w-10 h-10 md:w-12 md:h-12 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm md:text-base font-light">No partners yet. Be the first to apply!</p>
                 </div>
               ) : (
                 recentPartners.map((partner) => (
                   <div
                     key={partner.id}
-                    className="bg-[#0F172A]/50 border border-[#1E293B] rounded-xl p-4 hover:border-[#00E0FF]/30 transition-all duration-300"
+                    className="bg-[#0F172A]/50 border border-[#1E293B] rounded-lg md:rounded-xl p-3 md:p-4 hover:border-[#00E0FF]/30 transition-all duration-300"
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
                       <div>
-                        <h4 className="font-semibold text-white">{partner.organizationName}</h4>
-                        <p className="text-xs text-gray-400">{partner.organizationType}</p>
+                        <h4 className="font-semibold text-white text-sm md:text-base font-sans">{partner.organizationName}</h4>
+                        <p className="text-[10px] md:text-xs text-gray-400">{partner.organizationType}</p>
                       </div>
-                      <span className="text-[10px] text-gray-500">{new Date(partner.submittedAt).toLocaleDateString()}</span>
+                      <span className="text-[8px] md:text-[10px] text-gray-500">{new Date(partner.submittedAt).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-2">
+                    <p className="text-[10px] md:text-xs text-gray-500 mb-2">
                       Contact: {partner.contactPerson} | {partner.email}
                     </p>
-                    <p className="text-xs text-gray-400 line-clamp-2">{partner.message}</p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    <p className="text-[10px] md:text-xs text-gray-400 line-clamp-2">{partner.message}</p>
+                    <div className="mt-2 md:mt-3 flex items-center gap-2">
+                      <span className={`text-[8px] md:text-[10px] px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full ${
                         partner.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
                         partner.status === 'approved' ? 'bg-green-500/20 text-green-400' :
                         'bg-red-500/20 text-red-400'
@@ -613,9 +600,9 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       </span>
                       <button
                         onClick={() => generatePDF(partner)}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-[#1F4381]/20 text-[#00E0FF] hover:bg-[#1F4381]/40 transition-colors flex items-center gap-1"
+                        className="text-[8px] md:text-[10px] px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full bg-[#1F4381]/20 text-[#00E0FF] hover:bg-[#1F4381]/40 transition-colors flex items-center gap-1"
                       >
-                        <Download className="w-3 h-3" /> Export
+                        <Download className="w-2.5 h-2.5 md:w-3 md:h-3" /> Export
                       </button>
                     </div>
                   </div>
@@ -624,7 +611,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <style jsx>{`
         @keyframes fadeIn {
