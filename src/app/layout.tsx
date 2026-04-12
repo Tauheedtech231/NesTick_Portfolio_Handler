@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import './globals.css'
  // Client wrapper
 
-
+import { ThemeProvider } from "./ThemeProvider";
 
 export const metadata: Metadata = {
   title: "College Portfolio Handler Portal",
@@ -25,7 +25,9 @@ export default function RootLayout({
       >
 
 
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       
       </body>
     </html>

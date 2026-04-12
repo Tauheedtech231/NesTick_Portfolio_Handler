@@ -104,15 +104,49 @@ function Slider({ items, direction, speed = 50 }: SliderProps) {
 }
 
 export default function PartnerProductSection() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  
+  // Detect theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
   const productItems = products.map((product) => (
     <div
       key={product}
-      className="group relative px-3 py-1 md:px-4 md:py-1.5 bg-[#0F172A]/40 backdrop-blur-sm rounded-lg border border-transparent hover:border-[#E8CA5E]/30 transition-all duration-300 cursor-pointer whitespace-nowrap"
+      className="group relative px-3 py-1 md:px-4 md:py-1.5 rounded-lg border transition-all duration-300 cursor-pointer whitespace-nowrap"
+      style={{
+        backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+        borderColor: theme === 'dark' ? 'transparent' : 'rgba(232, 202, 94, 0.3)',
+      }}
     >
-      <span className="text-sm md:text-base lg:text-lg font-bold bg-gradient-to-r from-gray-300 to-gray-400 bg-clip-text text-transparent group-hover:from-[#E8CA5E] group-hover:to-[#A57F2A] transition-all duration-300">
+      <span 
+        className="text-sm md:text-base lg:text-lg font-bold transition-all duration-300 bg-clip-text text-transparent"
+        style={{
+          backgroundImage: theme === 'dark' 
+            ? 'linear-gradient(to right, #9CA3AF, #D1D5DB)'
+            : 'linear-gradient(to right, #1F4381, #00E0FF)',
+        }}
+      >
         {product}
       </span>
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/5 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/10 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   ));
 
@@ -121,7 +155,13 @@ export default function PartnerProductSection() {
       key={partner.id}
       className="group relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-300 cursor-pointer"
     >
-      <div className="relative w-8 h-8 md:w-10 md:h-10 grayscale group-hover:grayscale-0 transition-all duration-300 group-hover:scale-110">
+      <div 
+        className="relative w-8 h-8 md:w-10 md:h-10 transition-all duration-300 group-hover:scale-110"
+        style={{
+          filter: theme === 'dark' ? 'grayscale(100%)' : 'grayscale(0%)',
+          opacity: theme === 'dark' ? 0.6 : 1,
+        }}
+      >
         <Image
           src={partner.image}
           alt={partner.name}
@@ -132,63 +172,90 @@ export default function PartnerProductSection() {
     </div>
   ));
 
+  // Get gradient colors based on theme
+  const gradientColors = theme === 'dark'
+    ? ['#0B0F19', '#1F4381', '#E8CA5E', '#0B0F19', '#00E0FF', '#1F4381', '#0B0F19']
+    : ['#F5F5F5', '#E8CA5E', '#1F4381', '#F5F5F5', '#00E0FF', '#E8CA5E', '#F5F5F5'];
+
   return (
     <section className="relative py-4 md:py-6 overflow-hidden">
-      {/* Smooth Continuous Changing Background - Intact */}
-      <div className="absolute inset-0 bg-gradient-moving" />
+      {/* Theme-aware background - Fixed style conflict */}
+      <div 
+        className="absolute inset-0 transition-all duration-500"
+        style={{
+          backgroundImage: `linear-gradient(270deg, ${gradientColors.join(', ')})`,
+          backgroundSize: '400% 400%',
+          backgroundPosition: '0% 50%',
+          animation: 'smoothGradient 15s ease infinite',
+        }}
+      />
       
-      {/* Subtle overlay for blending - No borders */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0F19]/20 via-transparent to-[#0B0F19]/20 pointer-events-none" />
+      {/* Subtle overlay for blending */}
+      <div 
+        className="absolute inset-0 pointer-events-none transition-all duration-500"
+        style={{
+          background: theme === 'dark'
+            ? 'linear-gradient(to bottom, rgba(11, 15, 25, 0.3), rgba(11, 15, 25, 0.1), rgba(11, 15, 25, 0.3))'
+            : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3))'
+        }}
+      />
 
-      {/* Edge Fade Masks - Only these remain for smooth edges */}
+      {/* Edge Fade Masks */}
       <div className="relative z-10 container mx-auto px-4">
-        {/* Partners Slider - Right to Left */}
+        {/* Partners Slider */}
         <div className="mb-3 md:mb-4 relative">
-          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
-          <Slider items={partnerItems} direction="left" speed={35} />
+          <div 
+            className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
+            style={{
+              background: theme === 'dark'
+                ? 'linear-gradient(to right, #0B0F19, transparent)'
+                : 'linear-gradient(to right, #F5F5F5, transparent)'
+            }}
+          />
+          <div 
+            className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
+            style={{
+              background: theme === 'dark'
+                ? 'linear-gradient(to left, #0B0F19, transparent)'
+                : 'linear-gradient(to left, #F5F5F5, transparent)'
+            }}
+          />
+          <Slider items={partnerItems} direction="left" speed={30} />
         </div>
 
-        {/* Products Slider - Left to Right */}
+        {/* Products Slider */}
         <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0B0F19] via-[#0B0F19]/80 to-transparent z-10 pointer-events-none" />
-          <Slider items={productItems} direction="right" speed={40} />
+          <div 
+            className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
+            style={{
+              background: theme === 'dark'
+                ? 'linear-gradient(to right, #0B0F19, transparent)'
+                : 'linear-gradient(to right, #F5F5F5, transparent)'
+            }}
+          />
+          <div 
+            className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
+            style={{
+              background: theme === 'dark'
+                ? 'linear-gradient(to left, #0B0F19, transparent)'
+                : 'linear-gradient(to left, #F5F5F5, transparent)'
+            }}
+          />
+          <Slider items={productItems} direction="right" speed={35} />
         </div>
       </div>
 
       <style jsx>{`
         @keyframes smoothGradient {
-          0% {
-            background-position: 0% 50%;
-          }
-          25% {
-            background-position: 50% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          75% {
-            background-position: 50% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+          0% { background-position: 0% 50%; }
+          25% { background-position: 50% 50%; }
+          50% { background-position: 100% 50%; }
+          75% { background-position: 50% 50%; }
+          100% { background-position: 0% 50%; }
         }
         
-        .bg-gradient-moving {
-          background: linear-gradient(
-            270deg,
-            #0B0F19 0%,
-            #1F4381 20%,
-            #E8CA5E 35%,
-            #0B0F19 50%,
-            #00E0FF 65%,
-            #1F4381 80%,
-            #0B0F19 100%
-          );
-          background-size: 400% 400%;
-          animation: smoothGradient 12s ease infinite;
+        .will-change-transform {
+          will-change: transform;
         }
       `}</style>
     </section>

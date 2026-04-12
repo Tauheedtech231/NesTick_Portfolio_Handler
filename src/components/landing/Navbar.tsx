@@ -1,41 +1,98 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { LogOut, LayoutDashboard, Menu, X, MessageCircle } from "lucide-react";
+import { useEffect, useRef, useState, useCallback, memo } from "react";
+import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
+// Custom theme hook - simple and reliable
+function useTheme() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  }, [theme]);
+
+  return { theme, toggleTheme, mounted };
+}
+
+// Simple nav item - no heavy animations
+const NavItem = memo(({ item, isActive, onClick }: { 
+  item: { name: string; path: string }; 
+  isActive: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`relative px-4 py-2 transition-colors duration-200 group ${
+      isActive 
+        ? 'text-[#00E0FF]' 
+        : 'text-gray-400 hover:text-white'
+    }`}
+  >
+    <span className="font-medium text-sm uppercase tracking-wide">
+      {item.name}
+    </span>
+    <span className={`absolute left-0 bottom-0 h-0.5 bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] rounded-full transition-all duration-200 ${
+      isActive ? 'w-full' : 'w-0 group-hover:w-full'
+    }`} />
+  </button>
+));
+
+NavItem.displayName = 'NavItem';
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, toggleTheme, mounted } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // Handle scroll effect
+  // Simple scroll handler
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener('scroll', handleScroll);
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Check user authentication
   useEffect(() => {
     const checkUserAuthentication = () => {
-      if (typeof window !== 'undefined') {
+      try {
         const loginUser = localStorage.getItem('login_user');
         if (loginUser) {
           setUser(JSON.parse(loginUser));
         } else {
           setUser(null);
         }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        setUser(null);
       }
     };
 
@@ -49,71 +106,59 @@ export default function Navbar() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Mobile menu animations - Smooth slide from top
+  // Simple mobile menu toggle - CSS transition only
   useEffect(() => {
-    if (mobileMenuRef.current) {
-      if (isMobileMenuOpen) {
-        // Animate in - slide down with bounce effect
-        gsap.fromTo(mobileMenuRef.current,
-          { 
-            y: -20, 
-            opacity: 0,
-            display: "block"
-          },
-          { 
-            y: 0, 
-            opacity: 1, 
-            duration: 0.5,
-            ease: "back.out(0.6)",
-            clearProps: "display"
+    if (!mobileMenuRef.current) return;
+    
+    if (isMobileMenuOpen) {
+      mobileMenuRef.current.style.display = 'block';
+      setTimeout(() => {
+        if (mobileMenuRef.current) {
+          mobileMenuRef.current.style.opacity = '1';
+          mobileMenuRef.current.style.transform = 'translateY(0)';
+        }
+      }, 10);
+    } else {
+      if (mobileMenuRef.current) {
+        mobileMenuRef.current.style.opacity = '0';
+        mobileMenuRef.current.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+          if (mobileMenuRef.current && !isMobileMenuOpen) {
+            mobileMenuRef.current.style.display = 'none';
           }
-        );
-      } else {
-        // Animate out - slide up
-        gsap.to(mobileMenuRef.current, {
-          y: -20,
-          opacity: 0,
-          duration: 0.4,
-          ease: "power2.in",
-          onComplete: () => {
-            if (mobileMenuRef.current) {
-              gsap.set(mobileMenuRef.current, { display: "none" });
-            }
-          }
-        });
+        }, 200);
       }
     }
   }, [isMobileMenuOpen]);
 
-  // Logout function
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('login_user');
     setUser(null);
     setIsDropdownOpen(false);
     router.push('/auth/login');
-  };
+  }, [router]);
 
-  // Handle dashboard redirect for super admin
-  const handleDashboardRedirect = () => {
+  const handleDashboardRedirect = useCallback(() => {
     router.push('/Portfolio_Handler');
-  };
+  }, [router]);
 
-  // Handle logo click - redirect to designer portal
-  const handleLogoClick = (e: React.MouseEvent) => {
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    // Check if user is logged in and has access to designer portal
     if (user) {
       router.push('/designer-portal');
     } else {
-      // If not logged in, redirect to login page
       router.push('/auth/login');
     }
-  };
+  }, [user, router]);
 
-  const getUserEmail = () => {
-    if (!user) return '';
-    return user.email || '';
-  };
+  const handleNavigation = useCallback((path: string) => {
+    router.push(path);
+    setIsMobileMenuOpen(false);
+    setIsDropdownOpen(false);
+  }, [router]);
+
+  const getUserEmail = () => user?.email || '';
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -122,21 +167,33 @@ export default function Navbar() {
     { name: 'About', path: '/about' },
   ];
 
-  const handleNavigation = (path: string) => {
-    router.push(path);
-    setIsMobileMenuOpen(false);
-    setIsDropdownOpen(false);
-  };
+  // Don't render until mounted
+  if (!mounted) {
+    return (
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1F4381]/90 backdrop-blur-sm border-b border-[#00E0FF]/10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-gray-700" />
+              <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent">
+                Portfolio Handler
+              </span>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-[#1F4381]/95 backdrop-blur-lg border-b border-[#00E0FF]/20 shadow-lg' 
-        : 'bg-[#1F4381]/90 backdrop-blur-sm border-b border-[#00E0FF]/10'
+        ? 'bg-background/95 backdrop-blur-lg border-b border-border shadow-md' 
+        : 'bg-background/90 backdrop-blur-sm border-b border-border/50'
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          {/* Logo with Brand Colors - Bigger Logo */}
+          {/* Logo */}
           <div 
             onClick={handleLogoClick}
             className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity group"
@@ -148,53 +205,51 @@ export default function Navbar() {
               }
             }}
           >
-            {/* Bigger Logo Image */}
-            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-110 transition-all duration-300 shadow-lg shadow-[#00E0FF]/20">
+            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md shadow-primary/20">
               <Image
                 src="/logo.jpg"
                 alt="Logo"
                 fill
                 className="object-cover"
+                priority
               />
             </div>
-            {/* Stylish Company Name */}
-            <span className="text-xl md:text-2xl font-bold font-serif tracking-tight bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent animate-gradient">
+            <span className="text-xl md:text-2xl font-bold font-serif tracking-tight bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent">
               Portfolio Handler
             </span>
           </div>
 
-          {/* Desktop Navigation - Stylish Font */}
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.path;
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`relative px-4 py-2 transition-all duration-300 ease-out group ${
-                    isActive 
-                      ? 'text-[#00E0FF]' 
-                      : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  <span className="font-semibold text-sm uppercase tracking-wide font-sans">
-                    {item.name}
-                  </span>
-                  <span className={`absolute left-0 bottom-0 h-[2px] bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] rounded-full transition-all duration-500 ease-out ${
-                    isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                  }`}></span>
-                </button>
-              );
-            })}
+            {navItems.map((item) => (
+              <NavItem
+                key={item.name}
+                item={item}
+                isActive={pathname === item.path}
+                onClick={() => handleNavigation(item.path)}
+              />
+            ))}
           </div>
 
           {/* Right Side Buttons */}
           <div className="flex items-center space-x-3">
-            {/* Feedback Button - Stylish */}
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-muted/50 border border-border hover:border-[#00E0FF]/50 transition-all duration-200"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-yellow-500" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-700" />
+              )}
+            </button>
+
+            {/* Feedback Button */}
             <Link
               href="/feedback"
-              className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#E8CA5E]/30"
-              style={{ boxShadow: '0 0 15px rgba(232, 202, 94, 0.2)' }}
+              className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
             >
               <MessageCircle className="w-4 h-4" />
               Feedback
@@ -204,14 +259,14 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-[#1F4381]/50 border border-[#00E0FF]/30 hover:border-[#00E0FF] transition-all duration-300"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-xl bg-muted/50 border border-border hover:border-[#00E0FF] transition-all duration-200"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] rounded-lg flex items-center justify-center">
                     <span className="text-[#1F4381] font-bold text-sm">
                       {getUserEmail().charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="hidden lg:block text-sm font-medium text-gray-300 max-w-[150px] truncate font-sans">
+                  <span className="hidden lg:block text-sm font-medium text-muted-foreground max-w-[150px] truncate">
                     {getUserEmail()}
                   </span>
                 </button>
@@ -223,30 +278,28 @@ export default function Navbar() {
                       className="fixed inset-0 z-40" 
                       onClick={() => setIsDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-64 bg-[#1F4381] rounded-xl shadow-lg border border-[#00E0FF]/30 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-4 py-3 border-b border-[#00E0FF]/20">
-                        <p className="text-sm font-semibold text-white font-sans">Signed in as</p>
-                        <p className="text-sm text-gray-300 truncate font-light">{getUserEmail()}</p>
+                    <div className="absolute right-0 mt-2 w-64 bg-card rounded-xl shadow-lg border border-border z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-border">
+                        <p className="text-sm font-semibold text-foreground">Signed in as</p>
+                        <p className="text-sm text-muted-foreground truncate">{getUserEmail()}</p>
                       </div>
                       
                       <div className="p-2">
-                        {/* Designer Portal Link - For all logged in users */}
                         <button
                           onClick={() => {
                             router.push('/designer-portal');
                             setIsDropdownOpen(false);
                           }}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-muted-foreground hover:bg-primary/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           <span>Designer Portal</span>
                         </button>
                         
-                        {/* Super Admin Dashboard - Only for specific email */}
                         {user.email === 'tauheeddeveloper13@gmail.com' && (
                           <button
                             onClick={handleDashboardRedirect}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
+                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-muted-foreground hover:bg-primary/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                           >
                             <LayoutDashboard className="w-4 h-4" />
                             <span>Admin Dashboard</span>
@@ -255,7 +308,7 @@ export default function Navbar() {
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-gray-300 hover:bg-[#00E0FF]/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-muted-foreground hover:bg-primary/10 hover:text-[#00E0FF] rounded-lg transition-colors font-medium"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -266,41 +319,40 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <>
-                <Link
-                  href="/auth/login"
-                  className="bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-[#4F0281]/30"
-                  style={{ boxShadow: '0 0 15px rgba(79, 2, 129, 0.3)' }}
-                >
-                  Login
-                </Link>
-              </>
+              <Link
+                href="/auth/login"
+                className="bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+              >
+                Login
+              </Link>
             )}
 
-            {/* Mobile Menu Toggle with Animated Icon */}
+            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-[#1F4381]/50 border border-[#00E0FF]/30 hover:border-[#00E0FF] transition-all duration-300 relative overflow-hidden"
+              className="lg:hidden p-2.5 rounded-xl bg-muted/50 border border-border hover:border-[#00E0FF] transition-all duration-200"
               aria-label="Toggle menu"
             >
-              <div className="relative z-10">
-                {isMobileMenuOpen ? (
-                  <X className="w-5 h-5 text-gray-300 transition-transform duration-300 rotate-0" />
-                ) : (
-                  <Menu className="w-5 h-5 text-gray-300 transition-transform duration-300" />
-                )}
-              </div>
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-foreground" />
+              ) : (
+                <Menu className="w-5 h-5 text-foreground" />
+              )}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu Content - Smooth Slide Animation */}
+        {/* Mobile Menu - Simple CSS transition */}
         <div 
           ref={mobileMenuRef} 
-          className="lg:hidden mt-3 overflow-hidden"
-          style={{ display: 'none' }}
+          className="lg:hidden mt-3 overflow-hidden transition-all duration-200"
+          style={{ 
+            display: 'none',
+            transform: 'translateY(-10px)',
+            opacity: 0
+          }}
         >
-          <div className="bg-[#1F4381] border border-[#00E0FF]/30 rounded-xl shadow-lg">
+          <div className="bg-card border border-border rounded-xl shadow-lg">
             <div className="px-4 py-4 space-y-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.path;
@@ -308,10 +360,10 @@ export default function Navbar() {
                   <button
                     key={item.name}
                     onClick={() => handleNavigation(item.path)}
-                    className={`block w-full text-left font-semibold text-sm py-2.5 px-3 rounded-lg transition-all duration-300 ${
+                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-colors duration-200 ${
                       isActive 
-                        ? 'bg-[#00E0FF]/20 text-[#00E0FF]' 
-                        : 'text-gray-300 hover:bg-[#00E0FF]/10 hover:text-white'
+                        ? 'bg-primary/20 text-[#00E0FF]' 
+                        : 'text-muted-foreground hover:bg-primary/10 hover:text-foreground'
                     }`}
                   >
                     {item.name}
@@ -319,11 +371,10 @@ export default function Navbar() {
                 );
               })}
               
-              {/* Mobile Feedback Button */}
               <Link
                 href="/feedback"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full mt-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105"
+                className="flex items-center justify-center gap-2 w-full mt-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4" />
                 Feedback
@@ -331,27 +382,25 @@ export default function Navbar() {
             </div>
 
             {user ? (
-              <div className="border-t border-[#00E0FF]/20 px-4 py-4 space-y-2">
-                {/* Designer Portal - Mobile */}
+              <div className="border-t border-border px-4 py-4 space-y-2">
                 <button
                   onClick={() => {
                     router.push('/designer-portal');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#00E0FF] to-[#1F4381] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#00E0FF] to-[#1F4381] text-white rounded-lg transition-all duration-200 hover:scale-105 font-semibold"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Designer Portal
                 </button>
                 
-                {/* Super Admin Dashboard - Mobile */}
                 {user.email === 'tauheeddeveloper13@gmail.com' && (
                   <button
                     onClick={() => {
                       handleDashboardRedirect();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] rounded-lg transition-all duration-200 hover:scale-105 font-semibold"
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     Admin Dashboard
@@ -363,18 +412,18 @@ export default function Navbar() {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg transition-all duration-200 hover:scale-105 font-semibold"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="border-t border-[#00E0FF]/20 px-4 py-4">
+              <div className="border-t border-border px-4 py-4">
                 <Link
                   href="/auth/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg hover:scale-105 transition-all duration-300 font-semibold"
+                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm bg-gradient-to-r from-[#4F0281] to-[#DC33E0] text-white rounded-lg transition-all duration-200 hover:scale-105 font-semibold"
                 >
                   Login
                 </Link>
@@ -383,18 +432,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
     </nav>
   );
 }

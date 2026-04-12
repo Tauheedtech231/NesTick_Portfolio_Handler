@@ -1,3 +1,4 @@
+/* app/globals.css */
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -37,6 +38,18 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  
+  /* Brand Colors */
+  --color-gold: #E8CA5E;
+  --color-gold-dark: #A57F2A;
+  --color-gold-light: #F5D76E;
+  --color-cyan: #00E0FF;
+  --color-cyan-dark: #00B8D4;
+  --color-navy: #1F4381;
+  --color-navy-light: #2B5A9E;
+  --color-purple: #4F0281;
+  --color-purple-light: #DC33E0;
+  
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -118,5 +131,63 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for brand colors */
+@layer utilities {
+  .bg-gold {
+    background-color: #E8CA5E;
+  }
+  .bg-gold-dark {
+    background-color: #A57F2A;
+  }
+  .bg-gold-light {
+    background-color: #F5D76E;
+  }
+  .bg-cyan {
+    background-color: #00E0FF;
+  }
+  .bg-navy {
+    background-color: #1F4381;
+  }
+  .bg-purple {
+    background-color: #4F0281;
+  }
+  .text-gold {
+    color: #E8CA5E;
+  }
+  .text-cyan {
+    color: #00E0FF;
+  }
+  .text-navy {
+    color: #1F4381;
+  }
+  .from-gold {
+    --tw-gradient-from: #E8CA5E;
+  }
+  .to-gold-dark {
+    --tw-gradient-to: #A57F2A;
+  }
+  .via-gold-light {
+    --tw-gradient-via: #F5D76E;
+  }
+  .from-cyan {
+    --tw-gradient-from: #00E0FF;
+  }
+  .to-navy {
+    --tw-gradient-to: #1F4381;
+  }
+  .from-purple {
+    --tw-gradient-from: #4F0281;
+  }
+  .to-purple-light {
+    --tw-gradient-to: #DC33E0;
+  }
+  .border-gold\/30 {
+    border-color: rgba(232, 202, 94, 0.3);
+  }
+  .border-cyan\/30 {
+    border-color: rgba(0, 224, 255, 0.3);
   }
 }
