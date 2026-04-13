@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -104,6 +104,28 @@ export default function StudentFeedback() {
   const [allFeedbacks, setAllFeedbacks] = useState<FeedbackData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  // Detect theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -186,7 +208,7 @@ export default function StudentFeedback() {
     };
   }, []);
 
-  // Handle feedback click - Debug log
+  // Handle feedback click
   const handleFeedbackClick = (feedback: FeedbackData) => {
     console.log('Feedback clicked:', feedback);
     setSelected(feedback);
@@ -194,10 +216,21 @@ export default function StudentFeedback() {
 
   if (!mounted || isLoading) {
     return (
-      <section className="relative w-full min-h-screen flex items-center justify-center bg-[#0B0F19]">
+      <section className="relative w-full min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5' }}
+      >
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-[#FFD700] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading feedbacks...</p>
+          <div className="w-12 h-12 border-3 rounded-full animate-spin mx-auto mb-4"
+            style={{
+              borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 160, 255, 0.2)',
+              borderTopColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+            }}
+          />
+          <p className="text-sm"
+            style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+          >
+            Loading feedbacks...
+          </p>
         </div>
       </section>
     );
@@ -222,41 +255,72 @@ export default function StudentFeedback() {
       .slice(0, 2);
   };
 
- return (
-    <section className="relative w-full min-h-screen flex flex-col items-center justify-start lg:justify-center bg-[#0B0F19] py-12 lg:py-8 overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0B0F19] via-[#0F172A] to-[#0B0F19]" />
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl animate-pulse delay-500" />
+  return (
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-start lg:justify-center py-12 lg:py-8 overflow-hidden"
+      style={{
+        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+      }}
+    >
+      {/* Background - No gradients, just subtle blur */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl opacity-10"
+          style={{
+            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+          }}
+        />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl opacity-10"
+          style={{
+            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+          }}
+        />
       </div>
 
       {/* Content Container */}
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         {/* Center Content */}
         <div className="text-center max-w-2xl px-4 mb-8 lg:mb-12 mt-8 lg:mt-0">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFD700]/10 border border-[#FFD700]/30 backdrop-blur-sm mb-4 lg:mb-6">
-            <School className="w-3.5 h-3.5 text-[#FFD700]" />
-            <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 lg:mb-6 mx-auto w-fit"
+            style={{
+              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
+              border: 'none',
+            }}
+          >
+            <School className="w-3.5 h-3.5"
+              style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+            />
+            <span className="text-xs font-medium font-sans tracking-wide"
+              style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+            >
               College Portfolio Management
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white font-serif">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight font-serif"
+            style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+          >
             Portfolio Handler
           </h2>
-          <p className="mt-3 lg:mt-4 text-sm sm:text-base lg:text-lg text-gray-400 font-light tracking-wide">
+          <p className="mt-3 lg:mt-4 text-sm sm:text-base lg:text-lg font-light tracking-wide"
+            style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+          >
             Trusted by leading educational institutions for portfolio management
           </p>
           
           {/* Stats Badge */}
           <div className="flex justify-center gap-4 mt-4">
-            <div className="flex items-center gap-1 text-xs text-gray-400 font-sans tracking-wide">
-              <Users className="w-3 h-3 text-[#FFD700]" />
+            <div className="flex items-center gap-1 text-xs font-sans tracking-wide"
+              style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+            >
+              <Users className="w-3 h-3"
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+              />
               <span>{allFeedbacks.length}+ Feedbacks</span>
             </div>
-            <div className="flex items-center gap-1 text-xs text-gray-400 font-sans tracking-wide">
-              <Star className="w-3 h-3 text-[#FFD700]" />
+            <div className="flex items-center gap-1 text-xs font-sans tracking-wide"
+              style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+            >
+              <Star className="w-3 h-3"
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+              />
               <span>
                 {allFeedbacks.length > 0 
                   ? (allFeedbacks.reduce((acc, f) => acc + f.rating, 0) / allFeedbacks.length).toFixed(1)
@@ -275,32 +339,31 @@ export default function StudentFeedback() {
               height: ringSizes.large
             }}
           >
-            {/* Ring 1 - Largest - Gold tint */}
+            {/* Rings - Very subtle, almost invisible */}
             <div 
-              className="absolute rounded-full border border-[#FFD700]/20"
+              className="absolute rounded-full"
               style={{ 
                 width: ringSizes.large,
-                height: ringSizes.large
+                height: ringSizes.large,
+                border: `1px solid ${theme === 'dark' ? 'rgba(232, 202, 94, 0.1)' : 'rgba(0, 160, 255, 0.1)'}`,
               }}
-            ></div>
-            
-            {/* Ring 2 - Middle - Gold tint */}
+            />
             <div 
-              className="absolute rounded-full border border-[#FFD700]/15"
+              className="absolute rounded-full"
               style={{ 
                 width: ringSizes.medium,
-                height: ringSizes.medium
+                height: ringSizes.medium,
+                border: `1px solid ${theme === 'dark' ? 'rgba(232, 202, 94, 0.08)' : 'rgba(0, 160, 255, 0.08)'}`,
               }}
-            ></div>
-            
-            {/* Ring 3 - Smallest - Gold tint */}
+            />
             <div 
-              className="absolute rounded-full border border-[#FFD700]/10"
+              className="absolute rounded-full"
               style={{ 
                 width: ringSizes.small,
-                height: ringSizes.small
+                height: ringSizes.small,
+                border: `1px solid ${theme === 'dark' ? 'rgba(232, 202, 94, 0.05)' : 'rgba(0, 160, 255, 0.05)'}`,
               }}
-            ></div>
+            />
             
             {/* Rotating Orbit with Feedback Images */}
             <div 
@@ -332,11 +395,12 @@ export default function StudentFeedback() {
                         onClick={() => handleFeedbackClick(feedback)}
                         onMouseEnter={() => setHoveredId(feedback.id)}
                         onMouseLeave={() => setHoveredId(null)}
-                        className="relative rounded-full border-4 shadow-xl transition-all duration-300 overflow-hidden bg-gradient-to-br from-[#FFD700] to-[#B11217] cursor-pointer"
+                        className="relative rounded-full border-4 shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
                         style={{ 
                           width: isDesktop ? Math.min(90, ringSizes.orbit * 0.2) : Math.min(70, ringSizes.orbit * 0.2),
                           height: isDesktop ? Math.min(90, ringSizes.orbit * 0.2) : Math.min(70, ringSizes.orbit * 0.2),
-                          borderColor: hoveredId === feedback.id ? '#FFD700' : '#FFFFFF',
+                          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                          borderColor: hoveredId === feedback.id ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : '#FFFFFF',
                           marginLeft: isDesktop ? -45 : -35,
                           marginTop: isDesktop ? -45 : -35
                         }}
@@ -354,7 +418,7 @@ export default function StudentFeedback() {
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-bold text-lg font-sans tracking-wide">
                           {getInitials(feedback.name)}
                         </div>
-                        <div className="absolute inset-0 rounded-full border-2 border-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 rounded-full border-2 border-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </motion.button>
                     </div>
                   );
@@ -364,8 +428,14 @@ export default function StudentFeedback() {
             
             {/* Center Logo */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-20 h-20 lg:w-28 lg:h-28 bg-gradient-to-br from-[#FFD700] to-[#FFD700]/70 rounded-full flex items-center justify-center shadow-lg">
-                <Sparkles className="w-8 h-8 lg:w-12 lg:h-12 text-black" />
+              <div className="w-20 h-20 lg:w-28 lg:h-28 rounded-full flex items-center justify-center shadow-lg"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                }}
+              >
+                <Sparkles className="w-8 h-8 lg:w-12 lg:h-12"
+                  style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }}
+                />
               </div>
             </div>
           </div>
@@ -387,15 +457,27 @@ export default function StudentFeedback() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-[#0F172A] rounded-3xl max-w-md w-full text-center shadow-2xl relative overflow-hidden border border-[#FFD700]/30"
+              className="rounded-3xl max-w-md w-full text-center shadow-2xl relative overflow-hidden"
+              style={{
+                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                border: `1px solid ${theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)'}`,
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Top gradient bar - Theme colors */}
-              <div className="h-2 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-[#B11217]"></div>
+              {/* Top bar */}
+              <div className="h-2"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                }}
+              />
               
               <button
                 onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 w-10 h-10 bg-[#1E293B] rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FFD700] hover:text-black transition-all duration-300 z-10"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 z-10"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#1E293B' : '#F0F0F0',
+                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -403,10 +485,17 @@ export default function StudentFeedback() {
               </button>
 
               <div className="p-8">
-                {/* Profile Image - Same for all */}
+                {/* Profile Image */}
                 <div className="relative w-28 h-28 mx-auto mb-6">
-                  <div className="absolute inset-0 rounded-full border-4 border-[#FFD700] animate-pulse"></div>
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-[#0F172A] bg-gradient-to-br from-[#FFD700] to-[#B11217]">
+                  <div className="absolute inset-0 rounded-full border-4 animate-pulse"
+                    style={{ borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  />
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4"
+                    style={{
+                      borderColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                    }}
+                  >
                     <Image
                       src={DEFAULT_AVATAR}
                       alt={selected.name}
@@ -421,15 +510,23 @@ export default function StudentFeedback() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-2xl font-bold text-white mb-1 font-serif tracking-tight">
+                <h3 className="text-2xl font-bold mb-1 font-serif tracking-tight"
+                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                >
                   {selected.name}
                 </h3>
-                <p className="text-[#FFD700] font-medium text-sm mb-2 font-sans tracking-wide">
+                <p className="font-medium text-sm mb-2 font-sans tracking-wide"
+                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                >
                   {selected.role}
                 </p>
                 <div className="flex items-center justify-center gap-1 mb-3">
-                  <School className="w-3 h-3 text-gray-400" />
-                  <p className="text-gray-400 text-xs font-light tracking-wide">
+                  <School className="w-3 h-3"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  />
+                  <p className="text-xs font-light tracking-wide"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  >
                     {selected.institution}
                   </p>
                 </div>
@@ -441,39 +538,70 @@ export default function StudentFeedback() {
                       key={i}
                       className={`w-4 h-4 ${
                         i < selected.rating
-                          ? 'fill-[#FFD700] text-[#FFD700]'
-                          : 'text-gray-600 fill-none'
+                          ? `fill-current text-current`
+                          : 'fill-none'
                       }`}
+                      style={{
+                        color: i < selected.rating
+                          ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
+                          : (theme === 'dark' ? '#374151' : '#D1D5DB'),
+                      }}
                     />
                   ))}
                 </div>
 
                 {/* Quote icon */}
-                <Quote className="w-8 h-8 text-[#FFD700]/30 mx-auto mb-3" />
+                <Quote className="w-8 h-8 mx-auto mb-3"
+                  style={{ color: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)' }}
+                />
 
-                <p className="text-gray-300 leading-relaxed mb-4 relative text-sm font-light tracking-wide">
+                <p className="leading-relaxed mb-4 relative text-sm font-light tracking-wide"
+                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                >
                   &quot;{selected.feedback}&quot;
                 </p>
 
                 {selected.suggestions && selected.suggestions.trim() !== '' && (
-                  <div className="mt-3 p-3 bg-[#1E293B] rounded-lg">
-                    <p className="text-xs text-gray-400 mb-1 font-sans tracking-wide">💡 Suggestion:</p>
-                    <p className="text-xs text-gray-300 font-light tracking-wide">{selected.suggestions}</p>
+                  <div className="mt-3 p-3 rounded-lg"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#1E293B' : '#F0F0F0',
+                    }}
+                  >
+                    <p className="text-xs mb-1 font-sans tracking-wide"
+                      style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                    >
+                      💡 Suggestion:
+                    </p>
+                    <p className="text-xs font-light tracking-wide"
+                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    >
+                      {selected.suggestions}
+                    </p>
                   </div>
                 )}
 
                 <div className="flex items-center justify-center gap-1 mt-3">
-                  <Calendar className="w-3 h-3 text-gray-500" />
-                  <p className="text-gray-500 text-xs font-light tracking-wide">
+                  <Calendar className="w-3 h-3"
+                    style={{ color: theme === 'dark' ? '#6B7280' : '#9CA3AF' }}
+                  />
+                  <p className="text-xs font-light tracking-wide"
+                    style={{ color: theme === 'dark' ? '#6B7280' : '#9CA3AF' }}
+                  >
                     {new Date(selected.date).toLocaleDateString()}
                   </p>
                 </div>
 
                 {/* Decorative dots */}
                 <div className="flex justify-center gap-2 mt-4">
-                  <div className="w-2 h-2 rounded-full bg-[#FFD700]"></div>
-                  <div className="w-2 h-2 rounded-full bg-[#FFD700]/60"></div>
-                  <div className="w-2 h-2 rounded-full bg-[#B11217]"></div>
+                  <div className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  />
+                  <div className="w-2 h-2 rounded-full opacity-60"
+                    style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  />
+                  <div className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: theme === 'dark' ? '#B11217' : '#B11217' }}
+                  />
                 </div>
               </div>
             </motion.div>

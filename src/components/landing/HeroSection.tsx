@@ -1,4 +1,3 @@
-// components/HeroSection.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -11,10 +10,19 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ scrollToSection, heroRef }: HeroSectionProps) {
-  const [isMobile, setIsMobile] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [gifLoaded, setGifLoaded] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const parallaxRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Auto-play video when loaded
+  useEffect(() => {
+    if (videoRef.current && videoLoaded) {
+      videoRef.current.play().catch(error => {
+        console.log('Video autoplay failed:', error);
+      });
+    }
+  }, [videoLoaded]);
   
   // Detect theme changes
   useEffect(() => {
@@ -35,15 +43,6 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
-  }, []);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
   // Simple parallax effect on mouse move
@@ -70,76 +69,71 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     <section
       id="home"
       ref={heroRef}
-      className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-colors duration-500 ${
-        theme === 'dark' ? 'bg-[#0A0A0A]' : 'bg-white'
-      }`}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
     >
-      {/* Animated GIF Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* Video Background - Direct */}
+      <div className="absolute inset-0 z-0 w-full h-full">
         <div 
           ref={parallaxRef}
-          className="absolute inset-0 transition-transform duration-300 ease-out"
+          className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
         >
-          {/* Fallback Image - Shows until GIF loads */}
-          {!gifLoaded && (
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          <div className="absolute inset-0 w-full h-full bg-black">
+            <video
+              ref={videoRef}
+              className="absolute inset-0 w-full h-full object-cover"
+              loop
+              muted
+              playsInline
+              autoPlay
+              onLoadedData={() => setVideoLoaded(true)}
               style={{
-                backgroundImage: `url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                opacity: videoLoaded ? 1 : 0,
+                transition: 'opacity 0.5s ease-in-out'
               }}
-            />
-          )}
-          
-          {/* Animated GIF */}
-          <img
-            src="https://cdn.pixabay.com/animation/2023/01/24/23/10/23-10-04-56_512.gif"
-            alt="Animated galaxy background"
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-              gifLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onLoad={() => setGifLoaded(true)}
-          />
+            >
+              <source src="/v.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            
+            {/* Fallback gradient if video fails to load */}
+            {!videoLoaded && (
+              <div 
+                className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1F4381] to-[#0B0F19]"
+              />
+            )}
+          </div>
         </div>
-        
-        {/* Theme-aware overlays */}
-        <div 
-          className="absolute inset-0 z-10 transition-all duration-500"
-          style={{
-            background: theme === 'dark' 
-              ? 'linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6), rgba(0,0,0,0.8))'
-              : 'linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.2), rgba(255,255,255,0.3))'
-          }}
-        />
       </div>
+
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 z-10 bg-black/40" />
 
       {/* Main Content */}
       <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
         <div className="flex flex-col items-center justify-center text-center">
           
           {/* Badge */}
-          <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border shadow-md mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 ${
+          <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border shadow-md mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 ${
             theme === 'dark'
-              ? 'bg-[#1F4381]/40 border-[#E8CA5E]/30'
-              : 'bg-white border-[#E8CA5E]/50'
+              ? 'bg-[#1F4381] border-[#E8CA5E]'
+              : 'bg-white border-[#00A0FF]'
           }`}>
             <div className="flex gap-1">
               <Compass className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                theme === 'dark' ? 'text-[#00E0FF]' : 'text-[#1F4381]'
+                theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
               }`} />
               <Globe2 className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#A57F2A]'
+                theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
               }`} />
             </div>
             <span className={`text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500 ${
-              theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+              theme === 'dark' ? 'text-white' : 'text-[#00A0FF]'
             }`}>
               🌟 Trusted by 500+ Educational Institutions
             </span>
           </div>
 
-          {/* Headings - Mobile: 4xl, Desktop: 5xl */}
+          {/* Headings */}
           <div className="mb-5 sm:mb-7">
             <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
               <span className="block text-white font-serif tracking-tight drop-shadow-lg">
@@ -154,10 +148,8 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             </h1>
           </div>
 
-          {/* Subheading - Light mode: Yellow (#E8CA5E), Dark mode: Light gray */}
-          <p className={`text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide transition-all duration-500 ${
-            theme === 'dark' ? 'text-gray-300' : 'text-[#E8CA5E]'
-          }`}>
+          {/* Subheading - White in both modes */}
+          <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md">
             Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
             A centralized constellation where institutions create, customize, and control their digital 
             presence across the universe of learning.
@@ -166,7 +158,11 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           {/* Single CTA Button */}
           <button
             onClick={() => scrollToSection("templates")}
-            className="group inline-flex items-center gap-2 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] hover:from-[#00E0FF] hover:to-[#1F4381] text-[#1F4381] hover:text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300"
+            className={`group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-[#E8CA5E] text-[#1F4381] hover:bg-[#E8CA5E]/90'
+                : 'bg-[#00A0FF] text-white hover:bg-[#00A0FF]/90'
+            }`}
           >
             <span>Learn More</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -177,9 +173,9 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       {/* Simple scroll hint */}
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex flex-col items-center gap-1 opacity-50">
-          <span className="text-[9px] uppercase tracking-wider text-gray-400">Scroll</span>
-          <div className="w-4 h-6 border border-gray-400 rounded-full flex justify-center">
-            <div className="w-0.5 h-1.5 bg-gray-400 rounded-full mt-1 animate-bounce" />
+          <span className="text-[9px] uppercase tracking-wider text-white">Scroll</span>
+          <div className="w-4 h-6 border border-white rounded-full flex justify-center">
+            <div className="w-0.5 h-1.5 bg-white rounded-full mt-1 animate-bounce" />
           </div>
         </div>
       </div>

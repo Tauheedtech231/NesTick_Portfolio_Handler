@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,7 +30,6 @@ interface BuyNowFormData {
   templateType: 'free' | 'paid';
 }
 
-// Template features based on template name
 const getTemplateFeatures = (templateName: string): string[] => {
   const featuresMap: { [key: string]: string[] } = {
     "Modern Professional": [
@@ -38,19 +38,14 @@ const getTemplateFeatures = (templateName: string): string[] => {
       "SEO optimized structure",
       "Easy customization options",
       "Contact form integration",
-      "Project showcase gallery",
-      "Client testimonials section",
-      "Blog integration ready"
+      "Project showcase gallery"
     ],
     "Creative Arts": [
       "Vibrant visual design",
       "Portfolio grid layout",
-      "Animated transitions",
       "Social media integration",
       "Blog section included",
-      "Multi-color schemes",
-      "Video background support",
-      "Custom font integration"
+      "Multi-color schemes"
     ],
     "Academic Classic": [
       "Research paper showcase",
@@ -58,39 +53,7 @@ const getTemplateFeatures = (templateName: string): string[] => {
       "Citation management",
       "CV/Resume section",
       "Conference listings",
-      "Academic achievements",
-      "Grant proposals section",
-      "Peer review integration"
-    ],
-    "Tech Startup": [
-      "SaaS focused design",
-      "Pricing tables included",
-      "Team member profiles",
-      "Case study layouts",
-      "Newsletter integration",
-      "Analytics dashboard",
-      "API documentation ready",
-      "Dark mode support"
-    ],
-    "E-commerce": [
-      "Product catalog layout",
-      "Shopping cart integration",
-      "Payment gateway ready",
-      "Order tracking system",
-      "Customer review section",
-      "Wishlist functionality",
-      "Inventory management",
-      "Discount coupon system"
-    ],
-    "Personal Blog": [
-      "Magazine style layout",
-      "Comment system ready",
-      "Social sharing buttons",
-      "Author bio section",
-      "Related posts widget",
-      "Newsletter signup",
-      "Category filtering",
-      "Search optimization"
+      "Academic achievements"
     ]
   };
 
@@ -100,9 +63,7 @@ const getTemplateFeatures = (templateName: string): string[] => {
     "Fast loading performance",
     "Cross-browser compatible",
     "Mobile-first approach",
-    "Clean code structure",
-    "SEO friendly markup",
-    "Regular updates included"
+    "Clean code structure"
   ];
 
   return featuresMap[templateName] || defaultFeatures;
@@ -115,15 +76,14 @@ export default function TemplatesPage() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'free' | 'paid'>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   
-  // Modal states
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Preview modal state
   const [previewModal, setPreviewModal] = useState({
     isOpen: false,
     imageUrl: '',
@@ -132,13 +92,11 @@ export default function TemplatesPage() {
     liveUrl: null as string | null,
   });
 
-  // Details modal state
   const [detailsModal, setDetailsModal] = useState({
     isOpen: false,
     template: null as Template | null,
   });
 
-  // Form data state
   const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
     name: '',
     college: '',
@@ -150,11 +108,30 @@ export default function TemplatesPage() {
     templateType: 'free',
   });
 
-  // Form validation states
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
-  // Validation functions
+  // Detect theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -187,7 +164,6 @@ export default function TemplatesPage() {
     }
   };
 
-  // Check for duplicate email for free templates
   const checkDuplicateRequest = async (email: string, templateId: number): Promise<boolean> => {
     try {
       const response = await fetch(`/api/templates/template-requests/check-duplicate?email=${encodeURIComponent(email)}&template_id=${templateId}`);
@@ -199,7 +175,6 @@ export default function TemplatesPage() {
     }
   };
 
-  // Fetch templates from backend
   const fetchTemplates = async () => {
     setLoadingTemplates(true);
     try {
@@ -218,7 +193,6 @@ export default function TemplatesPage() {
     fetchTemplates();
   }, []);
 
-  // Filter templates based on search and type
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = searchQuery === '' || 
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -227,7 +201,6 @@ export default function TemplatesPage() {
     return matchesSearch && matchesType;
   });
 
-  // Handle Buy Now click
   const handleBuyNowClick = (template: Template) => {
     setSelectedTemplate(template);
     setBuyNowFormData({
@@ -245,7 +218,6 @@ export default function TemplatesPage() {
     setIsBuyNowModalOpen(true);
   };
 
-  // Handle Details click
   const handleDetailsClick = (template: Template) => {
     setDetailsModal({
       isOpen: true,
@@ -253,7 +225,6 @@ export default function TemplatesPage() {
     });
   };
 
-  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBuyNowFormData(prev => ({
@@ -267,7 +238,6 @@ export default function TemplatesPage() {
     }
   };
 
-  // Handle input blur for validation
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setTouchedFields(prev => ({ ...prev, [name]: true }));
@@ -275,7 +245,6 @@ export default function TemplatesPage() {
     setFormErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  // Handle form submission
   const handleBuyNowSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -350,7 +319,6 @@ export default function TemplatesPage() {
       setFormErrors({});
       setTouchedFields({});
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Submit request error:', error);
       alert(error.message || 'Failed to submit request. Please try again.');
@@ -475,16 +443,27 @@ export default function TemplatesPage() {
     }
   };
 
-return (
+  return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0B0F19] pt-16 lg:pt-20">
+      <main className="min-h-screen pt-16 lg:pt-20"
+        style={{
+          backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+        }}
+      >
         {/* Hero Section */}
         <section className="relative overflow-hidden py-10 md:py-12 lg:py-16">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-[#1D4ED8]/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#38BDF8]/5 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/5 rounded-full blur-3xl" />
+            <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl opacity-10"
+              style={{
+                backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
+              }}
+            />
+            <div className="absolute bottom-20 right-10 w-72 h-72 rounded-full blur-3xl opacity-10"
+              style={{
+                backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+              }}
+            />
           </div>
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -494,29 +473,49 @@ return (
               animate="visible"
               className="text-center max-w-4xl mx-auto"
             >
-              <motion.div variants={fromBottomVariants} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1D4ED8]/10 border border-[#1D4ED8]/20 backdrop-blur-sm mb-4">
-                <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
-                <span className="text-xs font-medium text-gray-300 font-sans tracking-wide">Our Templates</span>
+              <motion.div variants={fromBottomVariants} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
+                style={{
+                  backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
+                  border: 'none',
+                }}
+              >
+                <Sparkles className="w-3.5 h-3.5"
+                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                />
+                <span className="text-xs font-medium"
+                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                >
+                  Our Templates
+                </span>
               </motion.div>
 
-              <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 font-serif tracking-tight">
-                Beautiful{' '}
-                <span className="bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent animate-gradient">
+              <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-serif tracking-tight">
+                <span className="relative inline-block"
+                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                >
+                  Beautiful
+                </span>{' '}
+                <span className="inline-block"
+                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                >
                   Portfolio Templates
                 </span>
               </motion.h1>
 
-              <motion.p variants={fromRightVariants} className="text-base md:text-lg text-gray-400 mb-6 max-w-3xl mx-auto font-light tracking-wide">
+              <motion.p variants={fromRightVariants} className="text-base md:text-lg max-w-3xl mx-auto mb-6 font-light tracking-wide"
+                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+              >
                 Choose from our collection of professionally designed templates. Each template is fully customizable to match your institution&apos;s brand and requirements.
               </motion.p>
 
               {/* Search and Filter Bar */}
               <motion.div variants={fromBottomVariants} className="max-w-2xl mx-auto">
                 <div className="relative">
-                  <div className={`absolute inset-0 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-xl opacity-0 transition-opacity duration-300 ${isSearchFocused ? 'opacity-20' : ''}`} />
                   <div className="relative flex items-center gap-2">
                     <div className="flex-1 relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                      />
                       <input
                         type="text"
                         placeholder="Search templates by name or description..."
@@ -524,14 +523,20 @@ return (
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => setIsSearchFocused(true)}
                         onBlur={() => setIsSearchFocused(false)}
-                        className="w-full bg-[#0F172A] border border-[#1E293B] rounded-xl py-3 pl-10 pr-10 text-white placeholder:text-gray-500 text-sm focus:outline-none focus:border-[#38BDF8] transition-colors duration-300 font-sans"
+                        className="w-full rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none transition-colors duration-300 font-sans"
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                          borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                          borderWidth: '1px',
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        }}
                       />
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-[#1E293B] transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 transition-colors"
                         >
-                          <X className="w-3.5 h-3.5 text-gray-400" />
+                          <X className="w-3.5 h-3.5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                         </button>
                       )}
                     </div>
@@ -539,7 +544,13 @@ return (
                     {/* Filter Button */}
                     <button
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="px-4 py-3 bg-[#0F172A] border border-[#1E293B] rounded-xl text-gray-400 hover:text-white hover:border-[#38BDF8] transition-all duration-300 flex items-center gap-2 font-sans"
+                      className="px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 font-sans"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        borderWidth: '1px',
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      }}
                     >
                       <Filter className="w-4 h-4" />
                       <span className="text-sm hidden sm:inline">Filter</span>
@@ -554,35 +565,52 @@ return (
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="mt-3 p-2 bg-[#0F172A] border border-[#1E293B] rounded-xl flex gap-2"
+                      className="mt-3 p-2 rounded-xl flex gap-2"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        borderWidth: '1px',
+                      }}
                     >
                       <button
                         onClick={() => setSelectedType('all')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
-                          selectedType === 'all'
-                            ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
+                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
+                        style={{
+                          backgroundColor: selectedType === 'all'
+                            ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
+                            : 'transparent',
+                          color: selectedType === 'all'
+                            ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
+                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                        }}
                       >
                         All Templates
                       </button>
                       <button
                         onClick={() => setSelectedType('free')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
-                          selectedType === 'free'
-                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
+                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
+                        style={{
+                          backgroundColor: selectedType === 'free'
+                            ? '#22C55E'
+                            : 'transparent',
+                          color: selectedType === 'free'
+                            ? '#FFFFFF'
+                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                        }}
                       >
                         Free
                       </button>
                       <button
                         onClick={() => setSelectedType('paid')}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide ${
-                          selectedType === 'paid'
-                            ? 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
+                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
+                        style={{
+                          backgroundColor: selectedType === 'paid'
+                            ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
+                            : 'transparent',
+                          color: selectedType === 'paid'
+                            ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
+                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                        }}
                       >
                         Premium
                       </button>
@@ -592,7 +620,9 @@ return (
 
                 {/* Results Count */}
                 <div className="flex justify-between items-center mt-3">
-                  <p className="text-xs text-gray-500 font-sans tracking-wide">
+                  <p className="text-xs font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  >
                     {filteredTemplates.length} {filteredTemplates.length === 1 ? 'template' : 'templates'} available
                   </p>
                 </div>
@@ -606,120 +636,148 @@ return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {loadingTemplates ? (
               <div className="flex justify-center items-center py-16">
-                <div className="relative">
-                  <div className="w-10 h-10 border-4 border-[#1D4ED8]/20 border-t-[#1D4ED8] rounded-full animate-spin" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Sparkles className="w-3.5 h-3.5 text-[#38BDF8] animate-pulse" />
-                  </div>
-                </div>
+                <div className="w-10 h-10 border-4 rounded-full animate-spin"
+                  style={{
+                    borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 160, 255, 0.2)',
+                    borderTopColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                  }}
+                />
               </div>
             ) : filteredTemplates.length > 0 ? (
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
               >
                 {filteredTemplates.map((template) => (
                   <motion.div
                     key={template.id}
                     variants={itemVariants}
-                    whileHover={{ y: -4 }}
-                    className="group bg-[#0F172A] border border-[#1E293B] rounded-xl overflow-hidden transition-all duration-500 hover:border-[#FFD700]/50 hover:shadow-xl hover:shadow-[#FFD700]/10 flex flex-col h-full"
+                    whileHover={{ y: -8 }}
+                    className="group rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col h-full cursor-pointer"
+                    style={{
+                      backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                      border: '1px solid',
+                      borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
+                    }}
                   >
                     <div className="h-48 relative overflow-hidden flex-shrink-0">
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent z-10" />
-                      <Image
-                        src={template.image}
-                        alt={template.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
-                        }}
-                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
+                      <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+                        <Image
+                          src={template.image}
+                          alt={template.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
+                          }}
+                        />
+                      </div>
                       
                       <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                        <span className="text-[10px] font-semibold text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/20 font-sans tracking-wide">
-                          Portfolio Template
+                        <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+                          Template
                         </span>
-                        <span
-                          className={`text-[10px] font-semibold text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm font-sans tracking-wide ${
-                            template.type === 'free' 
-                              ? 'bg-green-500/80 border border-green-400/30' 
-                              : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] border border-[#38BDF8]/30'
-                          }`}
-                        >
+                        <span className={`text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
+                          template.type === 'free' 
+                            ? 'bg-green-500/80' 
+                            : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
+                        }`}>
                           {template.type === 'free' ? 'Free' : 'Premium'}
                         </span>
                       </div>
                       
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
-                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20 font-sans"
+                      <button
+                        onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
+                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center cursor-pointer"
+                      >
+                        <div className="px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5"
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                            color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          }}
                         >
                           <Eye size={12} />
                           Preview
-                        </button>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="text-xl font-bold mb-2 transition-colors duration-300"
+                        style={{
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        }}
+                      >
+                        {template.name}
+                      </h3>
+                      
+                      <p className="text-sm leading-relaxed mb-4 line-clamp-2"
+                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                      >
+                        {template.description}
+                      </p>
+
+                      <div className="mt-auto pt-4 flex gap-2">
                         <button
                           onClick={() => handleDetailsClick(template)}
-                          className="bg-white/10 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 hover:bg-white/20 border border-white/20 font-sans"
+                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
+                          style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            border: '1px solid',
+                            borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          }}
                         >
-                          <Info size={12} />
+                          <Info size={14} />
                           Details
                         </button>
                         <button
                           onClick={() => handleBuyNowClick(template)}
-                          className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg hover:shadow-xl font-sans tracking-wide"
+                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
+                          style={{
+                            backgroundColor: template.type === 'free'
+                              ? '#22C55E'
+                              : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
+                            color: template.type === 'free'
+                              ? '#FFFFFF'
+                              : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                          }}
                         >
-                          <ShoppingCart size={12} />
-                          Buy Now
+                          <ShoppingCart size={14} />
+                          {template.type === 'free' ? 'Use Free' : 'Buy Now'}
                         </button>
                       </div>
                     </div>
-
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-[#FFD700] transition-colors duration-300 font-sans tracking-wide">
-                        {template.name}
-                      </h3>
-                      
-                      <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2 font-light tracking-wide">
-                        {template.description}
-                      </p>
-
-                      <div className="mt-auto pt-2">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-sm font-bold font-sans tracking-wide ${
-                            template.type === 'free' 
-                              ? 'text-green-400' 
-                              : 'text-transparent bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text'
-                          }`}>
-                            {template.type === 'free' ? 'Free' : 'Starting from $49'}
-                          </span>
-                          <button
-                            onClick={() => handleBuyNowClick(template)}
-                            className="py-1.5 px-3 rounded-lg font-semibold text-xs transition-all duration-300 hover:scale-105 flex items-center gap-1.5 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40 font-sans tracking-wide"
-                          >
-                            <ShoppingCart size={10} />
-                            Buy Now
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1D4ED8] via-[#FFD700] to-[#38BDF8] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </motion.div>
                 ))}
               </motion.div>
             ) : (
               <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-3 bg-[#0F172A] rounded-full flex items-center justify-center border border-[#1E293B]">
-                  <Search className="w-6 h-6 text-gray-500" />
+                <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                    border: '1px solid',
+                    borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                  }}
+                >
+                  <Search className="w-6 h-6"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-1 font-serif tracking-tight">No templates found</h3>
-                <p className="text-gray-400 text-sm font-light tracking-wide">Try adjusting your search or filter to find what you&apos;re looking for.</p>
+                <h3 className="text-lg font-bold mb-1 font-serif tracking-tight"
+                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                >
+                  No templates found
+                </h3>
+                <p className="text-sm font-light tracking-wide"
+                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                >
+                  Try adjusting your search or filter to find what you&apos;re looking for.
+                </p>
               </div>
             )}
           </div>
@@ -728,29 +786,68 @@ return (
         {/* Preview Modal */}
         {previewModal.isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={closePreviewModal}>
-            <div className="relative bg-[#0F172A] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-[#1E293B]" onClick={(e) => e.stopPropagation()}>
-              <div className="sticky top-0 bg-[#0F172A] border-b border-[#1E293B] px-5 py-3 flex items-center justify-between">
+            <div className="relative rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
+              style={{
+                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                border: '1px solid',
+                borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 p-4 border-b"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                  borderColor: theme === 'dark' ? 'rgba(30,41,59,0.5)' : 'rgba(0,0,0,0.05)',
+                }}
+              >
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] rounded-lg flex items-center justify-center">
-                    <Eye className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                    }}
+                  >
+                    <Eye className="w-4 h-4" style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white font-serif tracking-tight">{previewModal.templateName}</h3>
-                    <p className="text-xs text-gray-400 font-light">Template Preview</p>
+                    <h3 className="text-lg font-bold"
+                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                    >
+                      {previewModal.templateName}
+                    </h3>
+                    <p className="text-xs"
+                      style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                    >
+                      Template Preview
+                    </p>
                   </div>
                 </div>
-                <button onClick={closePreviewModal} className="p-1.5 rounded-full hover:bg-[#1E293B] transition-colors">
-                  <X className="w-4 h-4 text-gray-400 hover:text-white" />
+                <button onClick={closePreviewModal} className="absolute right-4 top-4 p-1.5 rounded-full hover:bg-black/10 transition-colors">
+                  <X className="w-4 h-4" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                 </button>
               </div>
               <div className="p-5 overflow-y-auto max-h-[calc(90vh-70px)]">
-                <div className="relative w-full h-80 rounded-lg overflow-hidden mb-4 bg-[#1E293B]">
+                <div className="relative w-full h-80 rounded-lg overflow-hidden mb-4"
+                  style={{ backgroundColor: theme === 'dark' ? '#1E293B' : '#F0F0F0' }}
+                >
                   <Image src={previewModal.imageUrl} alt={previewModal.templateName} fill className="object-contain" />
                 </div>
-                <h4 className="text-white font-semibold text-base mb-1 font-sans tracking-wide">About this template</h4>
-                <p className="text-gray-400 text-sm leading-relaxed mb-4 font-light tracking-wide">{previewModal.description}</p>
+                <h4 className="text-base font-semibold mb-1"
+                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                >
+                  About this template
+                </h4>
+                <p className="text-sm leading-relaxed mb-4"
+                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                >
+                  {previewModal.description}
+                </p>
                 {previewModal.liveUrl && (
-                  <a href={previewModal.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white font-semibold text-sm rounded-lg hover:shadow-lg transition-all duration-300 font-sans tracking-wide">
+                  <a href={previewModal.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    }}
+                  >
                     <Eye size={14} />
                     Live Demo
                   </a>
@@ -769,24 +866,36 @@ return (
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="relative bg-gradient-to-br from-[#0F172A] to-[#0B0F19] rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-[#FFD700]/30 shadow-2xl shadow-[#FFD700]/20"
+                className="relative rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                  border: '1px solid',
+                  borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="sticky top-0 bg-[#0F172A]/95 backdrop-blur-sm border-b border-[#FFD700]/20 p-5">
+                <div className="sticky top-0 p-5 border-b"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                    borderColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,0,0,0.1)',
+                  }}
+                >
                   <button
                     onClick={() => setDetailsModal({ isOpen: false, template: null })}
-                    className="absolute right-4 top-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 text-gray-400 hover:text-white"
+                    className="absolute right-4 top-4 p-2 rounded-full hover:bg-black/10 transition-all duration-300"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                   </button>
-                  <h3 className="text-2xl font-bold text-white pr-8 font-serif tracking-tight">
+                  <h3 className="text-2xl font-bold pr-8 font-serif tracking-tight"
+                    style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  >
                     {detailsModal.template.name}
                   </h3>
                   <div className="flex gap-2 mt-2">
-                    <span className={`text-xs font-semibold text-white px-2 py-1 rounded-full font-sans tracking-wide ${
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                       detailsModal.template.type === 'free' 
-                        ? 'bg-green-500/80' 
-                        : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8]'
+                        ? 'bg-green-500 text-white' 
+                        : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
                     }`}>
                       {detailsModal.template.type === 'free' ? 'Free Template' : 'Premium Template'}
                     </span>
@@ -801,47 +910,97 @@ return (
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-[#FFD700] mb-2 font-sans tracking-wide">Description</h4>
-                    <p className="text-gray-300 leading-relaxed font-light tracking-wide">
+                    <h4 className="text-lg font-semibold mb-2"
+                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    >
+                      Description
+                    </h4>
+                    <p className="leading-relaxed"
+                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    >
                       {detailsModal.template.description}
                     </p>
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-[#FFD700] mb-3 font-sans tracking-wide">Key Features</h4>
+                    <h4 className="text-lg font-semibold mb-3"
+                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    >
+                      Key Features
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {getTemplateFeatures(detailsModal.template.name).map((feature, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-gray-300">
-                          <CheckCircle className="w-4 h-4 text-[#FFD700]" />
-                          <span className="text-sm font-light tracking-wide">{feature}</span>
+                        <div key={idx} className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4"
+                            style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                          />
+                          <span className="text-sm"
+                            style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          >
+                            {feature}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="bg-white/5 rounded-xl p-4 mb-6">
+                  <div className="rounded-xl p-4 mb-6"
+                    style={{
+                      backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    }}
+                  >
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Template ID</p>
-                        <p className="text-sm text-white font-sans">#{detailsModal.template.id}</p>
+                        <p className="text-xs mb-1"
+                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        >
+                          Template ID
+                        </p>
+                        <p className="text-sm"
+                          style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        >
+                          #{detailsModal.template.id}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Created</p>
-                        <p className="text-sm text-white font-sans">
+                        <p className="text-xs mb-1"
+                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        >
+                          Created
+                        </p>
+                        <p className="text-sm"
+                          style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        >
                           {new Date(detailsModal.template.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Type</p>
-                        <p className="text-sm text-white capitalize font-sans">{detailsModal.template.type}</p>
+                        <p className="text-xs mb-1"
+                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        >
+                          Type
+                        </p>
+                        <p className="text-sm capitalize"
+                          style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        >
+                          {detailsModal.template.type}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1 font-sans tracking-wide">Compatibility</p>
-                        <p className="text-sm text-white font-sans">All Devices</p>
+                        <p className="text-xs mb-1"
+                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        >
+                          Compatibility
+                        </p>
+                        <p className="text-sm"
+                          style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        >
+                          All Devices
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -852,7 +1011,13 @@ return (
                         setDetailsModal({ isOpen: false, template: null });
                         handlePreviewClick(detailsModal.template!.image, detailsModal.template!.name, detailsModal.template!.description, detailsModal.template!.live_url);
                       }}
-                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white hover:border-[#FFD700] hover:bg-white/15 font-sans tracking-wide"
+                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                        border: '1px solid',
+                        borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      }}
                     >
                       <Eye size={16} />
                       Preview Template
@@ -862,11 +1027,15 @@ return (
                         setDetailsModal({ isOpen: false, template: null });
                         handleBuyNowClick(detailsModal.template!);
                       }}
-                      className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 font-sans tracking-wide ${
-                        detailsModal.template.type === 'free'
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20 hover:shadow-green-500/40'
-                          : 'bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white shadow-lg shadow-[#1D4ED8]/20 hover:shadow-[#1D4ED8]/40'
-                      }`}
+                      className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: detailsModal.template.type === 'free'
+                          ? '#22C55E'
+                          : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
+                        color: detailsModal.template.type === 'free'
+                          ? '#FFFFFF'
+                          : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                      }}
                     >
                       <Sparkles size={16} />
                       {detailsModal.template.type === 'free' ? 'Use Template Free' : 'Buy Premium Template'}
@@ -881,25 +1050,43 @@ return (
         {/* Buy Now Modal */}
         {isBuyNowModalOpen && selectedTemplate && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="bg-[#0F172A] rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100 border border-[#1E293B]">
-              <div className="flex items-center justify-between p-5 border-b border-[#1E293B]">
+            <div className="rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100"
+              style={{
+                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                border: '1px solid',
+                borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+              }}
+            >
+              <div className="flex items-center justify-between p-5 border-b"
+                style={{
+                  borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                }}
+              >
                 <div>
-                  <h3 className="text-lg font-bold text-white font-serif tracking-tight">
+                  <h3 className="text-lg font-bold font-serif tracking-tight"
+                    style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  >
                     {selectedTemplate.name}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-0.5 font-light">Submit your request</p>
+                  <p className="text-xs mt-0.5 font-light"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  >
+                    Submit your request
+                  </p>
                 </div>
                 <button
                   onClick={() => setIsBuyNowModalOpen(false)}
-                  className="p-1.5 hover:bg-[#1E293B] rounded-lg transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-black/10 transition-colors"
                 >
-                  <X className="w-4 h-4 text-gray-400" />
+                  <X className="w-4 h-4" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                 </button>
               </div>
 
               <form onSubmit={handleBuyNowSubmit} className="p-5 space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
+                  <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  >
                     Full Name *
                   </label>
                   <input
@@ -909,9 +1096,15 @@ return (
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
-                      formErrors.name && touchedFields.name ? 'border-red-500' : 'border-[#1E293B]'
+                    className={`w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-[#00A0FF] focus:border-[#00A0FF] transition-all font-sans ${
+                      formErrors.name && touchedFields.name ? 'border-red-500' : ''
                     }`}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      borderWidth: '1px',
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    }}
                     placeholder="Enter your full name"
                   />
                   {formErrors.name && touchedFields.name && (
@@ -920,7 +1113,9 @@ return (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
+                  <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  >
                     College Name *
                   </label>
                   <input
@@ -930,9 +1125,15 @@ return (
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
-                      formErrors.college && touchedFields.college ? 'border-red-500' : 'border-[#1E293B]'
+                    className={`w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-[#00A0FF] focus:border-[#00A0FF] transition-all font-sans ${
+                      formErrors.college && touchedFields.college ? 'border-red-500' : ''
                     }`}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      borderWidth: '1px',
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    }}
                     placeholder="Enter your college name"
                   />
                   {formErrors.college && touchedFields.college && (
@@ -941,7 +1142,9 @@ return (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
+                  <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  >
                     Email Address *
                   </label>
                   <input
@@ -951,9 +1154,15 @@ return (
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
-                      formErrors.email && touchedFields.email ? 'border-red-500' : 'border-[#1E293B]'
+                    className={`w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-[#00A0FF] focus:border-[#00A0FF] transition-all font-sans ${
+                      formErrors.email && touchedFields.email ? 'border-red-500' : ''
                     }`}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      borderWidth: '1px',
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    }}
                     placeholder="Enter your email"
                   />
                   {formErrors.email && touchedFields.email && (
@@ -962,7 +1171,9 @@ return (
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
+                  <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  >
                     Phone Number *
                   </label>
                   <input
@@ -972,9 +1183,15 @@ return (
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     required
-                    className={`w-full px-3 py-2 text-sm border rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans ${
-                      formErrors.phone && touchedFields.phone ? 'border-red-500' : 'border-[#1E293B]'
+                    className={`w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-[#00A0FF] focus:border-[#00A0FF] transition-all font-sans ${
+                      formErrors.phone && touchedFields.phone ? 'border-red-500' : ''
                     }`}
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      borderWidth: '1px',
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    }}
                     placeholder="Enter your phone number"
                   />
                   {formErrors.phone && touchedFields.phone && (
@@ -984,7 +1201,9 @@ return (
 
                 {selectedTemplate.type === 'paid' && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1.5 font-sans tracking-wide">
+                    <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
+                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    >
                       Select Plan *
                     </label>
                     <select
@@ -992,7 +1211,13 @@ return (
                       value={buyNowFormData.selectedPlan}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 text-sm border border-[#1E293B] rounded-lg bg-[#0B0F19] text-white focus:ring-2 focus:ring-[#38BDF8] focus:border-[#38BDF8] transition-all font-sans"
+                      className="w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-[#00A0FF] focus:border-[#00A0FF] transition-all font-sans"
+                      style={{
+                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        borderWidth: '1px',
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      }}
                     >
                       <option value="basic">Basic Plan - $49</option>
                       <option value="professional">Professional Plan - $99</option>
@@ -1004,7 +1229,15 @@ return (
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 mt-2 disabled:opacity-50 disabled:cursor-not-allowed font-sans tracking-wide"
+                  className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 mt-2 disabled:opacity-50 disabled:cursor-not-allowed font-sans tracking-wide"
+                  style={{
+                    backgroundColor: selectedTemplate.type === 'free'
+                      ? '#22C55E'
+                      : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
+                    color: selectedTemplate.type === 'free'
+                      ? '#FFFFFF'
+                      : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                  }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}
                 </button>
@@ -1016,7 +1249,13 @@ return (
         {/* Success Popup */}
         {showSuccessPopup && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="bg-[#0F172A] rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100 border border-[#1E293B]">
+            <div className="rounded-2xl shadow-2xl p-6 max-w-md w-full transform transition-all duration-300 scale-100"
+              style={{
+                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
+                border: '1px solid',
+                borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+              }}
+            >
               <div className="text-center">
                 <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1024,28 +1263,43 @@ return (
                   </svg>
                 </div>
                 
-                <h3 className="text-lg font-bold text-white mb-2 font-serif tracking-tight">
+                <h3 className="text-lg font-bold mb-2 font-serif tracking-tight"
+                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                >
                   Request Submitted Successfully!
                 </h3>
                 
-                <p className="text-gray-400 text-sm mb-4 font-light tracking-wide">
+                <p className="text-sm mb-4 font-light tracking-wide"
+                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                >
                   {successMessage}
                 </p>
 
-                <p className="text-gray-400 text-xs mb-5 font-light">
-                  Our team at <strong className="text-white font-sans">Nestick Tech</strong> will contact you shortly to discuss your requirements.
+                <p className="text-xs mb-5 font-light"
+                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                >
+                  Our team at <strong className="font-sans"
+                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  >Nestick Tech</strong> will contact you shortly to discuss your requirements.
                 </p>
 
-                <div className="bg-[#0B0F19] rounded-lg p-3 mb-5">
+                <div className="rounded-lg p-3 mb-5"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+                  }}
+                >
                   <a 
                     href="https://nesticktech.com" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-[#38BDF8] hover:text-[#1D4ED8] font-medium text-sm block mb-1 font-sans tracking-wide"
+                    className="font-medium text-sm block mb-1 font-sans tracking-wide"
+                    style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
                   >
                     https://nesticktech.com
                   </a>
-                  <p className="text-xs text-gray-500 font-sans">
+                  <p className="text-xs font-sans"
+                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  >
                     <strong>Contact:</strong> +92 319 3236529
                   </p>
                 </div>
@@ -1055,7 +1309,11 @@ return (
                     setShowSuccessPopup(false);
                     setSuccessMessage('');
                   }}
-                  className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 font-sans tracking-wide"
+                  className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 font-sans tracking-wide"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                    color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                  }}
                 >
                   Close
                 </button>
@@ -1064,7 +1322,7 @@ return (
           </div>
         )}
       </main>
-      <StudentFeedback/>
+      <StudentFeedback />
       <Footer />
     </>
   );

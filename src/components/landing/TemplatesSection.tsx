@@ -217,16 +217,16 @@ export default function TemplatesSection({
           backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
         }}
       >
-        {/* Simple background decoration */}
+        {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20"
+          <div className="absolute top-1/4 -left-40 w-80 h-80 rounded-full blur-3xl opacity-10"
             style={{
-              backgroundColor: theme === 'dark' ? '#1F4381' : '#E8CA5E',
+              backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
             }}
           />
-          <div className="absolute bottom-1/4 -right-40 w-80 h-80 rounded-full blur-3xl opacity-20"
+          <div className="absolute bottom-1/4 -right-40 w-80 h-80 rounded-full blur-3xl opacity-10"
             style={{
-              backgroundColor: theme === 'dark' ? '#00E0FF' : '#1F4381',
+              backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
             }}
           />
         </div>
@@ -239,32 +239,35 @@ export default function TemplatesSection({
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto md:mx-0 w-fit"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 0, 0, 0.05)',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(232, 202, 94, 0.5)',
-                borderWidth: '1px',
+                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
+                border: 'none',
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#00E0FF]" />
+              <Sparkles className="w-3.5 h-3.5"
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+              />
               <span className="text-xs font-medium"
-                style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
               >
                 ✨ Ready-to-Use Portfolio Templates
               </span>
             </div>
             
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
               <span className="relative inline-block"
                 style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
               >
                 Beautiful
               </span>{' '}
-              <span className="bg-gradient-to-r from-[#E8CA5E] via-[#F5D76E] to-[#A57F2A] bg-clip-text text-transparent inline-block">
+              <span className="inline-block"
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+              >
                 Portfolio Templates
               </span>
             </h2>
             
-            <p className="text-sm md:text-base max-w-2xl mx-auto md:mx-0 leading-relaxed"
-              style={{ color: theme === 'dark' ? '#9CA3AF' : '#4B5563' }}
+            <p className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light"
+              style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
             >
               {templates.length > 0
                 ? "Professionally designed templates for every academic discipline"
@@ -274,14 +277,19 @@ export default function TemplatesSection({
 
           {loadingTemplates ? (
             <div className="flex justify-center items-center py-12">
-              <div className="w-8 h-8 border-2 border-[#E8CA5E]/20 border-t-[#E8CA5E] rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 rounded-full animate-spin"
+                style={{
+                  borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 160, 255, 0.2)',
+                  borderTopColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                }}
+              />
             </div>
           ) : templates.length > 0 ? (
             <>
-              {/* Templates Grid */}
+              {/* Templates Grid - Same style as OtherSections */}
               <motion.div 
                 variants={containerVariants}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
               >
                 {displayedTemplates.map((template, index) => (
                   <motion.div
@@ -289,16 +297,15 @@ export default function TemplatesSection({
                     ref={el => addToRefs(el, templateCardsRef)}
                     variants={cardVariants}
                     whileHover="hover"
-                    className="group rounded-xl overflow-hidden flex flex-col h-full cursor-pointer"
+                    className="group relative rounded-2xl p-6 md:p-8 transition-all duration-500 hover:shadow-2xl overflow-hidden flex flex-col cursor-pointer"
                     style={{
-                      backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.05)',
+                      backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                      border: '1px solid',
+                      borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
                     }}
                   >
-                    {/* Image Container */}
-                    <div className="h-44 relative overflow-hidden flex-shrink-0">
+                    {/* Template Image */}
+                    <div className="relative w-full h-48 rounded-xl overflow-hidden mb-4">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
                       <motion.div
                         className="w-full h-full"
@@ -325,7 +332,7 @@ export default function TemplatesSection({
                         <span className={`text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
                           template.type === 'free' 
                             ? 'bg-green-500/80' 
-                            : 'bg-gradient-to-r from-[#1F4381] to-[#00E0FF]'
+                            : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
                         }`}>
                           {template.type === 'free' ? 'Free' : 'Premium'}
                         </span>
@@ -338,7 +345,12 @@ export default function TemplatesSection({
                         onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
                         className="absolute inset-0 bg-black/50 z-20 flex items-center justify-center cursor-pointer"
                       >
-                        <div className="bg-[#E8CA5E] text-[#1F4381] px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5">
+                        <div className="px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5"
+                          style={{
+                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                            color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          }}
+                        >
                           <Eye size={12} />
                           Preview
                         </div>
@@ -346,16 +358,14 @@ export default function TemplatesSection({
                     </div>
 
                     {/* Content area */}
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-base font-bold mb-1.5 transition-colors duration-300"
-                        style={{ 
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                        }}
+                    <div className="relative z-10 flex flex-col flex-grow">
+                      <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
+                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
                       >
                         {template.name}
                       </h3>
                       
-                      <p className="text-xs leading-relaxed mb-3 line-clamp-2"
+                      <p className="leading-relaxed text-base mb-4"
                         style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
                       >
                         {template.description}
@@ -367,28 +377,32 @@ export default function TemplatesSection({
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleDetailsClick(template)}
-                          className="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            border: '1px solid',
                             borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                            borderWidth: '1px',
                             color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
                           }}
                         >
-                          <Info size={12} />
+                          <Info size={14} />
                           Details
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleBuyNowClick(template)}
-                          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer ${
-                            template.type === 'free'
-                              ? 'bg-green-500 text-white'
-                              : 'bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381]'
-                          }`}
+                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+                          style={{
+                            backgroundColor: template.type === 'free'
+                              ? '#22C55E'
+                              : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
+                            color: template.type === 'free'
+                              ? '#FFFFFF'
+                              : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                          }}
                         >
-                          <Sparkles size={12} />
+                          <Sparkles size={14} />
                           {template.type === 'free' ? 'Use Free' : 'Buy Now'}
                         </motion.button>
                       </div>
@@ -399,27 +413,31 @@ export default function TemplatesSection({
 
               {/* View More Button */}
               {!showAll && templates.length > 3 && (
-                <div className="flex justify-center mt-10">
+                <div className="flex justify-center mt-12">
                   <motion.button
                     variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
                     onClick={handleViewMore}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381] font-medium rounded-lg cursor-pointer"
+                    className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 cursor-pointer"
+                    style={{
+                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    }}
                   >
                     <span>View More Templates</span>
                     <motion.div
                       animate={{ x: [0, 4, 0] }}
                       transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                     >
-                      <ChevronRight className="w-3.5 h-3.5" />
+                      <ChevronRight className="w-4 h-4" />
                     </motion.div>
                   </motion.button>
                 </div>
               )}
             </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {[
                 { id: 1, name: "Modern Professional", description: "Clean, corporate design for business portfolios.", type: 'free' },
                 { id: 2, name: "Creative Arts", description: "Vibrant layout for art and design students.", type: 'paid' },
@@ -427,22 +445,20 @@ export default function TemplatesSection({
               ].map((template) => (
                 <div
                   key={template.id}
-                  className="rounded-xl overflow-hidden opacity-50 flex flex-col h-full"
+                  className="rounded-2xl p-6 md:p-8 opacity-50 flex flex-col"
                   style={{
-                    backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                    borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                    borderWidth: '1px',
+                    backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                    border: '1px solid',
+                    borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
                   }}
                 >
-                  <div className="h-44 relative overflow-hidden bg-gray-700 flex-shrink-0">
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden mb-4 bg-gray-700">
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-500 text-xs">No Preview</span>
+                      <span className="text-gray-500 text-sm">No Preview</span>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-base font-bold text-gray-500 mb-1">{template.name}</h3>
-                    <p className="text-xs text-gray-500">{template.description}</p>
-                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-gray-500">{template.name}</h3>
+                  <p className="text-base text-gray-500">{template.description}</p>
                 </div>
               ))}
             </div>
@@ -468,8 +484,8 @@ export default function TemplatesSection({
               className="relative rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto"
               style={{
                 backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                borderColor: theme === 'dark' ? '#00E0FF' : '#E8CA5E',
-                borderWidth: '1px',
+                border: '1px solid',
+                borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -477,7 +493,7 @@ export default function TemplatesSection({
               <div className="sticky top-0 p-4 border-b"
                 style={{
                   backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                  borderColor: theme === 'dark' ? 'rgba(0,224,255,0.2)' : 'rgba(0,0,0,0.1)',
+                  borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 0, 0, 0.1)',
                 }}
               >
                 <motion.button
@@ -488,12 +504,14 @@ export default function TemplatesSection({
                 >
                   <X className="w-4 h-4" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                 </motion.button>
-                <h3 className="text-lg font-bold pr-6" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+                <h3 className="text-xl font-bold pr-6" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
                   {selectedTemplate.name}
                 </h3>
                 <div className="flex gap-2 mt-1">
-                  <span className={`text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full ${
-                    selectedTemplate.type === 'free' ? 'bg-green-500/80' : 'bg-gradient-to-r from-[#1F4381] to-[#00E0FF]'
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                    selectedTemplate.type === 'free' 
+                      ? 'bg-green-500 text-white' 
+                      : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
                   }`}>
                     {selectedTemplate.type === 'free' ? 'Free' : 'Premium'}
                   </span>
@@ -504,7 +522,7 @@ export default function TemplatesSection({
               <div className="p-4">
                 {/* Template Image */}
                 <motion.div 
-                  className="relative h-40 rounded-lg overflow-hidden mb-4"
+                  className="relative h-48 rounded-lg overflow-hidden mb-4"
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -518,7 +536,11 @@ export default function TemplatesSection({
 
                 {/* Description */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-[#E8CA5E] mb-1">Description</h4>
+                  <h4 className="text-base font-semibold mb-1"
+                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  >
+                    Description
+                  </h4>
                   <p className="text-sm" style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}>
                     {selectedTemplate.description}
                   </p>
@@ -526,7 +548,11 @@ export default function TemplatesSection({
 
                 {/* Key Features */}
                 <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-[#00E0FF] mb-2">Features</h4>
+                  <h4 className="text-base font-semibold mb-2"
+                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  >
+                    Features
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {getTemplateFeatures(selectedTemplate.name).slice(0, 6).map((feature, idx) => (
                       <motion.div 
@@ -535,7 +561,9 @@ export default function TemplatesSection({
                         whileHover={{ x: 4 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <CheckCircle className="w-3 h-3 text-[#E8CA5E]" />
+                        <CheckCircle className="w-3 h-3"
+                          style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                        />
                         <span className="text-xs" style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}>
                           {feature}
                         </span>
@@ -556,8 +584,8 @@ export default function TemplatesSection({
                     className="flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer"
                     style={{
                       backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                      border: '1px solid',
                       borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                      borderWidth: '1px',
                       color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
                     }}
                   >
@@ -571,11 +599,15 @@ export default function TemplatesSection({
                       closeModal();
                       handleBuyNowClick(selectedTemplate);
                     }}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer ${
-                      selectedTemplate.type === 'free'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] text-[#1F4381]'
-                    }`}
+                    className="flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+                    style={{
+                      backgroundColor: selectedTemplate.type === 'free'
+                        ? '#22C55E'
+                        : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
+                      color: selectedTemplate.type === 'free'
+                        ? '#FFFFFF'
+                        : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                    }}
                   >
                     <Sparkles size={14} />
                     {selectedTemplate.type === 'free' ? 'Use Free' : 'Buy Now'}

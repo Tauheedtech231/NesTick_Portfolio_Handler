@@ -1,4 +1,3 @@
-// components/PartnerProductSection.tsx
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
@@ -104,156 +103,151 @@ function Slider({ items, direction, speed = 50 }: SliderProps) {
 }
 
 export default function PartnerProductSection() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  
-  // Detect theme changes
+  const [colorPhase, setColorPhase] = useState(0);
+
+  // Continuous color animation between yellow and blue
   useEffect(() => {
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setTheme(isDark ? 'dark' : 'light');
+    let animationFrameId: number;
+    const startTime = Date.now();
+    
+    const animateColor = () => {
+      const elapsed = (Date.now() - startTime) / 1000; // seconds elapsed
+      // Cycle every 8 seconds between 0 and 1
+      const phase = (elapsed % 8) / 8;
+      // Use sine wave for smooth back-and-forth transition
+      const smoothPhase = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
+      setColorPhase(smoothPhase);
+      
+      animationFrameId = requestAnimationFrame(animateColor);
     };
     
-    checkTheme();
+    animationFrameId = requestAnimationFrame(animateColor);
     
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkTheme();
-        }
-      });
-    });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, []);
 
-  const productItems = products.map((product) => (
-    <div
-      key={product}
-      className="group relative px-3 py-1 md:px-4 md:py-1.5 rounded-lg border transition-all duration-300 cursor-pointer whitespace-nowrap"
-      style={{
-        backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.8)',
-        borderColor: theme === 'dark' ? 'transparent' : 'rgba(232, 202, 94, 0.3)',
-      }}
-    >
-      <span 
-        className="text-sm md:text-base lg:text-lg font-bold transition-all duration-300 bg-clip-text text-transparent"
-        style={{
-          backgroundImage: theme === 'dark' 
-            ? 'linear-gradient(to right, #9CA3AF, #D1D5DB)'
-            : 'linear-gradient(to right, #1F4381, #00E0FF)',
-        }}
-      >
-        {product}
-      </span>
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E8CA5E]/0 via-[#E8CA5E]/10 to-[#E8CA5E]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    </div>
-  ));
+  // Interpolate between yellow (dark mode) and blue (light mode)
+  const getCurrentColor = () => {
+    // Yellow: RGB(232, 202, 94)
+    // Blue: RGB(0, 160, 255)
+    const r = Math.floor(232 + (0 - 232) * colorPhase);
+    const g = Math.floor(202 + (160 - 202) * colorPhase);
+    const b = Math.floor(94 + (255 - 94) * colorPhase);
+    return `rgba(${r}, ${g}, ${b}, 0.08)`;
+  };
 
-  const partnerItems = partnerLogos.map((partner) => (
-    <div
-      key={partner.id}
-      className="group relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-300 cursor-pointer"
-    >
-      <div 
-        className="relative w-8 h-8 md:w-10 md:h-10 transition-all duration-300 group-hover:scale-110"
-        style={{
-          filter: theme === 'dark' ? 'grayscale(100%)' : 'grayscale(0%)',
-          opacity: theme === 'dark' ? 0.6 : 1,
-        }}
-      >
-        <Image
-          src={partner.image}
-          alt={partner.name}
-          fill
-          className="object-contain rounded-lg"
-        />
-      </div>
-    </div>
-  ));
+  const getGlowColor = () => {
+    // Yellow: RGB(232, 202, 94)
+    // Blue: RGB(0, 160, 255)
+    const r = Math.floor(232 + (0 - 232) * colorPhase);
+    const g = Math.floor(202 + (160 - 202) * colorPhase);
+    const b = Math.floor(94 + (255 - 94) * colorPhase);
+    return `rgba(${r}, ${g}, ${b}, 0.15)`;
+  };
 
-  // Get gradient colors based on theme
-  const gradientColors = theme === 'dark'
-    ? ['#0B0F19', '#1F4381', '#E8CA5E', '#0B0F19', '#00E0FF', '#1F4381', '#0B0F19']
-    : ['#F5F5F5', '#E8CA5E', '#1F4381', '#F5F5F5', '#00E0FF', '#E8CA5E', '#F5F5F5'];
+  const getRadialGradient = () => {
+    const mainColor = getCurrentColor();
+    const glowColor = getGlowColor();
+    return `radial-gradient(circle at center, ${glowColor} 0%, ${mainColor} 50%, transparent 100%)`;
+  };
+
+  const getProductBgColor = () => {
+    const r = Math.floor(232 + (0 - 232) * colorPhase);
+    const g = Math.floor(202 + (160 - 202) * colorPhase);
+    const b = Math.floor(94 + (255 - 94) * colorPhase);
+    return `rgba(${r}, ${g}, ${b}, 0.12)`;
+  };
+
+  const getProductTextColor = () => {
+    const r = Math.floor(232 + (0 - 232) * colorPhase);
+    const g = Math.floor(202 + (160 - 202) * colorPhase);
+    const b = Math.floor(94 + (255 - 94) * colorPhase);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
 
   return (
-    <section className="relative py-4 md:py-6 overflow-hidden">
-      {/* Theme-aware background - Fixed style conflict */}
+    <section className="relative py-6 md:py-8 overflow-hidden">
+      {/* Animated gradient background that smoothly transitions between yellow and blue */}
       <div 
-        className="absolute inset-0 transition-all duration-500"
+        className="absolute inset-0 transition-all duration-300 ease-in-out"
         style={{
-          backgroundImage: `linear-gradient(270deg, ${gradientColors.join(', ')})`,
-          backgroundSize: '400% 400%',
-          backgroundPosition: '0% 50%',
-          animation: 'smoothGradient 15s ease infinite',
-        }}
-      />
-      
-      {/* Subtle overlay for blending */}
-      <div 
-        className="absolute inset-0 pointer-events-none transition-all duration-500"
-        style={{
-          background: theme === 'dark'
-            ? 'linear-gradient(to bottom, rgba(11, 15, 25, 0.3), rgba(11, 15, 25, 0.1), rgba(11, 15, 25, 0.3))'
-            : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3))'
+          background: getRadialGradient(),
         }}
       />
 
-      {/* Edge Fade Masks */}
-      <div className="relative z-10 container mx-auto px-4">
-        {/* Partners Slider */}
-        <div className="mb-3 md:mb-4 relative">
-          <div 
-            className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
-            style={{
-              background: theme === 'dark'
-                ? 'linear-gradient(to right, #0B0F19, transparent)'
-                : 'linear-gradient(to right, #F5F5F5, transparent)'
+      {/* Soft blur overlay for extra smoothness */}
+      <div 
+        className="absolute inset-0 backdrop-blur-[100px]"
+        style={{
+          background: 'transparent'
+        }}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Section label - with animated color */}
+        <div className="text-center mb-4">
+          <p 
+            className="text-[11px] uppercase tracking-wider font-medium transition-all duration-300"
+            style={{ 
+              color: getProductTextColor(),
             }}
-          />
-          <div 
-            className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
-            style={{
-              background: theme === 'dark'
-                ? 'linear-gradient(to left, #0B0F19, transparent)'
-                : 'linear-gradient(to left, #F5F5F5, transparent)'
-            }}
-          />
-          <Slider items={partnerItems} direction="left" speed={30} />
+          >
+            Trusted Partners & Products
+          </p>
         </div>
 
-        {/* Products Slider */}
+        {/* Partners Slider */}
+        <div className="mb-4 relative">
+          <Slider items={partnerLogos.map((partner) => (
+            <div
+              key={partner.id}
+              className="group relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-300 cursor-pointer"
+            >
+              <div 
+                className="relative w-8 h-8 md:w-10 md:h-10 transition-all duration-300 group-hover:scale-110"
+              >
+                <Image
+                  src={partner.image}
+                  alt={partner.name}
+                  fill
+                  className="object-contain rounded-full"
+                  style={{
+                    filter: 'none',
+                  }}
+                />
+              </div>
+            </div>
+          ))} direction="left" speed={25} />
+        </div>
+
+        {/* Products Slider with animated colors */}
         <div className="relative">
-          <div 
-            className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
-            style={{
-              background: theme === 'dark'
-                ? 'linear-gradient(to right, #0B0F19, transparent)'
-                : 'linear-gradient(to right, #F5F5F5, transparent)'
-            }}
-          />
-          <div 
-            className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none"
-            style={{
-              background: theme === 'dark'
-                ? 'linear-gradient(to left, #0B0F19, transparent)'
-                : 'linear-gradient(to left, #F5F5F5, transparent)'
-            }}
-          />
-          <Slider items={productItems} direction="right" speed={35} />
+          <Slider items={products.map((product) => (
+            <div
+              key={product}
+              className="group relative px-3 py-1 md:px-4 md:py-1.5 rounded-full transition-all duration-300 cursor-pointer whitespace-nowrap"
+              style={{
+                backgroundColor: getProductBgColor(),
+              }}
+            >
+              <span 
+                className="text-sm md:text-base lg:text-lg font-semibold transition-all duration-300"
+                style={{
+                  color: getProductTextColor(),
+                }}
+              >
+                {product}
+              </span>
+            </div>
+          ))} direction="right" speed={30} />
         </div>
       </div>
 
       <style jsx>{`
-        @keyframes smoothGradient {
-          0% { background-position: 0% 50%; }
-          25% { background-position: 50% 50%; }
-          50% { background-position: 100% 50%; }
-          75% { background-position: 50% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
         .will-change-transform {
           will-change: transform;
         }
