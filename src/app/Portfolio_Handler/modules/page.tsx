@@ -75,6 +75,7 @@ export default function ModulesPage() {
         throw new Error('Failed to fetch colleges');
       }
       const data = await response.json();
+      console.log("the data",data)
       setColleges(data.data || data);
       
       if (data.data?.length > 0 && !selectedCollegeId) {

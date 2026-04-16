@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['images.unsplash.com', 'ui-avatars.com'], // optional but fine
+    domains: ['images.unsplash.com', 'ui-avatars.com', 'plus.unsplash.com'], // ✅ plus.unsplash.com add kiya
 
     remotePatterns: [
       {
@@ -13,7 +13,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'ui-avatars.com',
-        pathname: '/**', // 👈 REQUIRED
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com', // ✅ YEH ADD KIYA
+        pathname: '/**',
       },
     ],
   },

@@ -1,452 +1,478 @@
+// app/components/sections/AboutSection.tsx (COMPLETELY FIXED)
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiInfo, FiPlus, FiTrash2, FiCheck } from 'react-icons/fi';
+import { 
+  FiEdit2, FiSave, FiX, FiInfo, FiPlus, FiTrash2, FiCheck,
+  FiCompass, FiUsers, FiImage as FiMountain, FiShield,
+  FiStar, FiBookOpen, FiTarget, FiPocket, FiHeart, FiBriefcase, FiRefreshCw
+} from 'react-icons/fi';
+import { FaSeedling } from "react-icons/fa"
+
 /* eslint-disable */
+
 interface AboutSectionProps {
   college: College;
+  templateId?: number;
 }
 
-interface FormDataType {
-  logo?: string;
-  coverImage?: string;
+// Complete data structure matching live template (without video)
+interface AboutFormData {
+  // Basic Info
   name: string;
+  tagline: string;
   shortDescription: string;
   longDescription: string;
+  establishedYear: string;
+  
+  // Story (array of paragraphs)
+  story: string[];
+  
+  // Mission & Vision
   mission: string;
   vision: string;
-  establishedYear: string;
-  tagline: string;
+  
+  // Philosophy
+  philosophy: {
+    heading: string;
+    points: string[];
+  };
+  
+  // Values
+  values: Array<{
+    id: number;
+    title: string;
+    description: string;
+    icon: string;
+  }>;
+  
+  // Approach
+  approach: {
+    heading: string;
+    description: string;
+    aspects: Array<{
+      title: string;
+      description: string;
+    }>;
+  };
+  
+  // Why Choose Us
+  whyChooseUs: {
+    intro: string;
+    points: Array<{
+      title: string;
+      description: string;
+      icon: string;
+    }>;
+  };
+  
+  // Stats
   stats: Array<{ id: number; value: number; suffix: string; label: string }>;
-  pillars: Array<{ id: number; title: string; description: string }>;
-  whyChooseUs: Array<{ id: number; title: string; description: string }>;
   highlights: Array<{ id: number; text: string }>;
-  accreditation: string;
+  
+  // Images
+  logo?: string;
+  coverImage?: string;
 }
 
-export function AboutSection({ college }: AboutSectionProps) {
+// Icon mapping for values and whyChooseUs
+const iconMap: Record<string, any> = {
+  compass: FiCompass,
+  seedling: FaSeedling,
+  users: FiUsers,
+  mountain: FiMountain,
+  shield: FiShield,
+  star: FiStar,
+  book: FiBookOpen,
+  target: FiTarget,
+  rocket: FiPocket,
+  heart: FiHeart,
+  briefcase: FiBriefcase,
+  default: FiStar
+};
+
+const getIconComponent = (iconName: string) => {
+  return iconMap[iconName.toLowerCase()] || iconMap.default;
+};
+
+const defaultFormData: AboutFormData = {
+  name: '',
+  tagline: 'Where thoughtful education shapes meaningful futures',
+  shortDescription: 'For more than a decade, we\'ve quietly cultivated an environment where education transcends routine learning—where students discover not just knowledge, but purpose.',
+  longDescription: '',
+  establishedYear: '2010',
+  
+  story: [
+    'What began as a modest initiative with three classrooms has gradually evolved into a respected learning community.',
+    'Along the way, we\'ve learned that meaningful education isn\'t about scaling rapidly, but about deepening connections.',
+    'The core intention remains unchanged: to create spaces where learning feels relevant, rigorous, and remarkably human.'
+  ],
+  
+  mission: 'To nurture curious minds through education that values depth over breadth, understanding over memorization, and personal growth alongside academic achievement.',
+  vision: 'To create a learning community where education adapts to human needs, not institutional requirements.',
+  
+  philosophy: {
+    heading: 'Our educational philosophy is simple but deliberate:',
+    points: [
+      'Learning should feel like discovery, not consumption',
+      'Depth in a few areas matters more than surface exposure to many',
+      'Practical application grounds theoretical understanding',
+      'Mentorship amplifies independent learning'
+    ]
+  },
+  
+  values: [
+    { id: 1, title: 'Thoughtful Engagement', description: 'We prioritize meaningful dialogue over passive reception.', icon: 'compass' },
+    { id: 2, title: 'Practical Wisdom', description: 'Knowledge finds its worth in application.', icon: 'seedling' },
+    { id: 3, title: 'Individual Attention', description: 'We maintain small cohorts and close relationships.', icon: 'users' },
+    { id: 4, title: 'Sustainable Growth', description: 'We measure success in long-term impact.', icon: 'mountain' }
+  ],
+  
+  approach: {
+    heading: 'How We Approach Education',
+    description: 'Rather than following trends, we\'ve developed approaches that align with how people actually learn.',
+    aspects: [
+      { title: 'Blended Rhythm', description: 'Alternating intensive study with reflective practice.' },
+      { title: 'Contextual Projects', description: 'Assignments rooted in actual challenges.' },
+      { title: 'Iterative Feedback', description: 'Continuous, constructive dialogue.' },
+      { title: 'Cross-disciplinary Threads', description: 'Connecting concepts across traditional boundaries.' }
+    ]
+  },
+  
+  whyChooseUs: {
+    intro: 'While many institutions promise results, we focus on the journey.',
+    points: [
+      { title: 'Faculty who prioritize presence', description: 'Educators first, experts second.', icon: 'users' },
+      { title: 'Curriculum with breathing room', description: 'Space to think is built into the schedule.', icon: 'book' },
+      { title: 'Assessment as dialogue', description: 'Feedback through conversation, not just grades.', icon: 'target' },
+      { title: 'Community as curriculum', description: 'Learning happens in relationship.', icon: 'heart' },
+      { title: 'Long-term partnership', description: 'Our relationship doesn\'t end at graduation.', icon: 'shield' }
+    ]
+  },
+  
+  stats: [
+    { id: 1, value: 15, suffix: '+', label: 'Years Experience' },
+    { id: 2, value: 5000, suffix: '+', label: 'Professionals' },
+    { id: 3, value: 98, suffix: '%', label: 'Success Rate' },
+    { id: 4, value: 50, suffix: '+', label: 'Industry Partners' }
+  ],
+  
+  highlights: [
+    { id: 1, text: 'NEBOSH Certification Programs' },
+    { id: 2, text: 'IOSH Managing Safely' },
+    { id: 3, text: 'OSHA Standards Training' },
+    { id: 4, text: 'Fire Safety Training' }
+  ],
+  
+  logo: undefined,
+  coverImage: undefined
+};
+
+export function AboutSection({ college, templateId }: AboutSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  
-  // Default form data
-  const defaultFormData: FormDataType = {
-    name: college.name || '',
-    shortDescription: college.shortDescription || '',
-    longDescription: college.longDescription || '',
-    mission: college.mission || '',
-    vision: college.vision || '',
-    logo: college.logo || undefined,
-    coverImage: college.coverImage || undefined,
-    establishedYear: '2008',
-    tagline: 'Pakistan Premier Safety Training Institute',
-    accreditation: 'Registered with TEVTA, PSB & International Bodies',
-    stats: [
-      { id: 1, value: 15, suffix: '+', label: 'Years Experience' },
-      { id: 2, value: 5000, suffix: '+', label: 'Professionals' },
-      { id: 3, value: 98, suffix: '%', label: 'Success Rate' },
-      { id: 4, value: 50, suffix: '+', label: 'Industry Partners' },
-    ],
-    pillars: [
-      { id: 1, title: 'Industry Leadership', description: '15+ years of excellence in safety training, setting industry standards and benchmarks for professional development.' },
-      { id: 2, title: 'Expert Training', description: 'Internationally certified trainers with real-world experience delivering practical, hands-on safety education.' },
-      { id: 3, title: 'Global Standards', description: 'Curriculum aligned with NEBOSH, IOSH, OSHA, and other international safety certification requirements.' },
-      { id: 4, title: 'Certified Excellence', description: '98% certification success rate with comprehensive assessment and continuous improvement programs.' },
-    ],
-    whyChooseUs: [
-      { id: 1, title: 'Proven Excellence', description: 'Consistently rated 4.9+ by professionals across industries' },
-      { id: 2, title: 'Expert Faculty', description: 'Industry veterans with 20+ years of safety experience' },
-      { id: 3, title: 'Industry Partnerships', description: 'Collaborations with top organizations for placement' },
-      { id: 4, title: 'Flexible Scheduling', description: 'Weekend, evening, and customized corporate batches' },
-      { id: 5, title: 'Premium Facilities', description: 'State-of-the-art training labs and equipment' },
-      { id: 6, title: 'Post-Course Support', description: 'Lifetime career guidance and certification renewal' },
-    ],
-    highlights: [
-      { id: 1, text: 'NEBOSH Certification Programs' },
-      { id: 2, text: 'IOSH Managing Safely' },
-      { id: 3, text: 'OSHA Standards Training' },
-      { id: 4, text: 'Fire Safety Training' },
-      { id: 5, text: 'First Aid & CPR Certification' },
-      { id: 6, text: 'Risk Assessment Training' },
-    ],
+  const [formData, setFormData] = useState<AboutFormData>(defaultFormData);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+
+const getActiveTemplateId = () => {
+  return templateId || (college as any).template_id || 1;
+};
+
+  // ✅ Get college ID from props
+  const getCollegeId = () => {
+    return parseInt((college as any).id);
   };
 
-  const [formData, setFormData] = useState<FormDataType>(defaultFormData);
-
-  const MAX_LENGTH: Record<string, number> = {
-    name: 100,
-    shortDescription: 200,
-    longDescription: 1000,
-    mission: 500,
-    vision: 500,
-    establishedYear: 10,
-    tagline: 200,
-    accreditation: 300,
-  };
-
-  // ✅ Load data from database on initial load with template_id = 2
-  useEffect(() => {
-    const loadFromDatabase = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/sections?template_id=2&section_name=About`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Fetched data:', data);
-          
-          if (data.sections && data.sections.length > 0) {
-            const section = data.sections[0];
-            const dbContent = section.content;
-            
-            // Update form data from database
-            const newFormData: FormDataType = {
-              name: dbContent.name || defaultFormData.name,
-              shortDescription: dbContent.shortDescription || defaultFormData.shortDescription,
-              longDescription: dbContent.longDescription || defaultFormData.longDescription,
-              mission: dbContent.mission || defaultFormData.mission,
-              vision: dbContent.vision || defaultFormData.vision,
-              establishedYear: dbContent.establishedYear || defaultFormData.establishedYear,
-              tagline: dbContent.tagline || defaultFormData.tagline,
-              accreditation: dbContent.accreditation || defaultFormData.accreditation,
-              logo: dbContent.logo || defaultFormData.logo,
-              coverImage: dbContent.coverImage || defaultFormData.coverImage,
-              stats: Array.isArray(dbContent.stats) && dbContent.stats.length > 0 
-                ? dbContent.stats 
-                : defaultFormData.stats,
-              pillars: Array.isArray(dbContent.pillars) && dbContent.pillars.length > 0 
-                ? dbContent.pillars 
-                : defaultFormData.pillars,
-              whyChooseUs: Array.isArray(dbContent.whyChooseUs) && dbContent.whyChooseUs.length > 0 
-                ? dbContent.whyChooseUs 
-                : defaultFormData.whyChooseUs,
-              highlights: Array.isArray(dbContent.highlights) && dbContent.highlights.length > 0 
-                ? dbContent.highlights.map((item: string | { id: number; text: string }, index: number) => ({
-                    id: index + 1,
-                    text: typeof item === 'string' ? item : item.text
-                  }))
-                : defaultFormData.highlights,
-            };
-            
-            setFormData(newFormData);
-          }
-        } else {
-          console.error('Failed to fetch from database:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Failed to load from database:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadFromDatabase();
-  }, []);
-
-  // Handle success popup display
-  useEffect(() => {
-    if (showSuccessPopup) {
-      const timer = setTimeout(() => {
-        setShowSuccessPopup(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessPopup]);
-
-  const updateForm = (patch: Partial<FormDataType>) => {
-    setFormData(prev => ({ ...prev, ...patch }));
-  };
-
-  const handleSave = async () => {
-    setIsSaving(true);
+  // ✅ Load fresh data from database with no cache
+  const loadFromDatabase = useCallback(async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
     
     try {
-      // Prepare content for database with template_id = 2
-      const dbContent = {
-        name: formData.name,
-        shortDescription: formData.shortDescription,
-        longDescription: formData.longDescription,
-        mission: formData.mission,
-        vision: formData.vision,
-        establishedYear: formData.establishedYear,
-        tagline: formData.tagline,
-        accreditation: formData.accreditation,
-        logo: formData.logo || null,
-        coverImage: formData.coverImage || null,
-        stats: formData.stats,
-        pillars: formData.pillars,
-        whyChooseUs: formData.whyChooseUs,
-        highlights: formData.highlights.map(item => item.text),
-      };
+      const activeTemplateId = getActiveTemplateId();
+      const collegeId = getCollegeId();
       
-      // Save to database with template_id = 2
-      const response = await fetch('/api/sections', {
-        method: 'POST',
+      // ✅ Add timestamp to prevent caching
+      const timestamp = Date.now();
+      const url = `/api/sections?template_id=${activeTemplateId}&section_name=About&college_id=${collegeId}&_=${timestamp}`;
+      
+      console.log('🔄 [AboutSection] Fetching fresh data from:', url);
+      console.log('🏫 [AboutSection] For College ID:', collegeId);
+      
+      const response = await fetch(url, {
+        cache: 'no-store',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          template_id: 2,
-          section_name: "About",
-          content: dbContent
-        }),
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Save error:', errorData);
-        throw new Error('Failed to save to database');
+      console.log(`📡 [AboutSection] API Response Status: ${response.status}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📦 [AboutSection] Raw API Response:', JSON.stringify(data, null, 2));
+        
+        if (data.sections && data.sections.length > 0) {
+          const dbContent = data.sections[0].content;
+          const updatedAt = data.sections[0].updated_at;
+          
+          console.log('💾 [AboutSection] Database Content:', dbContent);
+          console.log('🕐 [AboutSection] Last Updated:', updatedAt);
+          
+          setLastUpdated(updatedAt);
+          
+          if (dbContent && Object.keys(dbContent).length > 0) {
+            // Merge database content with defaults
+            const newFormData = {
+              ...defaultFormData,
+              ...dbContent,
+              stats: dbContent.stats || defaultFormData.stats,
+              values: dbContent.values || defaultFormData.values,
+              approach: dbContent.approach || defaultFormData.approach,
+              philosophy: dbContent.philosophy || defaultFormData.philosophy,
+              whyChooseUs: dbContent.whyChooseUs || defaultFormData.whyChooseUs,
+              story: dbContent.story || defaultFormData.story,
+              highlights: dbContent.highlights || defaultFormData.highlights
+            };
+            
+            console.log('✅ [AboutSection] Form Data Updated from DB');
+            console.log('📝 [AboutSection] Name:', newFormData.name);
+            console.log('📝 [AboutSection] Mission:', newFormData.mission?.substring(0, 50) + '...');
+            
+            setFormData(newFormData);
+          } else {
+            console.log('⚠️ [AboutSection] No content in database, using defaults');
+            setFormData(defaultFormData);
+          }
+        } else {
+          console.log('⚠️ [AboutSection] No sections found, using defaults');
+          setFormData(defaultFormData);
+        }
+      } else {
+        console.error('❌ [AboutSection] API Error:', response.status, response.statusText);
+        setFormData(defaultFormData);
       }
-      
-      await response.json();
-      
-      // Show success popup
-      setShowSuccessPopup(true);
-      setIsEditing(false);
-      
     } catch (error) {
-      console.error('Error saving:', error);
+      console.error('❌ [AboutSection] Failed to load:', error);
+      setFormData(defaultFormData);
+    } finally {
+      if (showLoading) setIsLoading(false);
+    }
+  }, [templateId, college.template_id, college.id]);
+
+  // Load data on mount and when dependencies change
+  useEffect(() => {
+    console.log('🔄 [AboutSection] useEffect triggered - Loading fresh data');
+    loadFromDatabase(true);
+  }, [loadFromDatabase]);
+
+  // ✅ Save to database with college_id
+  const handleSave = async () => {
+    setIsSaving(true);
+    console.log('💾 [AboutSection] Starting save operation...');
+    
+    try {
+      const activeTemplateId = getActiveTemplateId();
+      const collegeId = getCollegeId();
+      
+      console.log('🏫 [AboutSection] Saving for College ID:', collegeId);
+      
+      const contentToSave = {
+        name: formData.name,
+        tagline: formData.tagline,
+        shortDescription: formData.shortDescription,
+        longDescription: formData.longDescription,
+        establishedYear: formData.establishedYear,
+        story: formData.story,
+        mission: formData.mission,
+        vision: formData.vision,
+        philosophy: formData.philosophy,
+        values: formData.values,
+        approach: formData.approach,
+        whyChooseUs: formData.whyChooseUs,
+        stats: formData.stats,
+        highlights: formData.highlights,
+        logo: formData.logo,
+        coverImage: formData.coverImage
+      };
+      
+      console.log('📤 [AboutSection] Saving content:', {
+        template_id: activeTemplateId,
+        section_name: "About",
+        college_id: collegeId,
+        content: {
+          name: contentToSave.name,
+          mission_preview: contentToSave.mission?.substring(0, 50) + '...',
+          stats_count: contentToSave.stats?.length,
+          values_count: contentToSave.values?.length
+        }
+      });
+      
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_id: activeTemplateId,
+          section_name: "About",
+          college_id: collegeId,  // ✅ IMPORTANT: college_id passed here!
+          content: contentToSave
+        })
+      });
+      
+      console.log(`📡 [AboutSection] Save API Response Status: ${response.status}`);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ [AboutSection] Save successful:', result);
+        
+        setShowSuccessPopup(true);
+        setIsEditing(false);
+        
+        // ✅ Reload fresh data after save
+        console.log('🔄 [AboutSection] Reloading fresh data after save...');
+        await loadFromDatabase(false);
+        
+        // Hide popup after 3 seconds
+        setTimeout(() => setShowSuccessPopup(false), 3000);
+      } else {
+        const error = await response.json();
+        console.error('❌ [AboutSection] Save failed:', error);
+        alert('Failed to save changes: ' + (error.error || error.message));
+      }
+    } catch (error) {
+      console.error('❌ [AboutSection] Error saving:', error);
       alert('Failed to save changes. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleCancel = () => {
-    // Reload from database on cancel
-    const loadFromDatabase = async () => {
-      try {
-        const response = await fetch(
-          `/api/sections?template_id=2&section_name=About`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.sections && data.sections.length > 0) {
-            const section = data.sections[0];
-            const dbContent = section.content;
-            
-            const newFormData: FormDataType = {
-              name: dbContent.name || defaultFormData.name,
-              shortDescription: dbContent.shortDescription || defaultFormData.shortDescription,
-              longDescription: dbContent.longDescription || defaultFormData.longDescription,
-              mission: dbContent.mission || defaultFormData.mission,
-              vision: dbContent.vision || defaultFormData.vision,
-              establishedYear: dbContent.establishedYear || defaultFormData.establishedYear,
-              tagline: dbContent.tagline || defaultFormData.tagline,
-              accreditation: dbContent.accreditation || defaultFormData.accreditation,
-              logo: dbContent.logo || defaultFormData.logo,
-              coverImage: dbContent.coverImage || defaultFormData.coverImage,
-              stats: Array.isArray(dbContent.stats) && dbContent.stats.length > 0 
-                ? dbContent.stats 
-                : defaultFormData.stats,
-              pillars: Array.isArray(dbContent.pillars) && dbContent.pillars.length > 0 
-                ? dbContent.pillars 
-                : defaultFormData.pillars,
-              whyChooseUs: Array.isArray(dbContent.whyChooseUs) && dbContent.whyChooseUs.length > 0 
-                ? dbContent.whyChooseUs 
-                : defaultFormData.whyChooseUs,
-              highlights: Array.isArray(dbContent.highlights) && dbContent.highlights.length > 0 
-                ? dbContent.highlights.map((item: string | { id: number; text: string }, index: number) => ({
-                    id: index + 1,
-                    text: typeof item === 'string' ? item : item.text
-                  }))
-                : defaultFormData.highlights,
-            };
-            
-            setFormData(newFormData);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to reload from database:', error);
+  // Manual refresh handler
+  const handleRefresh = async () => {
+    console.log('🔄 [AboutSection] Manual refresh triggered');
+    await loadFromDatabase(true);
+  };
+
+  // Array handlers
+  const addStoryParagraph = () => {
+    setFormData(prev => ({ ...prev, story: [...prev.story, 'New paragraph...'] }));
+  };
+
+  const updateStoryParagraph = (index: number, value: string) => {
+    const newStory = [...formData.story];
+    newStory[index] = value;
+    setFormData(prev => ({ ...prev, story: newStory }));
+  };
+
+  const removeStoryParagraph = (index: number) => {
+    setFormData(prev => ({ ...prev, story: prev.story.filter((_, i) => i !== index) }));
+  };
+
+  const addPhilosophyPoint = () => {
+    setFormData(prev => ({
+      ...prev,
+      philosophy: { ...prev.philosophy, points: [...prev.philosophy.points, 'New philosophy point...'] }
+    }));
+  };
+
+  const updatePhilosophyPoint = (index: number, value: string) => {
+    const newPoints = [...formData.philosophy.points];
+    newPoints[index] = value;
+    setFormData(prev => ({ ...prev, philosophy: { ...prev.philosophy, points: newPoints } }));
+  };
+
+  const removePhilosophyPoint = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      philosophy: { ...prev.philosophy, points: prev.philosophy.points.filter((_, i) => i !== index) }
+    }));
+  };
+
+  const addValue = () => {
+    const newId = Math.max(...formData.values.map(v => v.id), 0) + 1;
+    setFormData(prev => ({
+      ...prev,
+      values: [...prev.values, { id: newId, title: 'New Value', description: 'Description', icon: 'star' }]
+    }));
+  };
+
+  const updateValue = (index: number, field: string, value: string) => {
+    const newValues = [...formData.values];
+    newValues[index] = { ...newValues[index], [field]: value };
+    setFormData(prev => ({ ...prev, values: newValues }));
+  };
+
+  const removeValue = (index: number) => {
+    setFormData(prev => ({ ...prev, values: prev.values.filter((_, i) => i !== index) }));
+  };
+
+  const addApproachAspect = () => {
+    setFormData(prev => ({
+      ...prev,
+      approach: { ...prev.approach, aspects: [...prev.approach.aspects, { title: 'New Aspect', description: 'Description' }] }
+    }));
+  };
+
+  const updateApproachAspect = (index: number, field: string, value: string) => {
+    const newAspects = [...formData.approach.aspects];
+    newAspects[index] = { ...newAspects[index], [field]: value };
+    setFormData(prev => ({ ...prev, approach: { ...prev.approach, aspects: newAspects } }));
+  };
+
+  const removeApproachAspect = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      approach: { ...prev.approach, aspects: prev.approach.aspects.filter((_, i) => i !== index) }
+    }));
+  };
+
+  const addWhyChooseUsPoint = () => {
+    setFormData(prev => ({
+      ...prev,
+      whyChooseUs: {
+        ...prev.whyChooseUs,
+        points: [...prev.whyChooseUs.points, { title: 'New Feature', description: 'Description', icon: 'star' }]
       }
-    };
-    
-    loadFromDatabase();
-    setIsEditing(false);
+    }));
   };
 
-  const handleTextChange = (key: keyof FormDataType, value: string) => {
-    if (value.length <= (MAX_LENGTH[key] || 1000)) updateForm({ [key]: value });
+  const updateWhyChooseUsPoint = (index: number, field: string, value: string) => {
+    const newPoints = [...formData.whyChooseUs.points];
+    newPoints[index] = { ...newPoints[index], [field]: value };
+    setFormData(prev => ({ ...prev, whyChooseUs: { ...prev.whyChooseUs, points: newPoints } }));
   };
 
-  // ✅ Array handlers for stats, pillars, whyChooseUs, highlights
-  const handleArrayItemChange = (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights', index: number, field: string, value: any) => {
-    const array = [...formData[arrayName]];
-    if (arrayName === 'highlights') {
-      array[index] = { ...array[index], text: value };
-    } else {
-      array[index] = { ...array[index], [field]: value };
-    }
-    updateForm({ [arrayName]: array });
+  const removeWhyChooseUsPoint = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      whyChooseUs: { ...prev.whyChooseUs, points: prev.whyChooseUs.points.filter((_, i) => i !== index) }
+    }));
   };
 
-  const addArrayItem = (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights') => {
-    const array = [...formData[arrayName]];
-    const newId = Math.max(...array.map(item => item.id), 0) + 1;
-    
-    const newItem = arrayName === 'stats' 
-      ? { id: newId, value: 0, suffix: '+', label: 'New Stat' }
-      : arrayName === 'pillars'
-      ? { id: newId, title: 'New Pillar', description: 'Description here' }
-      : arrayName === 'whyChooseUs'
-      ? { id: newId, title: 'New Feature', description: 'Description here' }
-      : { id: newId, text: 'New Highlight' };
-    
-    updateForm({ [arrayName]: [...array, newItem] });
-  };
-
-  const removeArrayItem = (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights', index: number) => {
-    const array = [...formData[arrayName]];
-    array.splice(index, 1);
-    updateForm({ [arrayName]: array });
-  };
-
-  // ✅ Image handler
   const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | string) => {
     if (typeof fileOrString === 'string') {
-      updateForm({ [key]: fileOrString });
+      setFormData(prev => ({ ...prev, [key]: fileOrString }));
       return;
     }
-
     const reader = new FileReader();
     reader.onloadend = () => {
-      updateForm({ [key]: reader.result as string });
+      setFormData(prev => ({ ...prev, [key]: reader.result as string }));
     };
     reader.readAsDataURL(fileOrString);
   };
 
-  // Content blocks in fixed order for better UX
-  const contentSections = [
-    {
-      id: 'logo',
-      type: 'image' as const,
-      field: 'logo' as const,
-      label: 'Logo',
-      description: 'Upload your institute logo (PNG/JPG)'
-    },
-    {
-      id: 'coverImage',
-      type: 'image' as const,
-      field: 'coverImage' as const,
-      label: 'Cover Image',
-      description: 'Add a banner image for your institute'
-    },
-    {
-      id: 'name',
-      type: 'text' as const,
-      field: 'name' as const,
-      label: 'Institute Name',
-      description: 'Enter the official name of your institute'
-    },
-    {
-      id: 'tagline',
-      type: 'text' as const,
-      field: 'tagline' as const,
-      label: 'Tagline',
-      description: 'Short description shown below the name'
-    },
-    {
-      id: 'establishedYear',
-      type: 'text' as const,
-      field: 'establishedYear' as const,
-      label: 'Established Year',
-      description: 'Year when your institute was founded'
-    },
-    {
-      id: 'shortDescription',
-      type: 'text' as const,
-      field: 'shortDescription' as const,
-      label: 'Introduction',
-      description: 'Brief introduction about your institute'
-    },
-    {
-      id: 'longDescription',
-      type: 'text' as const,
-      field: 'longDescription' as const,
-      label: 'Detailed History',
-      description: 'Comprehensive overview of your institute'
-    },
-    {
-      id: 'mission',
-      type: 'text' as const,
-      field: 'mission' as const,
-      label: 'Mission Statement',
-      description: 'What your institute aims to achieve'
-    },
-    {
-      id: 'vision',
-      type: 'text' as const,
-      field: 'vision' as const,
-      label: 'Vision Statement',
-      description: 'Future aspirations of your institute'
-    },
-    {
-      id: 'accreditation',
-      type: 'text' as const,
-      field: 'accreditation' as const,
-      label: 'Accreditation',
-      description: 'Government and industry recognitions'
-    },
-  ];
-
-  // Array sections
-  const arraySections = [
-    {
-      id: 'highlights',
-      type: 'array' as const,
-      field: 'highlights' as const,
-      label: 'Training Programs',
-      description: 'List of your key training programs',
-      fields: [{ name: 'text', label: 'Program Name', type: 'text' }]
-    },
-    {
-      id: 'stats',
-      type: 'array' as const,
-      field: 'stats' as const,
-      label: 'Impact Statistics',
-      description: 'Numbers that showcase your success',
-      fields: [
-        { name: 'value', label: 'Value', type: 'number' },
-        { name: 'suffix', label: 'Suffix (+, %, etc.)', type: 'text' },
-        { name: 'label', label: 'Label', type: 'text' }
-      ]
-    },
-    {
-      id: 'pillars',
-      type: 'array' as const,
-      field: 'pillars' as const,
-      label: 'Excellence Pillars',
-      description: 'Your key strengths and differentiators',
-      fields: [
-        { name: 'title', label: 'Title', type: 'text' },
-        { name: 'description', label: 'Description', type: 'textarea' }
-      ]
-    },
-    {
-      id: 'whyChooseUs',
-      type: 'array' as const,
-      field: 'whyChooseUs' as const,
-      label: 'Why Choose Us',
-      description: 'Features that make you stand out',
-      fields: [
-        { name: 'title', label: 'Title', type: 'text' },
-        { name: 'description', label: 'Description', type: 'textarea' }
-      ]
-    },
-  ];
-
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06B6D4]"></div>
+        <div className="flex flex-col justify-center items-center h-64 gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+          <p className="text-gray-500 dark:text-gray-400">Loading about section data...</p>
         </div>
       </div>
     );
@@ -457,302 +483,437 @@ export function AboutSection({ college }: AboutSectionProps) {
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right-4 duration-300">
-          <div className="bg-black text-white px-4 py-3 rounded-lg shadow-xl border border-gray-800 flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <FiCheck className="w-4 h-4" />
-            </div>
+          <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
+            <FiCheck className="w-5 h-5" />
             <div>
               <p className="font-medium">Changes Saved Successfully!</p>
-              <p className="text-sm text-gray-300">Your About section has been updated.</p>
+              <p className="text-sm text-green-100">Data refreshed from database.</p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
-        {/* Header */}
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+        {/* Header with Refresh Button */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About Section</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage institute information and branding</p>
-          </div>
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)}>
-              <FiEdit2 className="w-4 h-4 mr-2" /> Edit Information
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={handleCancel}>
-                <FiX className="w-4 h-4 mr-2" /> Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={isSaving}>
-                <FiSave className="w-4 h-4 mr-2" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Button>
+            <p className="text-gray-600 dark:text-gray-400">Manage complete about page content</p>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-xs text-teal-600 dark:text-teal-400">Template ID: {getActiveTemplateId()}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">College ID: {getCollegeId()}</p>
+              {lastUpdated && (
+                <p className="text-xs text-gray-400">Last updated: {new Date(lastUpdated).toLocaleString()}</p>
+              )}
             </div>
-          )}
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleRefresh} variant="outline" className="gap-2">
+              <FiRefreshCw className="w-4 h-4" /> Refresh
+            </Button>
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
+                <FiEdit2 className="w-4 h-4 mr-2" /> Edit All Content
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  <FiX className="w-4 h-4 mr-2" /> Cancel
+                </Button>
+                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700">
+                  <FiSave className="w-4 h-4 mr-2" />
+                  {isSaving ? 'Saving...' : 'Save All Changes'}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {isEditing && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
             <div className="flex items-start gap-3">
-              <FiInfo className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <FiInfo className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                  You can now modify all institute information. Changes will be saved directly to the database.
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  You can modify all about page content. Changes will be saved to database and reflected on live template.
                 </p>
               </div>
             </div>
           </div>
         )}
 
+        {/* Rest of the UI sections - same as before */}
         <div className="space-y-8">
-          {/* Main Content Sections */}
-          {contentSections.map((section) => (
-            <ContentSection
-              key={section.id}
-              section={section}
-              isEditing={isEditing}
-              formData={formData}
-              onTextChange={handleTextChange}
-              onImageChange={handleImageChange}
-              maxLength={MAX_LENGTH}
-            />
-          ))}
+          {/* Basic Info Section */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Institute Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                  placeholder="Institute Name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tagline</label>
+                <input
+                  type="text"
+                  value={formData.tagline}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Established Year</label>
+                <input
+                  type="text"
+                  value={formData.establishedYear}
+                  onChange={(e) => setFormData(prev => ({ ...prev, establishedYear: e.target.value }))}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>
+              <textarea
+                value={formData.shortDescription}
+                onChange={(e) => setFormData(prev => ({ ...prev, shortDescription: e.target.value }))}
+                disabled={!isEditing}
+                rows={3}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+              />
+            </div>
+          </div>
 
-          {/* Array Sections */}
-          {arraySections.map((section) => (
-            <ArraySection
-              key={section.id}
-              section={section}
-              isEditing={isEditing}
-              formData={formData}
-              onArrayItemChange={handleArrayItemChange}
-              onAddArrayItem={addArrayItem}
-              onRemoveArrayItem={removeArrayItem}
-            />
-          ))}
+          {/* Images Section */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Images</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+                <UploadImage
+                  value={formData.logo}
+                  onChange={(file) => handleImageChange('logo', file)}
+                  onRemove={() => handleImageChange('logo', '')}
+                  aspectRatio="square"
+                  disabled={!isEditing}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+                <UploadImage
+                  value={formData.coverImage}
+                  onChange={(file) => handleImageChange('coverImage', file)}
+                  onRemove={() => handleImageChange('coverImage', '')}
+                  aspectRatio="banner"
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Story Section */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Story (Paragraphs)</h3>
+              {isEditing && (
+                <Button size="sm" onClick={addStoryParagraph} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Paragraph
+                </Button>
+              )}
+            </div>
+            <div className="space-y-4">
+              {formData.story.map((paragraph, index) => (
+                <div key={index} className="flex gap-2">
+                  <textarea
+                    value={paragraph}
+                    onChange={(e) => updateStoryParagraph(index, e.target.value)}
+                    disabled={!isEditing}
+                    rows={2}
+                    className="flex-1 px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    placeholder={`Paragraph ${index + 1}`}
+                  />
+                  {isEditing && (
+                    <Button variant="ghost" size="sm" onClick={() => removeStoryParagraph(index)} className="text-red-500">
+                      <FiTrash2 />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mission & Vision */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Mission</h3>
+              <textarea
+                value={formData.mission}
+                onChange={(e) => setFormData(prev => ({ ...prev, mission: e.target.value }))}
+                disabled={!isEditing}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
+                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
+              />
+            </div>
+            <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vision</h3>
+              <textarea
+                value={formData.vision}
+                onChange={(e) => setFormData(prev => ({ ...prev, vision: e.target.value }))}
+                disabled={!isEditing}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
+                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
+              />
+            </div>
+          </div>
+
+          {/* Philosophy */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Philosophy</h3>
+              {isEditing && (
+                <Button size="sm" onClick={addPhilosophyPoint} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Point
+                </Button>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heading</label>
+              <input
+                type="text"
+                value={formData.philosophy.heading}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  philosophy: { ...prev.philosophy, heading: e.target.value }
+                }))}
+                disabled={!isEditing}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
+                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
+              />
+            </div>
+            <div className="space-y-3">
+              {formData.philosophy.points.map((point, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={point}
+                    onChange={(e) => updatePhilosophyPoint(index, e.target.value)}
+                    disabled={!isEditing}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                               bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
+                               disabled:bg-gray-100 dark:disabled:bg-gray-700"
+                  />
+                  {isEditing && (
+                    <Button variant="ghost" size="sm" onClick={() => removePhilosophyPoint(index)} className="text-red-500">
+                      <FiTrash2 />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Values */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Core Values</h3>
+              {isEditing && (
+                <Button size="sm" onClick={addValue} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Value
+                </Button>
+              )}
+            </div>
+            <div className="space-y-4">
+              {formData.values.map((value, index) => (
+                <div key={value.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-between mb-3">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Value {index + 1}</span>
+                    {isEditing && (
+                      <Button variant="ghost" size="sm" onClick={() => removeValue(index)} className="text-red-500">
+                        <FiTrash2 />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <input
+                      type="text"
+                      value={value.title}
+                      onChange={(e) => updateValue(index, 'title', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Title"
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                    <textarea
+                      value={value.description}
+                      onChange={(e) => updateValue(index, 'description', e.target.value)}
+                      disabled={!isEditing}
+                      rows={2}
+                      placeholder="Description"
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                    <select
+                      value={value.icon}
+                      onChange={(e) => updateValue(index, 'icon', e.target.value)}
+                      disabled={!isEditing}
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    >
+                      <option value="compass">Compass</option>
+                      <option value="seedling">Seedling</option>
+                      <option value="users">Users</option>
+                      <option value="mountain">Mountain</option>
+                      <option value="shield">Shield</option>
+                      <option value="star">Star</option>
+                      <option value="heart">Heart</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Approach */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Approach</h3>
+              {isEditing && (
+                <Button size="sm" onClick={addApproachAspect} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Aspect
+                </Button>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+              <textarea
+                value={formData.approach.description}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  approach: { ...prev.approach, description: e.target.value }
+                }))}
+                disabled={!isEditing}
+                rows={2}
+                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600"
+              />
+            </div>
+            <div className="space-y-4">
+              {formData.approach.aspects.map((aspect, index) => (
+                <div key={index} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-between mb-3">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Aspect {index + 1}</span>
+                    {isEditing && (
+                      <Button variant="ghost" size="sm" onClick={() => removeApproachAspect(index)} className="text-red-500">
+                        <FiTrash2 />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={aspect.title}
+                      onChange={(e) => updateApproachAspect(index, 'title', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Title"
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                    <textarea
+                      value={aspect.description}
+                      onChange={(e) => updateApproachAspect(index, 'description', e.target.value)}
+                      disabled={!isEditing}
+                      rows={2}
+                      placeholder="Description"
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Why Choose Us */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Why Choose Us</h3>
+              {isEditing && (
+                <Button size="sm" onClick={addWhyChooseUsPoint} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Point
+                </Button>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Intro Text</label>
+              <textarea
+                value={formData.whyChooseUs.intro}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  whyChooseUs: { ...prev.whyChooseUs, intro: e.target.value }
+                }))}
+                disabled={!isEditing}
+                rows={2}
+                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600"
+              />
+            </div>
+            <div className="space-y-4">
+              {formData.whyChooseUs.points.map((point, index) => (
+                <div key={index} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-between mb-3">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Point {index + 1}</span>
+                    {isEditing && (
+                      <Button variant="ghost" size="sm" onClick={() => removeWhyChooseUsPoint(index)} className="text-red-500">
+                        <FiTrash2 />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={point.title}
+                      onChange={(e) => updateWhyChooseUsPoint(index, 'title', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Title"
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                    <textarea
+                      value={point.description}
+                      onChange={(e) => updateWhyChooseUsPoint(index, 'description', e.target.value)}
+                      disabled={!isEditing}
+                      rows={2}
+                      placeholder="Description"
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    />
+                    <select
+                      value={point.icon}
+                      onChange={(e) => updateWhyChooseUsPoint(index, 'icon', e.target.value)}
+                      disabled={!isEditing}
+                      className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                    >
+                      <option value="users">Users</option>
+                      <option value="book">Book</option>
+                      <option value="target">Target</option>
+                      <option value="heart">Heart</option>
+                      <option value="shield">Shield</option>
+                      <option value="star">Star</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </>
   );
 }
 
-// Content Section Component
-interface ContentSectionProps {
-  section: {
-    id: string;
-    type: 'text' | 'image';
-    field: keyof FormDataType;
-    label: string;
-    description: string;
-  };
-  isEditing: boolean;
-  formData: FormDataType;
-  onTextChange: (key: keyof FormDataType, value: string) => void;
-  onImageChange: (key: 'logo' | 'coverImage', file: File | string) => void;
-  maxLength: Record<string, number>;
-}
-
-function ContentSection({
-  section,
-  isEditing,
-  formData,
-  onTextChange,
-  onImageChange,
-  maxLength
-}: ContentSectionProps) {
-  const renderContent = () => {
-    switch (section.type) {
-      case 'text':
-        const isTextArea = ['shortDescription', 'longDescription', 'mission', 'vision', 'accreditation'].includes(section.field);
-        const charCount = (formData[section.field] as string || '').length;
-        const charLimit = maxLength[section.field] || 1000;
-        
-        return (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                {section.label}
-              </label>
-              <span className={`text-xs ${charCount > charLimit * 0.8 ? 'text-orange-500' : 'text-gray-500'}`}>
-                {charCount}/{charLimit}
-              </span>
-            </div>
-            
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {section.description}
-            </p>
-            
-            {isTextArea ? (
-              <textarea
-                value={formData[section.field] as string || ''}
-                onChange={(e) => onTextChange(section.field, e.target.value)}
-                disabled={!isEditing}
-                rows={section.field === 'longDescription' ? 6 : 4}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700 resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder={`Enter ${section.label.toLowerCase()}...`}
-              />
-            ) : (
-              <input
-                type="text"
-                value={formData[section.field] as string || ''}
-                onChange={(e) => onTextChange(section.field, e.target.value)}
-                disabled={!isEditing}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder={`Enter ${section.label.toLowerCase()}...`}
-              />
-            )}
-          </div>
-        );
-
-      case 'image':
-        const isLogo = section.field === 'logo';
-        return (
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                {section.label}
-              </label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {section.description}
-              </p>
-            </div>
-            
-            <UploadImage
-              value={formData[section.field] as string}
-              onChange={(file) => onImageChange(section.field as 'logo' | 'coverImage', file)}
-              onRemove={() => onImageChange(section.field as 'logo' | 'coverImage', '')}
-              aspectRatio={isLogo ? "square" : "banner"}
-              disabled={!isEditing}
-            />
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-all hover:border-gray-300 dark:hover:border-gray-600">
-      {renderContent()}
-    </div>
-  );
-}
-
-// Array Section Component
-interface ArraySectionProps {
-  section: {
-    id: string;
-    type: 'array';
-    field: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights';
-    label: string;
-    description: string;
-    fields: Array<{ name: string; label: string; type: string }>;
-  };
-  isEditing: boolean;
-  formData: FormDataType;
-  onArrayItemChange: (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights', index: number, field: string, value: any) => void;
-  onAddArrayItem: (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights') => void;
-  onRemoveArrayItem: (arrayName: 'stats' | 'pillars' | 'whyChooseUs' | 'highlights', index: number) => void;
-}
-
-function ArraySection({
-  section,
-  isEditing,
-  formData,
-  onArrayItemChange,
-  onAddArrayItem,
-  onRemoveArrayItem,
-}: ArraySectionProps) {
-  const array = formData[section.field];
-
-  return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-            {section.label}
-          </label>
-          {isEditing && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => onAddArrayItem(section.field)}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              <FiPlus className="w-3 h-3 mr-1" /> Add Item
-            </Button>
-          )}
-        </div>
-        
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {section.description}
-        </p>
-        
-        <div className="space-y-4">
-          {array.map((item, index) => (
-            <div key={item.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {section.label} {index + 1}
-                </span>
-                {isEditing && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveArrayItem(section.field, index)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-              
-              <div className="space-y-3">
-                {section.fields.map((field) => (
-                  <div key={field.name}>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {field.label}
-                    </label>
-                    {field.type === 'textarea' ? (
-                      <textarea
-                        value={item[field.name as keyof typeof item] as number || ''}
-                        onChange={(e) => onArrayItemChange(section.field, index, field.name, e.target.value)}
-                        disabled={!isEditing}
-                        rows={2}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700 resize-none"
-                        placeholder={`Enter ${field.label.toLowerCase()}...`}
-                      />
-                    ) : field.type === 'number' ? (
-                      <input
-                        type="number"
-                        value={item[field.name as keyof typeof item] as number || ''}
-                        onChange={(e) => onArrayItemChange(section.field, index, field.name, parseInt(e.target.value) || 0)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700"
-                        placeholder={`Enter ${field.label.toLowerCase()}...`}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={item[field.name as keyof typeof item] as number || ''}
-                        onChange={(e) => onArrayItemChange(section.field, index, field.name, e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-700"
-                        placeholder={`Enter ${field.label.toLowerCase()}...`}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+export default AboutSection;

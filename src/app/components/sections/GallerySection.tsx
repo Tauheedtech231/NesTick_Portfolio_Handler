@@ -1,218 +1,223 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { GalleryItem, College } from '@/app/lib/gsap';
+import React, { useEffect, useState, useCallback } from 'react';
+import { College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
-import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiAward, FiImage, FiStar, FiCheck } from 'react-icons/fi';
+import { FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiImage, FiCheck, FiRefreshCw } from 'react-icons/fi';
 import Image from 'next/image';
 
 interface GallerySectionProps {
   college: College;
+  templateId?: number;
 }
 
-export function GallerySection({ college }: GallerySectionProps) {
+interface GalleryImage {
+  id: number;
+  src: string;
+  title: string;
+  category: string;
+  order: number;
+}
+
+const defaultCategories = ["Campus", "Facilities", "Academics", "Student Life", "Events"];
+
+export function GallerySection({ college, templateId }: GallerySectionProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [filter, setFilter] = useState<'all' | 'award' | 'photo' | 'achievement'>('all');
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  // ✅ Load gallery data from database
-  useEffect(() => {
-    const loadGalleryData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `/api/sections?template_id=2&section_name=Gallery`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.sections && data.sections.length > 0) {
-            const dbContent = data.sections[0].content;
-            if (dbContent && dbContent.gallery) {
-              setGallery(dbContent.gallery);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error loading gallery data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadGalleryData();
-  }, []);
-
-  // Handle success popup display
-  useEffect(() => {
-    if (showSuccessPopup) {
-      const timer = setTimeout(() => {
-        setShowSuccessPopup(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showSuccessPopup]);
-
-  const addItem = () => {
-    const newItem: GalleryItem = {
-      id: `gallery-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: '',
-      description: '',
-      date: new Date().toISOString().split('T')[0],
-      image: '',
-      category: 'photo',
-    };
-    setGallery([...gallery, newItem]);
+  const getActiveTemplateId = () => {
+    return templateId || college.template_id || 1;
   };
 
-  const updateItem = (index: number, field: keyof GalleryItem, value: string) => {
-    if (field === 'description' && value.length > 500) {
-      alert('Description cannot exceed 500 characters.');
-      return;
-    }
-
-    const updatedGallery = [...gallery];
-    updatedGallery[index] = { ...updatedGallery[index], [field]: value };
-    setGallery(updatedGallery);
+  const getCollegeId = () => {
+    return parseInt(college.id);
   };
 
-  const removeItem = (index: number) => {
-    const itemTitle = gallery[index].title || `Item ${index + 1}`;
-    if (window.confirm(`Are you sure you want to remove "${itemTitle}"?`)) {
-      setGallery(gallery.filter((_, i) => i !== index));
-    }
-  };
-
-  const saveChanges = async () => {
-    setIsSaving(true);
+  // Load gallery data from database
+  const loadFromDatabase = useCallback(async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
     
-    // Validate required fields
-    const invalidItems = gallery.filter(item => 
-      !item.title.trim() || !item.description.trim() || !item.image
-    );
-
-    if (invalidItems.length > 0) {
-      alert(`Please fill all required fields (title, description, and image) for ${invalidItems.length} item(s).`);
-      setIsSaving(false);
-      return;
-    }
-
     try {
-      // Save to database with template_id = 2
-      const dbContent = {
-        gallery: gallery.map(item => ({
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          date: item.date,
-          image: item.image,
-          category: item.category || 'photo'
-        }))
-      };
-
-      console.log('Saving gallery data:', dbContent);
-
-      const response = await fetch('/api/sections', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          template_id: 2,
-          section_name: "Gallery",
-          content: dbContent
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save to database');
-      }
-
-      const result = await response.json();
-      console.log('Saved gallery to database:', result);
+      const activeTemplateId = getActiveTemplateId();
+      const collegeId = getCollegeId();
+      const timestamp = Date.now();
       
-      // Show success popup
-      setShowSuccessPopup(true);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error saving gallery:', error);
-      alert('Failed to save changes. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const cancelEditing = async () => {
-    // Reload from database
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `/api/sections?template_id=2&section_name=Gallery`
-      );
+      const url = `/api/sections?template_id=${activeTemplateId}&section_name=Gallery&college_id=${collegeId}&_=${timestamp}`;
+      
+      console.log('🔄 [Gallery] Fetching gallery data from:', url);
+      
+      const response = await fetch(url, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
       
       if (response.ok) {
         const data = await response.json();
+        
         if (data.sections && data.sections.length > 0) {
           const dbContent = data.sections[0].content;
-          if (dbContent && dbContent.gallery) {
-            setGallery(dbContent.gallery);
+          const updatedAt = data.sections[0].updated_at;
+          
+          setLastUpdated(updatedAt);
+          
+          if (dbContent) {
+            if (dbContent.gallery && Array.isArray(dbContent.gallery)) {
+              setGalleryImages(dbContent.gallery);
+            }
+            if (dbContent.categories && Array.isArray(dbContent.categories)) {
+              setCategories(dbContent.categories);
+            }
+            console.log('✅ [Gallery] Loaded', dbContent.gallery?.length || 0, 'images');
           }
         }
       }
     } catch (error) {
-      console.error('Error reloading gallery data:', error);
+      console.error('❌ [Gallery] Failed to load:', error);
     } finally {
-      setIsLoading(false);
-      setIsEditing(false);
+      if (showLoading) setIsLoading(false);
+    }
+  }, [templateId, college.template_id, college.id]);
+
+  useEffect(() => {
+    loadFromDatabase(true);
+  }, [loadFromDatabase]);
+
+  // Save to database
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    try {
+      const activeTemplateId = getActiveTemplateId();
+      const collegeId = getCollegeId();
+      
+      const contentToSave = {
+        gallery: galleryImages,
+        categories: categories
+      };
+      
+      const response = await fetch('/api/sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_id: activeTemplateId,
+          section_name: "Gallery",
+          college_id: collegeId,
+          content: contentToSave
+        })
+      });
+      
+      if (response.ok) {
+        setShowSuccessPopup(true);
+        setIsEditing(false);
+        await loadFromDatabase(false);
+        setTimeout(() => setShowSuccessPopup(false), 3000);
+      } else {
+        const error = await response.json();
+        alert('Failed to save: ' + (error.error || error.message));
+      }
+    } catch (error) {
+      console.error('Error saving gallery:', error);
+      alert('Failed to save changes');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Handle image upload for gallery items
-  const handleImageChange = (index: number, fileOrString: File | string) => {
+  // Add new image
+  const addImage = () => {
+    const newId = Math.max(...galleryImages.map(img => img.id), 0) + 1;
+    const newImage: GalleryImage = {
+      id: newId,
+      src: '',
+      title: 'New Image',
+      category: categories[0] || 'Campus',
+      order: galleryImages.length
+    };
+    setGalleryImages([...galleryImages, newImage]);
+  };
+
+  // Update image
+  const updateImage = (index: number, field: keyof GalleryImage, value: string | number) => {
+    const updated = [...galleryImages];
+    updated[index] = { ...updated[index], [field]: value };
+    setGalleryImages(updated);
+  };
+
+  // Remove image
+  const removeImage = (index: number) => {
+    if (confirm('Are you sure you want to remove this image?')) {
+      setGalleryImages(galleryImages.filter((_, i) => i !== index));
+    }
+  };
+
+  // Move image up/down
+  const moveImage = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === galleryImages.length - 1) return;
+    
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...galleryImages];
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    
+    // Update order numbers
+    updated.forEach((img, idx) => { img.order = idx; });
+    setGalleryImages(updated);
+  };
+
+  // Handle image upload
+  const handleImageUpload = (index: number, fileOrString: File | string) => {
     if (typeof fileOrString === 'string') {
-      updateItem(index, 'image', fileOrString);
+      updateImage(index, 'src', fileOrString);
       return;
     }
-
+    
     const reader = new FileReader();
     reader.onloadend = () => {
-      updateItem(index, 'image', reader.result as string);
+      updateImage(index, 'src', reader.result as string);
     };
     reader.readAsDataURL(fileOrString);
   };
 
-  const filteredItems = filter === 'all' 
-    ? gallery 
-    : gallery.filter(item => item.category === filter);
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'award': return <FiAward className="w-4 h-4" />;
-      case 'photo': return <FiImage className="w-4 h-4" />;
-      case 'achievement': return <FiStar className="w-4 h-4" />;
-      default: return <FiImage className="w-4 h-4" />;
+  // Add new category
+  const addCategory = () => {
+    const newCategory = prompt('Enter new category name:');
+    if (newCategory && !categories.includes(newCategory)) {
+      setCategories([...categories, newCategory]);
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'award': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200';
-      case 'photo': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
-      case 'achievement': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+  // Remove category
+  const removeCategory = (category: string) => {
+    if (confirm(`Remove category "${category}"? Images with this category will become "Uncategorized".`)) {
+      const updatedImages = galleryImages.map(img => 
+        img.category === category ? { ...img, category: 'Uncategorized' } : img
+      );
+      setGalleryImages(updatedImages);
+      setCategories(categories.filter(c => c !== category));
     }
   };
+
+  const refreshData = async () => {
+    await loadFromDatabase(true);
+  };
+
+  const filteredImages = activeCategory === "All" 
+    ? galleryImages 
+    : galleryImages.filter(img => img.category === activeCategory);
 
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading gallery data...</span>
+        <div className="flex flex-col justify-center items-center h-64 gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+          <p className="text-gray-500 dark:text-gray-400">Loading gallery...</p>
         </div>
       </div>
     );
@@ -223,13 +228,11 @@ export function GallerySection({ college }: GallerySectionProps) {
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right-4 duration-300">
-          <div className="bg-black text-white px-4 py-3 rounded-lg shadow-xl border border-gray-800 flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <FiCheck className="w-4 h-4" />
-            </div>
+          <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
+            <FiCheck className="w-5 h-5" />
             <div>
               <p className="font-medium">Changes Saved Successfully!</p>
-              <p className="text-sm text-gray-300">Your Gallery section has been updated.</p>
+              <p className="text-sm text-green-100">Gallery updated.</p>
             </div>
           </div>
         </div>
@@ -239,283 +242,224 @@ export function GallerySection({ college }: GallerySectionProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gallery & Achievements</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage photos, awards, and achievements showcase</p>
-          </div>
-          
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)}>
-              <FiEdit2 className="w-4 h-4 mr-2" />
-              Manage Gallery
-            </Button>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-              <Button
-                variant="secondary"
-                onClick={cancelEditing}
-                className="w-full sm:w-auto"
-              >
-                <FiX className="w-4 h-4 mr-2" />
-                Cancel
-              </Button>
-              <Button
-                onClick={saveChanges}
-                disabled={isSaving}
-                className="w-full sm:w-auto"
-              >
-                <FiSave className="w-4 h-4 mr-2" />
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Button>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gallery Section</h2>
+            <p className="text-gray-600 dark:text-gray-400">Manage campus gallery images</p>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-xs text-teal-600 dark:text-teal-400">Template ID: {getActiveTemplateId()}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400">College ID: {getCollegeId()}</p>
+              {lastUpdated && (
+                <p className="text-xs text-gray-400">Last updated: {new Date(lastUpdated).toLocaleString()}</p>
+              )}
             </div>
-          )}
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={refreshData} variant="outline" className="gap-2">
+              <FiRefreshCw className="w-4 h-4" /> Refresh
+            </Button>
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
+                <FiEdit2 className="w-4 h-4 mr-2" /> Manage Gallery
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                  <FiX className="w-4 h-4 mr-2" /> Cancel
+                </Button>
+                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700">
+                  <FiSave className="w-4 h-4 mr-2" />
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
-        {!isEditing && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                filter === 'all'
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              All Items
-            </button>
-            <button
-              onClick={() => setFilter('award')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                filter === 'award'
-                  ? 'bg-yellow-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <FiAward className="w-4 h-4 inline mr-2" />
-              Awards
-            </button>
-            <button
-              onClick={() => setFilter('photo')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                filter === 'photo'
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <FiImage className="w-4 h-4 inline mr-2" />
-              Photos
-            </button>
-            <button
-              onClick={() => setFilter('achievement')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                filter === 'achievement'
-                  ? 'bg-green-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              <FiStar className="w-4 h-4 inline mr-2" />
-              Achievements
-            </button>
+        {isEditing && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
+            <div className="flex items-start gap-3">
+              <FiImage className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Add, remove, or reorder gallery images. Changes will be saved to database.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
+        {/* Category Filter - View Mode */}
+        {!isEditing && (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setActiveCategory("All")}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  activeCategory === "All"
+                    ? "bg-teal-600 text-white shadow-lg"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+                }`}
+              >
+                All ({galleryImages.length})
+              </button>
+              {categories.map(cat => {
+                const count = galleryImages.filter(img => img.category === cat).length;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      activeCategory === cat
+                        ? "bg-teal-600 text-white shadow-lg"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+                    }`}
+                  >
+                    {cat} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Edit Mode - Manage Images */}
         {isEditing ? (
           <div className="space-y-6">
-            {/* Add Item Button */}
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                  Gallery Items
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Add and manage gallery items, awards, and achievements
-                </p>
+            {/* Categories Management */}
+            <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Categories</h3>
+                <Button size="sm" onClick={addCategory} className="bg-teal-600">
+                  <FiPlus className="w-3 h-3 mr-1" /> Add Category
+                </Button>
               </div>
-              <Button onClick={addItem}>
-                <FiPlus className="w-4 h-4 mr-2" />
-                Add New Item
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                {categories.map(cat => (
+                  <div key={cat} className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-gray-900 rounded-full border">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{cat}</span>
+                    <button
+                      onClick={() => removeCategory(cat)}
+                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Gallery Items in Edit Mode */}
-            <div className="space-y-6">
-              {gallery.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                        <FiImage className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                          Gallery Item #{index + 1}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {item.title || 'New gallery item'}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to remove this gallery item?')) {
-                          removeItem(index);
-                        }
-                      }}
-                    >
-                      <FiTrash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+            {/* Images Management */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Gallery Images</h3>
+                <Button onClick={addImage} className="bg-teal-600">
+                  <FiPlus className="w-4 h-4 mr-2" /> Add Image
+                </Button>
+              </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Item Image */}
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                          Image
-                        </label>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          Upload gallery image (PNG/JPG)
-                        </p>
+              <div className="space-y-4">
+                {galleryImages.map((image, index) => (
+                  <div key={image.id} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Order: {index + 1}</span>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => moveImage(index, 'up')}
+                            className="p-1 text-gray-500 hover:text-teal-600"
+                            disabled={index === 0}
+                          >
+                            ↑
+                          </button>
+                          <button
+                            onClick={() => moveImage(index, 'down')}
+                            className="p-1 text-gray-500 hover:text-teal-600"
+                            disabled={index === galleryImages.length - 1}
+                          >
+                            ↓
+                          </button>
+                        </div>
                       </div>
-                      <UploadImage
-                        value={item.image}
-                        onChange={(file) => handleImageChange(index, file)}
-                        onRemove={() => updateItem(index, 'image', '')}
-                        aspectRatio="video"
-                        disabled={!isEditing}
-                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeImage(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </Button>
                     </div>
 
-                    {/* Item Details */}
-                    <div className="lg:col-span-2 space-y-6">
-                      <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                          Title *
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image</label>
+                        <UploadImage
+                          value={image.src}
+                          onChange={(file) => handleImageUpload(index, file)}
+                          onRemove={() => updateImage(index, 'src', '')}
+                          aspectRatio="video"
+                          disabled={!isEditing}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
                         <input
                           type="text"
-                          value={item.title || ''}
-                          onChange={(e) => updateItem(index, 'title', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="Best Engineering College Award"
+                          value={image.title}
+                          onChange={(e) => updateImage(index, 'title', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
+                          placeholder="Image title"
                         />
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                            Date *
-                          </label>
-                          <input
-                            type="date"
-                            value={item.date}
-                            onChange={(e) => updateItem(index, 'date', e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                            Category *
-                          </label>
-                          <select
-                            value={item.category || 'photo'}
-                            onChange={(e) => updateItem(index, 'category', e.target.value as "photo")}
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          >
-                            <option value="photo">Photo</option>
-                            <option value="award">Award</option>
-                            <option value="achievement">Achievement</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">
-                            Description * (Max 500 characters)
-                          </label>
-                          <span className={`text-xs ${
-                            (item.description?.length || 0) > 450 
-                              ? 'text-red-500' 
-                              : (item.description?.length || 0) > 400 
-                              ? 'text-yellow-500' 
-                              : 'text-gray-500'
-                          }`}>
-                            {item.description?.length || 0}/500
-                          </span>
-                        </div>
-                        <textarea
-                          value={item.description || ''}
-                          onChange={(e) => updateItem(index, 'description', e.target.value)}
-                          rows={3}
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="Describe this achievement or photo..."
-                          maxLength={500}
-                        />
-                        {(item.description?.length || 0) >= 500 && (
-                          <p className="text-xs text-red-500 mt-1">
-                            Maximum character limit reached
-                          </p>
-                        )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                        <select
+                          value={image.category}
+                          onChange={(e) => updateImage(index, 'category', e.target.value)}
+                          className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white"
+                        >
+                          {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
+                {galleryImages.length === 0 && (
+                  <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                    <FiImage className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-500">No images added yet. Click "Add Image" to get started.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
-          /* View Mode - Gallery Items */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
+          /* View Mode - Gallery Grid */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredImages.map((image, index) => (
               <div
-                key={item.id}
-                className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+                key={image.id}
+                className="group relative bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <div className="relative h-48 bg-gray-200 dark:bg-gray-700 rounded-xl overflow-hidden mb-4">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.title || 'Gallery image'}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  {image.src ? (
+                    <img
+                      src={image.src}
+                      alt={image.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <FiImage className="w-12 h-12" />
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                      <FiImage className="w-12 h-12 text-gray-400" />
                     </div>
                   )}
-                  <div className="absolute top-3 right-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category || 'photo')}`}>
-                      {getCategoryIcon(item.category || 'photo')}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg line-clamp-1">
-                      {item.title || 'Untitled Item'}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    {new Date(item.date).toLocaleDateString()}
-                  </p>
-                  
-                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
-                    {item.description || 'No description available'}
-                  </p>
-                  
-                  <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {(item.description?.length || 0)} characters
-                    </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-white font-semibold text-sm truncate">{image.title}</h3>
+                    <span className="text-white/80 text-xs">{image.category}</span>
                   </div>
                 </div>
               </div>
@@ -524,23 +468,15 @@ export function GallerySection({ college }: GallerySectionProps) {
         )}
 
         {/* Empty State */}
-        {!isEditing && filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <FiImage className="w-8 h-8 text-gray-400" />
+        {!isEditing && galleryImages.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center">
+              <FiImage className="w-10 h-10 text-teal-500" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-              No {filter !== 'all' ? filter : ''} Items Found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-              {filter === 'all' 
-                ? 'Start by adding your first gallery item to showcase achievements and photos.' 
-                : `No ${filter} items found. Try a different filter or add new items.`
-              }
-            </p>
-            <Button onClick={() => setIsEditing(true)}>
-              <FiPlus className="w-4 h-4 mr-2" />
-              Add Gallery Item
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">No Images Yet</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Click "Manage Gallery" to add images.</p>
+            <Button onClick={() => setIsEditing(true)} className="bg-teal-600">
+              <FiPlus className="w-4 h-4 mr-2" /> Add Images
             </Button>
           </div>
         )}

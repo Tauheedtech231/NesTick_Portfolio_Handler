@@ -1,4 +1,5 @@
 export interface College {
+  template_id: number | undefined;
   id: string;
   name: string;
   shortDescription: string;

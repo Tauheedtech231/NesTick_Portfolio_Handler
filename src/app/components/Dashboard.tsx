@@ -1,4 +1,5 @@
-// app/dashboard/page.tsx
+// app/dashboard/page.tsx (FULLY UPDATED - ALL SECTIONS GET PROPS)
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -473,9 +474,9 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
   </div>
 );
 
-/* Section Components */
+/* Section Components - All receive props */
 const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
-  dashboard: () => null, // Dashboard section ab show nahi hoga
+  dashboard: () => null,
   about: AboutSection,
   faculty: FacultySection,
   events: EventsSection,
@@ -491,7 +492,7 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
 };
 
 function DashboardContent({ initialData }: DashboardProps) {
-  const [activeSection, setActiveSection] = useState<SectionType>('about'); // Default about section
+  const [activeSection, setActiveSection] = useState<SectionType>('about');
   const [collegeData, setCollegeData] = useState<CollegeData>(initialData);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -722,6 +723,7 @@ function DashboardContent({ initialData }: DashboardProps) {
       ? collegeData.college?.contact
       : (collegeData as any)[activeSection];
 
+  // ✅ ALL SECTIONS receive college and templateId props
   return (
     <PortalLayout
       logo={collegeData.college?.logo || ''}
@@ -729,36 +731,47 @@ function DashboardContent({ initialData }: DashboardProps) {
       activeSection={activeSection}
       onSectionChange={(s) => setActiveSection(s)}
     >
-      {/* Dashboard content - Sirf stats aur announcements ab yahan dikhenge */}
-      <div className="space-y-8">
-        {/* Status Card */}
-        <StatusCard 
-          status={collegeStatus} 
-          collegeName={collegeName} 
-          collegeDetails={collegeDetails}
+      {activeSection === 'dashboard' ? (
+        <div className="space-y-8">
+          <StatusCard 
+            status={collegeStatus} 
+            collegeName={collegeName} 
+            collegeDetails={collegeDetails}
+          />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-gray-500" />
+              College Overview
+            </h3>
+            <StatsCards />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+              <PieChart className="w-5 h-5 text-gray-500" />
+              Quick Insights
+            </h3>
+            <QuickStats />
+          </div>
+          <AnnouncementsSection announcements={announcements} />
+        </div>
+      ) : activeSection === 'about' ? (
+        <AboutSection 
+          college={collegeData.college}
+          templateId={collegeDetails?.template_id}
         />
-        
-        {/* Beautiful Stats Cards */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-gray-500" />
-            College Overview
-          </h3>
-          <StatsCards />
-        </div>
-        
-        {/* Quick Stats Row */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-gray-500" />
-            Quick Insights
-          </h3>
-          <QuickStats />
-        </div>
-        
-        {/* Announcements */}
-        <AnnouncementsSection announcements={announcements} />
-      </div>
+      ) : activeSection === 'gallery' ? (
+        <GallerySection 
+          college={collegeData.college}
+          templateId={collegeDetails?.template_id}
+        />
+      ) : (
+        <ActiveComponent 
+          data={sectionData} 
+          onUpdate={(data: any) => updateSectionData(activeSection, data)}
+          college={collegeData.college}
+          templateId={collegeDetails?.template_id}
+        />
+      )}
 
       <PreviewPane isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} data={collegeData} />
     </PortalLayout>
