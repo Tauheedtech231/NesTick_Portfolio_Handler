@@ -151,7 +151,7 @@ export default function Navbar() {
   const handleLogoClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     if (user) {
-      router.push('/designer-portal');
+      router.push('/designer');
     } else {
       router.push('/auth/login');
     }
@@ -347,7 +347,7 @@ export default function Navbar() {
                       <div className="p-2">
                         <button
                           onClick={() => {
-                            router.push('/designer-portal');
+                            router.push('/designer');
                             setIsDropdownOpen(false);
                           }}
                           className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"

@@ -23,10 +23,17 @@ import {
   Crown,
   Settings,
   HelpCircle,
-  Bell
+  Bell,
+  Users,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Mail,
+  Briefcase,
+  UserPlus,
+  Brush
 } from 'lucide-react';
 
-// Define proper TypeScript interfaces
 interface MenuItemLink {
   type: 'link';
   href: string;
@@ -58,6 +65,8 @@ const menuItems: MenuItem[] = [
   { type: 'link', href: '/Portfolio_Handler/credientials_manage', icon: User, label: 'Credentials' },
   { type: 'link', href: '/Portfolio_Handler/modules', icon: Layers, label: 'Modules' },
   { type: 'link', href: '/Portfolio_Handler/announcements', icon: Megaphone, label: 'Announcements' },
+  { type: 'link', href: '/Portfolio_Handler/partners-designers', icon: Users, label: 'Partners & Designers' },
+  { type: 'link', href: '/Portfolio_Handler/design-management', icon: Brush, label: 'Design Management' }, // ✅ New Link
 ];
 
 export function Sidebar() {
@@ -68,24 +77,54 @@ export function Sidebar() {
   const [adminName, setAdminName] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [pendingDesignsCount, setPendingDesignsCount] = useState(0);
 
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   useEffect(() => {
-    // Get current logged-in user from localStorage
     const loginUser = localStorage.getItem('login_user');
     if (loginUser) {
       try {
         const parsed = JSON.parse(loginUser);
         setAdminEmail(parsed.email);
-        // Extract name from email or use default
         const nameFromEmail = parsed.email?.split('@')[0] || 'Admin';
         setAdminName(nameFromEmail);
       } catch {
         console.error("Invalid user data in localStorage");
       }
     }
+    
+    fetchPendingCount();
+    fetchPendingDesignsCount();
   }, []);
+
+  const fetchPendingCount = async () => {
+    try {
+      const designersRes = await fetch('/api/designers?status=pending');
+      const designersData = await designersRes.json();
+      
+      const partnersRes = await fetch('/api/partners?status=pending');
+      const partnersData = await partnersRes.json();
+      
+      const count = (designersData.data?.length || 0) + (partnersData.data?.length || 0);
+      setPendingCount(count);
+    } catch (error) {
+      console.error('Error fetching pending count:', error);
+    }
+  };
+
+  const fetchPendingDesignsCount = async () => {
+    try {
+      const designsRes = await fetch('/api/admin/designs?status=pending');
+      const designsData = await designsRes.json();
+      
+      const count = designsData.designs?.length || 0;
+      setPendingDesignsCount(count);
+    } catch (error) {
+      console.error('Error fetching pending designs count:', error);
+    }
+  };
 
   const filteredMenu = menuItems.filter((item) =>
     item.label.toLowerCase().includes(search.toLowerCase())
@@ -103,12 +142,10 @@ export function Sidebar() {
     return children.some(child => pathname === child.href);
   };
 
-  // Type guard to check if item is dropdown
   const isDropdown = (item: MenuItem): item is MenuItemDropdown => {
     return item.type === 'dropdown';
   };
 
-  // Type guard to check if item is link
   const isLink = (item: MenuItem): item is MenuItemLink => {
     return item.type === 'link';
   };
@@ -125,80 +162,99 @@ export function Sidebar() {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={`${collapsed ? 'w-20' : 'w-64'}
-        bg-gradient-to-b from-[#0B0F19] to-[#0F172A] border-r border-[#E8CA5E]/20
+        bg-[#0B0F19] border-r border-blue-600/30
         min-h-screen shadow-2xl flex flex-col justify-between
         transition-all duration-500 relative overflow-hidden`}
     >
-      {/* Decorative gradient lines */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E]" />
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8CA5E] via-[#00E0FF] to-[#E8CA5E] opacity-30" />
-      
-      {/* Animated background glow */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#E8CA5E]/5 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#00E0FF]/5 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-blue-600" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 opacity-30" />
 
       <div className="p-4 flex flex-col h-full relative z-10">
 
-        {/* ==== Header ==== */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          {/* Logo Section */}
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-lg blur-md opacity-60 bg-[#E8CA5E]" />
-              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-[#E8CA5E] to-[#A57F2A] flex items-center justify-center shadow-lg shadow-[#E8CA5E]/30">
-                <Crown className="w-4 h-4 text-[#1F4381]" />
-              </div>
+            <div className="relative w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg">
+              <Crown className="w-4 h-4 text-yellow-400" />
             </div>
-            <AnimatePresence initial={false}>
-              {!collapsed && (
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div>
-                    <h1 className="text-lg font-extrabold bg-gradient-to-r from-[#E8CA5E] to-[#A57F2A] bg-clip-text text-transparent tracking-tight">
-                      Neezamiya
-                    </h1>
-                    <p className="text-[10px] text-gray-500 -mt-1">Admin Portal</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div>
+                  <h1 className="text-lg font-extrabold text-white tracking-tight">
+                    Neezamiya
+                  </h1>
+                  <p className="text-[10px] text-gray-500 -mt-1">Admin Portal</p>
+                </div>
+              </motion.div>
+            )}
           </div>
 
-          {/* Collapse Button */}
           <button
             onClick={toggleSidebar}
-            className="flex p-2 rounded-lg transition-all duration-300 text-gray-400 hover:text-[#E8CA5E] hover:bg-[#1E293B]"
+            className="flex p-2 rounded-lg transition-all duration-300 text-gray-400 hover:text-yellow-400 hover:bg-[#1E293B]"
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
 
-        {/* ==== Search Bar ==== */}
+        {/* Search Bar */}
         {!collapsed && (
           <div className="relative mb-6">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#E8CA5E]/20 to-[#00E0FF]/20 blur-md opacity-0 focus-within:opacity-100 transition-opacity duration-300" />
             <input
               type="text"
               placeholder="Search menu..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-[#0F172A] border border-[#1E293B] text-white placeholder:text-gray-500 focus:outline-none focus:border-[#00E0FF] transition-all duration-300 text-sm relative z-10"
+              className="w-full px-4 py-2 rounded-xl bg-[#0F172A] border border-blue-600/30 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 transition-all duration-300 text-sm relative z-10"
             />
-            <Search
-              size={16}
-              className="absolute right-3 top-2.5 text-gray-500 z-10"
-            />
+            <Search size={16} className="absolute right-3 top-2.5 text-gray-500 z-10" />
           </div>
         )}
 
-        {/* ==== Navigation ==== */}
+        {/* Pending Notification */}
+        {!collapsed && pendingCount > 0 && (
+          <div className="mb-2">
+            <Link
+              href="/Portfolio_Handler/partners-designers"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-blue-600/10 border border-blue-600/30 hover:bg-blue-600/20 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <Bell size={16} className="text-yellow-400" />
+                <span className="text-sm text-white">Pending Approvals</span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-yellow-500 text-black text-xs font-bold">
+                {pendingCount}
+              </span>
+            </Link>
+          </div>
+        )}
+
+        {/* Pending Designs Notification */}
+        {!collapsed && pendingDesignsCount > 0 && (
+          <div className="mb-4">
+            <Link
+              href="/Portfolio_Handler/design-management"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-purple-600/10 border border-purple-600/30 hover:bg-purple-600/20 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <Brush size={16} className="text-purple-400" />
+                <span className="text-sm text-white">Pending Designs</span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-purple-500 text-white text-xs font-bold">
+                {pendingDesignsCount}
+              </span>
+            </Link>
+          </div>
+        )}
+
+        {/* Navigation */}
         <nav className="flex flex-col gap-1 flex-1">
           {filteredMenu.map((item) => {
-            // Check if item is dropdown
             if (isDropdown(item)) {
               const isActive = isDropdownActive(item.children);
               const isOpen = openDropdown === item.label;
@@ -208,83 +264,60 @@ export function Sidebar() {
                   <button
                     onClick={() => !collapsed ? handleDropdownToggle(item.label) : router.push(item.children[0].href)}
                     className={`group flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
-                      ${
-                        isActive
-                          ? 'bg-gradient-to-r from-[#E8CA5E]/10 to-transparent border-l-2 border-[#E8CA5E] text-[#E8CA5E]'
-                          : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
+                      ${isActive
+                        ? 'bg-blue-600/10 border-l-2 border-blue-600 text-blue-400'
+                        : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon
-                        size={20}
-                        className={`transition-all duration-300 ${
-                          isActive
-                            ? 'text-[#E8CA5E]'
-                            : 'text-gray-500 group-hover:text-[#00E0FF]'
-                        }`}
-                      />
-                      <AnimatePresence initial={false}>
-                        {!collapsed && (
-                          <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {item.label}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
+                      <item.icon size={20} className={isActive ? 'text-blue-400' : 'text-gray-500 group-hover:text-yellow-400'} />
+                      {!collapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
                     </div>
                     {!collapsed && (
-                      <ChevronDown
-                        size={14}
-                        className={`transform transition-transform duration-300 ${
-                          isOpen ? 'rotate-180' : ''
-                        } ${isActive ? 'text-[#E8CA5E]' : 'text-gray-500'}`}
-                      />
+                      <ChevronDown size={14} className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                     )}
                   </button>
                   
-                  {/* Dropdown Content */}
-                  <AnimatePresence>
-                    {!collapsed && isOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="ml-9 mt-1 space-y-1 overflow-hidden"
-                      >
-                        {item.children.map((child) => {
-                          const isChildActive = pathname === child.href;
-                          return (
-                            <Link
-                              key={child.href}
-                              href={child.href}
-                              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
-                                ${
-                                  isChildActive
-                                    ? 'bg-gradient-to-r from-[#00E0FF]/10 to-transparent text-[#00E0FF] border-l-2 border-[#00E0FF]'
-                                    : 'text-gray-500 hover:bg-[#1E293B] hover:text-gray-300'
-                                }`}
-                            >
-                              <child.icon
-                                size={14}
-                                className={isChildActive ? 'text-[#00E0FF]' : 'text-gray-500'}
-                              />
-                              <span>{child.label}</span>
-                            </Link>
-                          );
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {!collapsed && isOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="ml-9 mt-1 space-y-1 overflow-hidden"
+                    >
+                      {item.children.map((child) => {
+                        const isChildActive = pathname === child.href;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                              ${isChildActive
+                                ? 'bg-blue-600/10 text-blue-400 border-l-2 border-blue-600'
+                                : 'text-gray-500 hover:bg-[#1E293B] hover:text-gray-300'
+                              }`}
+                          >
+                            <child.icon size={14} />
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </motion.div>
+                  )}
                 </div>
               );
             }
             
-            // Regular menu item (type === 'link')
             if (isLink(item)) {
               const isActive = pathname === item.href;
               return (
@@ -292,32 +325,32 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300
-                    ${
-                      isActive
-                        ? 'bg-gradient-to-r from-[#E8CA5E]/10 to-transparent border-l-2 border-[#E8CA5E] text-[#E8CA5E]'
-                        : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
+                    ${isActive
+                      ? 'bg-blue-600/10 border-l-2 border-blue-600 text-blue-400'
+                      : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
                     }`}
                 >
-                  <item.icon
-                    size={20}
-                    className={`transition-all duration-300 ${
-                      isActive
-                        ? 'text-[#E8CA5E]'
-                        : 'text-gray-500 group-hover:text-[#00E0FF]'
-                    }`}
-                  />
-                  <AnimatePresence initial={false}>
-                    {!collapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {item.label}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                  <item.icon size={20} className={isActive ? 'text-blue-400' : 'text-gray-500 group-hover:text-yellow-400'} />
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                  {item.label === 'Partners & Designers' && pendingCount > 0 && !collapsed && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-yellow-500 text-black text-[10px] font-bold">
+                      {pendingCount}
+                    </span>
+                  )}
+                  {item.label === 'Design Management' && pendingDesignsCount > 0 && !collapsed && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-purple-500 text-white text-[10px] font-bold">
+                      {pendingDesignsCount}
+                    </span>
+                  )}
                 </Link>
               );
             }
@@ -326,20 +359,17 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* ==== Admin Details at Bottom ==== */}
+        {/* Admin Details at Bottom */}
         {!collapsed && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="mt-auto pt-4 border-t border-[#1E293B]"
+            className="mt-auto pt-4 border-t border-blue-600/30"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-xl blur-sm bg-[#E8CA5E]/50 opacity-50" />
-                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8CA5E]/20 to-[#00E0FF]/10 flex items-center justify-center border border-[#E8CA5E]/30">
-                  <User className="w-5 h-5 text-[#E8CA5E]" />
-                </div>
+              <div className="relative w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center border border-blue-600/30">
+                <User className="w-5 h-5 text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate text-white">
@@ -352,7 +382,7 @@ export function Sidebar() {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-[#E8CA5E]/10 to-[#A57F2A]/5 border border-[#E8CA5E]/30 text-[#E8CA5E] text-sm font-medium hover:bg-gradient-to-r hover:from-[#E8CA5E]/20 hover:to-[#A57F2A]/10 hover:border-[#E8CA5E]/50 transition-all duration-300 group"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 border border-blue-600/30 text-blue-400 text-sm font-medium hover:bg-blue-600/30 transition-all duration-300 group"
             >
               <LogOut size={16} className="group-hover:scale-110 transition-transform" />
               Logout
@@ -362,12 +392,9 @@ export function Sidebar() {
 
         {/* Collapsed Admin Avatar */}
         {collapsed && (
-          <div className="mt-auto pt-4 border-t border-[#1E293B]">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-xl blur-sm bg-[#E8CA5E]/50 opacity-50" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8CA5E]/20 to-[#00E0FF]/10 flex items-center justify-center border border-[#E8CA5E]/30 mx-auto">
-                <User className="w-5 h-5 text-[#E8CA5E]" />
-              </div>
+          <div className="mt-auto pt-4 border-t border-blue-600/30">
+            <div className="relative w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center border border-blue-600/30 mx-auto">
+              <User className="w-5 h-5 text-blue-400" />
             </div>
           </div>
         )}
