@@ -23,8 +23,20 @@ import {
   Package,
   Diamond,
   Gem,
-  Check
+  Check,
+  Phone,
+  GraduationCap,
+  Paintbrush,
+  Headphones,
+  Sliders,
+  ShieldCheck,
+  BookOpen,
+  Server,
+  ShoppingBag,
+  Layers,
+  Briefcase
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface OtherSectionsProps {
@@ -41,70 +53,64 @@ interface OtherSectionsProps {
   isDarkMode: boolean;
 }
 
-// Packages Data
+// Updated Packages Data as per requirements
 const packages = [
   {
-    name: "Starter",
-    price: "$99",
-    period: "/month",
-    description: "Perfect for small colleges starting their digital journey",
+    name: "Basic",
+    price: "Contact Us",
+    period: "",
+    description: "Perfect starting point for small colleges and institutions",
     features: [
-      "Up to 500 Student Portfolios",
-      "Basic Templates (5 templates)",
-      "Email Support",
-      "Basic Analytics",
-      "24/7 Support",
-      "1 Admin Account"
-    ],
-    notIncluded: [
-      "Custom Domain",
-      "API Access"
+      { text: "Portfolio site", icon: Layout, included: true },
+      { text: "Basic template", icon: Paintbrush, included: true },
+      { text: "24/7 support", icon: Headphones, included: true },
+      { text: "Full customization", icon: Sliders, included: true },
+      { text: "Admin control", icon: ShieldCheck, included: true },
+      { text: "Drag & drop site management", icon: Layers, included: true }
     ],
     icon: Package,
     color: "#1F4381",
-    popular: false
+    bgColor: "rgba(31, 67, 129, 0.15)",
+    popular: false,
+    ctaText: "Contact Sales"
   },
   {
-    name: "Professional",
-    price: "$199",
-    period: "/month",
+    name: "Most Featured",
+    price: "Contact Us",
+    period: "",
     description: "Ideal for growing institutions with advanced needs",
     features: [
-      "Up to 2,000 Student Portfolios",
-      "Premium Templates (15+ templates)",
-      "Priority Support",
-      "Advanced Analytics",
-      "24/7 Priority Support",
-      "5 Admin Accounts",
-      "Custom Branding",
-      "API Access"
+      { text: "LMS / Admission automation", icon: BookOpen, included: true },
+      { text: "Portfolio site (free)", icon: Layout, included: true },
+      { text: "24/7 support", icon: Headphones, included: true },
+      { text: "Free maintenance at P.S.", icon: Server, included: true },
+      { text: "Admin control", icon: ShieldCheck, included: true },
+      { text: "Multi portal and customizable apps", icon: Layers, included: true }
     ],
-    notIncluded: [],
     icon: Diamond,
     color: "#E8CA5E",
-    popular: true
+    bgColor: "rgba(232, 202, 94, 0.15)",
+    popular: true,
+    ctaText: "Contact Sales"
   },
   {
-    name: "Enterprise",
-    price: "Custom",
+    name: "Premium",
+    price: "Contact Us",
     period: "",
-    description: "For large universities with custom requirements",
+    description: "Complete ERP solution for large universities",
     features: [
-      "Unlimited Student Portfolios",
-      "All Templates + Custom Design",
-      "Dedicated Support Team",
-      "Custom Analytics & Reports",
-      "24/7 Priority Support",
-      "Unlimited Admin Accounts",
-      "Custom Branding",
-      "API Access",
-      "SLA Agreement",
-      "On-premise Deployment Option"
+      { text: "Complete ERP", icon: Briefcase, included: true },
+      { text: "Portfolio site (free)", icon: Layout, included: true },
+      { text: "70% off on paid templates", icon: ShoppingBag, included: true },
+      { text: "Free maintenance at P.S.", icon: Server, included: true },
+      { text: "Customizable ERP system", icon: Settings, included: true },
+      { text: "24/7 support", icon: Headphones, included: true }
     ],
-    notIncluded: [],
     icon: Gem,
     color: "#00E0FF",
-    popular: false
+    bgColor: "rgba(0, 224, 255, 0.15)",
+    popular: false,
+    ctaText: "Contact Sales"
   }
 ];
 
@@ -369,7 +375,7 @@ export default function OtherSections({
         </div>
       </section>
 
-      {/* Packages Section - Same background as others */}
+      {/* Packages Section - UPDATED as per requirements */}
       <section className="py-20 px-4 sm:px-6 relative overflow-hidden"
         style={{
           backgroundColor: getSectionBg(),
@@ -428,7 +434,7 @@ export default function OtherSections({
               <p className="text-lg md:text-xl max-w-2xl lg:max-w-full font-light"
                 style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
               >
-                Flexible pricing options tailored to fit your institution&apos;s needs and scale
+                Flexible solutions tailored to fit your institution&apos;s needs and scale
               </p>
             </motion.div>
 
@@ -457,7 +463,7 @@ export default function OtherSections({
                   style={{
                     backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
                     border: pkg.popular 
-                      ? `1px solid ${theme === 'dark' ? '#E8CA5E' : '#00A0FF'}`
+                      ? `2px solid ${pkg.color}`
                       : `1px solid ${theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)'}`,
                   }}
                 >
@@ -465,12 +471,12 @@ export default function OtherSections({
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <div className="px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1"
                         style={{
-                          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                          backgroundColor: pkg.color,
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
                         }}
                       >
                         <Star className="w-3 h-3" />
-                        Most Popular
+                        Most Featured
                       </div>
                     </div>
                   )}
@@ -478,7 +484,7 @@ export default function OtherSections({
                   <div className="text-center mb-6">
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                       style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
+                        backgroundColor: pkg.bgColor,
                       }}
                     >
                       <Icon className="w-8 h-8" style={{ color: pkg.color }} />
@@ -489,8 +495,8 @@ export default function OtherSections({
                       {pkg.name}
                     </h3>
                     <div className="mb-2">
-                      <span className="text-4xl font-bold"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                      <span className="text-3xl font-bold"
+                        style={{ color: pkg.color }}
                       >
                         {pkg.price}
                       </span>
@@ -504,37 +510,47 @@ export default function OtherSections({
                   </div>
 
                   <div className="space-y-3 mb-6">
-                    {pkg.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4"
-                          style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                        />
-                        <span style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}>{feature}</span>
-                      </div>
-                    ))}
-                    {pkg.notIncluded.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm opacity-50">
-                        <Lock className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-500">{feature}</span>
-                      </div>
-                    ))}
+                    {pkg.features.map((feature, idx) => {
+                      const FeatureIcon = feature.icon;
+                      return (
+                        <div key={idx} className="flex items-center gap-2 text-sm">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{
+                              backgroundColor: feature.included ? pkg.bgColor : 'rgba(107, 114, 128, 0.2)',
+                            }}
+                          >
+                            {feature.included ? (
+                              <Check className="w-3 h-3" style={{ color: pkg.color }} />
+                            ) : (
+                              <Lock className="w-3 h-3 text-gray-500" />
+                            )}
+                          </div>
+                          <FeatureIcon className="w-3.5 h-3.5" style={{ color: feature.included ? pkg.color : '#6B7280' }} />
+                          <span style={{ color: feature.included ? (theme === 'dark' ? '#D1D5DB' : '#4B5563') : '#6B7280' }}>
+                            {feature.text}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  <button
-                    onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="w-full py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
-                    style={{
-                      backgroundColor: pkg.popular
-                        ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
-                        : (theme === 'dark' ? '#1E293B' : '#E5E7EB'),
-                      color: pkg.popular
-                        ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                        : (theme === 'dark' ? '#D1D5DB' : '#4B5563'),
-                    }}
-                  >
-                    {pkg.price === "Custom" ? "Contact Sales" : "Get Started"}
-                    <ArrowRight className="w-4 h-4 inline-block ml-2" />
-                  </button>
+
+<Link href="/contact">
+  <button
+    className="w-full py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
+    style={{
+      backgroundColor: pkg.popular
+        ? pkg.color
+        : (theme === 'dark' ? '#1E293B' : '#E5E7EB'),
+      color: pkg.popular
+        ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
+        : (theme === 'dark' ? '#D1D5DB' : '#4B5563'),
+    }}
+  >
+    {pkg.ctaText}
+    <Phone className="w-4 h-4" />
+  </button>
+</Link>
                 </motion.div>
               );
             })}
@@ -550,9 +566,9 @@ export default function OtherSections({
             <p className="text-sm"
               style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
             >
-              All plans include free setup, basic support, and regular updates.
+              All plans include basic support and regular updates.
               <br />
-              Need a custom solution? <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="hover:underline"
+              Need more information? <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="hover:underline font-medium"
                 style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
               >Contact our sales team</button>
             </p>

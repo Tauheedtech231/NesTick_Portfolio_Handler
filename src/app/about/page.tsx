@@ -237,15 +237,44 @@ export default function AboutPage() {
   };
 
   // Journey Timeline Data
-  const journeyMilestones = [
-    { year: "2020", title: "The Beginning", description: "Portfolio Handler was founded with a vision to transform educational portfolio management.", icon: Rocket },
-    { year: "2021", title: "First Milestone", description: "Launched MVP with 10+ partner institutions across Pakistan.", icon: Award },
-    { year: "2022", title: "Rapid Growth", description: "Reached 100+ institutions and introduced premium features.", icon: TrendingUp },
-    { year: "2023", title: "Global Expansion", description: "Expanded services to international markets with new partnerships.", icon: Globe },
-    { year: "2024", title: "AI Innovation", description: "Launched AI-powered portfolio features and reached 500+ institutions.", icon: Brain },
-    { year: "2025", title: "Scale & Impact", description: "Crossed 1000+ institutions globally with 98% satisfaction rate.", icon: Users },
-    { year: "2026", title: "Future Ready", description: "Launching next-gen AI analytics & immersive portfolio experiences.", icon: Infinity },
-  ];
+ const journeyMilestones = [
+  { 
+    year: "'21", 
+    title: "Start of NestickTech", 
+    description: "Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions.", 
+    icon: Rocket 
+  },
+  { 
+    year: "'22", 
+    title: "Good Client Base Established", 
+    description: "Successfully built a strong client base across Pakistan, earning trust through quality service and support.", 
+    icon: Award 
+  },
+  { 
+    year: "'23", 
+    title: "Global Expansion", 
+    description: "Expanded operations internationally, serving clients worldwide with customized digital solutions.", 
+    icon: Globe 
+  },
+  { 
+    year: "'24", 
+    title: "Launch of 1st Product — Neezamiya", 
+    description: "Launched our flagship product 'Neezamiya' - a comprehensive educational management system.", 
+    icon: Brain 
+  },
+  { 
+    year: "'25", 
+    title: "Launch of PBM", 
+    description: "Introduced Portfolio Business Manager (PBM) - revolutionizing portfolio handling for institutions.", 
+    icon: TrendingUp 
+  },
+  { 
+    year: "'26", 
+    title: "Ready to Conquer This Year", 
+    description: "Setting our sights on new heights with AI-powered solutions and global market leadership.", 
+    icon: Infinity 
+  },
+];
 
   return (
     <>
@@ -302,7 +331,7 @@ export default function AboutPage() {
                     Digital Futures
                   </span>
                 </span>
-                <span className="block">Since 2020</span>
+                <span className="block">Since 2021</span>
               </h1>
             </motion.div>
 

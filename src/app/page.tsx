@@ -57,13 +57,19 @@ export default function LandingPage() {
     liveUrl: null as string | null,
   });
   
+  // Updated BuyNowFormData with all new fields
   const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
     name: '',
     college: '',
     email: '',
     phone: '',
-    selectedPlan: 'basic',
-    templateName: ''
+    designation: '',
+    studentCount: '',
+    selectedPlan: 'Most Featured',
+    templateName: '',
+    requirements: '',
+    timeline: '',
+    hearAbout: ''
   });
 
   // Form validation states
@@ -119,6 +125,9 @@ export default function LandingPage() {
       case 'college':
         if (!value.trim()) return 'College name is required';
         return '';
+      case 'designation':
+        if (!value.trim()) return 'Designation is required';
+        return '';
       default:
         return '';
     }
@@ -145,8 +154,8 @@ export default function LandingPage() {
     setFormErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  // Handle buy now input change with validation
-  const handleBuyNowInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Handle buy now input change with validation (supports text, select, textarea)
+  const handleBuyNowInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setBuyNowFormData(prev => ({
       ...prev,
@@ -307,13 +316,23 @@ export default function LandingPage() {
     });
   };
 
-  // Buy Now Modal Handlers
+  // Buy Now Modal Handlers - FIXED VERSION
   const handleBuyNowClick = (template: Template) => {
     setSelectedTemplate(template);
-    setBuyNowFormData(prev => ({
-      ...prev,
-      templateName: template.name
-    }));
+    // Reset all form fields properly
+    setBuyNowFormData({
+      name: '',
+      college: '',
+      email: '',
+      phone: '',
+      designation: '',
+      studentCount: '',
+      selectedPlan: 'Most Featured',
+      templateName: template.name,
+      requirements: '',
+      timeline: '',
+      hearAbout: ''
+    });
     setFormErrors({});
     setTouchedFields({});
     setIsBuyNowModalOpen(true);
@@ -322,19 +341,19 @@ export default function LandingPage() {
   const handleBuyNowSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
+    // Validate all fields including new ones
     const errors: Record<string, string> = {};
-    Object.keys(buyNowFormData).forEach(key => {
-      if (key !== 'selectedPlan' && key !== 'templateName') {
-        const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData]);
-        if (error) errors[key] = error;
-      }
+    const fieldsToValidate = ['name', 'college', 'email', 'phone', 'designation'];
+    
+    fieldsToValidate.forEach(key => {
+      const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData] as string);
+      if (error) errors[key] = error;
     });
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       // Mark all fields as touched to show errors
-      const allTouched = Object.keys(buyNowFormData).reduce((acc, key) => {
+      const allTouched = fieldsToValidate.reduce((acc, key) => {
         acc[key] = true;
         return acc;
       }, {} as Record<string, boolean>);
@@ -354,7 +373,7 @@ export default function LandingPage() {
       }
     }
     
-    // Submit request to API
+    // Submit request to API with new fields
     try {
       setIsSubmitting(true);
       
@@ -364,9 +383,16 @@ export default function LandingPage() {
         college: buyNowFormData.college.trim(),
         email: buyNowFormData.email.toLowerCase().trim(),
         phone: buyNowFormData.phone.trim(),
+        designation: buyNowFormData.designation.trim(),
+        student_count: buyNowFormData.studentCount,
         plan: selectedTemplate?.type === 'paid' ? buyNowFormData.selectedPlan : undefined,
-        type: selectedTemplate!.type
+        type: selectedTemplate!.type,
+        requirements: buyNowFormData.requirements,
+        timeline: buyNowFormData.timeline,
+        hear_about: buyNowFormData.hearAbout
       };
+
+      console.log('Submitting request:', requestData);
 
       const response = await fetch('/api/templates/template-requests', {
         method: 'POST',
@@ -387,14 +413,19 @@ export default function LandingPage() {
       setShowSuccessPopup(true);
       setIsBuyNowModalOpen(false);
       
-      // Reset form
+      // Reset form with new fields
       setBuyNowFormData({
         name: '',
         college: '',
         email: '',
         phone: '',
-        selectedPlan: 'basic',
-        templateName: ''
+        designation: '',
+        studentCount: '',
+        selectedPlan: 'Most Featured',
+        templateName: '',
+        requirements: '',
+        timeline: '',
+        hearAbout: ''
       });
       setFormErrors({});
       setTouchedFields({});
@@ -535,9 +566,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-500 font-sans overflow-x-hidden">
       {/* Navbar */}
-      <Navbar
-        
-      />
+      <Navbar />
 
       {/* Hero Section */}
       <HeroSection 
@@ -561,11 +590,6 @@ export default function LandingPage() {
         featuresRef={featuresRef}
         aboutRef={aboutRef}
         contactRef={contactRef}
-      
-        
-      
-        
-      
         scrollToSection={scrollToSection}
         addToRefs={addToRefs}
         featureCardsRef={featureCardsRef}

@@ -31,7 +31,12 @@ import {
   Mail,
   Briefcase,
   UserPlus,
-  Brush
+  Brush,
+  Grid,
+  Blocks,
+  Key,
+  Shield,
+  Code2
 } from 'lucide-react';
 
 interface MenuItemLink {
@@ -58,15 +63,31 @@ const menuItems: MenuItem[] = [
     icon: Building2,
     children: [
       { type: 'link', href: '/Portfolio_Handler/colleges', icon: Building2, label: 'All Colleges' },
-      { type: 'link', href: '/Portfolio_Handler/Requested_template', icon: FileText, label: 'Requested Templates' }
+      { type: 'link', href: '/Portfolio_Handler/Requested_template', icon: FileText, label: 'Requested Templates' },
+      { type: 'link', href: '/Portfolio_Handler/credientials_manage', icon: Key, label: 'Credentials' }
     ]
   },
-  { type: 'link', href: '/Portfolio_Handler/themes', icon: Palette, label: 'Templates' },
-  { type: 'link', href: '/Portfolio_Handler/credientials_manage', icon: User, label: 'Credentials' },
-  { type: 'link', href: '/Portfolio_Handler/modules', icon: Layers, label: 'Modules' },
+  { 
+    type: 'dropdown',
+    label: 'Templates',
+    icon: Palette,
+    children: [
+      { type: 'link', href: '/Portfolio_Handler/themes', icon: Grid, label: 'All Templates' },
+      { type: 'link', href: '/Portfolio_Handler/modules', icon: Blocks, label: 'Modules' }
+    ]
+  },
   { type: 'link', href: '/Portfolio_Handler/announcements', icon: Megaphone, label: 'Announcements' },
   { type: 'link', href: '/Portfolio_Handler/partners-designers', icon: Users, label: 'Partners & Designers' },
-  { type: 'link', href: '/Portfolio_Handler/design-management', icon: Brush, label: 'Design Management' }, // ✅ New Link
+  { type: 'link', href: '/Portfolio_Handler/design-management', icon: Brush, label: 'Design Management' },
+  { 
+    type: 'dropdown',
+    label: 'Developer Management',
+    icon: Code2,
+    children: [
+      
+      { type: 'link', href: '/Portfolio_Handler/submitted-designs', icon: FileText, label: 'Submitted Designs' }
+    ]
+  },
 ];
 
 export function Sidebar() {

@@ -1,34 +1,53 @@
 // app/designer/login/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, LogIn, Palette, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, Palette, Code2, AlertCircle } from 'lucide-react';
 
-export default function DesignerLogin() {
+// Main component that uses useSearchParams
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [portalType, setPortalType] = useState<'designer' | 'developer'>('designer');
 
-  // Check if already logged in
   useEffect(() => {
+    const type = searchParams.get('type') as 'designer' | 'developer';
+    if (type === 'developer') {
+      setPortalType('developer');
+    }
+    
     const designerAuth = sessionStorage.getItem('designer_auth');
-    if (designerAuth) {
+    const developerAuth = sessionStorage.getItem('developer_auth');
+    
+    if (portalType === 'designer' && designerAuth) {
       try {
         const auth = JSON.parse(designerAuth);
         if (auth.user && auth.user.id) {
-          router.replace('/designer'); // use replace instead of push
+          router.replace('/designer');
         }
       } catch (e) {
-        console.error('Invalid auth data');
         sessionStorage.removeItem('designer_auth');
       }
     }
-  }, [router]);
+    
+    if (portalType === 'developer' && developerAuth) {
+      try {
+        const auth = JSON.parse(developerAuth);
+        if (auth.user && auth.user.id) {
+          router.replace('/developer');
+        }
+      } catch (e) {
+        sessionStorage.removeItem('developer_auth');
+      }
+    }
+  }, [router, searchParams, portalType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,31 +55,32 @@ export default function DesignerLogin() {
     setError('');
 
     try {
-      const response = await fetch('/api/designers/login', {
+      const endpoint = portalType === 'developer' ? '/api/developers/login' : '/api/designers/login';
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
       const data = await response.json();
-      console.log('Login response:', data);
 
       if (response.ok && data.success) {
-        // Clear any existing auth first
-        sessionStorage.removeItem('designer_auth');
-        
-        // Save to sessionStorage
-        sessionStorage.setItem('designer_auth', JSON.stringify({
-          user: data.user,
-          loggedInAt: new Date().toISOString()
-        }));
-        
-        // Verify it was saved
-        const saved = sessionStorage.getItem('designer_auth');
-        console.log('Saved auth:', saved);
-        
-        // Redirect to dashboard
-        router.replace('/designer');
+        if (portalType === 'designer') {
+          sessionStorage.removeItem('designer_auth');
+          sessionStorage.setItem('designer_auth', JSON.stringify({
+            user: data.user,
+            loggedInAt: new Date().toISOString()
+          }));
+          router.replace('/designer');
+        } else {
+          sessionStorage.removeItem('developer_auth');
+          sessionStorage.setItem('developer_auth', JSON.stringify({
+            user: data.user,
+            loggedInAt: new Date().toISOString()
+          }));
+          router.replace('/developer');
+        }
       } else {
         setError(data.error || 'Login failed. Please check your credentials.');
       }
@@ -86,14 +106,59 @@ export default function DesignerLogin() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 shadow-lg mb-4">
-            <Palette size={32} className="text-white" />
+          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg mb-4 ${
+            portalType === 'designer' ? 'bg-blue-600' : 'bg-purple-600'
+          }`}>
+            {portalType === 'designer' ? (
+              <Palette size={32} className="text-white" />
+            ) : (
+              <Code2 size={32} className="text-white" />
+            )}
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Designer Portal</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {portalType === 'designer' ? 'Designer Portal' : 'Developer Portal'}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Sign in to your {portalType} account
+          </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8">
+          <div className="flex gap-2 mb-6 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
+            <button
+              onClick={() => {
+                setPortalType('designer');
+                setEmail('');
+                setPassword('');
+                setError('');
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                portalType === 'designer'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <Palette size={16} />
+              Designer
+            </button>
+            <button
+              onClick={() => {
+                setPortalType('developer');
+                setEmail('');
+                setPassword('');
+                setError('');
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                portalType === 'developer'
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <Code2 size={16} />
+              Developer
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-2">
@@ -113,7 +178,7 @@ export default function DesignerLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="designer@example.com"
+                  placeholder={portalType === 'designer' ? 'designer@example.com' : 'developer@example.com'}
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -146,7 +211,11 @@ export default function DesignerLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className={`w-full py-2.5 font-medium rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                portalType === 'designer'
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white'
+              }`}
             >
               {loading ? (
                 <>
@@ -156,13 +225,41 @@ export default function DesignerLogin() {
               ) : (
                 <>
                   <LogIn size={18} />
-                  Sign In
+                  Sign In as {portalType === 'designer' ? 'Designer' : 'Developer'}
                 </>
               )}
             </button>
           </form>
+          
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Don&apos;t have an account?{' '}
+              <button
+                onClick={() => router.push('/partner')}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Register as {portalType === 'designer' ? 'Designer' : 'Developer'}
+              </button>
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>
+  );
+}
+
+// Main exported component with Suspense
+export default function DesignerLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

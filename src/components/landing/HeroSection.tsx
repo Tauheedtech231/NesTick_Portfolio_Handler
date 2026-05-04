@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Compass, Globe2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Compass, Globe2, Palette, X, Send, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 
 interface HeroSectionProps {
@@ -9,11 +10,55 @@ interface HeroSectionProps {
   heroRef: React.RefObject<HTMLDivElement | null>;
 }
 
+interface DesignFormData {
+  name: string;
+  email: string;
+  phone: string;
+  designType: string;
+  inspiration: string;
+  description: string;
+}
+
+const designTypes = [
+  'Portfolio Website',
+  'Educational Platform',
+  'E-commerce Site',
+  'Corporate Website',
+  'Mobile App Design',
+  'Brand Identity',
+  'UI/UX Design',
+  'Other'
+];
+
 export default function HeroSection({ scrollToSection, heroRef }: HeroSectionProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const parallaxRef = useRef<HTMLDivElement>(null);
+  const [parallaxRef, setParallaxRef] = useState<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
+  
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [formData, setFormData] = useState<DesignFormData>({
+    name: '',
+    email: '',
+    phone: '',
+    designType: '',
+    inspiration: '',
+    description: ''
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  
+  const handleLearn = () => {
+    router.push('/templates');
+  };
+  
+  const handleDesignClick = () => {
+    setIsModalOpen(true);
+    setSubmitSuccess(false);
+  };
   
   // Auto-play video when loaded
   useEffect(() => {
@@ -47,7 +92,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
   
   // Simple parallax effect on mouse move
   useEffect(() => {
-    if (!parallaxRef.current) return;
+    if (!parallaxRef) return;
     
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
@@ -56,147 +101,436 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       const xPercent = (clientX / innerWidth - 0.5) * 10;
       const yPercent = (clientY / innerHeight - 0.5) * 5;
       
-      if (parallaxRef.current) {
-        parallaxRef.current.style.transform = `translate(${xPercent}px, ${yPercent}px)`;
+      if (parallaxRef) {
+        parallaxRef.style.transform = `translate(${xPercent}px, ${yPercent}px)`;
       }
     };
     
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [parallaxRef]);
+  
+  // Validate form
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) errors.name = 'Name is required';
+    if (!formData.email.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Valid email is required';
+    if (!formData.phone.trim()) errors.phone = 'Phone number is required';
+    if (!formData.designType) errors.designType = 'Please select a design type';
+    if (!formData.description.trim()) errors.description = 'Please describe your requirements';
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  
+  // Handle form input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/design-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setSubmitSuccess(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          designType: '',
+          inspiration: '',
+          description: ''
+        });
+        
+        // Close modal after 3 seconds
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setSubmitSuccess(false);
+        }, 3000);
+      } else {
+        throw new Error(data.message || 'Submission failed');
+      }
+    } catch (error) {
+      console.error('Design request error:', error);
+      alert('Failed to submit your request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      designType: '',
+      inspiration: '',
+      description: ''
+    });
+    setFormErrors({});
+    setSubmitSuccess(false);
+  };
 
   return (
-    <section
-      id="home"
-      ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
-    >
-      {/* Video Background - Direct */}
-      <div className="absolute inset-0 z-0 w-full h-full">
-        <div 
-          ref={parallaxRef}
-          className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out"
-        >
-          <div className="absolute inset-0 w-full h-full bg-black">
-            <video
-              ref={videoRef}
-              className="absolute inset-0 w-full h-full object-cover"
-              loop
-              muted
-              playsInline
-              autoPlay
-              onLoadedData={() => setVideoLoaded(true)}
-              style={{
-                opacity: videoLoaded ? 1 : 0,
-                transition: 'opacity 0.5s ease-in-out'
-              }}
-            >
-              <source src="/v.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            
-            {/* Fallback gradient if video fails to load */}
-            {!videoLoaded && (
-              <div 
-                className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1F4381] to-[#0B0F19]"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 z-10 bg-black/40" />
-
-      {/* Main Content */}
-      <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
-        <div className="flex flex-col items-center justify-center text-center">
-          
-          {/* Badge */}
-          <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border shadow-md mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 ${
-            theme === 'dark'
-              ? 'bg-[#1F4381] border-[#E8CA5E]'
-              : 'bg-white border-[#00A0FF]'
-          }`}>
-            <div className="flex gap-1">
-              <Compass className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
-              }`} />
-              <Globe2 className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
-              }`} />
-            </div>
-            <span className={`text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500 ${
-              theme === 'dark' ? 'text-white' : 'text-[#00A0FF]'
-            }`}>
-              🌟 Trusted by 500+ Educational Institutions
-            </span>
-          </div>
-
-          {/* Headings */}
-          <div className="mb-5 sm:mb-7">
-            <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
-              <span className="block text-white font-serif tracking-tight drop-shadow-lg">
-                Journey Through the
-              </span>
-            </h1>
-            <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
-              <span className="block">
-                <span className="text-[#E8CA5E] font-serif drop-shadow-lg">Galaxy of</span>{' '}
-                <span className="text-[#00E0FF] font-serif drop-shadow-lg">College Portfolios</span>
-              </span>
-            </h1>
-          </div>
-
-          {/* Subheading - White in both modes */}
-          <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md">
-            Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
-            A centralized constellation where institutions create, customize, and control their digital 
-            presence across the universe of learning.
-          </p>
-
-          {/* Single CTA Button */}
-          <button
-            onClick={() => scrollToSection("templates")}
-            className={`group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 ${
-              theme === 'dark'
-                ? 'bg-[#E8CA5E] text-[#1F4381] hover:bg-[#E8CA5E]/90'
-                : 'bg-[#00A0FF] text-white hover:bg-[#00A0FF]/90'
-            }`}
+    <>
+      <section
+        id="home"
+        ref={heroRef}
+        className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
+      >
+        {/* Video Background - Direct */}
+        <div className="absolute inset-0 z-0 w-full h-full">
+          <div 
+            ref={(el) => setParallaxRef(el)}
+            className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out will-change-transform"
           >
-            <span>Learn More</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </div>
-
-      {/* Simple scroll hint */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="flex flex-col items-center gap-1 opacity-50">
-          <span className="text-[9px] uppercase tracking-wider text-white">Scroll</span>
-          <div className="w-4 h-6 border border-white rounded-full flex justify-center">
-            <div className="w-0.5 h-1.5 bg-white rounded-full mt-1 animate-bounce" />
+            <div className="absolute inset-0 w-full h-full bg-black">
+              <video
+                ref={videoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                loop
+                muted
+                playsInline
+                autoPlay
+                onLoadedData={() => setVideoLoaded(true)}
+                style={{
+                  opacity: videoLoaded ? 1 : 0,
+                  transition: 'opacity 0.5s ease-in-out'
+                }}
+              >
+                <source src="/v.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
+              {/* Fallback gradient if video fails to load */}
+              {!videoLoaded && (
+                <div 
+                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1F4381] to-[#0B0F19]"
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      <style jsx>{`
-        .will-change-transform {
-          will-change: transform;
-        }
-        
-        /* Smooth font rendering */
-        * {
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-        
-        /* Elegant text selection */
-        ::selection {
-          background: linear-gradient(135deg, #E8CA5E40, #00E0FF40);
-          color: #E8CA5E;
-        }
-      `}</style>
-    </section>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 z-10 bg-black/40" />
+
+        {/* Main Content */}
+        <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
+          <div className="flex flex-col items-center justify-center text-center">
+            
+            {/* Badge */}
+            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border shadow-md mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 ${
+              theme === 'dark'
+                ? 'bg-[#1F4381] border-[#E8CA5E]'
+                : 'bg-white border-[#00A0FF]'
+            }`}>
+              <div className="flex gap-1">
+                <Compass className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
+                  theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
+                }`} />
+                <Globe2 className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
+                  theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
+                }`} />
+              </div>
+              <span className={`text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500 ${
+                theme === 'dark' ? 'text-white' : 'text-[#00A0FF]'
+              }`}>
+                🌟 Trusted by 500+ Educational Institutions
+              </span>
+            </div>
+
+            {/* Headings */}
+            <div className="mb-5 sm:mb-7">
+              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
+                <span className="block text-white font-serif tracking-tight drop-shadow-lg">
+                  Journey Through the
+                </span>
+              </h1>
+              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
+                <span className="block">
+                  <span className="text-[#E8CA5E] font-serif drop-shadow-lg">Galaxy of</span>{' '}
+                  <span className="text-[#00E0FF] font-serif drop-shadow-lg">College Portfolios</span>
+                </span>
+              </h1>
+            </div>
+
+            {/* Subheading */}
+            <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md">
+              Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
+              A centralized constellation where institutions create, customize, and control their digital 
+              presence across the universe of learning.
+            </p>
+
+            {/* Two CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={handleLearn}
+                className={`group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-[#E8CA5E] text-[#1F4381] hover:bg-[#E8CA5E]/90'
+                    : 'bg-[#00A0FF] text-white hover:bg-[#00A0FF]/90'
+                }`}
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+              
+              <button
+                onClick={handleDesignClick}
+                className="group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 hover:border-white"
+              >
+                <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                <span>Your Design</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Simple scroll hint */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="flex flex-col items-center gap-1 opacity-50">
+            <span className="text-[9px] uppercase tracking-wider text-white">Scroll</span>
+            <div className="w-4 h-6 border border-white rounded-full flex justify-center">
+              <div className="w-0.5 h-1.5 bg-white rounded-full mt-1 animate-bounce" />
+            </div>
+          </div>
+        </div>
+
+        <style jsx>{`
+          .will-change-transform {
+            will-change: transform;
+          }
+          
+          /* Smooth font rendering */
+          * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+          
+          /* Elegant text selection */
+          ::selection {
+            background: linear-gradient(135deg, #E8CA5E40, #00E0FF40);
+            color: #E8CA5E;
+          }
+        `}</style>
+      </section>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
+            onClick={closeModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative bg-[#0F172A] rounded-2xl w-full max-w-2xl my-8 shadow-2xl border border-blue-500/30 overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="px-6 py-5 border-b border-gray-800 flex items-center justify-between bg-[#0F172A] sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Palette className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">You Design</h2>
+                    <p className="text-sm text-gray-400">Share your creative vision with us</p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="p-2 rounded-full hover:bg-gray-800 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400 hover:text-white" />
+                </button>
+              </div>
+
+              {/* Scrollable Form Content */}
+              <div className="max-h-[70vh] overflow-y-auto">
+                {submitSuccess ? (
+                  <div className="p-12 text-center">
+                    <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                      <CheckCircle className="w-8 h-8 text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>
+                    <p className="text-gray-400">
+                      Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+                            formErrors.name ? 'border-red-500' : 'border-gray-700'
+                          }`}
+                          placeholder="Enter your full name"
+                        />
+                        {formErrors.name && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+                            formErrors.email ? 'border-red-500' : 'border-gray-700'
+                          }`}
+                          placeholder="you@example.com"
+                        />
+                        {formErrors.email && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+                            formErrors.phone ? 'border-red-500' : 'border-gray-700'
+                          }`}
+                          placeholder="+92 300 1234567"
+                        />
+                        {formErrors.phone && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                          Design Type *
+                        </label>
+                        <select
+                          name="designType"
+                          value={formData.designType}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
+                            formErrors.designType ? 'border-red-500' : 'border-gray-700'
+                          }`}
+                        >
+                          <option value="">Select design type</option>
+                          {designTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                        {formErrors.designType && (
+                          <p className="text-red-500 text-xs mt-1">{formErrors.designType}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        What inspires you? (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="inspiration"
+                        value={formData.inspiration}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        placeholder="e.g., Modern minimalism, Nature, Technology, Art Deco..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        Describe your design requirements *
+                      </label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        rows={4}
+                        className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none ${
+                          formErrors.description ? 'border-red-500' : 'border-gray-700'
+                        }`}
+                        placeholder="Tell us about your vision, preferred colors, style, features you need, etc..."
+                      />
+                      {formErrors.description && (
+                        <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit Request
+                          <Send className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

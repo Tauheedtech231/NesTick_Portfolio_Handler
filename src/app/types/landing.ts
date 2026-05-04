@@ -1,3 +1,5 @@
+// app/types/landing.ts
+
 export interface Template {
   id: number;
   name: string;
@@ -13,8 +15,13 @@ export interface BuyNowFormData {
   college: string;
   email: string;
   phone: string;
+  designation: string;
+  studentCount: string;
   selectedPlan: string;
   templateName: string;
+  requirements: string;
+  timeline: string;
+  hearAbout: string;
 }
 
 export interface ContactFormData {

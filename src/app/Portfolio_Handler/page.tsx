@@ -4,18 +4,19 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Plus, Palette, Download, Trash2, Check, X, User, Calendar, 
+  Plus, Palette, Download, Check, X, User, Calendar, 
   AlertTriangle, CheckCircle, TrendingUp, Building2, RefreshCw,
-  Activity, Zap, Shield, BarChart3, PieChart as PieChartIcon,
-  Loader2, Bell, Clock, MoreVertical, Search, Sparkles, Crown,
-  LayoutDashboard, Users, School, Award, Globe, Target, Eye
+  Activity, Loader2, Bell, Search, Sparkles, Crown,
+  LayoutDashboard, Users, School, Award, Grid, FileText,
+  ChevronRight, Zap, FileCode, Handshake, UserPlus as UserPlusIcon,
+  Layers, Blocks,
+  Clock
 } from 'lucide-react';
 /* eslint-disable */
 import { MainLayout } from './components/layout/main-layout';
-import { StatsCard } from './components/dashboard/stats-card';
 
 // Import Recharts for professional charts
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart, Brush } from 'recharts';
 
 interface Toast {
   id: string;
@@ -51,6 +52,15 @@ interface PieChartData {
   color: string;
 }
 
+interface DashboardStats {
+  totalColleges: number;
+  activeInstitutes: number;
+  inactiveInstitutes: number;
+  totalDesigns: number;
+  totalTemplates: number;
+  totalDesigners: number;
+}
+
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label, isDarkMode }: any) => {
   if (active && payload && payload.length) {
@@ -76,6 +86,17 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeQuickTab, setActiveQuickTab] = useState<'template' | 'partner' | 'designer'>('template');
+
+  // Stats states
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    totalColleges: 0,
+    activeInstitutes: 0,
+    inactiveInstitutes: 0,
+    totalDesigns: 0,
+    totalTemplates: 0,
+    totalDesigners: 0
+  });
 
   // Chart data states
   const [lineChartData, setLineChartData] = useState<ChartData[]>([]);
@@ -105,6 +126,19 @@ export default function DashboardPage() {
         const data = await response.json();
         setColleges(data);
         generateChartData(data);
+        
+        // Update colleges stats
+        const total = data.length || 0;
+        const active = data.filter((c: any) => c.is_active).length || 0;
+        const inactive = total - active;
+        
+        setDashboardStats(prev => ({
+          ...prev,
+          totalColleges: total,
+          activeInstitutes: active,
+          inactiveInstitutes: inactive
+        }));
+        
         addToast('Colleges loaded successfully!', 'success');
       } catch (error) {
         console.error('Error fetching colleges:', error);
@@ -115,6 +149,32 @@ export default function DashboardPage() {
     };
 
     fetchColleges();
+  }, []);
+
+  // Fetch extra stats (designers, designs, templates)
+  const fetchExtraStats = async () => {
+    try {
+      const response = await fetch('/api/dashboard/stats');
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      const result = await response.json();
+      
+      if (result.success) {
+        setDashboardStats(prev => ({
+          ...prev,
+          totalDesigners: result.data.totalDesigners || 0,
+          totalDesigns: result.data.totalDesigns || 0,
+          totalTemplates: result.data.totalTemplates || 0
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching extra stats:', error);
+      addToast('Failed to load dashboard statistics', 'error');
+    }
+  };
+
+  // Fetch extra stats on mount
+  useEffect(() => {
+    fetchExtraStats();
   }, []);
 
   const generateChartData = (collegesData: College[]) => {
@@ -168,9 +228,9 @@ export default function DashboardPage() {
     setTimeout(() => setToasts(prev => prev.filter(toast => toast.id !== id)), 5000);
   };
 
-  const total = colleges.length;
-  const active = colleges.filter((c) => c.is_active).length;
-  const inactive = colleges.filter((c) => !c.is_active).length;
+  const total = dashboardStats.totalColleges;
+  const active = dashboardStats.activeInstitutes;
+  const inactive = dashboardStats.inactiveInstitutes;
   const activePercentage = total > 0 ? ((active / total) * 100).toFixed(1) : 0;
 
   const handleAdd = () => router.push('/Portfolio_Handler/colleges');
@@ -216,6 +276,19 @@ export default function DashboardPage() {
       const data = await response.json();
       setColleges(data);
       generateChartData(data);
+      
+      const total = data.length || 0;
+      const active = data.filter((c: any) => c.is_active).length || 0;
+      const inactive = total - active;
+      
+      setDashboardStats(prev => ({
+        ...prev,
+        totalColleges: total,
+        activeInstitutes: active,
+        inactiveInstitutes: inactive
+      }));
+      
+      await fetchExtraStats();
       addToast('Data refreshed successfully!', 'success');
     } catch (error) {
       console.error('Error refreshing colleges:', error);
@@ -231,37 +304,104 @@ export default function DashboardPage() {
     color: item.color
   }));
 
-  // Stats Data with solid colors
-  const stats = [
+  // All 6 Stats Data
+  const allStats = [
     { 
-      title: "Total Colleges", 
-      value: total.toString(), 
+      title: "Number of Colleges", 
+      value: dashboardStats.totalColleges.toString(), 
       icon: School, 
       bgColor: "bg-blue-600",
-      trend: "+12% this month"
+      trend: "Total registered colleges"
     },
     { 
-      title: "Active Institutions", 
-      value: active.toString(), 
+      title: "Active Institutes", 
+      value: dashboardStats.activeInstitutes.toString(), 
       icon: Building2, 
-      bgColor: "bg-blue-500",
+      bgColor: "bg-green-600",
       trend: `${activePercentage}% of total`
     },
     { 
-      title: "Inactive Institutions", 
-      value: inactive.toString(), 
+      title: "Inactive Institutes", 
+      value: dashboardStats.inactiveInstitutes.toString(), 
       icon: AlertTriangle, 
       bgColor: "bg-yellow-500",
       trend: "Need attention"
     },
     { 
-      title: "Success Rate", 
-      value: `${activePercentage}%`, 
-      icon: Award, 
-      bgColor: "bg-yellow-600",
-      trend: "Active colleges ratio"
+      title: "Total Designs", 
+      value: dashboardStats.totalDesigns.toString(), 
+      icon: LayoutDashboard, 
+      bgColor: "bg-purple-600",
+      trend: "Designer designs"
+    },
+    { 
+      title: "Total Templates", 
+      value: dashboardStats.totalTemplates.toString(), 
+      icon: Grid, 
+      bgColor: "bg-indigo-600",
+      trend: "Available templates"
+    },
+    { 
+      title: "Number of Designers", 
+      value: dashboardStats.totalDesigners.toString(), 
+      icon: Users, 
+      bgColor: "bg-teal-600",
+      trend: "Registered designers"
     }
   ];
+
+  // Tab Content for Quick Actions
+  const tabContent = {
+    template: {
+      title: "Template Requests",
+      icon: FileCode,
+      description: "Manage template requests from colleges",
+      actions: [
+        { label: "View All Template Requests", href: "/Portfolio_Handler/Requested_template", icon: FileText },
+        { label: "Manage Templates", href: "/Portfolio_Handler/themes", icon: Palette },
+        { label: "Template Categories", href: "/Portfolio_Handler/modules", icon: Layers }
+      ]
+    },
+    partner: {
+      title: "Partner Requests",
+      icon: Handshake,
+      description: "Manage partner & collaboration requests",
+      actions: [
+        { label: "View Partner Applications", href: "/Portfolio_Handler/partners-designers", icon: Users },
+        { label: "Pending Approvals", href: "/Portfolio_Handler/partners-designers?status=pending", icon: Clock },
+        { label: "Approved Partners", href: "/Portfolio_Handler/partners-designers?status=approved", icon: CheckCircle }
+      ]
+    },
+    designer: {
+      title: "Designer Requests",
+      icon: UserPlusIcon,
+      description: "Manage designer registrations & designs",
+      actions: [
+        { label: "View Designers", href: "/Portfolio_Handler/partners-designers", icon: Users },
+        { label: "Pending Designs", href: "/Portfolio_Handler/design-management", icon: Brush },
+        { label: "Design Approvals", href: "/Portfolio_Handler/design-management?status=pending", icon: Clock }
+      ]
+    }
+  };
+
+  const tabs = [
+    { id: 'template', label: 'Template Request', icon: FileCode },
+    { id: 'partner', label: 'Partner Request', icon: Handshake },
+    { id: 'designer', label: 'Designer Request', icon: UserPlusIcon }
+  ];
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader2 size={48} className="animate-spin text-yellow-500 mx-auto mb-4" />
+            <p className="text-gray-400">Loading dashboard...</p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -347,16 +487,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {stats.map((stat, index) => {
+        {/* Stats Grid - 6 Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 lg:gap-6">
+          {allStats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <motion.div
                 key={stat.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -4 }}
                 className="relative group overflow-hidden rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
               >
@@ -374,9 +514,9 @@ export default function DashboardPage() {
                   <div className="mt-2 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${index === 0 ? (total > 0 ? 100 : 0) : index === 1 ? activePercentage : index === 2 ? (inactive > 0 ? 100 : 0) : activePercentage}%` }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                      className={`h-full rounded-full ${index === 0 || index === 1 ? 'bg-blue-500' : 'bg-yellow-500'}`}
+                      animate={{ width: stat.value !== "0" ? "100%" : "0%" }}
+                      transition={{ duration: 1, delay: 0.3 }}
+                      className={`h-full rounded-full ${index < 3 ? 'bg-blue-500' : 'bg-yellow-500'}`}
                     />
                   </div>
                 </div>
@@ -385,40 +525,70 @@ export default function DashboardPage() {
           })}
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { icon: Plus, label: 'Add College', desc: 'Register new institution', onClick: handleAdd, color: "bg-blue-600" },
-            { icon: Palette, label: 'Manage Themes', desc: 'Customize appearance', onClick: handleThemes, color: "bg-yellow-600" },
-            { icon: Download, label: 'Backup Data', desc: 'Export all data', onClick: handleBackup, color: "bg-blue-500" },
-            { icon: RefreshCw, label: 'Refresh Data', desc: 'Sync latest data', onClick: refreshCollegeData, color: "bg-yellow-500", loading: refreshing }
-          ].map((action, index) => (
-            <motion.button
-              key={action.label}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 20 }}
+        {/* Quick Actions - Tabbed Interface */}
+        <div className="rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all duration-300 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-800">
+            <h3 className="font-semibold text-lg text-white flex items-center gap-2">
+              <Zap size={18} className="text-yellow-500" />
+              Quick Actions
+            </h3>
+            <p className="text-sm text-gray-500 mt-1">Manage requests and approvals</p>
+          </div>
+          
+          {/* Tabs */}
+          <div className="flex border-b border-gray-800 px-5">
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeQuickTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveQuickTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-300 border-b-2 ${
+                    isActive
+                      ? 'border-yellow-500 text-yellow-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600'
+                  }`}
+                >
+                  <TabIcon size={16} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeQuickTab}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              onClick={action.onClick}
-              disabled={action.loading}
-              className={`group relative p-4 rounded-2xl transition-all duration-300 bg-gray-900 border border-gray-800 hover:border-blue-500/50 overflow-hidden ${action.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="divide-y divide-gray-800"
             >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  {action.loading ? <Loader2 size={18} className="text-white animate-spin" /> : <action.icon size={18} className="text-white" />}
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold text-sm text-white">
-                    {action.label}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {action.desc}
-                  </p>
-                </div>
-              </div>
-            </motion.button>
-          ))}
+              {tabContent[activeQuickTab].actions.map((action, idx) => {
+                const ActionIcon = action.icon;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => router.push(action.href)}
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-800/50 transition-all duration-300 cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <div className="text-left">
+                        <h4 className="font-medium text-white text-sm group-hover:text-yellow-500 transition-colors">
+                          {action.label}
+                        </h4>
+                      </div>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-600 group-hover:text-yellow-500 transition-colors" />
+                  </button>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Charts Section */}
@@ -486,7 +656,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="font-semibold text-lg flex items-center gap-2 text-white">
-                    <PieChartIcon size={20} className="text-yellow-500" />
+                    <Activity size={20} className="text-yellow-500" />
                     Status Distribution
                   </h3>
                   <p className="text-sm text-gray-500">

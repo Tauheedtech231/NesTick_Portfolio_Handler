@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, memo } from "react";
-import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -165,6 +165,12 @@ export default function Navbar() {
 
   const getUserEmail = () => user?.email || '';
 
+  // Check if user is a developer (from developers table)
+  const isDeveloper = user?.email === 'tauheeddeveloper13@gmail.com' || user?.userType === 'developer';
+  
+  // Check if user is admin
+  const isAdmin = user?.email === 'tauheeddeveloper13@gmail.com';
+
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Vision', path: '/vision' },
@@ -206,7 +212,7 @@ export default function Navbar() {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
+              if (e.key === 'Enter' || e.key === 'Space') {
                 handleLogoClick(e as unknown as React.MouseEvent);
               }
             }}
@@ -345,6 +351,7 @@ export default function Navbar() {
                       </div>
                       
                       <div className="p-2">
+                        {/* Designer Portal - For all designers */}
                         <button
                           onClick={() => {
                             router.push('/designer');
@@ -356,9 +363,27 @@ export default function Navbar() {
                           <span>Designer Portal</span>
                         </button>
                         
-                        {user.email === 'tauheeddeveloper13@gmail.com' && (
+                        {/* Developer Portal - Only for developers */}
+                        {isDeveloper && (
                           <button
-                            onClick={handleDashboardRedirect}
+                            onClick={() => {
+                              router.push('/developer');
+                              setIsDropdownOpen(false);
+                            }}
+                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
+                          >
+                            <Code2 className="w-4 h-4" />
+                            <span>Developer Portal</span>
+                          </button>
+                        )}
+                        
+                        {/* Admin Dashboard - Only for admin */}
+                        {isAdmin && (
+                          <button
+                            onClick={() => {
+                              handleDashboardRedirect();
+                              setIsDropdownOpen(false);
+                            }}
                             className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
                           >
                             <LayoutDashboard className="w-4 h-4" />
@@ -366,9 +391,11 @@ export default function Navbar() {
                           </button>
                         )}
                         
+                        <hr className="my-2 border-gray-100" />
+                        
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-red-600 hover:bg-red-50"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -438,9 +465,10 @@ export default function Navbar() {
             {/* Mobile Menu - Login/User Section */}
             {user ? (
               <div className="border-t border-gray-100 px-4 py-4 space-y-2">
+                {/* Designer Portal */}
                 <button
                   onClick={() => {
-                    router.push('/designer-portal');
+                    router.push('/designer');
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
@@ -453,7 +481,26 @@ export default function Navbar() {
                   Designer Portal
                 </button>
                 
-                {user.email === 'tauheeddeveloper13@gmail.com' && (
+                {/* Developer Portal - Only for developers */}
+                {isDeveloper && (
+                  <button
+                    onClick={() => {
+                      router.push('/developer');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                    style={{
+                      backgroundColor: '#8B5CF6',
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    <Code2 className="w-4 h-4" />
+                    Developer Portal
+                  </button>
+                )}
+                
+                {/* Admin Dashboard - Only for admin */}
+                {isAdmin && (
                   <button
                     onClick={() => {
                       handleDashboardRedirect();
@@ -461,7 +508,7 @@ export default function Navbar() {
                     }}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
                     style={{
-                      backgroundColor: '#00A0FF',
+                      backgroundColor: '#F59E0B',
                       color: '#FFFFFF',
                     }}
                   >
@@ -477,7 +524,7 @@ export default function Navbar() {
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
                   style={{
-                    backgroundColor: '#4F0281',
+                    backgroundColor: '#DC2626',
                     color: '#FFFFFF',
                   }}
                 >

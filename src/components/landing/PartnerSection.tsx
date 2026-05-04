@@ -18,21 +18,81 @@ import {
   Sparkles,
   FileText,
   Palette,
-  Mail,
-  Lock,
-  User,
-  Briefcase
+  Plus,
+  Trash2,
+  Upload,
+  Link,
+  X,
+  DollarSign,
+  Network,
+  Briefcase as BriefcaseIcon,
+  Store,
+  HeartHandshake,
+  Code2,
+  Award,
+  Clock,
+  MapPin,
+  Briefcase,
+  GraduationCap
 } from 'lucide-react';
+
+// Partner Types
+const partnerTypes = [
+  { value: 'institute', label: 'Institute', icon: Building2 },
+  { value: 'bd', label: 'Business Development (BD)', icon: TrendingUp },
+  { value: 'marketing_firm', label: 'Marketing Firm', icon: Network },
+  { value: 'investor', label: 'Investor', icon: DollarSign },
+  { value: 'software_house', label: 'Software House', icon: BriefcaseIcon },
+  { value: 'other', label: 'Other', icon: Store },
+];
+
+// Developer Specializations
+const developerSpecializations = [
+  'Frontend Developer',
+  'Backend Developer',
+  'Full Stack Developer',
+  'WordPress Developer',
+  'Shopify Developer',
+  'React/Next.js Specialist',
+  'UI/UX Developer',
+  'Mobile App Developer',
+  'E-commerce Developer',
+  'CMS Developer',
+  'Other'
+];
+
+// Experience Levels
+const experienceLevels = [
+  'Fresher (0-1 years)',
+  'Junior (1-3 years)',
+  'Intermediate (3-5 years)',
+  'Senior (5-8 years)',
+  'Expert (8+ years)'
+];
+
+// Skills Options
+const skillOptions = [
+  'HTML/CSS', 'JavaScript', 'TypeScript', 'React', 'Next.js', 
+  'Node.js', 'Python', 'PHP', 'Laravel', 'WordPress', 
+  'Shopify', 'MongoDB', 'MySQL', 'Tailwind CSS', 'Bootstrap',
+  'GraphQL', 'REST API', 'Git', 'Figma to Code'
+];
 
 interface PartnerFormData {
   id: string;
+  partnerType: string;
+  otherDomain: string;
   organizationName: string;
   contactPerson: string;
   email: string;
   phone: string;
-  organizationType: string;
   country: string;
   message: string;
+  links: string[];
+  proposalFile: File | null;
+  cvFile: File | null;
+  proposalFileName: string;
+  cvFileName: string;
   submittedAt: string;
   status: 'pending' | 'reviewed' | 'approved' | 'rejected';
 }
@@ -47,6 +107,28 @@ interface DesignerFormData {
   specialization: string;
   experience: string;
   portfolio: string;
+  cvFile: File | null;
+  cvFileName: string;
+  submittedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+interface DeveloperFormData {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  companyName: string;
+  specialization: string;
+  experience: string;
+  skills: string[];
+  portfolio: string;
+  cvFile: File | null;
+  cvFileName: string;
+  bio: string;
+  location: string;
+  bankAccountDetails: string;
   submittedAt: string;
   status: 'pending' | 'approved' | 'rejected';
 }
@@ -54,18 +136,8 @@ interface DesignerFormData {
 interface PartnerSectionProps {
   onPartnerSubmit?: (data: PartnerFormData) => void;
   onDesignerSubmit?: (data: DesignerFormData) => void;
+  onDeveloperSubmit?: (data: DeveloperFormData) => void;
 }
-
-const organizationTypes = [
-  'Educational Institution',
-  'Tech Company',
-  'Investment Firm',
-  'NGO',
-  'Government Body',
-  'Media Partner',
-  'Research Organization',
-  'Other'
-];
 
 const countries = [
   'Pakistan', 'USA', 'UK', 'Canada', 'Australia', 'UAE', 'Saudi Arabia',
@@ -84,22 +156,28 @@ const specializations = [
   'Other'
 ];
 
-export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSectionProps) {
+export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperSubmit }: PartnerSectionProps) {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [partnerType, setPartnerType] = useState<'partner' | 'designer'>('partner');
+  const [activeForm, setActiveForm] = useState<'partner' | 'designer' | 'developer'>('partner');
   
   // Partner Form State
   const [formData, setFormData] = useState<PartnerFormData>({
     id: '',
+    partnerType: '',
+    otherDomain: '',
     organizationName: '',
     contactPerson: '',
     email: '',
     phone: '',
-    organizationType: '',
     country: '',
     message: '',
+    links: [''],
+    proposalFile: null,
+    cvFile: null,
+    proposalFileName: '',
+    cvFileName: '',
     submittedAt: '',
     status: 'pending'
   });
@@ -115,6 +193,29 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
     specialization: '',
     experience: '',
     portfolio: '',
+    cvFile: null,
+    cvFileName: '',
+    submittedAt: '',
+    status: 'pending'
+  });
+
+  // Developer Form State
+  const [developerForm, setDeveloperForm] = useState<DeveloperFormData>({
+    id: '',
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    companyName: '',
+    specialization: '',
+    experience: '',
+    skills: [],
+    portfolio: '',
+    cvFile: null,
+    cvFileName: '',
+    bio: '',
+    location: '',
+    bankAccountDetails: '',
     submittedAt: '',
     status: 'pending'
   });
@@ -122,7 +223,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showDesignerForm, setShowDesignerForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Detect theme changes
   useEffect(() => {
@@ -145,20 +246,67 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
     return () => observer.disconnect();
   }, []);
 
-  // Send email notification
-  const sendEmailNotification = async (type: string, data: any) => {
-    try {
-      const response = await fetch('/api/send-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, data })
-      });
-      
-      if (!response.ok) {
-        console.error('Failed to send email notification');
+  // Partner Form Handlers
+  const addLinkField = () => {
+    if (formData.links.length < 7) {
+      setFormData(prev => ({ ...prev, links: [...prev.links, ''] }));
+    }
+  };
+
+  const removeLinkField = (index: number) => {
+    if (formData.links.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        links: prev.links.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateLink = (index: number, value: string) => {
+    const newLinks = [...formData.links];
+    newLinks[index] = value;
+    setFormData(prev => ({ ...prev, links: newLinks }));
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'proposal' | 'cv', isDesigner: boolean = false, isDeveloper: boolean = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      alert('File size must be less than 20MB');
+      return;
+    }
+
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload PDF, DOC, DOCX, JPG, or PNG files only');
+      return;
+    }
+
+    if (isDeveloper) {
+      setDeveloperForm(prev => ({ ...prev, cvFile: file, cvFileName: file.name }));
+    } else if (isDesigner) {
+      setDesignerForm(prev => ({ ...prev, cvFile: file, cvFileName: file.name }));
+    } else {
+      if (type === 'proposal') {
+        setFormData(prev => ({ ...prev, proposalFile: file, proposalFileName: file.name }));
+      } else {
+        setFormData(prev => ({ ...prev, cvFile: file, cvFileName: file.name }));
       }
-    } catch (error) {
-      console.error('Email notification error:', error);
+    }
+  };
+
+  const removeFile = (type: 'proposal' | 'cv', isDesigner: boolean = false, isDeveloper: boolean = false) => {
+    if (isDeveloper) {
+      setDeveloperForm(prev => ({ ...prev, cvFile: null, cvFileName: '' }));
+    } else if (isDesigner) {
+      setDesignerForm(prev => ({ ...prev, cvFile: null, cvFileName: '' }));
+    } else {
+      if (type === 'proposal') {
+        setFormData(prev => ({ ...prev, proposalFile: null, proposalFileName: '' }));
+      } else {
+        setFormData(prev => ({ ...prev, cvFile: null, cvFileName: '' }));
+      }
     }
   };
 
@@ -172,67 +320,96 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
     setDesignerForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleDeveloperChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setDeveloperForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSkillToggle = (skill: string) => {
+    setDeveloperForm(prev => ({
+      ...prev,
+      skills: prev.skills.includes(skill)
+        ? prev.skills.filter(s => s !== skill)
+        : [...prev.skills, skill]
+    }));
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handlePartnerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     try {
-      const newPartner: PartnerFormData = {
-        ...formData,
+      const validLinks = formData.links.filter(link => link.trim() !== '');
+      let proposalBase64 = '';
+      let cvBase64 = '';
+
+      if (formData.proposalFile) proposalBase64 = await fileToBase64(formData.proposalFile);
+      if (formData.cvFile) cvBase64 = await fileToBase64(formData.cvFile);
+
+      const newPartner: any = {
         id: `PART-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+        partnerType: formData.partnerType,
+        otherDomain: formData.partnerType === 'other' ? formData.otherDomain : null,
+        organizationName: formData.organizationName,
+        contactPerson: formData.contactPerson,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        message: formData.message,
+        links: validLinks,
+        proposalFile: proposalBase64,
+        proposalFileName: formData.proposalFileName,
+        cvFile: cvBase64,
+        cvFileName: formData.cvFileName,
         submittedAt: new Date().toISOString(),
         status: 'pending'
       };
 
-      // Save to API
       const response = await fetch('/api/partners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          organization_name: newPartner.organizationName,
-          contact_person: newPartner.contactPerson,
-          email: newPartner.email,
-          phone: newPartner.phone,
-          organization_type: newPartner.organizationType,
-          country: newPartner.country,
-          message: newPartner.message
-        })
+        body: JSON.stringify(newPartner),
       });
 
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Submission failed');
       
-      if (!response.ok) {
-        throw new Error(result.error || 'Submission failed');
-      }
+      if (onPartnerSubmit) onPartnerSubmit(newPartner);
       
-      if (onPartnerSubmit) {
-        onPartnerSubmit(newPartner);
-      }
-      
-      // Send email notification to admins and user
-      await sendEmailNotification('partner', newPartner);
-      
+      setSuccessMessage('Partnership application submitted successfully! Our team will contact you within 48 hours.');
       setSubmitStatus('success');
       setShowSuccessModal(true);
       
       setFormData({
         id: '',
+        partnerType: '',
+        otherDomain: '',
         organizationName: '',
         contactPerson: '',
         email: '',
         phone: '',
-        organizationType: '',
         country: '',
         message: '',
+        links: [''],
+        proposalFile: null,
+        cvFile: null,
+        proposalFileName: '',
+        cvFileName: '',
         submittedAt: '',
         status: 'pending'
       });
       
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 5000);
-      
+      setTimeout(() => setShowSuccessModal(false), 5000);
     } catch (error) {
       console.error('Partner form error:', error);
       setSubmitStatus('error');
@@ -248,42 +425,37 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
     setSubmitStatus('idle');
 
     try {
-      const newDesigner: DesignerFormData = {
-        ...designerForm,
+      let cvBase64 = '';
+      if (designerForm.cvFile) cvBase64 = await fileToBase64(designerForm.cvFile);
+
+      const newDesigner: any = {
         id: `DES-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+        name: designerForm.name,
+        email: designerForm.email,
+        password: designerForm.password,
+        phone: designerForm.phone,
+        company: designerForm.company,
+        specialization: designerForm.specialization,
+        experience: designerForm.experience,
+        portfolio: designerForm.portfolio,
+        cvFile: cvBase64,
+        cvFileName: designerForm.cvFileName,
         submittedAt: new Date().toISOString(),
         status: 'pending'
       };
 
-      // Save to API
       const response = await fetch('/api/designers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newDesigner.name,
-          email: newDesigner.email,
-          password: newDesigner.password,
-          phone: newDesigner.phone,
-          company: newDesigner.company,
-          specialization: newDesigner.specialization,
-          experience: newDesigner.experience,
-          portfolio: newDesigner.portfolio
-        })
+        body: JSON.stringify(newDesigner),
       });
 
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Registration failed');
       
-      if (!response.ok) {
-        throw new Error(result.error || 'Registration failed');
-      }
+      if (onDesignerSubmit) onDesignerSubmit(newDesigner);
       
-      if (onDesignerSubmit) {
-        onDesignerSubmit(newDesigner);
-      }
-      
-      // Send email notification to admins and user
-      await sendEmailNotification('designer', newDesigner);
-      
+      setSuccessMessage('Designer registration submitted successfully! Our team will review and approve within 48 hours.');
       setSubmitStatus('success');
       setShowSuccessModal(true);
       
@@ -297,18 +469,89 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
         specialization: '',
         experience: '',
         portfolio: '',
+        cvFile: null,
+        cvFileName: '',
         submittedAt: '',
         status: 'pending'
       });
       
-      setShowDesignerForm(false);
-      
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 5000);
-      
+      setTimeout(() => setShowSuccessModal(false), 5000);
     } catch (error) {
       console.error('Designer form error:', error);
+      setSubmitStatus('error');
+      setTimeout(() => setSubmitStatus('idle'), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeveloperSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      let cvBase64 = '';
+      if (developerForm.cvFile) cvBase64 = await fileToBase64(developerForm.cvFile);
+
+      const newDeveloper: any = {
+        id: `DEV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+        name: developerForm.name,
+        email: developerForm.email,
+        password: developerForm.password,
+        phone: developerForm.phone,
+        companyName: developerForm.companyName,
+        specialization: developerForm.specialization,
+        experience: developerForm.experience,
+        skills: developerForm.skills,
+        portfolio: developerForm.portfolio,
+        cvFile: cvBase64,
+        cvFileName: developerForm.cvFileName,
+        bio: developerForm.bio,
+        location: developerForm.location,
+        bankAccountDetails: developerForm.bankAccountDetails,
+        submittedAt: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      const response = await fetch('/api/developers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDeveloper),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Registration failed');
+      
+      if (onDeveloperSubmit) onDeveloperSubmit(newDeveloper);
+      
+      setSuccessMessage('Developer registration submitted successfully! Our team will review and contact you within 48 hours.');
+      setSubmitStatus('success');
+      setShowSuccessModal(true);
+      
+      setDeveloperForm({
+        id: '',
+        name: '',
+        email: '',
+        password: '',
+        phone: '',
+        companyName: '',
+        specialization: '',
+        experience: '',
+        skills: [],
+        portfolio: '',
+        cvFile: null,
+        cvFileName: '',
+        bio: '',
+        location: '',
+        bankAccountDetails: '',
+        submittedAt: '',
+        status: 'pending'
+      });
+      
+      setTimeout(() => setShowSuccessModal(false), 5000);
+    } catch (error) {
+      console.error('Developer form error:', error);
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } finally {
@@ -325,13 +568,28 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
     { icon: Globe, title: "Global Reach", description: "Connect with institutions across the globe", color: "#1F4381" }
   ];
 
+  const getInputStyle = () => ({
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    borderRadius: '0.5rem',
+    fontSize: '0.75rem',
+    backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
+    border: `1px solid ${theme === 'dark' ? '#1E293B' : '#E5E7EB'}`,
+    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+  });
+
+  const getInputHoverStyle = {
+    borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+  };
+
   return (
     <section ref={sectionRef} className="py-12 md:py-24 px-4 sm:px-6 relative overflow-hidden"
       style={{
         backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
       }}
     >
-      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] rounded-full blur-3xl opacity-15"
           style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
@@ -367,45 +625,56 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight">
             <span className="text-white">Become a </span>
             <span className="inline-block" style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}>
-              Strategic Partner
+              Partner, Designer or Developer
             </span>
           </h2>
           
           <p className="text-sm md:text-base max-w-2xl mx-auto px-4 font-light tracking-wide"
             style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
           >
-            Join hands with us to revolutionize educational portfolio management across the globe.
+            Join our ecosystem of partners, designers, and developers to revolutionize educational portfolio management.
           </p>
         </motion.div>
 
-        {/* Category Selection */}
+        {/* Category Selection - 3 Tabs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.15, duration: 0.6 }}
-          className="flex justify-center gap-4 mb-8"
+          className="flex flex-wrap justify-center gap-3 mb-8"
         >
           <button
-            onClick={() => { setPartnerType('partner'); setShowDesignerForm(false); }}
-            className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-              partnerType === 'partner'
+            onClick={() => setActiveForm('partner')}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
+              activeForm === 'partner'
                 ? 'bg-teal-500 text-white shadow-lg'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
-            <Building2 className="w-4 h-4 inline mr-2" />
+            <Building2 className="w-4 h-4" />
             Organization Partner
           </button>
           <button
-            onClick={() => { setPartnerType('designer'); setShowDesignerForm(true); }}
-            className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-              partnerType === 'designer'
-                ? 'bg-teal-500 text-white shadow-lg'
+            onClick={() => setActiveForm('designer')}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
+              activeForm === 'designer'
+                ? 'bg-purple-500 text-white shadow-lg'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
-            <Palette className="w-4 h-4 inline mr-2" />
+            <Palette className="w-4 h-4" />
             Designer / Template Creator
+          </button>
+          <button
+            onClick={() => setActiveForm('developer')}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
+              activeForm === 'developer'
+                ? 'bg-blue-500 text-white shadow-lg'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            <Code2 className="w-4 h-4" />
+            Developer / Agency
           </button>
         </motion.div>
 
@@ -472,12 +741,16 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center"
                 style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
               >
-                <Building2 className="w-5 h-5 md:w-6 md:h-6" style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />
+                {activeForm === 'partner' && <Building2 className="w-5 h-5 md:w-6 md:h-6" style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />}
+                {activeForm === 'designer' && <Palette className="w-5 h-5 md:w-6 md:h-6" style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />}
+                {activeForm === 'developer' && <Code2 className="w-5 h-5 md:w-6 md:h-6" style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />}
               </div>
               <h3 className="text-lg md:text-xl font-bold font-serif tracking-tight"
                 style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
               >
-                {partnerType === 'partner' ? 'Why Partner With Us?' : 'Why Become a Designer?'}
+                {activeForm === 'partner' && 'Why Partner With Us?'}
+                {activeForm === 'designer' && 'Why Become a Designer?'}
+                {activeForm === 'developer' && 'Why Become a Developer?'}
               </h3>
             </div>
 
@@ -485,62 +758,52 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
               <p className="text-sm md:text-base leading-relaxed font-light tracking-wide"
                 style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
               >
-                {partnerType === 'partner' 
-                  ? "We're building the future of educational technology, and we're looking for passionate partners who share our vision."
-                  : "Join our creative community of designers and template creators. Showcase your talent, earn revenue, and help institutions build beautiful portfolios."}
+                {activeForm === 'partner' && "We're building the future of educational technology, and we're looking for passionate partners who share our vision."}
+                {activeForm === 'designer' && "Join our creative community of designers and template creators. Showcase your talent, earn revenue, and help institutions build beautiful portfolios."}
+                {activeForm === 'developer' && "Join our developer community! Get paid for building templates from approved designs. Work on exciting projects and earn competitive revenue sharing."}
               </p>
 
-              {partnerType === 'designer' && (
+              {activeForm === 'developer' && (
                 <div className="p-4 md:p-5 rounded-r-xl"
                   style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.1)' : 'rgba(0, 160, 255, 0.05)',
-                    borderLeft: `4px solid ${theme === 'dark' ? '#E8CA5E' : '#00A0FF'}`,
+                    backgroundColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)',
+                    borderLeft: `4px solid ${theme === 'dark' ? '#3B82F6' : '#3B82F6'}`,
                   }}
                 >
                   <p className="text-xs md:text-sm italic leading-relaxed font-light"
                     style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
                   >
-                    "Design templates that inspire. Your creativity can help thousands of institutions present their best selves."
+                    "Build templates that power educational institutions worldwide. Earn up to 70% revenue share on every template sale!"
                   </p>
                 </div>
               )}
 
-              <div>
-                <h4 className="font-semibold text-xs md:text-sm mb-2 md:mb-3 flex items-center gap-2 font-sans"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
-                >
-                  <Users className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }} />
-                  {partnerType === 'partner' ? 'Partnership Types:' : 'Designer Benefits:'}
-                </h4>
-                <div className="flex flex-wrap gap-1.5 md:gap-2">
-                  {partnerType === 'partner' 
-                    ? organizationTypes.map((type, idx) => (
-                        <span key={idx} className="px-2 py-0.5 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-medium"
-                          style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
-                            color: theme === 'dark' ? '#00E0FF' : '#00A0FF',
-                          }}
-                        >
-                          {type}
-                        </span>
-                      ))
-                    : ['Revenue Sharing', 'Creative Freedom', 'Global Exposure', 'Technical Support'].map((benefit, idx) => (
-                        <span key={idx} className="px-2 py-0.5 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-medium"
-                          style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
-                            color: theme === 'dark' ? '#00E0FF' : '#00A0FF',
-                          }}
-                        >
-                          {benefit}
-                        </span>
-                      ))
-                  }
+              {activeForm === 'developer' && (
+                <div>
+                  <h4 className="font-semibold text-xs md:text-sm mb-2 md:mb-3 flex items-center gap-2 font-sans"
+                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  >
+                    <Award className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: theme === 'dark' ? '#3B82F6' : '#3B82F6' }} />
+                    Developer Benefits:
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5 md:gap-2">
+                    {['70% Revenue Share', 'Flexible Work', 'Global Exposure', 'Dedicated Support', 'Early Payments', 'Project Assignments'].map((benefit, idx) => (
+                      <span key={idx} className="px-2 py-0.5 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-medium"
+                        style={{
+                          backgroundColor: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+                          color: theme === 'dark' ? '#60A5FA' : '#3B82F6',
+                        }}
+                      >
+                        {benefit}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
 
-          {/* Right Side - Form */}
+          {/* Right Side - Forms */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -562,17 +825,67 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                 <h3 className="text-lg md:text-xl font-bold font-serif tracking-tight"
                   style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
                 >
-                  {partnerType === 'partner' ? 'Partner Application' : 'Designer Registration'}
+                  {activeForm === 'partner' && 'Partner Application'}
+                  {activeForm === 'designer' && 'Designer Registration'}
+                  {activeForm === 'developer' && 'Developer Registration'}
                 </h3>
               </div>
               <div className="text-[10px] md:text-xs font-sans" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>
-                All fields are required *
+                * Required fields
               </div>
             </div>
 
-            {partnerType === 'partner' ? (
-              <form onSubmit={handlePartnerSubmit} className="space-y-3 md:space-y-4">
-                {/* Partner Form Fields */}
+            {/* Partner Form */}
+            {activeForm === 'partner' && (
+              <form onSubmit={handlePartnerSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Partner Type *</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {partnerTypes.map((type) => {
+                      const Icon = type.icon;
+                      return (
+                        <label
+                          key={type.value}
+                          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${
+                            formData.partnerType === type.value
+                              ? 'bg-teal-500/20 border-teal-500'
+                              : 'bg-gray-800/50 border-gray-700'
+                          } border`}
+                        >
+                          <input
+                            type="radio"
+                            name="partnerType"
+                            value={type.value}
+                            checked={formData.partnerType === type.value}
+                            onChange={handleInputChange}
+                            className="hidden"
+                          />
+                          <Icon className="w-4 h-4" style={{ color: formData.partnerType === type.value ? '#00E0FF' : '#9CA3AF' }} />
+                          <span className="text-xs">{type.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {formData.partnerType === 'other' && (
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Please specify your domain *</label>
+                    <input
+                      type="text"
+                      name="otherDomain"
+                      value={formData.otherDomain}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="e.g., Investor, Consultant, etc."
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-[10px] md:text-xs font-medium mb-1">Organization Name *</label>
                   <input
@@ -583,12 +896,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     required
                     placeholder="Enter your organization name"
                     className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    }}
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                   />
                 </div>
 
@@ -602,12 +912,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     required
                     placeholder="Full name of contact person"
                     className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    }}
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                   />
                 </div>
 
@@ -622,12 +929,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       required
                       placeholder="contact@organization.com"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                   <div>
@@ -640,58 +944,146 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       required
                       placeholder="+92 300 1234567"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1">Organization Type *</label>
-                    <select
-                      name="organizationType"
-                      value={formData.organizationType}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Country *</label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                    style={getInputStyle()}
+                  >
+                    <option value="">Select country</option>
+                    {countries.map((country, idx) => (
+                      <option key={idx} value={country}>{country}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Links (Optional - Max 7)</label>
+                  {formData.links.map((link, index) => (
+                    <div key={index} className="flex gap-2 mb-2">
+                      <div className="relative flex-1">
+                        <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                        <input
+                          type="url"
+                          value={link}
+                          onChange={(e) => updateLink(index, e.target.value)}
+                          placeholder={`Link ${index + 1} (e.g., https://...)`}
+                          className="w-full pl-8 pr-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                          style={getInputStyle()}
+                          onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                          onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                        />
+                      </div>
+                      {formData.links.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeLinkField(index)}
+                          className="p-2 rounded-lg hover:bg-red-500/20 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-400" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {formData.links.length < 7 && (
+                    <button
+                      type="button"
+                      onClick={addLinkField}
+                      className="flex items-center gap-1 text-xs text-teal-400 hover:text-teal-300 transition-colors mt-1"
                     >
-                      <option value="">Select type</option>
-                      {organizationTypes.map((type, idx) => (
-                        <option key={idx} value={type}>{type}</option>
-                      ))}
-                    </select>
+                      <Plus className="w-3.5 h-3.5" />
+                      Add another link ({formData.links.length}/7)
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Upload Proposal (Optional - PDF/DOC/IMG, Max 20MB)</label>
+                  <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
+                    style={{
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : 'rgba(245, 245, 245, 0.5)',
+                    }}
+                    onClick={() => document.getElementById('proposalUpload')?.click()}
+                  >
+                    <input
+                      id="proposalUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect(e, 'proposal', false)}
+                      className="hidden"
+                    />
+                    {formData.proposalFileName ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-teal-400" />
+                          <span className="text-xs">{formData.proposalFileName}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeFile('proposal', false); }}
+                          className="p-1 hover:bg-red-500/20 rounded"
+                        >
+                          <X className="w-3.5 h-3.5 text-red-400" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1">
+                        <Upload className="w-6 h-6 text-gray-500" />
+                        <p className="text-xs text-gray-500">Click to upload or drag and drop</p>
+                        <p className="text-[10px] text-gray-600">PDF, DOC, DOCX, JPG, PNG up to 20MB</p>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1">Country *</label>
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
-                    >
-                      <option value="">Select country</option>
-                      {countries.map((country, idx) => (
-                        <option key={idx} value={country}>{country}</option>
-                      ))}
-                    </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Upload CV/Resume (Optional - Max 20MB)</label>
+                  <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
+                    style={{
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : 'rgba(245, 245, 245, 0.5)',
+                    }}
+                    onClick={() => document.getElementById('partnerCvUpload')?.click()}
+                  >
+                    <input
+                      id="partnerCvUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect(e, 'cv', false)}
+                      className="hidden"
+                    />
+                    {formData.cvFileName ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-teal-400" />
+                          <span className="text-xs">{formData.cvFileName}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeFile('cv', false); }}
+                          className="p-1 hover:bg-red-500/20 rounded"
+                        >
+                          <X className="w-3.5 h-3.5 text-red-400" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1">
+                        <Upload className="w-6 h-6 text-gray-500" />
+                        <p className="text-xs text-gray-500">Upload your CV/Resume</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -702,15 +1094,12 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     value={formData.message}
                     onChange={handleInputChange}
                     required
-                    rows={4}
+                    rows={3}
                     placeholder="Tell us about your organization and how you'd like to partner with us..."
                     className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all resize-none"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    }}
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                   />
                 </div>
 
@@ -739,9 +1128,11 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                   )}
                 </button>
               </form>
-            ) : (
-              <form onSubmit={handleDesignerSubmit} className="space-y-3 md:space-y-4">
-                {/* Designer Form Fields */}
+            )}
+
+            {/* Designer Form */}
+            {activeForm === 'designer' && (
+              <form onSubmit={handleDesignerSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                 <div>
                   <label className="block text-[10px] md:text-xs font-medium mb-1">Full Name *</label>
                   <input
@@ -752,12 +1143,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     required
                     placeholder="Enter your full name"
                     className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    }}
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                   />
                 </div>
 
@@ -772,12 +1160,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       required
                       placeholder="designer@example.com"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                   <div>
@@ -790,12 +1175,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       required
                       placeholder="Create a password"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                 </div>
@@ -811,12 +1193,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       required
                       placeholder="+92 300 1234567"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                   <div>
@@ -828,12 +1207,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       onChange={handleDesignerChange}
                       placeholder="Your company name"
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                     />
                   </div>
                 </div>
@@ -847,12 +1223,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       onChange={handleDesignerChange}
                       required
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
                     >
                       <option value="">Select specialization</option>
                       {specializations.map((spec, idx) => (
@@ -868,12 +1239,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                       onChange={handleDesignerChange}
                       required
                       className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
+                      style={getInputStyle()}
                     >
                       <option value="">Select experience</option>
                       <option value="0-1">0-1 years</option>
@@ -894,13 +1260,49 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     onChange={handleDesignerChange}
                     placeholder="https://yourportfolio.com"
                     className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                      borderWidth: '1px',
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    }}
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Upload CV/Resume (Optional - Max 20MB)</label>
+                  <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
+                    style={{
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : 'rgba(245, 245, 245, 0.5)',
+                    }}
+                    onClick={() => document.getElementById('designerCvUpload')?.click()}
+                  >
+                    <input
+                      id="designerCvUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect(e, 'cv', true)}
+                      className="hidden"
+                    />
+                    {designerForm.cvFileName ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-teal-400" />
+                          <span className="text-xs">{designerForm.cvFileName}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeFile('cv', true); }}
+                          className="p-1 hover:bg-red-500/20 rounded"
+                        >
+                          <X className="w-3.5 h-3.5 text-red-400" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1">
+                        <Upload className="w-6 h-6 text-gray-500" />
+                        <p className="text-xs text-gray-500">Upload your CV/Resume</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <button
@@ -924,6 +1326,277 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
                     <>
                       Register as Designer
                       <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* Developer Form */}
+            {activeForm === 'developer' && (
+              <form onSubmit={handleDeveloperSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={developerForm.name}
+                      onChange={handleDeveloperChange}
+                      required
+                      placeholder="Enter your full name"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Email *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={developerForm.email}
+                      onChange={handleDeveloperChange}
+                      required
+                      placeholder="developer@example.com"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Password *</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={developerForm.password}
+                      onChange={handleDeveloperChange}
+                      required
+                      placeholder="Create a password"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Phone *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={developerForm.phone}
+                      onChange={handleDeveloperChange}
+                      required
+                      placeholder="+92 300 1234567"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Company Name (Optional)</label>
+                    <input
+                      type="text"
+                      name="companyName"
+                      value={developerForm.companyName}
+                      onChange={handleDeveloperChange}
+                      placeholder="Your company/agency name"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Location (Optional)</label>
+                    <input
+                      type="text"
+                      name="location"
+                      value={developerForm.location}
+                      onChange={handleDeveloperChange}
+                      placeholder="City, Country"
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Specialization *</label>
+                    <select
+                      name="specialization"
+                      value={developerForm.specialization}
+                      onChange={handleDeveloperChange}
+                      required
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                    >
+                      <option value="">Select specialization</option>
+                      {developerSpecializations.map((spec, idx) => (
+                        <option key={idx} value={spec}>{spec}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1">Experience *</label>
+                    <select
+                      name="experience"
+                      value={developerForm.experience}
+                      onChange={handleDeveloperChange}
+                      required
+                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                      style={getInputStyle()}
+                    >
+                      <option value="">Select experience</option>
+                      {experienceLevels.map((exp, idx) => (
+                        <option key={idx} value={exp}>{exp}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Skills *</label>
+                  <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-gray-700 bg-[#0B0F19]">
+                    {skillOptions.map((skill) => (
+                      <label
+                        key={skill}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs cursor-pointer transition-all ${
+                          developerForm.skills.includes(skill)
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          value={skill}
+                          checked={developerForm.skills.includes(skill)}
+                          onChange={() => handleSkillToggle(skill)}
+                          className="hidden"
+                        />
+                        {skill}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Portfolio/GitHub Link (Optional)</label>
+                  <input
+                    type="url"
+                    name="portfolio"
+                    value={developerForm.portfolio}
+                    onChange={handleDeveloperChange}
+                    placeholder="https://github.com/yourusername or https://yourportfolio.com"
+                    className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Bio / About You (Optional)</label>
+                  <textarea
+                    name="bio"
+                    value={developerForm.bio}
+                    onChange={handleDeveloperChange}
+                    rows={3}
+                    placeholder="Tell us about yourself, your experience, and what kind of projects you're interested in..."
+                    className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all resize-none"
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Bank Account Details (For Payments - Optional)</label>
+                  <textarea
+                    name="bankAccountDetails"
+                    value={developerForm.bankAccountDetails}
+                    onChange={handleDeveloperChange}
+                    rows={2}
+                    placeholder="Bank name, Account holder name, Account number, IBAN (if applicable)"
+                    className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 transition-all resize-none"
+                    style={getInputStyle()}
+                    onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                    onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB' })}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1">Upload CV/Resume (Optional - Max 20MB)</label>
+                  <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    style={{
+                      borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                      backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : 'rgba(245, 245, 245, 0.5)',
+                    }}
+                    onClick={() => document.getElementById('developerCvUpload')?.click()}
+                  >
+                    <input
+                      id="developerCvUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileSelect(e, 'cv', false, true)}
+                      className="hidden"
+                    />
+                    {developerForm.cvFileName ? (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-400" />
+                          <span className="text-xs">{developerForm.cvFileName}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeFile('cv', false, true); }}
+                          className="p-1 hover:bg-red-500/20 rounded"
+                        >
+                          <X className="w-3.5 h-3.5 text-red-400" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1">
+                        <Upload className="w-6 h-6 text-gray-500" />
+                        <p className="text-xs text-gray-500">Upload your CV/Resume</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 md:py-3 px-4 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#3B82F6' : '#3B82F6',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      Register as Developer
+                      <Send className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>
@@ -958,14 +1631,14 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit }: PartnerSec
             <h3 className="text-lg md:text-xl font-bold mb-2 font-serif"
               style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
             >
-              {partnerType === 'partner' ? 'Application Submitted!' : 'Registration Successful!'}
+              {activeForm === 'partner' && 'Application Submitted!'}
+              {activeForm === 'designer' && 'Registration Successful!'}
+              {activeForm === 'developer' && 'Registration Submitted!'}
             </h3>
             <p className="text-xs md:text-sm mb-4 font-light"
               style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
             >
-              {partnerType === 'partner'
-                ? "Thank you for your interest. Our team will review your application and contact you within 48 hours."
-                : "Welcome to our designer community! Our team will review your application and send login credentials soon."}
+              {successMessage}
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}

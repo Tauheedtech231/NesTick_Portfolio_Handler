@@ -20,17 +20,28 @@ export async function POST(request: NextRequest) {
       college: string;
       email: string;
       phone: string;
+      designation?: string;
+      student_count?: string;
       plan?: string;
       type: string;
+      requirements?: string;
+      timeline?: string;
+      hear_about?: string;
     };
+    
     const { 
       template_id, 
       name, 
       college, 
       email, 
       phone, 
-      plan = 'basic', 
-      type 
+      designation = '',
+      student_count = '',
+      plan = 'Most Featured', 
+      type,
+      requirements = '',
+      timeline = '',
+      hear_about = ''
     } = body;
    
 
@@ -47,6 +58,10 @@ export async function POST(request: NextRequest) {
 
     if (!college?.trim()) {
       errors.push("College name is required");
+    }
+
+    if (!designation?.trim()) {
+      errors.push("Designation is required");
     }
 
     if (!email?.trim()) {
@@ -66,9 +81,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate plan based on type
-    const validPlans = ['basic', 'professional', 'enterprise'];
+    const validPlans = ['Basic', 'Most Featured', 'Premium'];
     if (type === 'paid' && (!plan || !validPlans.includes(plan))) {
-      errors.push("Valid plan (basic, professional, or enterprise) is required for paid templates");
+      errors.push("Valid plan (Basic, Most Featured, or Premium) is required for paid templates");
     }
 
     if (errors.length > 0) {
@@ -115,19 +130,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert request into database
+    // Check for duplicate request
+    const [existingRequests] = await connection.execute(
+      'SELECT id FROM template_requests WHERE template_id = ? AND email = ?',
+      [template_id, email.toLowerCase().trim()]
+    );
+
+    if ((existingRequests as unknown[]).length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: "You have already submitted a request for this template with this email" 
+        },
+        { status: 409 }
+      );
+    }
+
+    // Insert request into database with new fields
     const [result] = await connection.execute(
       `INSERT INTO template_requests 
-       (template_id, name, college, email, phone, plan, type, status) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
+       (template_id, name, college, email, phone, designation, student_count, plan, type, requirements, timeline, hear_about, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [
         template_id,
         name.trim(),
         college.trim(),
         email.toLowerCase().trim(),
         phone.trim(),
-        type === 'paid' ? plan : null, // Only store plan for paid templates
-        type
+        designation.trim() || null,
+        student_count || null,
+        type === 'paid' ? plan : null,
+        type,
+        requirements.trim() || null,
+        timeline || null,
+        hear_about || null
       ]
     );
 
@@ -144,8 +180,13 @@ export async function POST(request: NextRequest) {
         college: college.trim(),
         email: email.toLowerCase().trim(),
         phone: phone.trim(),
+        designation: designation.trim() || null,
+        student_count: student_count || null,
         plan: type === 'paid' ? plan : null,
         type,
+        requirements: requirements.trim() || null,
+        timeline: timeline || null,
+        hear_about: hear_about || null,
         status: 'pending'
       }
     });
@@ -214,7 +255,7 @@ export async function GET(request: NextRequest) {
     // Connect to DB
     connection = await mysql.createConnection(dbConfig);
 
-    // Base query
+    // Base query with new fields
     let query = `
       SELECT tr.*, t.name AS template_name, t.type AS template_type
       FROM template_requests tr
@@ -239,22 +280,26 @@ export async function GET(request: NextRequest) {
       query += ' WHERE ' + conditions.join(' AND ');
     }
 
-    // Correct column for ordering
     query += ' ORDER BY tr.submitted_at DESC';
 
     const [rows] = await connection.execute(query, params);
 
-    // Format data for CollegeTable
+    // Format data for CollegeTable with new fields
     const formatted = (rows as Array<Record<string, unknown>>).map(r => ({
       id: (r.id as number).toString(),
       name: r.name as string,
       representativeName: r.college as string,
       email: r.email as string,
       phone: r.phone as string,
+      designation: r.designation as string || null,
+      studentCount: r.student_count as string || null,
       status: r.status as string,
-      plan: r.plan as string | null,
+      plan: r.plan as string || null,
       templateName: r.template_name as string,
       type: r.template_type as string,
+      requirements: r.requirements as string || null,
+      timeline: r.timeline as string || null,
+      hearAbout: r.hear_about as string || null,
       createdAt: r.submitted_at as string,
       updatedAt: r.submitted_at,
     }));
@@ -277,6 +322,66 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { success: false, message: "Failed to fetch template requests" },
+      { status: 500 }
+    );
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
+// PUT method to update template request status (for admin panel)
+export async function PUT(request: NextRequest) {
+  let connection;
+
+  try {
+    const body = await request.json() as {
+      id: string;
+      status: string;
+    };
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json(
+        { success: false, message: "ID and status are required" },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ['pending', 'approved', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid status value" },
+        { status: 400 }
+      );
+    }
+
+    connection = await mysql.createConnection(dbConfig);
+
+    const [result] = await connection.execute(
+      'UPDATE template_requests SET status = ?, updated_at = NOW() WHERE id = ?',
+      [status, id]
+    );
+
+    const updateResult = result as { affectedRows: number };
+
+    if (updateResult.affectedRows === 0) {
+      return NextResponse.json(
+        { success: false, message: "Template request not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Template request ${status} successfully`
+    });
+
+  } catch (error: unknown) {
+    console.error('Update template request error:', error);
+    return NextResponse.json(
+      { success: false, message: "Failed to update template request" },
       { status: 500 }
     );
   } finally {
