@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/api/developer/assignments/route.ts
+// app/api/developer/assignments/route.ts (Complete updated file)
+
 import { NextRequest, NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 
@@ -33,6 +34,8 @@ export async function GET(request: NextRequest) {
           da.design_id,
           dd.title as design_title,
           dd.description as design_description,
+          dd.preview_image as preview_image,
+          dd.figma_url as figma_url,
           d.name as designer_name,
           da.status,
           da.assigned_at,
@@ -65,10 +68,17 @@ export async function GET(request: NextRequest) {
 
       const [rows] = await connection.execute(query, params);
 
+      // Transform response to match frontend expected fields
+      const transformedRows = (rows as any[]).map(row => ({
+        ...row,
+        design_preview_image: row.preview_image,
+        design_figma_url: row.figma_url
+      }));
+
       return NextResponse.json({
         success: true,
-        data: rows,
-        count: (rows as any[]).length
+        data: transformedRows,
+        count: transformedRows.length
       });
 
     } finally {

@@ -1985,7 +1985,7 @@ export default function TemplatesPage() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
-                      You Design
+                      Your Design
                     </h2>
                     <p className="text-sm" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>
                       Share your creative vision with us

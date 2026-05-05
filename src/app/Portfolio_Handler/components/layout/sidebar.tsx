@@ -78,18 +78,25 @@ const menuItems: MenuItem[] = [
   },
   { type: 'link', href: '/Portfolio_Handler/announcements', icon: Megaphone, label: 'Announcements' },
   { type: 'link', href: '/Portfolio_Handler/partners-designers', icon: Users, label: 'Partners & Designers' },
-  { type: 'link', href: '/Portfolio_Handler/design-management', icon: Brush, label: 'Design Management' },
+  { 
+    type: 'dropdown',
+    label: 'Designer Management',
+    icon: Brush,
+    children: [
+      { type: 'link', href: '/Portfolio_Handler/design-management', icon: Brush, label: 'Design Management' },
+      { type: 'link', href: '/Portfolio_Handler/designers', icon: Users, label: 'Designers' }
+    ]
+  },
   { 
     type: 'dropdown',
     label: 'Developer Management',
     icon: Code2,
     children: [
-      
+      { type: 'link', href: '/Portfolio_Handler/developer-management', icon: Users, label: 'Developer Requests' },
       { type: 'link', href: '/Portfolio_Handler/submitted-designs', icon: FileText, label: 'Submitted Designs' }
     ]
   },
 ];
-
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();

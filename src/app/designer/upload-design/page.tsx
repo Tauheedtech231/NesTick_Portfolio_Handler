@@ -19,7 +19,10 @@ import {
   Eye,
   Globe,
   Figma,
-  AlertCircle
+  AlertCircle,
+  FileArchive,
+  CheckCircle,
+  Loader2
 } from 'lucide-react';
 
 export default function UploadDesignPage() {
@@ -33,11 +36,15 @@ export default function UploadDesignPage() {
     designFile: null as File | null,
     figmaUrl: '',
     liveUrl: '',
+    whitePaperFile: null as File | null,
+    instructionFile: null as File | null,
     status: 'draft' as 'draft' | 'published'
   });
   
   const [currentTag, setCurrentTag] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [whitePaperName, setWhitePaperName] = useState('');
+  const [instructionName, setInstructionName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [designerId, setDesignerId] = useState<number | null>(null);
@@ -57,27 +64,13 @@ export default function UploadDesignPage() {
     }
   }, []);
 
-  // Upload image to Cloudinary
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const cloudinaryFormData = new FormData();
-    cloudinaryFormData.append('file', file);
-    cloudinaryFormData.append('upload_preset', 'lms_upload');
-    cloudinaryFormData.append('folder', 'designer-designs');
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/dfp9qc0gu/image/upload`,
-      {
-        method: 'POST',
-        body: cloudinaryFormData
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Cloudinary upload failed');
-    }
-
-    const data = await response.json();
-    return data.secure_url;
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
   };
 
   const handleAddTag = () => {
@@ -94,6 +87,10 @@ export default function UploadDesignPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
       setFormData(prev => ({ ...prev, designFile: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -101,6 +98,50 @@ export default function UploadDesignPage() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleWhitePaperChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('White paper file size must be less than 5MB');
+        return;
+      }
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload PDF or DOC/DOCX files only');
+        return;
+      }
+      setFormData(prev => ({ ...prev, whitePaperFile: file }));
+      setWhitePaperName(file.name);
+    }
+  };
+
+  const handleInstructionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Instruction file size must be less than 5MB');
+        return;
+      }
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload PDF, DOC, DOCX, or TXT files only');
+        return;
+      }
+      setFormData(prev => ({ ...prev, instructionFile: file }));
+      setInstructionName(file.name);
+    }
+  };
+
+  const removeWhitePaper = () => {
+    setFormData(prev => ({ ...prev, whitePaperFile: null }));
+    setWhitePaperName('');
+  };
+
+  const removeInstruction = () => {
+    setFormData(prev => ({ ...prev, instructionFile: null }));
+    setInstructionName('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,6 +175,16 @@ export default function UploadDesignPage() {
       setUploading(false);
       return;
     }
+    if (!formData.liveUrl) {
+      setError('Live URL is required');
+      setUploading(false);
+      return;
+    }
+    if (!formData.whitePaperFile) {
+      setError('White paper / technical documentation is required');
+      setUploading(false);
+      return;
+    }
     if (!designerId) {
       setError('Please login again');
       setUploading(false);
@@ -141,14 +192,23 @@ export default function UploadDesignPage() {
     }
 
     try {
-      // First upload image to Cloudinary
       let imageUrl = '';
-      try {
-        imageUrl = await uploadToCloudinary(formData.designFile);
-      } catch (cloudinaryError) {
-        setError('Failed to upload image. Please try again.');
-        setUploading(false);
-        return;
+      let whitePaperBase64 = '';
+      let instructionBase64 = '';
+
+      // Convert images to base64 (store in DB, not Cloudinary)
+      if (formData.designFile) {
+        imageUrl = await fileToBase64(formData.designFile);
+      }
+
+      // Convert white paper to base64
+      if (formData.whitePaperFile) {
+        whitePaperBase64 = await fileToBase64(formData.whitePaperFile);
+      }
+
+      // Convert instruction file to base64 if present
+      if (formData.instructionFile) {
+        instructionBase64 = await fileToBase64(formData.instructionFile);
       }
 
       // Prepare data for API
@@ -162,6 +222,10 @@ export default function UploadDesignPage() {
         preview_image: imageUrl,
         figma_url: formData.figmaUrl,
         live_url: formData.liveUrl,
+        white_paper: whitePaperBase64,
+        white_paper_filename: formData.whitePaperFile.name,
+        instruction_doc: instructionBase64 || null,
+        instruction_filename: formData.instructionFile?.name || null,
         status: formData.status === 'published' ? 'pending' : 'draft'
       };
 
@@ -189,9 +253,13 @@ export default function UploadDesignPage() {
           designFile: null,
           figmaUrl: '',
           liveUrl: '',
+          whitePaperFile: null,
+          instructionFile: null,
           status: 'draft'
         });
         setPreviewImage(null);
+        setWhitePaperName('');
+        setInstructionName('');
         
         // Redirect to my designs page
         router.push('/designer/my-designs');
@@ -207,7 +275,7 @@ export default function UploadDesignPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-10">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Upload New Design</h1>
@@ -218,7 +286,7 @@ export default function UploadDesignPage() {
         {/* Error Message */}
         {error && (
           <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-2">
-            <AlertCircle size={16} className="text-red-500" />
+            <AlertCircle size={16} className="text-red-500 cursor-pointer" />
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
@@ -227,8 +295,8 @@ export default function UploadDesignPage() {
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Design Preview *</h3>
           <div 
-            className={`border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center transition-all ${
-              previewImage ? 'border-blue-500' : ''
+            className={`border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center transition-all cursor-pointer ${
+              previewImage ? 'border-blue-500' : 'hover:border-blue-500'
             }`}
           >
             {previewImage ? (
@@ -237,17 +305,17 @@ export default function UploadDesignPage() {
                 <button
                   type="button"
                   onClick={() => { setPreviewImage(null); setFormData(prev => ({ ...prev, designFile: null })); }}
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors cursor-pointer"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
               <>
-                <ImageIcon size={48} className="mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-500 dark:text-gray-400 mb-2">Upload your design preview</p>
-                <p className="text-xs text-gray-400">PNG, JPG, or GIF (max 5MB)</p>
-                <label className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
+                <ImageIcon size={48} className="mx-auto text-gray-400 mb-3 cursor-pointer" />
+                <p className="text-gray-500 dark:text-gray-400 mb-2 cursor-pointer">Upload your design preview</p>
+                <p className="text-xs text-gray-400 cursor-pointer">PNG, JPG, or GIF (max 5MB)</p>
+                <label className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
                   Choose File
                   <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" required={!previewImage} />
                 </label>
@@ -269,7 +337,7 @@ export default function UploadDesignPage() {
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 required
                 placeholder="e.g., Modern Portfolio Template"
-                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
               />
             </div>
 
@@ -281,7 +349,7 @@ export default function UploadDesignPage() {
                 required
                 rows={4}
                 placeholder="Describe your design, its features, and what makes it unique..."
-                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white resize-none"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
               />
             </div>
 
@@ -292,7 +360,7 @@ export default function UploadDesignPage() {
                   value={formData.category}
                   onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                   required
-                  className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="">Select category</option>
                   {categories.map(cat => (
@@ -313,7 +381,7 @@ export default function UploadDesignPage() {
                     min="0"
                     step="0.01"
                     placeholder="49.99"
-                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
                   />
                 </div>
               </div>
@@ -328,12 +396,12 @@ export default function UploadDesignPage() {
                   onChange={(e) => setCurrentTag(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                   placeholder="Add tags (e.g., modern, responsive, minimalist)"
-                  className="flex-1 px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="flex-1 px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
                 >
                   <Plus size={18} />
                 </button>
@@ -342,7 +410,7 @@ export default function UploadDesignPage() {
                 {formData.tags.map(tag => (
                   <span key={tag} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs flex items-center gap-1">
                     {tag}
-                    <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500">
+                    <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500 transition-colors cursor-pointer">
                       <X size={12} />
                     </button>
                   </span>
@@ -354,33 +422,121 @@ export default function UploadDesignPage() {
 
         {/* Links Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Links (Optional)</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Important Links</h3>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
-                <Figma size={16} /> Figma URL
+                <Globe size={16} /> Live Demo URL <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="url"
+                value={formData.liveUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, liveUrl: e.target.value }))}
+                required
+                placeholder="https://your-live-demo.com"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
+              />
+              <p className="text-xs text-gray-500 mt-1">Provide the URL where your design is live</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
+                <Figma size={16} /> Figma URL (Optional)
               </label>
               <input
                 type="url"
                 value={formData.figmaUrl}
                 onChange={(e) => setFormData(prev => ({ ...prev, figmaUrl: e.target.value }))}
                 placeholder="https://figma.com/file/..."
-                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
               />
             </div>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-2">
-                <Globe size={16} /> Live Demo URL
+        {/* Documentation Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Documentation</h3>
+          
+          <div className="space-y-4">
+            {/* White Paper - Required */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <FileText size={16} /> White Paper / Technical Documentation <span className="text-red-500">*</span>
               </label>
-              <input
-                type="url"
-                value={formData.liveUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, liveUrl: e.target.value }))}
-                placeholder="https://your-demo-link.com"
-                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
-              />
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-blue-500 transition-colors cursor-pointer"
+                onClick={() => document.getElementById('whitePaper')?.click()}>
+                <input
+                  id="whitePaper"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleWhitePaperChange}
+                  className="hidden"
+                  required={!whitePaperName}
+                />
+                {whitePaperName ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileArchive size={20} className="text-green-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{whitePaperName}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeWhitePaper(); }}
+                      className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
+                    >
+                      <X size={16} className="text-red-500" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <FileText size={40} className="mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500">Click to upload white paper</p>
+                    <p className="text-xs text-gray-400">PDF, DOC, DOCX (max 5MB)</p>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Include technical documentation, algorithms used, architecture decisions</p>
+            </div>
+
+            {/* Instruction Document - Optional */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <FileArchive size={16} /> Instruction Document (Optional)
+              </label>
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-blue-500 transition-colors cursor-pointer"
+                onClick={() => document.getElementById('instructionDoc')?.click()}>
+                <input
+                  id="instructionDoc"
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt"
+                  onChange={handleInstructionChange}
+                  className="hidden"
+                />
+                {instructionName ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileArchive size={20} className="text-blue-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{instructionName}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeInstruction(); }}
+                      className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
+                    >
+                      <X size={16} className="text-red-500" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <FileArchive size={40} className="mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500">Click to upload instruction document</p>
+                    <p className="text-xs text-gray-400">PDF, DOC, DOCX, TXT (max 5MB)</p>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Installation instructions, setup guide, or additional notes</p>
             </div>
           </div>
         </div>
@@ -390,25 +546,25 @@ export default function UploadDesignPage() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Publish Settings</h3>
           
           <div className="flex gap-4">
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 value="draft"
                 checked={formData.status === 'draft'}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
-                className="w-4 h-4"
+                className="w-4 h-4 cursor-pointer"
               />
-              <span className="text-gray-700 dark:text-gray-300">Save as Draft</span>
+              <span className="text-gray-700 dark:text-gray-300 cursor-pointer">Save as Draft</span>
             </label>
-            <label className="flex items-center gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
                 value="published"
                 checked={formData.status === 'published'}
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
-                className="w-4 h-4"
+                className="w-4 h-4 cursor-pointer"
               />
-              <span className="text-gray-700 dark:text-gray-300">Submit for Review</span>
+              <span className="text-gray-700 dark:text-gray-300 cursor-pointer">Submit for Review</span>
             </label>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -421,11 +577,11 @@ export default function UploadDesignPage() {
           <button
             type="submit"
             disabled={uploading}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
             {uploading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <Loader2 size={18} className="animate-spin" />
                 Uploading...
               </>
             ) : (
@@ -437,7 +593,7 @@ export default function UploadDesignPage() {
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer"
           >
             Cancel
           </button>

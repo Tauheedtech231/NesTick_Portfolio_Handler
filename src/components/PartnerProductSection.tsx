@@ -5,14 +5,12 @@ import Image from 'next/image';
 
 const products = ["Neezamiya", "Advance POS", "MarX", "Build N"];
 
-const partnerLogos = [
-  { id: 1, name: "Microsoft", image: "https://images.unsplash.com/photo-1642132652075-0c5f10da6c0e?w=100&h=100&fit=crop" },
-  { id: 2, name: "Google", image: "https://images.unsplash.com/photo-1573804633927-b8c6e3c9f8b5?w=100&h=100&fit=crop" },
-  { id: 3, name: "Amazon", image: "https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=100&h=100&fit=crop" },
-  { id: 4, name: "Apple", image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=100&h=100&fit=crop" },
-  { id: 5, name: "Meta", image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=100&h=100&fit=crop" },
-  { id: 6, name: "Netflix", image: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&h=100&fit=crop" },
-];
+const partnerLogos= [
+    { id: 1, name: "Saqfiyat", image: "/p1.jpg" },
+    { id: 2, name: "Skeler Security", image: "/p2.jpg" },
+    { id: 3, name: "Futurizm", image: "/p3.jpg" },
+    { id: 4, name: "Pixsy Studio", image: "/p4.jpg" },
+  ]; 
 
 interface SliderProps {
   items: React.ReactNode[];
@@ -235,7 +233,7 @@ export default function PartnerProductSection() {
               }}
             >
               <span 
-                className="text-sm md:text-base lg:text-lg font-semibold transition-all duration-300"
+                className="text-sm md:text-base  font-semibold transition-all duration-300"
                 style={{
                   color: getProductTextColor(),
                 }}

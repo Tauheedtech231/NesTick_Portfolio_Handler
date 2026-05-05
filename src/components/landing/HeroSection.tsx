@@ -362,7 +362,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     <Palette className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">You Design</h2>
+                    <h2 className="text-xl font-bold text-white">Your Design</h2>
                     <p className="text-sm text-gray-400">Share your creative vision with us</p>
                   </div>
                 </div>
