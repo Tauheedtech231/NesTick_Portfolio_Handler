@@ -10,7 +10,8 @@ import {
   Upload, 
   DollarSign, 
   User,
-  
+  FileCheck,  // <-- New icon for docs upload
+  CheckCircle
 } from 'lucide-react';
 
 interface DesignerSidebarProps {
@@ -21,6 +22,7 @@ const menuItems = [
   { href: '/designer', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/designer/my-designs', icon: Layers, label: 'My Designs' },
   { href: '/designer/upload-design', icon: Upload, label: 'Upload Design' },
+  { href: '/designer/approved-docs', icon: FileCheck, label: 'Approved Designs Docs' }, // <-- New tab
   { href: '/designer/earnings', icon: DollarSign, label: 'Earnings' },
   { href: '/designer/profile', icon: User, label: 'Profile' },
 ];
@@ -61,8 +63,6 @@ export function DesignerSidebar({ collapsed }: DesignerSidebarProps) {
             );
           })}
         </nav>
-
-    
       </div>
     </aside>
   );

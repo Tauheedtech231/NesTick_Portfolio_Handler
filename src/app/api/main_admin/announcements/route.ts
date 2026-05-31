@@ -1,5 +1,5 @@
 // app/api/announcements/route.ts - FIXED VERSION
-import { getConnection } from '@/app/lib/db';
+import { getConnection } from '@/lib/db'; 
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 /* eslint-disable */
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const pool = getConnection();
 
     // Insert new announcement
-    const [result] = await pool.execute<mysql.ResultSetHeader>(
+    const [result] = await (await pool).execute<mysql.ResultSetHeader>(
       `INSERT INTO announcements 
        (title, message, college_id, created_at, updated_at)
        VALUES (?, ?, ?, NOW(), NOW())`,
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     );
 
     // Fetch the newly created announcement
-    const [newAnnouncement] = await pool.execute<mysql.RowDataPacket[]>(
+    const [newAnnouncement] = await (await pool).execute<mysql.RowDataPacket[]>(
       'SELECT * FROM announcements WHERE id = ?',
       [(result as mysql.ResultSetHeader).insertId]
     );

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 /* eslint-disable */
 
 const dbConfig = {
-  host:process.env.DB_HOST,
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -15,19 +15,34 @@ const dbConfig = {
 
 export async function POST(request: NextRequest) {
   let connection;
+
   try {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json({ success: false, message: "Email and password required" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email and password required"
+        },
+        { status: 400 }
+      );
     }
 
     connection = await mysql.createConnection(dbConfig);
 
-    // Fetch credentials by email
+    // Fetch credentials
     const [rows] = await connection.execute(
-      `SELECT cc.id as credential_id, cc.college_id, cc.template_request_id, cc.login_email, cc.password_hash,
-              c.name as college_name, tr.name as template_name, tr.plan, tr.type
+      `SELECT 
+          cc.id as credential_id,
+          cc.college_id,
+          cc.template_request_id,
+          cc.login_email,
+          cc.password_hash,
+          c.name as college_name,
+          tr.name as template_name,
+          tr.plan,
+          tr.type
        FROM college_credentials cc
        JOIN colleges c ON cc.college_id = c.id
        JOIN template_requests tr ON cc.template_request_id = tr.id
@@ -38,20 +53,49 @@ export async function POST(request: NextRequest) {
     const creds = rows as any[];
 
     if (creds.length === 0) {
-      return NextResponse.json({ success: false, message: "Email not found" }, { status: 404 });
+      console.log("❌ Email not found:", email);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Email not found"
+        },
+        { status: 404 }
+      );
     }
 
     const credential = creds[0];
 
-    // Verify password
-    const isMatch = await bcrypt.compare(password, credential.password_hash);
+    // DEBUG LOGS
+    console.log("================================");
+    console.log("LOGIN DEBUG");
+    console.log("User Email:", email);
+    console.log("User Entered Password:", password);
+    console.log("DB Hash:", credential.password_hash);
+
+    // Compare password
+    const isMatch = await bcrypt.compare(
+      password,
+      credential.password_hash
+    );
+
+    console.log("Password Match:", isMatch);
+    console.log("================================");
+
     if (!isMatch) {
-      return NextResponse.json({ success: false, message: "Invalid password" }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid password"
+        },
+        { status: 401 }
+      );
     }
 
-    // Login successful → return relevant data
+    // SUCCESS
     return NextResponse.json({
       success: true,
+      message: "Login successful",
       data: {
         credentialId: credential.credential_id,
         collegeId: credential.college_id,
@@ -65,8 +109,17 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("Login error:", error);
-    return NextResponse.json({ success: false, message: "Login failed", error: error.message }, { status: 500 });
+    console.error("❌ Login error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Login failed",
+        error: error.message
+      },
+      { status: 500 }
+    );
+
   } finally {
     if (connection) await connection.end();
   }

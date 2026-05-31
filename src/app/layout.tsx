@@ -11,6 +11,9 @@ import { ThemeProvider } from "./ThemeProvider";
 export const metadata: Metadata = {
   title: "College Portfolio Handler Portal",
   description: "Centralized portal for managing college portfolio content",
+  icons:{
+    icon:'/logo.jpg'
+  }
 };
 
 export default function RootLayout({
@@ -21,11 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        
+      
       >
+      
+        
 
 
         <ThemeProvider>
+  
           {children}
         </ThemeProvider>
       

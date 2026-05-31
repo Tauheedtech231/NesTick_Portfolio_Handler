@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 // app/Portfolio_Handler/submitted-designs/page.tsx
 'use client';
 
@@ -8,7 +9,7 @@ import {
   Clock, Search, RefreshCw, Loader2, AlertCircle,
   Calendar, User, Link as LinkIcon, Image as ImageIcon,
   Send, Mail, Code2, ChevronRight, MessageSquare,
-  Filter, X, ArrowLeft, ThumbsUp, ThumbsDown
+  Filter, X, ArrowLeft, ThumbsUp, ThumbsDown, RefreshCw as RevisionIcon
 } from 'lucide-react';
 import { MainLayout } from '../components/layout/main-layout';
 import Image from 'next/image';
@@ -28,6 +29,9 @@ interface Submission {
   submitted_at: string;
   status: 'pending' | 'approved' | 'rejected';
   review_notes: string | null;
+  revision_count: number;
+  is_permanently_rejected: boolean;
+  rejection_reason: string | null;
 }
 
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
@@ -41,7 +45,8 @@ export default function SubmittedDesignsPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
-  const [processingId, setProcessingId] = useState<number | null>(null);
+  const [processingApproveId, setProcessingApproveId] = useState<number | null>(null);
+  const [processingRejectId, setProcessingRejectId] = useState<number | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -82,7 +87,7 @@ export default function SubmittedDesignsPage() {
   const handleApprove = async (submission: Submission) => {
     if (!confirm(`Approve "${submission.design_title}"?`)) return;
     
-    setProcessingId(submission.id);
+    setProcessingApproveId(submission.id);
     try {
       const response = await fetch('/api/admin/submissions', {
         method: 'PUT',
@@ -106,7 +111,7 @@ export default function SubmittedDesignsPage() {
       console.error('Error approving:', error);
       alert('Failed to approve design');
     } finally {
-      setProcessingId(null);
+      setProcessingApproveId(null);
     }
   };
 
@@ -117,7 +122,7 @@ export default function SubmittedDesignsPage() {
     
     if (!confirm(`Reject "${submission.design_title}"?`)) return;
     
-    setProcessingId(submission.id);
+    setProcessingRejectId(submission.id);
     try {
       const response = await fetch('/api/admin/submissions', {
         method: 'PUT',
@@ -141,7 +146,7 @@ export default function SubmittedDesignsPage() {
       console.error('Error rejecting:', error);
       alert('Failed to reject design');
     } finally {
-      setProcessingId(null);
+      setProcessingRejectId(null);
     }
   };
 
@@ -158,16 +163,21 @@ export default function SubmittedDesignsPage() {
   const approvedCount = submissions.filter(s => s.status === 'approved').length;
   const rejectedCount = submissions.filter(s => s.status === 'rejected').length;
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (submission: Submission) => {
+    if (submission.is_permanently_rejected) {
+      return <span className="px-2 py-1 rounded-full bg-red-700 text-white text-xs flex items-center gap-1"><XCircle size={12} /> Permanently Rejected</span>;
+    }
+    switch (submission.status) {
       case 'pending':
         return <span className="px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs flex items-center gap-1"><Clock size={12} /> Pending</span>;
       case 'approved':
         return <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs flex items-center gap-1"><CheckCircle size={12} /> Approved</span>;
       case 'rejected':
-        return <span className="px-2 py-1 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center gap-1"><XCircle size={12} /> Rejected</span>;
+        return <span className="px-2 py-1 rounded-full bg-red-500/20 text-red-400 text-xs flex items-center gap-1">
+          <XCircle size={12} /> Rejected {submission.revision_count > 0 && `(${submission.revision_count}/3)`}
+        </span>;
       default:
-        return <span className="text-xs text-gray-400">{status}</span>;
+        return <span className="text-xs text-gray-400">{submission.status}</span>;
     }
   };
 
@@ -192,12 +202,12 @@ export default function SubmittedDesignsPage() {
               Submitted Designs
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-              Review and manage developer design submissions
+              Review and manage developer design submissions with revision tracking
             </p>
           </div>
 
           {/* Stats Cards - Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -225,6 +235,15 @@ export default function SubmittedDesignsPage() {
                 <XCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 opacity-50" />
               </div>
             </div>
+            <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-400">Total</p>
+                  <p className="text-xl sm:text-2xl font-bold text-purple-500">{submissions.length}</p>
+                </div>
+                <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500 opacity-50" />
+              </div>
+            </div>
           </div>
 
           {/* Filters - Responsive */}
@@ -245,7 +264,7 @@ export default function SubmittedDesignsPage() {
             <div className="sm:hidden">
               <button
                 onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-                className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2"
+                className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Filter size={16} />
                 Filter by Status
@@ -258,7 +277,7 @@ export default function SubmittedDesignsPage() {
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
-                  className={`px-4 py-2 rounded-lg capitalize transition-all text-sm sm:text-base ${
+                  className={`px-4 py-2 rounded-lg capitalize transition-all text-sm sm:text-base cursor-pointer ${
                     statusFilter === status
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -273,7 +292,7 @@ export default function SubmittedDesignsPage() {
             <button
               onClick={fetchSubmissions}
               disabled={refreshing}
-              className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all disabled:opacity-50 cursor-pointer"
             >
               {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
               <span className="hidden sm:inline">Refresh</span>
@@ -292,7 +311,7 @@ export default function SubmittedDesignsPage() {
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 space-y-2">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Status</span>
-                    <button onClick={() => setMobileFilterOpen(false)}>
+                    <button onClick={() => setMobileFilterOpen(false)} className="cursor-pointer">
                       <X size={16} className="text-gray-500" />
                     </button>
                   </div>
@@ -303,7 +322,7 @@ export default function SubmittedDesignsPage() {
                         setStatusFilter(status);
                         setMobileFilterOpen(false);
                       }}
-                      className={`w-full px-4 py-2 rounded-lg capitalize transition-all text-left ${
+                      className={`w-full px-4 py-2 rounded-lg capitalize transition-all text-left cursor-pointer ${
                         statusFilter === status
                           ? 'bg-purple-600 text-white'
                           : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-400'
@@ -331,7 +350,11 @@ export default function SubmittedDesignsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5 hover:border-purple-500 transition-all"
+                  className={`bg-white dark:bg-gray-800 rounded-xl border p-4 sm:p-5 hover:border-purple-500 transition-all ${
+                    submission.is_permanently_rejected 
+                      ? 'border-red-500 bg-red-50/30 dark:bg-red-900/10' 
+                      : 'border-gray-200 dark:border-gray-700'
+                  }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                     <div className="flex-1">
@@ -339,7 +362,7 @@ export default function SubmittedDesignsPage() {
                         <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           {submission.design_title}
                         </h3>
-                        {getStatusBadge(submission.status)}
+                        {getStatusBadge(submission)}
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
                         {submission.design_description}
@@ -354,6 +377,11 @@ export default function SubmittedDesignsPage() {
                         <span className="flex items-center gap-1">
                           <Calendar size={12} /> {new Date(submission.submitted_at).toLocaleDateString()}
                         </span>
+                        {submission.revision_count > 0 && (
+                          <span className="flex items-center gap-1 text-orange-500">
+                            <RevisionIcon size={12} /> Revision {submission.revision_count}/3
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2 sm:self-center">
@@ -363,7 +391,7 @@ export default function SubmittedDesignsPage() {
                           setShowDetailModal(true);
                           setReviewNotes(submission.review_notes || '');
                         }}
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-blue-600/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-600/30 transition-all flex items-center gap-1 flex-1 sm:flex-none justify-center"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-blue-600/20 text-blue-600 dark:text-blue-400 text-sm font-medium hover:bg-blue-600/30 transition-all flex items-center gap-1 flex-1 sm:flex-none justify-center cursor-pointer"
                       >
                         <Eye size={14} /> <span className="text-xs sm:text-sm">Review</span>
                       </button>
@@ -400,7 +428,7 @@ export default function SubmittedDesignsPage() {
                   </div>
                   <button
                     onClick={() => setShowDetailModal(false)}
-                    className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   >
                     <XCircle size={18} className="sm:w-5 sm:h-5" />
                   </button>
@@ -434,7 +462,23 @@ export default function SubmittedDesignsPage() {
                         {new Date(selectedSubmission.submitted_at).toLocaleString()}
                       </p>
                     </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500">Revision Count</p>
+                      <p className={`text-sm sm:text-base font-medium ${selectedSubmission.revision_count >= 3 ? 'text-red-500' : 'text-orange-500'}`}>
+                        {selectedSubmission.revision_count}/3
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Revision Status Alert */}
+                  {selectedSubmission.revision_count >= 3 && selectedSubmission.status === 'rejected' && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                      <p className="text-sm text-red-600 dark:text-red-400 font-medium flex items-center gap-2">
+                        <AlertCircle size={16} />
+                        ⚠️ This design has been permanently rejected after {selectedSubmission.revision_count} revisions.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Preview Image */}
                   {selectedSubmission.preview_image_url && (
@@ -459,7 +503,7 @@ export default function SubmittedDesignsPage() {
                       href={selectedSubmission.live_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-500 hover:underline flex items-center gap-1 text-sm sm:text-base break-all"
+                      className="text-purple-500 hover:underline flex items-center gap-1 text-sm sm:text-base break-all cursor-pointer"
                     >
                       {selectedSubmission.live_url} <ExternalLink size={14} className="flex-shrink-0" />
                     </a>
@@ -473,7 +517,7 @@ export default function SubmittedDesignsPage() {
                         href={selectedSubmission.source_code_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-purple-500 hover:underline flex items-center gap-1 text-sm sm:text-base break-all"
+                        className="text-purple-500 hover:underline flex items-center gap-1 text-sm sm:text-base break-all cursor-pointer"
                       >
                         {selectedSubmission.source_code_url} <Code2 size={14} className="flex-shrink-0" />
                       </a>
@@ -498,6 +542,16 @@ export default function SubmittedDesignsPage() {
                     </div>
                   )}
 
+                  {/* Previous Rejection Reason */}
+                  {selectedSubmission.rejection_reason && (
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500 mb-2">Previous Rejection Reason</p>
+                      <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-xs sm:text-sm text-red-600 dark:text-red-400">
+                        {selectedSubmission.rejection_reason}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Review Notes Input */}
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -518,29 +572,46 @@ export default function SubmittedDesignsPage() {
                       <>
                         <button
                           onClick={() => handleApprove(selectedSubmission)}
-                          disabled={processingId === selectedSubmission.id}
-                          className="order-1 sm:order-none px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm sm:text-base"
+                          disabled={processingApproveId === selectedSubmission.id || selectedSubmission.is_permanently_rejected}
+                          className={`order-1 sm:order-none px-4 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer ${
+                            selectedSubmission.is_permanently_rejected
+                              ? 'bg-gray-500 cursor-not-allowed opacity-50'
+                              : 'bg-green-600 hover:bg-green-700 text-white'
+                          }`}
+                          title={selectedSubmission.is_permanently_rejected ? 'Cannot approve permanently rejected design' : ''}
                         >
-                          {processingId === selectedSubmission.id ? <Loader2 size={16} className="animate-spin" /> : <ThumbsUp size={16} />}
+                          {processingApproveId === selectedSubmission.id ? <Loader2 size={16} className="animate-spin" /> : <ThumbsUp size={16} />}
                           Approve Design
                         </button>
                         <button
                           onClick={() => handleReject(selectedSubmission)}
-                          disabled={processingId === selectedSubmission.id}
-                          className="order-2 sm:order-none px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm sm:text-base"
+                          disabled={processingRejectId === selectedSubmission.id || selectedSubmission.revision_count >= 3}
+                          className={`order-2 sm:order-none px-4 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer ${
+                            selectedSubmission.revision_count >= 3
+                              ? 'bg-gray-500 cursor-not-allowed opacity-50'
+                              : 'bg-red-600 hover:bg-red-700 text-white'
+                          }`}
+                          title={selectedSubmission.revision_count >= 3 ? 'Maximum revisions reached' : ''}
                         >
-                          {processingId === selectedSubmission.id ? <Loader2 size={16} className="animate-spin" /> : <ThumbsDown size={16} />}
-                          Reject Design
+                          {processingRejectId === selectedSubmission.id ? <Loader2 size={16} className="animate-spin" /> : <ThumbsDown size={16} />}
+                          Reject Design {selectedSubmission.revision_count >= 2 && selectedSubmission.revision_count < 3 && `(${selectedSubmission.revision_count + 1}/3 will be final)`}
                         </button>
                       </>
                     )}
                     <button
                       onClick={() => setShowDetailModal(false)}
-                      className="order-3 sm:order-none px-4 py-2 rounded-lg bg-gray-600 text-white font-medium hover:bg-gray-700 transition-all text-sm sm:text-base"
+                      className="order-3 sm:order-none px-4 py-2 rounded-lg bg-gray-600 text-white font-medium hover:bg-gray-700 transition-all text-sm sm:text-base cursor-pointer"
                     >
                       Close
                     </button>
                   </div>
+
+                  {/* Warning for final rejection */}
+                  {selectedSubmission.status === 'pending' && selectedSubmission.revision_count === 2 && (
+                    <p className="text-xs text-red-500 text-center">
+                      ⚠️ Warning: This will be the 3rd rejection. The design will be permanently rejected.
+                    </p>
+                  )}
                 </div>
               </motion.div>
             </motion.div>

@@ -20,7 +20,8 @@ import {
   Upload,
   AlertCircle,
   X,
-  Save
+  Save,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -39,6 +40,8 @@ interface Design {
   live_url: string;
   tags: string[];
   rejection_reason: string | null;
+  revision_count: number;
+  is_permanently_rejected: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -50,6 +53,7 @@ export default function MyDesignsPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [categories, setCategories] = useState<string[]>(['all']);
+  const [resubmittingId, setResubmittingId] = useState<number | null>(null);
   
   // Edit modal state
   const [editingDesign, setEditingDesign] = useState<Design | null>(null);
@@ -103,7 +107,10 @@ export default function MyDesignsPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, isPermanentlyRejected?: boolean) => {
+    if (isPermanentlyRejected) {
+      return <span className="px-2 py-1 rounded-full bg-red-700 dark:bg-red-800 text-white text-xs flex items-center gap-1"><XCircle size={12} /> Permanently Rejected</span>;
+    }
     switch(status) {
       case 'approved':
         return <span className="px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs flex items-center gap-1"><CheckCircle size={12} /> Approved</span>;
@@ -114,6 +121,8 @@ export default function MyDesignsPage() {
       default: return null;
     }
   };
+
+  
 
   // Handle Edit
   const handleEditClick = (design: Design) => {
@@ -282,6 +291,13 @@ export default function MyDesignsPage() {
             <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>
           ))}
         </select>
+
+        <button
+          onClick={fetchDesigns}
+          className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+        >
+          <RefreshCw size={16} /> Refresh
+        </button>
       </div>
 
       {/* Designs Grid */}
@@ -305,7 +321,7 @@ export default function MyDesignsPage() {
                   </div>
                 )}
                 <div className="absolute top-3 right-3 z-10">
-                  {getStatusBadge(design.status)}
+                  {getStatusBadge(design.status, design.is_permanently_rejected)}
                 </div>
               </div>
 
@@ -328,11 +344,23 @@ export default function MyDesignsPage() {
                   <div>
                     <span className="text-lg font-bold text-gray-900 dark:text-white">${design.price}</span>
                     <span className="text-xs text-gray-500 ml-1">one-time</span>
+                    {/* Show revision count for rejected designs */}
+                    {design.status === 'rejected' && !design.is_permanently_rejected && (
+                      <div className="text-xs text-orange-500 mt-1">
+                        Revision {design.revision_count || 0}/3
+                      </div>
+                    )}
+                    {design.status === 'rejected' && design.is_permanently_rejected && (
+                      <div className="text-xs text-red-600 font-semibold mt-1">
+                        Max revisions reached
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => handleViewClick(design)}
                       className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      title="View Details"
                     >
                       <Eye size={16} className="text-gray-500" />
                     </button>
@@ -340,13 +368,26 @@ export default function MyDesignsPage() {
                       <button 
                         onClick={() => handleEditClick(design)}
                         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        title="Edit Design"
                       >
                         <Edit size={16} className="text-gray-500" />
                       </button>
                     )}
+                    {/* Resubmit button for rejected designs (if not permanently rejected) */}
+   
+{design.status === 'rejected' && !design.is_permanently_rejected && design.revision_count < 3 && (
+  <Link 
+    href={`/designer/resubmit-design/${design.id}`}
+    className="p-2 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors"
+    title="Resubmit for Review"
+  >
+    <Upload size={16} className="text-green-500" />
+  </Link>
+)}
                     <button 
                       onClick={() => handleDeleteClick(design.id)}
                       className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                      title="Delete Design"
                     >
                       <Trash2 size={16} className="text-red-500" />
                     </button>
@@ -577,125 +618,158 @@ export default function MyDesignsPage() {
       </AnimatePresence>
 
       {/* View Modal */}
-      <AnimatePresence>
-        {showViewModal && viewingDesign && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowViewModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{viewingDesign.title}</h2>
-                      {getStatusBadge(viewingDesign.status)}
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Uploaded on {new Date(viewingDesign.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button onClick={() => setShowViewModal(false)} className="text-gray-500 hover:text-gray-700">
-                    <X size={24} />
-                  </button>
-                </div>
+   <AnimatePresence>
+  {showViewModal && viewingDesign && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={() => setShowViewModal(false)}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{viewingDesign.title}</h2>
+                {getStatusBadge(viewingDesign.status, viewingDesign.is_permanently_rejected)}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Uploaded on {new Date(viewingDesign.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <button onClick={() => setShowViewModal(false)} className="text-gray-500 hover:text-gray-700">
+              <X size={24} />
+            </button>
+          </div>
 
-                {viewingDesign.preview_image && (
-                  <div className="mb-6">
-                    <img src={viewingDesign.preview_image} alt={viewingDesign.title} className="w-full max-h-96 object-cover rounded-lg" />
-                  </div>
+          {viewingDesign.preview_image && (
+            <div className="mb-6">
+              <img src={viewingDesign.preview_image} alt={viewingDesign.title} className="w-full max-h-96 object-cover rounded-lg" />
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Description</h3>
+              <p className="text-gray-900 dark:text-white">{viewingDesign.description || 'No description'}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Category</h3>
+                <p className="text-gray-900 dark:text-white">{viewingDesign.category}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Price</h3>
+                <p className="text-lg font-bold text-blue-600">${viewingDesign.price}</p>
+              </div>
+            </div>
+
+            {/* Revision Info for Rejected Designs */}
+            {viewingDesign.status === 'rejected' && (
+              <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200">
+                <h3 className="text-sm font-medium text-orange-700 dark:text-orange-400 mb-1">Revision Status</h3>
+                <p className="text-sm text-orange-600 dark:text-orange-300">
+                  Revision Attempts: {viewingDesign.revision_count || 0}/3
+                </p>
+                {viewingDesign.is_permanently_rejected && (
+                  <p className="text-sm text-red-600 font-semibold mt-1">
+                    ⚠️ Design permanently rejected. Maximum revisions exceeded.
+                  </p>
                 )}
+                {!viewingDesign.is_permanently_rejected && viewingDesign.revision_count < 3 && (
+                  <p className="text-sm text-green-600 mt-1">
+                    You can resubmit this design after making the required changes.
+                  </p>
+                )}
+              </div>
+            )}
 
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Description</h3>
-                    <p className="text-gray-900 dark:text-white">{viewingDesign.description || 'No description'}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Category</h3>
-                      <p className="text-gray-900 dark:text-white">{viewingDesign.category}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Price</h3>
-                      <p className="text-lg font-bold text-blue-600">${viewingDesign.price}</p>
-                    </div>
-                  </div>
-
-                  {viewingDesign.tags && viewingDesign.tags.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tags</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {viewingDesign.tags.map(tag => (
-                          <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {viewingDesign.figma_url && (
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Figma URL</h3>
-                        <a href={viewingDesign.figma_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm break-all">
-                          View in Figma
-                        </a>
-                      </div>
-                    )}
-                    {viewingDesign.live_url && (
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Live Demo</h3>
-                        <a href={viewingDesign.live_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm break-all">
-                          View Live Demo
-                        </a>
-                      </div>
-                    )}
-                  </div>
-
-                  {viewingDesign.status === 'rejected' && viewingDesign.rejection_reason && (
-                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200">
-                      <h3 className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">Rejection Reason</h3>
-                      <p className="text-sm text-red-600 dark:text-red-300">{viewingDesign.rejection_reason}</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    {viewingDesign.status === 'pending' && (
-                      <button
-                        onClick={() => {
-                          setShowViewModal(false);
-                          handleEditClick(viewingDesign);
-                        }}
-                        className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-                      >
-                        <Edit size={16} /> Edit Design
-                      </button>
-                    )}
-                    <button
-                      onClick={() => setShowViewModal(false)}
-                      className="flex-1 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300"
-                    >
-                      Close
-                    </button>
-                  </div>
+            {viewingDesign.tags && viewingDesign.tags.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {viewingDesign.tags.map(tag => (
+                    <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              {viewingDesign.figma_url && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Figma URL</h3>
+                  <a href={viewingDesign.figma_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm break-all">
+                    View in Figma
+                  </a>
+                </div>
+              )}
+              {viewingDesign.live_url && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Live Demo</h3>
+                  <a href={viewingDesign.live_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm break-all">
+                    View Live Demo
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {viewingDesign.status === 'rejected' && viewingDesign.rejection_reason && (
+              <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200">
+                <h3 className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">Rejection Reason</h3>
+                <p className="text-sm text-red-600 dark:text-red-300">{viewingDesign.rejection_reason}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              {viewingDesign.status === 'pending' && (
+                <button
+                  onClick={() => {
+                    setShowViewModal(false);
+                    handleEditClick(viewingDesign);
+                  }}
+                  className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                >
+                  <Edit size={16} /> Edit Design
+                </button>
+              )}
+              
+              {/* UPDATED: Resubmit button - Redirect to resubmit page instead of API call */}
+              {viewingDesign.status === 'rejected' && !viewingDesign.is_permanently_rejected && (viewingDesign.revision_count || 0) < 3 && (
+                <Link
+                  href={`/designer/resubmit-design/${viewingDesign.id}`}
+                  onClick={() => setShowViewModal(false)}
+                  className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                >
+                  <Upload size={16} />
+                  Resubmit Design
+                </Link>
+              )}
+              
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="flex-1 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </div>
   );
 }

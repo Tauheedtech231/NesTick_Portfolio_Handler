@@ -1,5 +1,5 @@
 // app/api/announcements/[id]/route.ts
-import { getConnection } from '@/app/lib/db';
+import { getConnection } from '@/lib/db'; 
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 /* eslint-disable */
@@ -36,7 +36,7 @@ export async function GET(
     }
 
     const pool = await getConnection();
-    const [announcements] = await pool.execute<mysql.RowDataPacket[]>(
+    const [announcements] = await (await pool).execute<mysql.RowDataPacket[]>(
       `SELECT a.*, c.name AS college_name
        FROM announcements a
        LEFT JOIN colleges c ON a.college_id = c.id

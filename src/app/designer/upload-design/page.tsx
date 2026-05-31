@@ -36,15 +36,11 @@ export default function UploadDesignPage() {
     designFile: null as File | null,
     figmaUrl: '',
     liveUrl: '',
-    whitePaperFile: null as File | null,
-    instructionFile: null as File | null,
     status: 'draft' as 'draft' | 'published'
   });
   
   const [currentTag, setCurrentTag] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [whitePaperName, setWhitePaperName] = useState('');
-  const [instructionName, setInstructionName] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [designerId, setDesignerId] = useState<number | null>(null);
@@ -100,50 +96,6 @@ export default function UploadDesignPage() {
     }
   };
 
-  const handleWhitePaperChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('White paper file size must be less than 5MB');
-        return;
-      }
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Please upload PDF or DOC/DOCX files only');
-        return;
-      }
-      setFormData(prev => ({ ...prev, whitePaperFile: file }));
-      setWhitePaperName(file.name);
-    }
-  };
-
-  const handleInstructionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Instruction file size must be less than 5MB');
-        return;
-      }
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Please upload PDF, DOC, DOCX, or TXT files only');
-        return;
-      }
-      setFormData(prev => ({ ...prev, instructionFile: file }));
-      setInstructionName(file.name);
-    }
-  };
-
-  const removeWhitePaper = () => {
-    setFormData(prev => ({ ...prev, whitePaperFile: null }));
-    setWhitePaperName('');
-  };
-
-  const removeInstruction = () => {
-    setFormData(prev => ({ ...prev, instructionFile: null }));
-    setInstructionName('');
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
@@ -180,11 +132,6 @@ export default function UploadDesignPage() {
       setUploading(false);
       return;
     }
-    if (!formData.whitePaperFile) {
-      setError('White paper / technical documentation is required');
-      setUploading(false);
-      return;
-    }
     if (!designerId) {
       setError('Please login again');
       setUploading(false);
@@ -193,22 +140,10 @@ export default function UploadDesignPage() {
 
     try {
       let imageUrl = '';
-      let whitePaperBase64 = '';
-      let instructionBase64 = '';
 
       // Convert images to base64 (store in DB, not Cloudinary)
       if (formData.designFile) {
         imageUrl = await fileToBase64(formData.designFile);
-      }
-
-      // Convert white paper to base64
-      if (formData.whitePaperFile) {
-        whitePaperBase64 = await fileToBase64(formData.whitePaperFile);
-      }
-
-      // Convert instruction file to base64 if present
-      if (formData.instructionFile) {
-        instructionBase64 = await fileToBase64(formData.instructionFile);
       }
 
       // Prepare data for API
@@ -222,10 +157,6 @@ export default function UploadDesignPage() {
         preview_image: imageUrl,
         figma_url: formData.figmaUrl,
         live_url: formData.liveUrl,
-        white_paper: whitePaperBase64,
-        white_paper_filename: formData.whitePaperFile.name,
-        instruction_doc: instructionBase64 || null,
-        instruction_filename: formData.instructionFile?.name || null,
         status: formData.status === 'published' ? 'pending' : 'draft'
       };
 
@@ -253,13 +184,9 @@ export default function UploadDesignPage() {
           designFile: null,
           figmaUrl: '',
           liveUrl: '',
-          whitePaperFile: null,
-          instructionFile: null,
           status: 'draft'
         });
         setPreviewImage(null);
-        setWhitePaperName('');
-        setInstructionName('');
         
         // Redirect to my designs page
         router.push('/designer/my-designs');
@@ -451,92 +378,6 @@ export default function UploadDesignPage() {
                 placeholder="https://figma.com/file/..."
                 className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-text"
               />
-            </div>
-          </div>
-        </div>
-
-        {/* Documentation Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Documentation</h3>
-          
-          <div className="space-y-4">
-            {/* White Paper - Required */}
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <FileText size={16} /> White Paper / Technical Documentation <span className="text-red-500">*</span>
-              </label>
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-blue-500 transition-colors cursor-pointer"
-                onClick={() => document.getElementById('whitePaper')?.click()}>
-                <input
-                  id="whitePaper"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleWhitePaperChange}
-                  className="hidden"
-                  required={!whitePaperName}
-                />
-                {whitePaperName ? (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileArchive size={20} className="text-green-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{whitePaperName}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); removeWhitePaper(); }}
-                      className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
-                    >
-                      <X size={16} className="text-red-500" />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <FileText size={40} className="mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500">Click to upload white paper</p>
-                    <p className="text-xs text-gray-400">PDF, DOC, DOCX (max 5MB)</p>
-                  </>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Include technical documentation, algorithms used, architecture decisions</p>
-            </div>
-
-            {/* Instruction Document - Optional */}
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <FileArchive size={16} /> Instruction Document (Optional)
-              </label>
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-blue-500 transition-colors cursor-pointer"
-                onClick={() => document.getElementById('instructionDoc')?.click()}>
-                <input
-                  id="instructionDoc"
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  onChange={handleInstructionChange}
-                  className="hidden"
-                />
-                {instructionName ? (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileArchive size={20} className="text-blue-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{instructionName}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); removeInstruction(); }}
-                      className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
-                    >
-                      <X size={16} className="text-red-500" />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <FileArchive size={40} className="mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500">Click to upload instruction document</p>
-                    <p className="text-xs text-gray-400">PDF, DOC, DOCX, TXT (max 5MB)</p>
-                  </>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Installation instructions, setup guide, or additional notes</p>
             </div>
           </div>
         </div>

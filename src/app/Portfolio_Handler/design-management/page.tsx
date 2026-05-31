@@ -32,7 +32,8 @@ import {
   Download,
   Trash2,
   MoreVertical,
-  Edit
+  Edit,
+  Ban
 } from 'lucide-react';
 import { MainLayout } from '../components/layout/main-layout';
 
@@ -54,6 +55,8 @@ interface Design {
   tags: string[];
   views?: number;
   likes?: number;
+  revision_count?: number;
+  is_permanently_rejected?: boolean;
 }
 
 type SortField = 'title' | 'designer_name' | 'price' | 'created_at' | 'status';
@@ -136,6 +139,13 @@ export default function DesignManagementPage() {
         await fetchDesigns();
         setShowRejectModal(null);
         setRejectionReason('');
+        
+        // Show appropriate message based on rejection result
+        if (data.is_permanently_rejected) {
+          alert(`Design permanently rejected! (Revision ${data.revision_count}/3)`);
+        } else {
+          alert(`Design rejected. (Revision ${data.revision_count}/3)`);
+        }
       } else {
         alert(data.error || 'Failed to reject design');
       }
@@ -157,16 +167,38 @@ export default function DesignManagementPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch(status) {
+  const getStatusBadge = (design: Design) => {
+    // Check for permanently rejected first
+    if (design.is_permanently_rejected) {
+      return <span className="px-2 py-1 rounded-full bg-gradient-to-r from-red-700 to-red-800 dark:from-red-800 dark:to-red-900 text-white text-xs flex items-center gap-1"><Ban size={12} /> Permanently Rejected</span>;
+    }
+    
+    switch(design.status) {
       case 'approved':
-        return <span className="cursor-pointer px-2 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-400 text-xs flex items-center gap-1 transition-all hover:scale-105"><CheckCircle size={12} /> Approved</span>;
+        return <span className="px-2 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-400 text-xs flex items-center gap-1"><CheckCircle size={12} /> Approved</span>;
       case 'pending':
-        return <span className="cursor-pointer px-2 py-1 rounded-full bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 text-yellow-700 dark:text-yellow-400 text-xs flex items-center gap-1 transition-all hover:scale-105"><Clock size={12} /> Pending</span>;
+        return <span className="px-2 py-1 rounded-full bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 text-yellow-700 dark:text-yellow-400 text-xs flex items-center gap-1"><Clock size={12} /> Pending</span>;
       case 'rejected':
-        return <span className="cursor-pointer px-2 py-1 rounded-full bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 text-red-700 dark:text-red-400 text-xs flex items-center gap-1 transition-all hover:scale-105"><XCircle size={12} /> Rejected</span>;
+        return <span className="px-2 py-1 rounded-full bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 text-red-700 dark:text-red-400 text-xs flex items-center gap-1"><XCircle size={12} /> Rejected ({design.revision_count || 0}/3)</span>;
       default: return null;
     }
+  };
+
+  const canReject = (design: Design) => {
+    // Cannot reject if already approved
+    if (design.status === 'approved') return false;
+    // Cannot reject if permanently rejected
+    if (design.is_permanently_rejected) return false;
+    // Cannot reject if already 3 or more revisions
+    if ((design.revision_count || 0) >= 3) return false;
+    return true;
+  };
+
+  const canApprove = (design: Design) => {
+    // Cannot approve if permanently rejected
+    if (design.is_permanently_rejected) return false;
+    // Can only approve pending designs
+    return design.status === 'pending';
   };
 
   const handleViewDetails = (designId: number) => {
@@ -219,12 +251,15 @@ export default function DesignManagementPage() {
   );
 
   const totalPages = Math.ceil(sortedDesigns.length / itemsPerPage);
-  const pendingCount = designs.filter(d => d.status === 'pending').length;
+  const pendingCount = designs.filter(d => d.status === 'pending' && !d.is_permanently_rejected).length;
 
   const exportToCSV = () => {
-    const headers = ['ID', 'Title', 'Designer', 'Category', 'Price', 'Status', 'Created At'];
+    const headers = ['ID', 'Title', 'Designer', 'Category', 'Price', 'Status', 'Revision Count', 'Created At'];
     const csvData = sortedDesigns.map(d => [
-      d.id, d.title, d.designer_name, d.category, d.price, d.status, new Date(d.created_at).toLocaleDateString()
+      d.id, d.title, d.designer_name, d.category, d.price, 
+      d.is_permanently_rejected ? 'Permanently Rejected' : d.status,
+      d.revision_count || 0,
+      new Date(d.created_at).toLocaleDateString()
     ]);
     const csvContent = [headers, ...csvData].map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -282,22 +317,22 @@ export default function DesignManagementPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <motion.div whileHover={{ y: -2 }} className="cursor-pointer bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800 hover:shadow-lg transition-all">
+            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800 hover:shadow-lg transition-all">
               <p className="text-sm text-yellow-600 dark:text-yellow-400">Pending Review</p>
               <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{pendingCount}</p>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} className="cursor-pointer bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800 hover:shadow-lg transition-all">
+            </div>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800 hover:shadow-lg transition-all">
               <p className="text-sm text-green-600 dark:text-green-400">Approved</p>
-              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{designs.filter(d => d.status === 'approved').length}</p>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} className="cursor-pointer bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800 hover:shadow-lg transition-all">
+              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{designs.filter(d => d.status === 'approved' && !d.is_permanently_rejected).length}</p>
+            </div>
+            <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800 hover:shadow-lg transition-all">
               <p className="text-sm text-red-600 dark:text-red-400">Rejected</p>
-              <p className="text-2xl font-bold text-red-700 dark:text-red-300">{designs.filter(d => d.status === 'rejected').length}</p>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} className="cursor-pointer bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 hover:shadow-lg transition-all">
-              <p className="text-sm text-blue-600 dark:text-blue-400">Total Designs</p>
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{designs.length}</p>
-            </motion.div>
+              <p className="text-2xl font-bold text-red-700 dark:text-red-300">{designs.filter(d => d.status === 'rejected' && !d.is_permanently_rejected).length}</p>
+            </div>
+            <div className="bg-gradient-to-br from-red-700 to-red-800 dark:from-red-800 dark:to-red-900 rounded-xl p-4 border border-red-600 hover:shadow-lg transition-all">
+              <p className="text-sm text-red-300">Permanently Rejected</p>
+              <p className="text-2xl font-bold text-white">{designs.filter(d => d.is_permanently_rejected).length}</p>
+            </div>
           </div>
 
           {/* Filters */}
@@ -355,9 +390,7 @@ export default function DesignManagementPage() {
 
           {/* Bulk Actions */}
           {selectedDesigns.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
               className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 flex items-center justify-between"
             >
               <span className="text-sm text-purple-700 dark:text-purple-300">
@@ -369,7 +402,7 @@ export default function DesignManagementPage() {
               >
                 <CheckCircle size={16} /> Approve Selected
               </button>
-            </motion.div>
+            </div>
           )}
 
           {/* Table View */}
@@ -384,7 +417,7 @@ export default function DesignManagementPage() {
                           type="checkbox"
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedDesigns(paginatedDesigns.map(d => d.id));
+                              setSelectedDesigns(paginatedDesigns.filter(d => canApprove(d)).map(d => d.id));
                             } else {
                               setSelectedDesigns([]);
                             }
@@ -402,6 +435,7 @@ export default function DesignManagementPage() {
                       <th className="cursor-pointer px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 transition-colors" onClick={() => handleSort('price')}>
                         <div className="flex items-center gap-1">Price {getSortIcon('price')}</div>
                       </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Revisions</th>
                       <th className="cursor-pointer px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-purple-600 transition-colors" onClick={() => handleSort('status')}>
                         <div className="flex items-center gap-1">Status {getSortIcon('status')}</div>
                       </th>
@@ -412,103 +446,103 @@ export default function DesignManagementPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    <AnimatePresence>
-                      {paginatedDesigns.map((design, index) => (
-                        <motion.tr
-                          key={design.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ delay: index * 0.03 }}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                        >
-                          <td className="px-4 py-3">
-                            <input
-                              type="checkbox"
-                              checked={selectedDesigns.includes(design.id)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedDesigns([...selectedDesigns, design.id]);
-                                } else {
-                                  setSelectedDesigns(selectedDesigns.filter(id => id !== design.id));
-                                }
-                              }}
-                              className="cursor-pointer rounded border-gray-300"
-                            />
-                          </td>
-                          <td className="px-4 py-3">
+                    {paginatedDesigns.map((design, index) => (
+                      <tr
+                        key={design.id}
+                        className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${design.is_permanently_rejected ? 'bg-red-50/30 dark:bg-red-900/10' : ''}`}
+                      >
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedDesigns.includes(design.id)}
+                            onChange={(e) => {
+                              if (e.target.checked && canApprove(design)) {
+                                setSelectedDesigns([...selectedDesigns, design.id]);
+                              } else {
+                                setSelectedDesigns(selectedDesigns.filter(id => id !== design.id));
+                              }
+                            }}
+                            disabled={!canApprove(design)}
+                            className="cursor-pointer rounded border-gray-300 disabled:opacity-50"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleViewDetails(design.id)}
+                            className="cursor-pointer text-sm font-medium text-gray-900 dark:text-white hover:text-purple-600 transition-colors text-left"
+                          >
+                            {design.title}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <User size={14} className="text-gray-400" />
+                            <span className="text-sm text-gray-600 dark:text-gray-300">{design.designer_name}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs">
+                            {design.category}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-sm font-semibold text-purple-600">${design.price}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs font-medium ${(design.revision_count || 0) >= 3 ? 'text-red-600' : 'text-gray-500'}`}>
+                            {design.revision_count || 0}/3
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">{getStatusBadge(design)}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Calendar size={12} />
+                            {new Date(design.created_at).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
                             <button
                               onClick={() => handleViewDetails(design.id)}
-                              className="cursor-pointer text-sm font-medium text-gray-900 dark:text-white hover:text-purple-600 transition-colors text-left"
+                              className="cursor-pointer p-1.5 text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-all"
+                              title="View Details"
                             >
-                              {design.title}
+                              <Eye size={16} />
                             </button>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <User size={14} className="text-gray-400" />
-                              <span className="text-sm text-gray-600 dark:text-gray-300">{design.designer_name}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs">
-                              {design.category}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-sm font-semibold text-purple-600">${design.price}</span>
-                          </td>
-                          <td className="px-4 py-3">{getStatusBadge(design.status)}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                              <Calendar size={12} />
-                              {new Date(design.created_at).toLocaleDateString()}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
+                            {canApprove(design) && (
                               <button
-                                onClick={() => handleViewDetails(design.id)}
-                                className="cursor-pointer p-1.5 text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-all"
-                                title="View Details"
+                                onClick={() => handleApprove(design.id)}
+                                disabled={approvingId === design.id}
+                                className="cursor-pointer p-1.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all disabled:opacity-50"
+                                title="Approve"
                               >
-                                <Eye size={16} />
+                                {approvingId === design.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
                               </button>
-                              {design.status === 'pending' && (
-                                <>
-                                  <button
-                                    onClick={() => handleApprove(design.id)}
-                                    disabled={approvingId === design.id}
-                                    className="cursor-pointer p-1.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all disabled:opacity-50"
-                                    title="Approve"
-                                  >
-                                    {approvingId === design.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-                                  </button>
-                                  <button
-                                    onClick={() => setShowRejectModal(design)}
-                                    className="cursor-pointer p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
-                                    title="Reject"
-                                  >
-                                    <XCircle size={16} />
-                                  </button>
-                                </>
-                              )}
-                              {design.figma_url && (
-                                <a
-                                  href={design.figma_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="cursor-pointer p-1.5 text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-all"
-                                  title="Open in Figma"
-                                >
-                                  <Figma size={16} />
-                                </a>
-                              )}
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </AnimatePresence>
+                            )}
+                            {canReject(design) && (
+                              <button
+                                onClick={() => setShowRejectModal(design)}
+                                className="cursor-pointer p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                                title={`Reject (${design.revision_count || 0}/3)`}
+                              >
+                                <XCircle size={16} />
+                              </button>
+                            )}
+                            {design.figma_url && (
+                              <a
+                                href={design.figma_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cursor-pointer p-1.5 text-pink-600 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-all"
+                                title="Open in Figma"
+                              >
+                                <Figma size={16} />
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -542,12 +576,13 @@ export default function DesignManagementPage() {
           {viewMode === 'grid' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedDesigns.map((design) => (
-                <motion.div
+                <div
                   key={design.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -4 }}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border overflow-hidden hover:shadow-xl transition-all duration-300 ${
+                    design.is_permanently_rejected 
+                      ? 'border-red-300 dark:border-red-700 bg-red-50/30 dark:bg-red-900/10' 
+                      : 'border-gray-200 dark:border-gray-700'
+                  }`}
                 >
                   {/* Preview Image */}
                   <div className="relative h-48 bg-gray-100 dark:bg-gray-700 overflow-hidden group">
@@ -559,8 +594,13 @@ export default function DesignManagementPage() {
                       </div>
                     )}
                     <div className="absolute top-3 right-3">
-                      {getStatusBadge(design.status)}
+                      {getStatusBadge(design)}
                     </div>
+                    {design.is_permanently_rejected && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <Ban size={48} className="text-white" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <Eye size={32} className="text-white" />
                     </div>
@@ -574,9 +614,14 @@ export default function DesignManagementPage() {
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">{design.description}</p>
                     
-                    <div className="flex items-center gap-2 mb-3 text-sm text-gray-600 dark:text-gray-400">
-                      <User size={14} />
-                      <span className="truncate">{design.designer_name}</span>
+                    <div className="flex items-center justify-between mb-3 text-sm">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <User size={14} />
+                        <span className="truncate">{design.designer_name}</span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Revisions: {(design.revision_count || 0)}/3
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-3">
@@ -597,27 +642,28 @@ export default function DesignManagementPage() {
                       >
                         <Eye size={16} /> View Details
                       </button>
-                      {design.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(design.id)}
-                            disabled={approvingId === design.id}
-                            className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                          >
-                            {approvingId === design.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => setShowRejectModal(design)}
-                            className="py-2 px-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
-                          >
-                            <XCircle size={16} />
-                          </button>
-                        </>
+                      {canApprove(design) && (
+                        <button
+                          onClick={() => handleApprove(design.id)}
+                          disabled={approvingId === design.id}
+                          className="flex-1 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {approvingId === design.id ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                          Approve
+                        </button>
+                      )}
+                      {canReject(design) && (
+                        <button
+                          onClick={() => setShowRejectModal(design)}
+                          className="py-2 px-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                          title={`Reject (${design.revision_count || 0}/3)`}
+                        >
+                          <XCircle size={16} />
+                        </button>
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
@@ -635,17 +681,11 @@ export default function DesignManagementPage() {
       {/* Reject Modal */}
       <AnimatePresence>
         {showRejectModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             onClick={() => setShowRejectModal(null)}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+            <div
               className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
@@ -654,7 +694,17 @@ export default function DesignManagementPage() {
                   <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
                     <AlertCircle size={24} className="text-red-600" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Reject Design</h3>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Reject Design</h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Revision {showRejectModal.revision_count || 0}/3
+                      {(showRejectModal.revision_count || 0) >= 2 && (
+                        <span className="text-red-500 ml-2">
+                          ⚠️ Next rejection will permanently reject this design!
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                   Provide a reason for rejecting "<span className="font-semibold text-gray-700 dark:text-gray-300">{showRejectModal.title}</span>"
@@ -688,12 +738,12 @@ export default function DesignManagementPage() {
                     ) : (
                       <XCircle size={16} />
                     )}
-                    Reject Design
+                    {((showRejectModal.revision_count || 0) + 1) >= 3 ? 'Permanently Reject' : 'Reject Design'}
                   </button>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
     </MainLayout>
