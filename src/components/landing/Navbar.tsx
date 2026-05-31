@@ -169,7 +169,7 @@ export default function Navbar() {
   const isDeveloper = user?.email === 'tauheeddeveloper13@gmail.com' || user?.userType === 'developer';
   
   // Check if user is admin
-  const isAdmin = user?.email === 'tauheeddeveloper13@gmail.com';
+  const isAdmin = user?.email === 'tauheeddeveloper13@gmail.com' || user?.email === 'nesticktech@gmail.com';
 
   const navItems = [
     { name: 'Home', path: '/' },
