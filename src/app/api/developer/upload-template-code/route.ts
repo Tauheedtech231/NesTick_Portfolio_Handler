@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       templateDescription, 
       templateType,
       liveUrl,
+      githubUrl,  // ✅ Added GitHub URL
       whitePaper,
       whitePaperFileName,
       fullTemplateFile,
@@ -38,6 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: false, 
         error: 'Live Demo URL is required' 
+      }, { status: 400 });
+    }
+
+    // ✅ GitHub URL validation
+    if (!githubUrl) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'GitHub Repository URL is required' 
+      }, { status: 400 });
+    }
+
+    if (!githubUrl.includes('github.com')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Please enter a valid GitHub repository URL' 
       }, { status: 400 });
     }
 
@@ -71,9 +87,9 @@ export async function POST(request: NextRequest) {
       
       await connection.execute(
         `UPDATE templates 
-         SET name = ?, description = ?, image = ?, live_url = ?, type = ?, updated_at = NOW()
+         SET name = ?, description = ?, image = ?, live_url = ?, github_url = ?, type = ?, updated_at = NOW()
          WHERE id = ? AND assignment_id = ?`,
-        [templateName, templateDescription, templateImage, liveUrl, templateType, templateId, assignmentId]
+        [templateName, templateDescription, templateImage, liveUrl, githubUrl, templateType, templateId, assignmentId]
       );
 
       // Update white paper if provided
@@ -96,9 +112,9 @@ export async function POST(request: NextRequest) {
       console.log('📝 Creating new template');
       
       const [templateResult] = await connection.execute(
-        `INSERT INTO templates (name, description, image, live_url, type, developer_id, assignment_id, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'active')`,
-        [templateName, templateDescription, templateImage, liveUrl, templateType, developerId, assignmentId]
+        `INSERT INTO templates (name, description, image, live_url, github_url, type, developer_id, assignment_id, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+        [templateName, templateDescription, templateImage, liveUrl, githubUrl, templateType, developerId, assignmentId]
       );
 
       templateId = (templateResult as any).insertId;

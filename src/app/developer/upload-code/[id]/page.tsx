@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/developer/upload-code/[id]/page.tsx
 'use client';
@@ -23,7 +24,9 @@ import {
   Eye,
   Download,
   RefreshCw,
-  Globe
+  Globe,
+  Info,
+  Github
 } from 'lucide-react';
 
 interface Section {
@@ -47,6 +50,7 @@ interface ExistingData {
   whitePaper?: string;
   whitePaperFileName?: string;
   liveUrl?: string;
+  githubUrl?: string;
   sections?: Section[];
 }
 
@@ -62,29 +66,34 @@ export default function UploadCodePage() {
   const [developerId, setDeveloperId] = useState<number | null>(null);
   const [assignment, setAssignment] = useState<any>(null);
   const [existingData, setExistingData] = useState<ExistingData | null>(null);
+  const [hasFullTemplate, setHasFullTemplate] = useState(false);
   
   // White Paper
   const [whitePaperFile, setWhitePaperFile] = useState<File | null>(null);
   const [whitePaperName, setWhitePaperName] = useState('');
   const [existingWhitePaper, setExistingWhitePaper] = useState<string | null>(null);
   
-  // Full template ZIP upload
+  // Full template ZIP upload (MANDATORY for first time)
   const [fullTemplateFile, setFullTemplateFile] = useState<File | null>(null);
   const [fullTemplateName, setFullTemplateName] = useState('');
   const [existingTemplateZip, setExistingTemplateZip] = useState<string | null>(null);
   
-  // Sections upload
-const [sections, setSections] = useState<Section[]>([
-  { section_name: 'Navbar', section_key: 'navbar', file: null, fileName: '' },
-  { section_name: 'Hero', section_key: 'hero', file: null, fileName: '' },
-  { section_name: 'About', section_key: 'about', file: null, fileName: '' },
-  { section_name: 'Courses', section_key: 'courses', file: null, fileName: '' },
-  { section_name: 'Faculty', section_key: 'faculty', file: null, fileName: '' },
-  { section_name: 'Gallery', section_key: 'gallery', file: null, fileName: '' },
-  { section_name: 'Events', section_key: 'events', file: null, fileName: '' },
-  { section_name: 'Contact', section_key: 'contact', file: null, fileName: '' },
-  { section_name: 'Footer', section_key: 'footer', file: null, fileName: '' },
-]);
+  // ✅ GitHub URL (Mandatory)
+  const [githubUrl, setGithubUrl] = useState('');
+  const [existingGithubUrl, setExistingGithubUrl] = useState('');
+  
+  // Sections upload (OPTIONAL - page by page)
+  const [sections, setSections] = useState<Section[]>([
+    { section_name: 'Navbar', section_key: 'navbar', file: null, fileName: '' },
+    { section_name: 'Hero', section_key: 'hero', file: null, fileName: '' },
+    { section_name: 'About', section_key: 'about', file: null, fileName: '' },
+    { section_name: 'Courses', section_key: 'courses', file: null, fileName: '' },
+    { section_name: 'Faculty', section_key: 'faculty', file: null, fileName: '' },
+    { section_name: 'Gallery', section_key: 'gallery', file: null, fileName: '' },
+    { section_name: 'Events', section_key: 'events', file: null, fileName: '' },
+    { section_name: 'Contact', section_key: 'contact', file: null, fileName: '' },
+    { section_name: 'Footer', section_key: 'footer', file: null, fileName: '' },
+  ]);
   
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
@@ -139,12 +148,17 @@ const [sections, setSections] = useState<Section[]>([
       const data = await response.json();
       if (data.success && data.data) {
         setExistingData(data.data);
+        setHasFullTemplate(!!data.data.templateId);
         
         // Pre-fill template info
         if (data.data.templateName) setTemplateName(data.data.templateName);
         if (data.data.templateDescription) setTemplateDescription(data.data.templateDescription);
         if (data.data.templateType) setTemplateType(data.data.templateType);
         if (data.data.liveUrl) setLiveUrl(data.data.liveUrl);
+        if (data.data.githubUrl) {
+          setExistingGithubUrl(data.data.githubUrl);
+          setGithubUrl(data.data.githubUrl);
+        }
         
         // Set existing files
         if (data.data.whitePaper) {
@@ -206,7 +220,7 @@ const [sections, setSections] = useState<Section[]>([
         return;
       }
       if (!file.name.endsWith('.zip')) {
-        setError('Please upload a ZIP file');
+        setError('Please upload a ZIP file containing the "out" folder');
         return;
       }
       setFullTemplateFile(file);
@@ -283,6 +297,27 @@ const [sections, setSections] = useState<Section[]>([
       return;
     }
 
+    // ✅ GitHub URL Mandatory
+    if (!githubUrl.trim()) {
+      setError('GitHub Repository URL is required');
+      setSubmitting(false);
+      return;
+    }
+
+    // Validate GitHub URL
+    if (!githubUrl.includes('github.com')) {
+      setError('Please enter a valid GitHub repository URL');
+      setSubmitting(false);
+      return;
+    }
+
+    // ✅ MANDATORY: First time upload requires full template ZIP
+    if (!hasFullTemplate && !fullTemplateFile) {
+      setError('Please upload the full template ZIP file (out folder) first. Individual sections can be updated later.');
+      setSubmitting(false);
+      return;
+    }
+
     try {
       let whitePaperBase64 = null;
       if (whitePaperFile) {
@@ -329,6 +364,7 @@ const [sections, setSections] = useState<Section[]>([
           templateDescription: templateDescription,
           templateType: templateType,
           liveUrl: liveUrl,
+          githubUrl: githubUrl,
           whitePaper: whitePaperBase64,
           whitePaperFileName: whitePaperName,
           fullTemplateFile: fullTemplateBase64,
@@ -391,8 +427,52 @@ const [sections, setSections] = useState<Section[]>([
             {existingData?.templateId ? 'Update Template Code' : 'Upload Template Code'}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {existingData?.templateId ? 'Update your' : 'Upload your'} complete template or individual section code for: <strong>{assignment.design_title}</strong>
+            {existingData?.templateId ? 'Update your' : 'Upload your'} complete template for: <strong>{assignment.design_title}</strong>
           </p>
+        </div>
+      </div>
+
+      {/* 📁 How to Upload - Info Box */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-5 border border-blue-200 dark:border-blue-800">
+        <h3 className="text-md font-semibold text-blue-800 dark:text-blue-400 mb-3 flex items-center gap-2">
+          <Info size={18} />
+          How to Upload Your Template
+        </h3>
+        <div className="space-y-3 text-sm text-blue-700 dark:text-blue-300">
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center text-xs font-bold mt-0.5">1</div>
+            <div>
+              <span className="font-semibold">Build your Next.js template:</span>
+              <code className="block text-xs bg-white dark:bg-gray-800 p-2 rounded mt-1">npm run build</code>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center text-xs font-bold mt-0.5">2</div>
+            <div>
+              <span className="font-semibold">ZIP the 'out' folder:</span>
+              <code className="block text-xs bg-white dark:bg-gray-800 p-2 rounded mt-1">zip -r template.zip out/</code>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center text-xs font-bold mt-0.5">3</div>
+            <div>
+              <span className="font-semibold">Upload the ZIP file below (MANDATORY for first time)</span>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 rounded-full bg-purple-200 dark:bg-purple-800 flex items-center justify-center text-xs font-bold mt-0.5">4</div>
+            <div>
+              <span className="font-semibold">Add your GitHub repository URL (MANDATORY)</span>
+              <p className="text-xs mt-1">Provide the source code repository link</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <div className="w-5 h-5 rounded-full bg-green-200 dark:bg-green-800 flex items-center justify-center text-xs font-bold mt-0.5">📌</div>
+            <div>
+              <span className="font-semibold">After full template upload, you can update individual sections</span>
+              <p className="text-xs mt-1">Upload section-specific ZIP files to update only specific pages (hero, about, etc.)</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -424,11 +504,42 @@ const [sections, setSections] = useState<Section[]>([
             onChange={(e) => setLiveUrl(e.target.value)}
             required
             placeholder="https://your-deployed-application.com"
-            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-text"
           />
           <p className="text-xs text-gray-500 mt-2">
             You can update the live demo URL if your application has moved to a new location
           </p>
+        </div>
+
+        {/* ✅ GitHub Repository URL - Mandatory */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Github size={18} className="text-purple-500" />
+            GitHub Repository URL <span className="text-red-500 text-sm">*</span>
+          </h2>
+          <input
+            type="url"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            required
+            placeholder="https://github.com/username/repository"
+            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-text"
+          />
+          <p className="text-xs text-gray-500 mt-2">
+            Provide the GitHub repository URL containing your template source code
+          </p>
+          {existingGithubUrl && !githubUrl && (
+            <div className="mt-2">
+              <a 
+                href={existingGithubUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-blue-500 hover:underline flex items-center gap-1"
+              >
+                <Github size={12} /> View existing repository
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Template Info */}
@@ -547,7 +658,7 @@ const [sections, setSections] = useState<Section[]>([
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <FileArchive size={18} className="text-purple-500" />
-            Full Template ZIP (Optional)
+            Full Template ZIP {!hasFullTemplate && <span className="text-red-500 text-sm">* (Mandatory for first time)</span>}
           </h2>
           
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
@@ -572,7 +683,7 @@ const [sections, setSections] = useState<Section[]>([
               <>
                 <FileArchive size={48} className="mx-auto text-gray-400 mb-3" />
                 <p className="text-sm text-gray-500 mb-2">Upload complete template as ZIP file</p>
-                <p className="text-xs text-gray-400 mb-4">ZIP file containing all template files (max 50MB)</p>
+                <p className="text-xs text-gray-400 mb-4">ZIP file containing 'out' folder (max 50MB)</p>
                 <label className="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer">
                   Choose ZIP File
                   <input 
@@ -603,7 +714,7 @@ const [sections, setSections] = useState<Section[]>([
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <Layers size={18} className="text-purple-500" />
-              Section-wise Code (Optional)
+              Section-wise Code (Optional - for updates only)
             </h2>
             <button
               type="button"
@@ -630,7 +741,13 @@ const [sections, setSections] = useState<Section[]>([
                     />
                     <p className="text-xs text-gray-400 mt-1">Key: {section.section_key}</p>
                   </div>
-              
+                  <button
+                    type="button"
+                    onClick={() => removeSection(index)}
+                    className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 rounded cursor-pointer"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
                 
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-center hover:border-purple-500 transition-colors">
@@ -658,7 +775,7 @@ const [sections, setSections] = useState<Section[]>([
                   ) : (
                     <>
                       <Code2 size={24} className="mx-auto text-gray-400 mb-2" />
-                      <p className="text-xs text-gray-500 mb-2">Upload ZIP for {section.section_name} section</p>
+                      <p className="text-xs text-gray-500 mb-2">Upload ZIP for {section.section_name} section (only if updating)</p>
                       <label className="inline-block px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors cursor-pointer text-xs">
                         Choose ZIP
                         <input 
@@ -685,9 +802,10 @@ const [sections, setSections] = useState<Section[]>([
               </div>
             ))}
           </div>
+          <p className="text-xs text-gray-500 mt-3 italic">
+            💡 Note: Section-wise uploads are optional. Use them only if you want to update specific sections without re-uploading the entire template.
+          </p>
         </div>
-
-       
 
         {/* Submit Buttons */}
         <div className="flex gap-3">
