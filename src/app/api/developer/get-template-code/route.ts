@@ -21,9 +21,9 @@ export async function GET(request: NextRequest) {
     connection = await getConnection();
     console.log('✅ Get template code connection acquired');
 
-    // Simple query - select all columns
+    // ✅ Added github_url to SELECT query
     const [templates] = await connection.execute(
-      `SELECT id, name, description, image, live_url, type, 
+      `SELECT id, name, description, image, live_url, github_url, type, 
               template_zip_path, template_zip_filename,
               white_paper_path, white_paper_filename,
               developer_id, assignment_id, status
@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
         templateDescription: template.description,
         templateType: template.type,
         liveUrl: template.live_url,
+        githubUrl: template.github_url,  // ✅ Added GitHub URL
         templateZipPath: template.template_zip_path,
         templateZipFileName: template.template_zip_filename,
         whitePaper: template.white_paper_path,
