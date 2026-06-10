@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/developer/upload-template-code/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir, unlink } from 'fs/promises';
+import { writeFile, mkdir, unlink, readdir, readFile } from 'fs/promises';
 import path from 'path';
 import { getConnection } from '@/lib/db';
+import AdmZip from 'adm-zip';
 
 const STORAGE_BASE = process.env.STORAGE_PATH || '/storage';
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       templateDescription, 
       templateType,
       liveUrl,
-      githubUrl,  // ✅ Added GitHub URL
+      githubUrl,
       whitePaper,
       whitePaperFileName,
       fullTemplateFile,
@@ -42,7 +43,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // ✅ GitHub URL validation
     if (!githubUrl) {
       return NextResponse.json({ 
         success: false, 
@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
     connection = await getConnection();
     console.log('✅ Upload template connection acquired');
 
-    // Get assignment details with preview image
     const [assignments] = await connection.execute(
       `SELECT da.*, dd.title, dd.description, da.preview_image_url as template_image
        FROM developer_assignments da
@@ -80,9 +79,7 @@ export async function POST(request: NextRequest) {
     const templateImage = assignment.template_image || assignment.preview_image_url || '';
     let templateId = existingTemplateId;
 
-    // Check if template already exists
     if (templateId) {
-      // Update existing template
       console.log(`📝 Updating existing template ${templateId}`);
       
       await connection.execute(
@@ -92,7 +89,6 @@ export async function POST(request: NextRequest) {
         [templateName, templateDescription, templateImage, liveUrl, githubUrl, templateType, templateId, assignmentId]
       );
 
-      // Update white paper if provided
       if (whitePaper && whitePaperFileName) {
         const whitePaperFolder = path.join(STORAGE_BASE, 'templates', `template_${templateId}`);
         await mkdir(whitePaperFolder, { recursive: true });
@@ -108,7 +104,6 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      // Create new template
       console.log('📝 Creating new template');
       
       const [templateResult] = await connection.execute(
@@ -121,7 +116,6 @@ export async function POST(request: NextRequest) {
       const templateFolder = path.join(STORAGE_BASE, 'templates', `template_${templateId}`);
       await mkdir(templateFolder, { recursive: true });
 
-      // Save white paper if provided
       if (whitePaper && whitePaperFileName) {
         const whitePaperPath = path.join(templateFolder, 'whitepaper.pdf');
         const base64Data = whitePaper.split(',')[1];
@@ -137,9 +131,8 @@ export async function POST(request: NextRequest) {
 
     const templateFolder = path.join(STORAGE_BASE, 'templates', `template_${templateId}`);
 
-    // Handle full template ZIP
+    // ✅ Handle full template ZIP with AUTO-EXTRACT
     if (fullTemplateFile && fullTemplateFileName) {
-      // Delete old ZIP if exists
       const [oldTemplate] = await connection.execute(
         `SELECT template_zip_path FROM templates WHERE id = ?`,
         [templateId]
@@ -157,12 +150,50 @@ export async function POST(request: NextRequest) {
       const filePath = path.join(templateFolder, 'template.zip');
       await writeFile(filePath, buffer);
 
+      // ✅ AUTO-EXTRACT ZIP
+      console.log(`📦 Extracting ZIP: ${filePath}`);
+      const zip = new AdmZip(filePath);
+      const extractPath = path.join(templateFolder, 'extracted');
+      zip.extractAllTo(extractPath, true);
+      console.log(`✅ Extracted to: ${extractPath}`);
+
+      // ✅ Move HTML files from extracted/out to sections folder
+      const outPath = path.join(extractPath, 'out');
+      const sectionsPath = path.join(templateFolder, 'sections');
+      await mkdir(sectionsPath, { recursive: true });
+
+      try {
+        const files = await readdir(outPath);
+        for (const file of files) {
+          if (file.endsWith('.html')) {
+            const srcPath = path.join(outPath, file);
+            const destPath = path.join(sectionsPath, file);
+            await writeFile(destPath, await readFile(srcPath, 'utf8'));
+            console.log(`📄 Moved: ${file} → sections/`);
+          }
+        }
+      } catch (err) {
+        console.log('No "out" folder found, checking root...');
+        const files = await readdir(extractPath);
+        for (const file of files) {
+          if (file.endsWith('.html')) {
+            const srcPath = path.join(extractPath, file);
+            const destPath = path.join(sectionsPath, file);
+            await writeFile(destPath, await readFile(srcPath, 'utf8'));
+            console.log(`📄 Moved: ${file} → sections/`);
+          }
+        }
+      }
+
+      // ✅ Clean up extracted folder
+      await unlink(filePath); // Delete original ZIP? Keep it? Let's keep it.
+      // await rm(extractPath, { recursive: true, force: true });
+
       await connection.execute(
         `UPDATE templates SET template_zip_path = ?, template_zip_filename = ? WHERE id = ?`,
         [filePath, fullTemplateFileName, templateId]
       );
 
-      // Record upload
       await connection.execute(
         `INSERT INTO developer_uploads (assignment_id, developer_id, template_id, upload_type, file_name, storage_path, file_size)
          VALUES (?, ?, ?, 'full_template', ?, ?, ?)`,
@@ -170,17 +201,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Handle sections
+    // Handle sections (individual uploads)
     const sectionsFolder = path.join(STORAGE_BASE, 'sections', `template_${templateId}`);
     await mkdir(sectionsFolder, { recursive: true });
 
     for (const section of sections) {
       if (section.file) {
-        // New or updated section
         const sectionFolder = path.join(sectionsFolder, section.section_key);
         await mkdir(sectionFolder, { recursive: true });
         
-        // Delete old section file if exists
         if (section.id) {
           const [oldSection] = await connection.execute(
             `SELECT storage_path FROM template_sections WHERE id = ?`,
@@ -197,12 +226,11 @@ export async function POST(request: NextRequest) {
         
         const base64Data = section.file.split(',')[1];
         const buffer = Buffer.from(base64Data, 'base64');
-        const version = section.id ? 2 : 1; // Increment version for updates
+        const version = section.id ? 2 : 1;
         const filePath = path.join(sectionFolder, `v${version}.zip`);
         await writeFile(filePath, buffer);
 
         if (section.id) {
-          // Update existing section
           await connection.execute(
             `UPDATE template_sections 
              SET file_name = ?, storage_path = ?, version = ?, updated_at = NOW()
@@ -210,7 +238,6 @@ export async function POST(request: NextRequest) {
             [section.fileName, filePath, version, section.id]
           );
         } else {
-          // Insert new section
           await connection.execute(
             `INSERT INTO template_sections (template_id, assignment_id, section_name, section_key, file_name, storage_path, version, uploaded_by)
              VALUES (?, ?, ?, ?, ?, ?, 1, ?)`,
@@ -218,12 +245,10 @@ export async function POST(request: NextRequest) {
           );
         }
       } else if (section.keepExisting && section.id) {
-        // Section exists but no new file - keep as is (do nothing)
         console.log(`Keeping existing section: ${section.section_name}`);
       }
     }
 
-    // Update developer_assignments submission_url if liveUrl changed
     if (liveUrl !== assignment.submission_url) {
       await connection.execute(
         `UPDATE developer_assignments SET submission_url = ? WHERE id = ?`,
