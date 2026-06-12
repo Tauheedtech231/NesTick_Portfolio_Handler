@@ -28,6 +28,30 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      // Special case for neezamiya@gmail.com
+      if (email === 'neezamiya@gmail.com' && password === 'tauheed123456') {
+        const userData = {
+          id: 'neezamiya_001',
+          email: 'neezamiya@gmail.com',
+          type: 'admin',
+          loginTime: new Date().toISOString(),
+        };
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('login_user', JSON.stringify(userData));
+        }
+
+        setMessage('Login successful! Redirecting...');
+
+        setTimeout(() => {
+          if (typeof window !== 'undefined') window.location.href = '/';
+        }, 1000);
+        
+        setIsLoading(false);
+        return;
+      }
+
+      // Regular API call for other users
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

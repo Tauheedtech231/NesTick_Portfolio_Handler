@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, memo } from "react";
-import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2 } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2, UserCircle, Shield, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -65,6 +65,76 @@ const NavItem = memo(({ item, isActive, onClick, theme }: {
 
 NavItem.displayName = 'NavItem';
 
+// Login Dropdown Component
+const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect: (role: string) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const roles = [
+    { id: 'admin', name: 'Admin', icon: Shield, route: '/auth/login', color: '#F59E0B' },
+    { id: 'developer', name: 'Developer', icon: Code2, route: '/designer/login?type=developer', color: '#8B5CF6' },
+    { id: 'designer', name: 'Designer', icon: Sparkles, route: '/designer/login', color: '#00A0FF' }
+  ];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+        style={{
+          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+          color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+        }}
+      >
+        <UserCircle className="w-4 h-4" />
+        Login
+      </button>
+
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50"
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
+            }}
+          >
+            <div className="px-4 py-3 border-b"
+              style={{
+                borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.1)',
+              }}
+            >
+              <p className="text-sm font-semibold text-gray-800">Login as</p>
+              <p className="text-xs text-gray-500">Choose your role to continue</p>
+            </div>
+            
+            <div className="p-2">
+              {roles.map((role) => {
+                const Icon = role.icon;
+                return (
+                  <button
+                    key={role.id}
+                    onClick={() => {
+                      onSelect(role.route);
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    <Icon className="w-4 h-4" style={{ color: role.color }} />
+                    <span>{role.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -73,6 +143,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'designer' | 'developer' | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   // Simple scroll handler
@@ -85,30 +156,70 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check user authentication
+  // Check user authentication from all storage locations
   useEffect(() => {
     const checkUserAuthentication = () => {
       try {
+        // Check for Admin (localStorage)
         const loginUser = localStorage.getItem('login_user');
         if (loginUser) {
-          setUser(JSON.parse(loginUser));
-        } else {
-          setUser(null);
+          const adminUser = JSON.parse(loginUser);
+          setUser(adminUser);
+          setUserRole('admin');
+          return;
         }
+        
+        // Check for Designer (sessionStorage)
+        const designerAuth = sessionStorage.getItem('designer_auth');
+        if (designerAuth) {
+          const designerData = JSON.parse(designerAuth);
+          if (designerData.user && designerData.user.email) {
+            setUser({ email: designerData.user.email, id: designerData.user.id });
+            setUserRole('designer');
+            return;
+          }
+        }
+        
+        // Check for Developer (sessionStorage)
+        const developerAuth = sessionStorage.getItem('developer_auth');
+        if (developerAuth) {
+          const developerData = JSON.parse(developerAuth);
+          if (developerData.user && developerData.user.email) {
+            setUser({ email: developerData.user.email, id: developerData.user.id });
+            setUserRole('developer');
+            return;
+          }
+        }
+        
+        // No user found
+        setUser(null);
+        setUserRole(null);
       } catch (error) {
         console.error('Error parsing user data:', error);
         setUser(null);
+        setUserRole(null);
       }
     };
 
     checkUserAuthentication();
 
+    // Listen for storage changes
     const handleStorageChange = () => {
       checkUserAuthentication();
     };
 
+    // Custom event for sessionStorage changes
+    const handleSessionStorageChange = () => {
+      checkUserAuthentication();
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('sessionStorageChange', handleSessionStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sessionStorageChange', handleSessionStorageChange);
+    };
   }, []);
 
   // Simple mobile menu toggle
@@ -138,24 +249,37 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('login_user');
+    // Clear based on role
+    if (userRole === 'admin') {
+      localStorage.removeItem('login_user');
+    } else if (userRole === 'designer') {
+      sessionStorage.removeItem('designer_auth');
+    } else if (userRole === 'developer') {
+      sessionStorage.removeItem('developer_auth');
+    }
+    
     setUser(null);
+    setUserRole(null);
     setIsDropdownOpen(false);
-    router.push('/auth/login');
-  }, [router]);
+    
+    // Redirect to home
+    router.push('/');
+  }, [userRole, router]);
 
   const handleDashboardRedirect = useCallback(() => {
-    router.push('/Portfolio_Handler');
-  }, [router]);
+    if (userRole === 'admin') {
+      router.push('/Portfolio_Handler');
+    } else if (userRole === 'designer') {
+      router.push('/designer');
+    } else if (userRole === 'developer') {
+      router.push('/developer');
+    }
+  }, [userRole, router]);
 
   const handleLogoClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    if (user) {
-      router.push('/designer');
-    } else {
-      router.push('/auth/login');
-    }
-  }, [user, router]);
+    router.push('/');
+  }, [router]);
 
   const handleNavigation = useCallback((path: string) => {
     router.push(path);
@@ -163,13 +287,12 @@ export default function Navbar() {
     setIsDropdownOpen(false);
   }, [router]);
 
-  const getUserEmail = () => user?.email || '';
+  const handleRoleSelect = useCallback((route: string) => {
+    router.push(route);
+  }, [router]);
 
-  // Check if user is a developer (from developers table)
-  const isDeveloper = user?.email === 'tauheeddeveloper13@gmail.com' || user?.userType === 'developer';
-  
-  // Check if user is admin
-  const isAdmin = user?.email === 'tauheeddeveloper13@gmail.com' || user?.email === 'nesticktech@gmail.com';
+  const getUserEmail = () => user?.email || '';
+  const getUserInitial = () => user?.email?.charAt(0).toUpperCase() || 'U';
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -288,16 +411,9 @@ export default function Navbar() {
 
             {/* Desktop Login Button - Show when user is NOT logged in */}
             {!user && (
-              <Link
-                href="/auth/login"
-                className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
-                style={{
-                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                }}
-              >
-                Login
-              </Link>
+              <div className="hidden lg:block">
+                <LoginDropdown theme={theme} onSelect={handleRoleSelect} />
+              </div>
             )}
 
             {/* User Dropdown - Desktop only when user is logged in */}
@@ -314,11 +430,11 @@ export default function Navbar() {
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      backgroundColor: userRole === 'admin' ? '#F59E0B' : (userRole === 'developer' ? '#8B5CF6' : '#00A0FF'),
                     }}
                   >
                     <span className="text-white font-bold text-sm">
-                      {getUserEmail().charAt(0).toUpperCase()}
+                      {getUserInitial()}
                     </span>
                   </div>
                   <span className="hidden xl:block text-sm font-medium max-w-[150px] truncate"
@@ -348,48 +464,21 @@ export default function Navbar() {
                       >
                         <p className="text-sm font-semibold text-gray-800">Signed in as</p>
                         <p className="text-sm text-gray-600 truncate">{getUserEmail()}</p>
+                        <p className="text-xs text-gray-500 mt-1 capitalize">{userRole}</p>
                       </div>
                       
                       <div className="p-2">
-                        {/* Designer Portal - For all designers */}
+                        {/* Dashboard Link - Based on role */}
                         <button
                           onClick={() => {
-                            router.push('/designer');
+                            handleDashboardRedirect();
                             setIsDropdownOpen(false);
                           }}
                           className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          <span>Designer Portal</span>
+                          <span>{userRole === 'admin' ? 'Admin Dashboard' : (userRole === 'developer' ? 'Developer Dashboard' : 'Designer Dashboard')}</span>
                         </button>
-                        
-                        {/* Developer Portal - Only for developers */}
-                        {isDeveloper && (
-                          <button
-                            onClick={() => {
-                              router.push('/developer');
-                              setIsDropdownOpen(false);
-                            }}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
-                          >
-                            <Code2 className="w-4 h-4" />
-                            <span>Developer Portal</span>
-                          </button>
-                        )}
-                        
-                        {/* Admin Dashboard - Only for admin */}
-                        {isAdmin && (
-                          <button
-                            onClick={() => {
-                              handleDashboardRedirect();
-                              setIsDropdownOpen(false);
-                            }}
-                            className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
-                          >
-                            <LayoutDashboard className="w-4 h-4" />
-                            <span>Admin Dashboard</span>
-                          </button>
-                        )}
                         
                         <hr className="my-2 border-gray-100" />
                         
@@ -465,57 +554,21 @@ export default function Navbar() {
             {/* Mobile Menu - Login/User Section */}
             {user ? (
               <div className="border-t border-gray-100 px-4 py-4 space-y-2">
-                {/* Designer Portal */}
+                {/* Dashboard Button */}
                 <button
                   onClick={() => {
-                    router.push('/designer');
+                    handleDashboardRedirect();
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
                   style={{
-                    backgroundColor: '#00A0FF',
+                    backgroundColor: userRole === 'admin' ? '#F59E0B' : (userRole === 'developer' ? '#8B5CF6' : '#00A0FF'),
                     color: '#FFFFFF',
                   }}
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  Designer Portal
+                  {userRole === 'admin' ? 'Admin Dashboard' : (userRole === 'developer' ? 'Developer Dashboard' : 'Designer Dashboard')}
                 </button>
-                
-                {/* Developer Portal - Only for developers */}
-                {isDeveloper && (
-                  <button
-                    onClick={() => {
-                      router.push('/developer');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
-                    style={{
-                      backgroundColor: '#8B5CF6',
-                      color: '#FFFFFF',
-                    }}
-                  >
-                    <Code2 className="w-4 h-4" />
-                    Developer Portal
-                  </button>
-                )}
-                
-                {/* Admin Dashboard - Only for admin */}
-                {isAdmin && (
-                  <button
-                    onClick={() => {
-                      handleDashboardRedirect();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
-                    style={{
-                      backgroundColor: '#F59E0B',
-                      color: '#FFFFFF',
-                    }}
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Admin Dashboard
-                  </button>
-                )}
                 
                 <button
                   onClick={() => {
@@ -533,18 +586,52 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="border-t border-gray-100 px-4 py-4">
-                <Link
-                  href="/auth/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+              <div className="border-t border-gray-100 px-4 py-4 space-y-2">
+                {/* Mobile Login Options */}
+                <button
+                  onClick={() => {
+                    router.push('/auth/login');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  style={{
+                    backgroundColor: '#F59E0B',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <Shield className="w-4 h-4" />
+                  Login as Admin
+                </button>
+                
+                <button
+                  onClick={() => {
+                    router.push('/designer/login?type=developer');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  style={{
+                    backgroundColor: '#8B5CF6',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <Code2 className="w-4 h-4" />
+                  Login as Developer
+                </button>
+                
+                <button
+                  onClick={() => {
+                    router.push('/designer/login');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
                   style={{
                     backgroundColor: '#00A0FF',
                     color: '#FFFFFF',
                   }}
                 >
-                  Login
-                </Link>
+                  <Sparkles className="w-4 h-4" />
+                  Login as Designer
+                </button>
               </div>
             )}
           </div>

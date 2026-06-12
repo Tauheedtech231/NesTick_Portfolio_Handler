@@ -1,13 +1,52 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
 import { Menu, X } from 'lucide-react';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const checkUserAccess = () => {
+      try {
+        const loginUser = localStorage.getItem('login_user');
+        
+        if (loginUser) {
+          const user = JSON.parse(loginUser);
+          const userEmail = user?.email;
+          
+          // Allowed emails list
+          const allowedEmails = [
+            'tauheeddeveloper13@gmail.com',
+            'nesticktech@gmail.com',
+            'neezamiya@gmail.com'
+          ];
+          
+          // Check if user email is not in allowed list
+          if (!allowedEmails.includes(userEmail)) {
+            // Redirect to login page
+            localStorage.removeItem('login_user'); // Clear unauthorized user
+            router.push('/auth/login');
+          }
+        } else {
+          // No user found, redirect to login
+          router.push('/auth/login');
+        }
+      } catch (error) {
+        console.error('Error checking user access:', error);
+        router.push('/auth/login');
+      }
+    };
+
+    checkUserAccess();
+  }, [router, pathname]);
 
   return (
     <div className="flex min-h-screen bg-[#0B0F19] transition-colors duration-500">
