@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, User, Sparkles, LogIn } from 'lucide-react';
+import Image from 'next/image';
+import { Eye, EyeOff, Lock, Mail, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -145,12 +145,18 @@ export default function LoginPage() {
       <MessagePopup />
 
       <div className="max-w-md w-full space-y-8 relative z-10">
-        {/* Header */}
+        {/* Header with Real Logo */}
         <div className="text-center">
-          <div className="relative mx-auto w-16 h-16 mb-4">
+          <div className="relative mx-auto w-20 h-20 mb-4">
             <div className="absolute inset-0 bg-[#FFD700] rounded-2xl blur-xl opacity-50 animate-pulse"></div>
-            <div className="relative w-16 h-16 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 rounded-2xl flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
-              <Sparkles className="w-8 h-8 text-black" />
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-[#FFD700]/30 hover:scale-105 transition-transform duration-300 cursor-pointer">
+              <Image
+                src="/logo.jpg"
+                alt="Logo"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 bg-clip-text text-transparent">
@@ -166,7 +172,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">
+              <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5 cursor-pointer">
                 Email Address
               </label>
               <div className="relative">
@@ -186,7 +192,7 @@ export default function LoginPage() {
                     "bg-[#0F172A] border border-[#1E293B] text-white",
                     "placeholder:text-gray-600 text-sm",
                     "focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]",
-                    "transition-all duration-300"
+                    "transition-all duration-300 cursor-text"
                   )}
                 />
               </div>
@@ -194,7 +200,7 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1.5">
+              <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1.5 cursor-pointer">
                 Password
               </label>
               <div className="relative">
@@ -214,13 +220,13 @@ export default function LoginPage() {
                     "bg-[#0F172A] border border-[#1E293B] text-white",
                     "placeholder:text-gray-600 text-sm",
                     "focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]",
-                    "transition-all duration-300"
+                    "transition-all duration-300 cursor-text"
                   )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:scale-110 transition-transform duration-200"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-500 hover:text-[#FFD700] transition-colors" />
@@ -244,7 +250,7 @@ export default function LoginPage() {
               "hover:scale-105 hover:shadow-xl hover:shadow-[#FFD700]/40",
               "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0B0F19] focus:ring-[#FFD700]",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
-              "transition-all duration-300"
+              "transition-all duration-300 cursor-pointer"
             )}
           >
             {isLoading ? (
@@ -263,7 +269,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-600 cursor-default">
             Secure login powered by Portfolio Handler
           </p>
         </div>

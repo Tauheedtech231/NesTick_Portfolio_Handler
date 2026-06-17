@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, memo } from "react";
-import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2, UserCircle, Shield, Sparkles } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2, UserCircle, Shield, Sparkles, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -45,7 +45,7 @@ const NavItem = memo(({ item, isActive, onClick, theme }: {
 }) => (
   <button
     onClick={onClick}
-    className={`relative px-4 py-2 transition-colors duration-200 group ${
+    className={`relative px-4 py-2 transition-colors duration-200 group cursor-pointer ${
       isActive 
         ? (theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00E0FF]')
         : (theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-[#1F4381]')
@@ -66,20 +66,21 @@ const NavItem = memo(({ item, isActive, onClick, theme }: {
 NavItem.displayName = 'NavItem';
 
 // Login Dropdown Component
-const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect: (role: string) => void }) => {
+const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect: (route: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const roles = [
     { id: 'admin', name: 'Admin', icon: Shield, route: '/auth/login', color: '#F59E0B' },
     { id: 'developer', name: 'Developer', icon: Code2, route: '/designer/login?type=developer', color: '#8B5CF6' },
-    { id: 'designer', name: 'Designer', icon: Sparkles, route: '/designer/login', color: '#00A0FF' }
+    { id: 'designer', name: 'Designer', icon: Sparkles, route: '/designer/login', color: '#00A0FF' },
+    { id: 'principal', name: 'Principal Portal', icon: GraduationCap, route: '/College_Portfolio_Handler/login', color: '#10B981' }
   ];
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md cursor-pointer"
         style={{
           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -95,7 +96,7 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50"
+          <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
             style={{
               backgroundColor: '#FFFFFF',
               borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
@@ -120,10 +121,11 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
                       onSelect(role.route);
                       setIsOpen(false);
                     }}
-                    className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
+                    className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 hover:shadow-md cursor-pointer group"
                   >
-                    <Icon className="w-4 h-4" style={{ color: role.color }} />
+                    <Icon className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" style={{ color: role.color }} />
                     <span>{role.name}</span>
+                    {/* REMOVED: "New" badge for principal */}
                   </button>
                 );
               })}
@@ -143,7 +145,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<'admin' | 'designer' | 'developer' | null>(null);
+  const [userRole, setUserRole] = useState<'admin' | 'designer' | 'developer' | 'principal' | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   // Simple scroll handler
@@ -160,6 +162,21 @@ export default function Navbar() {
   useEffect(() => {
     const checkUserAuthentication = () => {
       try {
+        // Check for Principal (localStorage) - ADDED THIS
+        const authCollege = localStorage.getItem('auth_college');
+        if (authCollege) {
+          const collegeData = JSON.parse(authCollege);
+          if (collegeData.email) {
+            setUser({ 
+              email: collegeData.email, 
+              name: collegeData.name || collegeData.email,
+              collegeId: collegeData.collegeId 
+            });
+            setUserRole('principal');
+            return;
+          }
+        }
+        
         // Check for Admin (localStorage)
         const loginUser = localStorage.getItem('login_user');
         if (loginUser) {
@@ -256,6 +273,8 @@ export default function Navbar() {
       sessionStorage.removeItem('designer_auth');
     } else if (userRole === 'developer') {
       sessionStorage.removeItem('developer_auth');
+    } else if (userRole === 'principal') {
+      localStorage.removeItem('auth_college');
     }
     
     setUser(null);
@@ -273,6 +292,8 @@ export default function Navbar() {
       router.push('/designer');
     } else if (userRole === 'developer') {
       router.push('/developer');
+    } else if (userRole === 'principal') {
+      router.push('/College_Portfolio_Handler');
     }
   }, [userRole, router]);
 
@@ -288,11 +309,27 @@ export default function Navbar() {
   }, [router]);
 
   const handleRoleSelect = useCallback((route: string) => {
-    router.push(route);
+    // Check if user is already logged in for Principal Portal
+    if (route === '/College_Portfolio_Handler/login') {
+      const authCollege = localStorage.getItem('auth_college');
+      if (authCollege) {
+        // User is logged in, go to dashboard
+        router.push('/College_Portfolio_Handler');
+      } else {
+        // User not logged in, go to login
+        router.push('/College_Portfolio_Handler/login');
+      }
+    } else {
+      router.push(route);
+    }
   }, [router]);
 
   const getUserEmail = () => user?.email || '';
-  const getUserInitial = () => user?.email?.charAt(0).toUpperCase() || 'U';
+  const getUserName = () => user?.name || user?.email || '';
+  const getUserInitial = () => {
+    const name = getUserName();
+    return name?.charAt(0).toUpperCase() || 'U';
+  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -340,7 +377,7 @@ export default function Navbar() {
               }
             }}
           >
-            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md"
+            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md cursor-pointer"
               style={{
                 boxShadow: theme === 'dark' ? '0 0 15px rgba(232, 202, 94, 0.2)' : '0 0 15px rgba(0, 160, 255, 0.2)',
               }}
@@ -354,7 +391,7 @@ export default function Navbar() {
               />
             </div>
             {/* Company name */}
-            <span className="hidden sm:inline-block text-xl md:text-2xl font-bold font-serif tracking-tight"
+            <span className="hidden sm:inline-block text-xl md:text-2xl font-bold font-serif tracking-tight cursor-pointer"
               style={{
                 color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
               }}
@@ -381,7 +418,7 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl transition-all duration-200"
+              className="p-2 rounded-xl transition-all duration-200 hover:scale-110 cursor-pointer"
               style={{
                 backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
                 borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
@@ -399,7 +436,7 @@ export default function Navbar() {
             {/* Feedback Button */}
             <Link
               href="/feedback"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md"
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md cursor-pointer"
               style={{
                 backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
                 color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -421,7 +458,7 @@ export default function Navbar() {
               <div className="relative hidden lg:block">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer"
                   style={{
                     backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
                     borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
@@ -430,7 +467,9 @@ export default function Navbar() {
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{
-                      backgroundColor: userRole === 'admin' ? '#F59E0B' : (userRole === 'developer' ? '#8B5CF6' : '#00A0FF'),
+                      backgroundColor: userRole === 'admin' ? '#F59E0B' : 
+                                     (userRole === 'developer' ? '#8B5CF6' : 
+                                     (userRole === 'principal' ? '#10B981' : '#00A0FF')),
                     }}
                   >
                     <span className="text-white font-bold text-sm">
@@ -440,7 +479,7 @@ export default function Navbar() {
                   <span className="hidden xl:block text-sm font-medium max-w-[150px] truncate"
                     style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
                   >
-                    {getUserEmail()}
+                    {getUserName()}
                   </span>
                 </button>
 
@@ -451,7 +490,7 @@ export default function Navbar() {
                       className="fixed inset-0 z-40" 
                       onClick={() => setIsDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50"
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
                       style={{
                         backgroundColor: '#FFFFFF',
                         borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
@@ -463,7 +502,7 @@ export default function Navbar() {
                         }}
                       >
                         <p className="text-sm font-semibold text-gray-800">Signed in as</p>
-                        <p className="text-sm text-gray-600 truncate">{getUserEmail()}</p>
+                        <p className="text-sm text-gray-600 truncate">{getUserName()}</p>
                         <p className="text-xs text-gray-500 mt-1 capitalize">{userRole}</p>
                       </div>
                       
@@ -474,17 +513,22 @@ export default function Navbar() {
                             handleDashboardRedirect();
                             setIsDropdownOpen(false);
                           }}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-gray-700 hover:bg-gray-100"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          <span>{userRole === 'admin' ? 'Admin Dashboard' : (userRole === 'developer' ? 'Developer Dashboard' : 'Designer Dashboard')}</span>
+                          <span>
+                            {userRole === 'admin' ? 'Admin Dashboard' : 
+                             userRole === 'developer' ? 'Developer Dashboard' : 
+                             userRole === 'principal' ? 'Principal Dashboard' : 
+                             'Designer Dashboard'}
+                          </span>
                         </button>
                         
                         <hr className="my-2 border-gray-100" />
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-red-600 hover:bg-red-50"
+                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-red-600 hover:bg-red-50 hover:scale-105 cursor-pointer"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -499,7 +543,7 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl transition-all duration-200"
+              className="lg:hidden p-2.5 rounded-xl transition-all duration-200 hover:scale-110 cursor-pointer"
               style={{
                 backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
                 borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
@@ -539,7 +583,7 @@ export default function Navbar() {
                   <button
                     key={item.name}
                     onClick={() => handleNavigation(item.path)}
-                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-colors duration-200 ${
+                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-200 cursor-pointer ${
                       isActive 
                         ? 'bg-[#00A0FF]/20 text-[#00A0FF]'
                         : 'text-gray-700 hover:bg-gray-100'
@@ -560,14 +604,19 @@ export default function Navbar() {
                     handleDashboardRedirect();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
-                    backgroundColor: userRole === 'admin' ? '#F59E0B' : (userRole === 'developer' ? '#8B5CF6' : '#00A0FF'),
+                    backgroundColor: userRole === 'admin' ? '#F59E0B' : 
+                                   (userRole === 'developer' ? '#8B5CF6' : 
+                                   (userRole === 'principal' ? '#10B981' : '#00A0FF')),
                     color: '#FFFFFF',
                   }}
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  {userRole === 'admin' ? 'Admin Dashboard' : (userRole === 'developer' ? 'Developer Dashboard' : 'Designer Dashboard')}
+                  {userRole === 'admin' ? 'Admin Dashboard' : 
+                   userRole === 'developer' ? 'Developer Dashboard' : 
+                   userRole === 'principal' ? 'Principal Dashboard' : 
+                   'Designer Dashboard'}
                 </button>
                 
                 <button
@@ -575,7 +624,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
                     backgroundColor: '#DC2626',
                     color: '#FFFFFF',
@@ -593,7 +642,7 @@ export default function Navbar() {
                     router.push('/auth/login');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
                     backgroundColor: '#F59E0B',
                     color: '#FFFFFF',
@@ -608,7 +657,7 @@ export default function Navbar() {
                     router.push('/designer/login?type=developer');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
                     backgroundColor: '#8B5CF6',
                     color: '#FFFFFF',
@@ -623,7 +672,7 @@ export default function Navbar() {
                     router.push('/designer/login');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
                     backgroundColor: '#00A0FF',
                     color: '#FFFFFF',
@@ -631,6 +680,28 @@ export default function Navbar() {
                 >
                   <Sparkles className="w-4 h-4" />
                   Login as Designer
+                </button>
+
+                {/* Mobile Principal Portal */}
+                <button
+                  onClick={() => {
+                    const authCollege = localStorage.getItem('auth_college');
+                    if (authCollege) {
+                      router.push('/College_Portfolio_Handler');
+                    } else {
+                      router.push('/College_Portfolio_Handler/login');
+                    }
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  style={{
+                    backgroundColor: '#10B981',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  Principal Portal
+                  {/* REMOVED: "New" badge */}
                 </button>
               </div>
             )}

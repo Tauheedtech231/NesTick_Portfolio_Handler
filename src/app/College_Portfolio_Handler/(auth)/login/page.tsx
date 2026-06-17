@@ -3,13 +3,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, Building2 } from 'lucide-react';
+import Image from 'next/image';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CollegeAdmin {
   email: string;
   password: string;
- adminName: string;
+  adminName: string;
   collegeId: string;
 }
 
@@ -38,49 +39,67 @@ export default function LoginPage() {
     }
   }, [router]);
 
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError('');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-  try {
-    const response = await fetch('/api/colleges/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim(), password: password.trim() })
-    });
+    try {
+      // ✅ TEST CREDENTIALS - Direct redirect
+      if (email.trim() === 'test@gmail.com' && password.trim() === '1234') {
+        const authData: AuthCollege = {
+          email: 'test@gmail.com',
+          name: 'Test College',
+          collegeId: 'TEST123',
+          token: `college_${Date.now()}`,
+          timestamp: Date.now()
+        };
 
-    const result = await response.json();
+        // Save to localStorage
+        localStorage.setItem('auth_college', JSON.stringify(authData));
 
-    if (!result.success) {
-      setError(result.message || "Login failed");
+        // Redirect to portal
+        router.push('/College_Portfolio_Handler');
+        setIsLoading(false);
+        return;
+      }
+
+      // Regular API login
+      const response = await fetch('/api/colleges/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password: password.trim() })
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        setError(result.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      const authData: AuthCollege = {
+        email: result.data.email,
+        name: result.data.collegeName,
+        collegeId: result.data.collegeId,
+        token: `college_${Date.now()}`,
+        timestamp: Date.now()
+      };
+
+      // Save to localStorage
+      localStorage.setItem('auth_college', JSON.stringify(authData));
+
+      // Redirect to portal
+      router.push('/College_Portfolio_Handler');
+
+    } catch (err) {
+      console.error(err);
+      setError('Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    const authData: AuthCollege = {
-      email: result.data.email,
-      name: result.data.collegeName,
-      collegeId: result.data.collegeId,
-      token: `college_${Date.now()}`,
-      timestamp: Date.now()
-    };
-
-    // Save to localStorage
-    localStorage.setItem('auth_college', JSON.stringify(authData));
-
-    // Redirect to portal
-    router.push('/College_Portfolio_Handler');
-
-  } catch (err) {
-    console.error(err);
-    setError('Login failed. Please try again.');
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+  };
 
   // Error popup component
   const ErrorPopup = () => {
@@ -103,10 +122,17 @@ const handleLogin = async (e: React.FormEvent) => {
       <ErrorPopup />
       
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
+        {/* Header with Real Logo */}
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-gray-900 dark:bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-            <Building2 className="w-6 h-6 text-white dark:text-gray-900" />
+          <div className="mx-auto w-20 h-20 rounded-2xl overflow-hidden shadow-lg mb-4 hover:scale-105 transition-transform duration-300 cursor-pointer">
+            <Image
+              src="/logo.jpg"
+              alt="Neezamiya Logo"
+              width={80}
+              height={80}
+              className="object-cover w-full h-full"
+              priority
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             College Portal
@@ -121,7 +147,7 @@ const handleLogin = async (e: React.FormEvent) => {
           <div className="space-y-4">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Email Address
               </label>
               <div className="relative">
@@ -140,7 +166,7 @@ const handleLogin = async (e: React.FormEvent) => {
                     "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
                     "placeholder-gray-500 dark:placeholder-gray-400",
                     "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
+                    "transition-all duration-200 cursor-text"
                   )}
                   placeholder="Enter your email"
                 />
@@ -149,7 +175,7 @@ const handleLogin = async (e: React.FormEvent) => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                 Password
               </label>
               <div className="relative">
@@ -168,14 +194,14 @@ const handleLogin = async (e: React.FormEvent) => {
                     "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100",
                     "placeholder-gray-500 dark:placeholder-gray-400",
                     "focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent",
-                    "transition-all duration-200"
+                    "transition-all duration-200 cursor-text"
                   )}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:scale-110 transition-transform duration-200"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
@@ -197,7 +223,7 @@ const handleLogin = async (e: React.FormEvent) => {
               "bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200",
               "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 dark:focus:ring-gray-100",
               "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-all duration-200"
+              "transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
             )}
           >
             {isLoading ? (
@@ -210,14 +236,7 @@ const handleLogin = async (e: React.FormEvent) => {
             )}
           </button>
 
-          {/* Help Text */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Contact support if you have forgotten your credentials
-            </p>
-          </div>
-
-          
+      
         </form>
       </div>
     </div>
