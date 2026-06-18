@@ -77,10 +77,10 @@ export default function LandingPage() {
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   // Refs for animations
-  const heroRef = useRef<HTMLDivElement>(null);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const aboutRef = useRef<HTMLDivElement>(null);
-  const contactRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const featuresRef = useRef<HTMLDivElement | null>(null);
+  const aboutRef = useRef<HTMLDivElement | null>(null);
+  const contactRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const featureCardsRef = useRef<HTMLDivElement[]>([]);
   const templateCardsRef = useRef<HTMLDivElement[]>([]);

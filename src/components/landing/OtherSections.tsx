@@ -2,11 +2,8 @@
 
 import { motion, Variants } from "framer-motion";
 import { 
-  Sparkles, 
   Building2, 
-  Layout, 
   Zap, 
-  Shield, 
   BarChart3,
   CheckCircle2,
   Crown,
@@ -30,10 +27,12 @@ import {
   Server,
   ShoppingBag,
   Layers,
-  Briefcase
+  Briefcase,
+  Layout
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import FeaturesSection from "./FeaturesSection";
 
 interface OtherSectionsProps {
   featuresRef: React.RefObject<HTMLDivElement | null>;
@@ -65,8 +64,6 @@ const packages = [
       { text: "Drag & drop site management", icon: Layers, included: true }
     ],
     icon: Package,
-    color: "#0066FF",
-    bgColor: "rgba(0, 102, 255, 0.08)",
     popular: false,
     ctaText: "Contact Sales"
   },
@@ -84,8 +81,6 @@ const packages = [
       { text: "Multi portal and customizable apps", icon: Layers, included: true }
     ],
     icon: Diamond,
-    color: "#0066FF",
-    bgColor: "rgba(0, 102, 255, 0.08)",
     popular: true,
     ctaText: "Contact Sales"
   },
@@ -103,11 +98,44 @@ const packages = [
       { text: "24/7 support", icon: Headphones, included: true }
     ],
     icon: Gem,
-    color: "#0066FF",
-    bgColor: "rgba(0, 102, 255, 0.08)",
     popular: false,
     ctaText: "Contact Sales"
   }
+];
+
+const portals = [
+  {
+    title: "Generic Portal",
+    description: "Public-facing portal for previewing templates and submitting requests. No login required for basic access.",
+    features: ["Template Preview", "Request Submission", "Public Access"],
+    icon: Globe2,
+  },
+  {
+    title: "Main Admin Portal",
+    description: "Central control center for system administrators to manage all colleges and system-wide settings.",
+    features: ["College Management", "Template Approval", "System Analytics", "Global Settings"],
+    icon: Crown,
+  },
+  {
+    title: "College Admin Portal",
+    description: "Secure portal for individual colleges to manage their content, portfolios, and student data.",
+    features: ["Content Management", "Student Portfolios", "College Settings", "Local Analytics"],
+    icon: Users,
+  }
+];
+
+const stats = [
+  { label: "Institutions Supported", value: "500+", description: "Colleges and educational institutes", icon: Building2 },
+  { label: "Active Portfolios", value: "50K+", description: "Student portfolios managed", icon: FileText },
+  { label: "System Uptime", value: "99.9%", description: "Reliable service availability", icon: Database },
+  { label: "Admin Satisfaction", value: "98%", description: "Positive feedback rate", icon: Users }
+];
+
+const steps = [
+  { step: "01", title: "Template Selection", description: "Colleges browse and select from professional portfolio templates tailored for education" },
+  { step: "02", title: "Centralized Approval", description: "Main admin reviews and approves template requests with customization options" },
+  { step: "03", title: "Content Management", description: "College admins manage their content through a secure, dedicated portal" },
+  { step: "04", title: "Live Publication", description: "Real-time updates ensure instant publication of portfolio content" }
 ];
 
 export default function OtherSections({
@@ -118,7 +146,6 @@ export default function OtherSections({
 }: OtherSectionsProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Detect theme changes
   useEffect(() => {
     const checkTheme = () => {
       const isDark = document.documentElement.classList.contains('dark');
@@ -138,125 +165,19 @@ export default function OtherSections({
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
-  
-  const features = [
-    {
-      title: "Ready-Made Portfolio Templates",
-      description: "Professional templates for colleges with standard sections: Home, About, Services, Faculty, Gallery, Contact. Easily customizable for any educational institute.",
-      icon: Layout,
-      color: "#0066FF",
-    },
-    {
-      title: "Multi-Portal Architecture",
-      description: "Three-tier system: Generic Portal for previews, Main Admin Portal for centralized control, and College Admin Portal for individual institution management.",
-      icon: Building2,
-      color: "#0066FF",
-    },
-    {
-      title: "Centralized Management",
-      description: "Add/edit/delete colleges, approve template requests, upload new templates, and manage sections per college from a single dashboard.",
-      icon: Settings,
-      color: "#0066FF",
-    },
-    {
-      title: "Real-Time Content Updates",
-      description: "Changes made by college admins reflect instantly on live websites with live synchronization to the centralized database.",
-      icon: Zap,
-      color: "#0066FF",
-    },
-    {
-      title: "Role-Based Access Control",
-      description: "Three-tier access: Generic users view templates, College admins manage their content, Main admin has full system control.",
-      icon: Shield,
-      color: "#0066FF",
-    },
-    {
-      title: "Scalable Infrastructure",
-      description: "Built to support multiple institutions simultaneously with independent workspaces and robust data management tools.",
-      icon: BarChart3,
-      color: "#0066FF",
-    }
-  ];
 
-  const portals = [
-    {
-      title: "Generic Portal",
-      description: "Public-facing portal for previewing templates and submitting requests. No login required for basic access.",
-      features: ["Template Preview", "Request Submission", "Public Access"],
-      icon: Globe2,
-      color: "#0066FF"
-    },
-    {
-      title: "Main Admin Portal",
-      description: "Central control center for system administrators to manage all colleges and system-wide settings.",
-      features: ["College Management", "Template Approval", "System Analytics", "Global Settings"],
-      icon: Crown,
-      color: "#0066FF"
-    },
-    {
-      title: "College Admin Portal",
-      description: "Secure portal for individual colleges to manage their content, portfolios, and student data.",
-      features: ["Content Management", "Student Portfolios", "College Settings", "Local Analytics"],
-      icon: Users,
-      color: "#0066FF"
-    }
-  ];
-
-  const stats = [
-    { label: "Institutions Supported", value: "500+", description: "Colleges and educational institutes", icon: Building2, color: "#0066FF" },
-    { label: "Active Portfolios", value: "50K+", description: "Student portfolios managed", icon: FileText, color: "#0066FF" },
-    { label: "System Uptime", value: "99.9%", description: "Reliable service availability", icon: Database, color: "#0066FF" },
-    { label: "Admin Satisfaction", value: "98%", description: "Positive feedback rate", icon: Users, color: "#0066FF" }
-  ];
-
-  const steps = [
-    { step: "01", title: "Template Selection", description: "Colleges browse and select from professional portfolio templates tailored for education" },
-    { step: "02", title: "Centralized Approval", description: "Main admin reviews and approves template requests with customization options" },
-    { step: "03", title: "Content Management", description: "College admins manage their content through a secure, dedicated portal" },
-    { step: "04", title: "Live Publication", description: "Real-time updates ensure instant publication of portfolio content" }
-  ];
-
-  const containerVariants:Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants:Variants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 70,
-        damping: 12,
-        duration: 0.5,
-      },
-    },
-  };
-
-  // Clean background - no gradients
   const getSectionBg = () => {
     return theme === 'dark' ? '#0B0F19' : '#FFFFFF';
   };
 
-  // Clean card background
   const getCardBg = () => {
     return theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF';
   };
 
-  // Clean border
   const getBorderColor = () => {
     return theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   };
 
-  // Accent color
   const getAccentColor = () => {
     return theme === 'dark' ? '#E8CA5E' : '#0066FF';
   };
@@ -267,113 +188,12 @@ export default function OtherSections({
 
   return (
     <>
-      {/* Features Section */}
-      <section
-        id="features"
-        ref={featuresRef}
-        className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
-        style={{
-          backgroundColor: getSectionBg(),
-        }}
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12 md:mb-16"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
-              style={{
-                backgroundColor: getAccentBg(),
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5"
-                style={{ color: getAccentColor() }}
-              />
-              <span className="text-xs font-medium"
-                style={{ color: getAccentColor() }}
-              >
-                Powerful Features
-              </span>
-            </div>
-            
-            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
-              <span className="relative inline-block"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-              >
-                Comprehensive
-              </span>{' '}
-              <span className="inline-block"
-                style={{ color: getAccentColor() }}
-              >
-                System Features
-              </span>
-            </h2>
-            
-            <p className="text-lg md:text-xl max-w-2xl mx-auto font-light"
-              style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-            >
-              A complete solution for managing educational portfolios with multi-level architecture
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          >
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={feature.title}
-                  variants={itemVariants}
-                  ref={(el) => addToRefs(el, featureCardsRef)}
-                  whileHover={{ y: -8 }}
-                  className="group relative rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-xl"
-                  style={{
-                    backgroundColor: getCardBg(),
-                    border: `1px solid ${getBorderColor()}`,
-                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                  }}
-                >
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"
-                      style={{
-                        backgroundColor: getAccentBg(),
-                      }}
-                    >
-                      <Icon className="w-6 h-6" style={{ color: getAccentColor() }} />
-                    </div>
-                    
-                    <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
-                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                    >
-                      {feature.title}
-                    </h3>
-                    
-                    <p className="leading-relaxed text-base mb-4"
-                      style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                    >
-                      {feature.description}
-                    </p>
-                    
-                    <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className="w-4 h-4"
-                        style={{ color: getAccentColor() }}
-                      />
-                      <span style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>Active Feature</span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </div>
-      </section>
+      {/* Features Section - Using separate component */}
+      <FeaturesSection 
+        featuresRef={featuresRef}
+        addToRefs={addToRefs}
+        featureCardsRef={featureCardsRef}
+      />
 
       {/* Packages Section */}
       <section className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
