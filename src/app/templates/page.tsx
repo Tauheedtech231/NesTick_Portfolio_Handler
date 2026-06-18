@@ -5,14 +5,18 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { 
-  Search, Sparkles, Eye, X, Info, CheckCircle, Filter,
-  Star, ChevronRight, Mail, Send, Phone, Clock, 
-  Layout, Diamond, Gem, User, Building2, GraduationCap, Palette
+  Eye, Sparkles, X, CheckCircle, 
+  Star, ChevronRight, Send, 
+  Layout, Diamond, Gem, Palette
 } from 'lucide-react';
 import Image from 'next/image';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import TestimonialSection from '../components/TestimonialSection';
+import HeroSection from './HeroSection';
+import TemplatesGrid from './TemplatesGrid';
+import FeaturedTemplates from './FeaturedTemplates';
+import ContactSection from './ContactSection';
 
 interface Template {
   id: number;
@@ -150,10 +154,6 @@ export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [featuredTemplates, setFeaturedTemplates] = useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [selectedType, setSelectedType] = useState<'all' | 'free' | 'paid'>('all');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
@@ -175,7 +175,6 @@ export default function TemplatesPage() {
     template: null as Template | null,
   });
 
-  // Design Modal States
   const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
   const [isDesignSubmitting, setIsDesignSubmitting] = useState(false);
   const [designSubmitSuccess, setDesignSubmitSuccess] = useState(false);
@@ -208,16 +207,6 @@ export default function TemplatesPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
-  // Contact form state
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  });
-  const [contactSubmitting, setContactSubmitting] = useState(false);
-  const [contactSuccess, setContactSuccess] = useState(false);
-
   // Detect theme changes
   useEffect(() => {
     const checkTheme = () => {
@@ -239,17 +228,27 @@ export default function TemplatesPage() {
     return () => observer.disconnect();
   }, []);
 
-  // Parallax effect for header
+  const fetchTemplates = async () => {
+    setLoadingTemplates(true);
+    try {
+      const response = await fetch('/api/templates');
+      if (!response.ok) throw new Error('Failed to fetch templates');
+      const data = await response.json();
+      if (data.success) {
+        const allTemplates = data.templates;
+        const paidTemplates = allTemplates.filter((t: Template) => t.type === 'paid');
+        setFeaturedTemplates(paidTemplates.slice(0, 2));
+        setTemplates(allTemplates);
+      }
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
   useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const parallaxElements = document.querySelectorAll('.parallax-bg');
-      parallaxElements.forEach((el) => {
-        (el as HTMLElement).style.transform = `translateY(${scrolled * 0.5}px)`;
-      });
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    fetchTemplates();
   }, []);
 
   const validateEmail = (email: string): boolean => {
@@ -297,37 +296,6 @@ export default function TemplatesPage() {
       return false;
     }
   };
-
-  const fetchTemplates = async () => {
-    setLoadingTemplates(true);
-    try {
-      const response = await fetch('/api/templates');
-      if (!response.ok) throw new Error('Failed to fetch templates');
-      const data = await response.json();
-      if (data.success) {
-        const allTemplates = data.templates;
-        const paidTemplates = allTemplates.filter((t: Template) => t.type === 'paid');
-        setFeaturedTemplates(paidTemplates.slice(0, 2));
-        setTemplates(allTemplates);
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-    } finally {
-      setLoadingTemplates(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  const filteredTemplates = templates.filter(template => {
-    const matchesSearch = searchQuery === '' || 
-      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = selectedType === 'all' || template.type === selectedType;
-    return matchesSearch && matchesType;
-  });
 
   const handleBuyNowClick = (template: Template) => {
     setSelectedTemplate(template);
@@ -539,35 +507,6 @@ export default function TemplatesPage() {
     }
   };
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setContactSubmitting(true);
-    
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: contactForm.name,
-          email: contactForm.email,
-          phone: contactForm.phone,
-          subject: 'Template Page Inquiry',
-          message: contactForm.message
-        })
-      });
-      
-      if (response.ok) {
-        setContactSuccess(true);
-        setContactForm({ name: '', email: '', phone: '', message: '' });
-        setTimeout(() => setContactSuccess(false), 5000);
-      }
-    } catch (error) {
-      console.error('Contact error:', error);
-    } finally {
-      setContactSubmitting(false);
-    }
-  };
-
   const handlePreviewClick = (imageUrl: string, templateName: string, description: string, liveUrl?: string | null) => {
     setPreviewModal({
       isOpen: true,
@@ -582,87 +521,7 @@ export default function TemplatesPage() {
     setPreviewModal({ isOpen: false, imageUrl: '', templateName: '', description: '', liveUrl: null });
   };
 
-  // Animation variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 70,
-        damping: 12,
-        duration: 0.5,
-      },
-    },
-  };
-
-  const heroVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const fromLeftVariants: Variants = {
-    hidden: { x: -50, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 60,
-        damping: 12,
-        duration: 0.6,
-      },
-    },
-  };
-
-  const fromRightVariants: Variants = {
-    hidden: { x: 50, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 60,
-        damping: 12,
-        duration: 0.6,
-      },
-    },
-  };
-
-  const fromBottomVariants: Variants = {
-    hidden: { y: 50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 60,
-        damping: 12,
-        duration: 0.6,
-        delay: 0.2,
-      },
-    },
-  };
-
-  const modalVariants: Variants = {
+  const modalVariants:Variants = {
     hidden: { opacity: 0, scale: 0.95, y: 20 },
     visible: { 
       opacity: 1, 
@@ -692,623 +551,27 @@ export default function TemplatesPage() {
           backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
         }}
       >
-        {/* Hero Section with "Your Design" Button */}
-        <section className="relative overflow-hidden py-16 md:py-20 lg:py-24">
-          <div 
-            className="parallax-bg absolute inset-0 opacity-10 pointer-events-none"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%239C92AC' fillOpacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              backgroundRepeat: 'repeat',
-            }}
-          />
-          
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl opacity-10"
-              style={{
-                backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
-              }}
-            />
-            <div className="absolute bottom-20 right-10 w-72 h-72 rounded-full blur-3xl opacity-10"
-              style={{
-                backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-              }}
-            />
-          </div>
+        <HeroSection theme={theme} onDesignClick={handleDesignClick} />
+        
+        <TemplatesGrid
+          templates={templates}
+          loadingTemplates={loadingTemplates}
+          theme={theme}
+          onPreviewClick={handlePreviewClick}
+          onBuyNowClick={handleBuyNowClick}
+          onDetailsClick={handleDetailsClick}
+        />
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              variants={heroVariants}
-              initial="hidden"
-              animate="visible"
-              className="text-center max-w-4xl mx-auto"
-            >
-              <motion.div variants={fromBottomVariants} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
-                  border: 'none',
-                }}
-              >
-                <Sparkles className="w-3.5 h-3.5"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                />
-                <span className="text-xs font-medium"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                >
-                  Our Templates
-                </span>
-              </motion.div>
+      <FeaturedTemplates
+  featuredTemplates={featuredTemplates}
+  theme={theme}
+  onBuyNowClick={handleBuyNowClick}
+/>
 
-              <motion.h1 variants={fromLeftVariants} className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-serif tracking-tight">
-                <span className="relative inline-block"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                >
-                  Beautiful
-                </span>{' '}
-                <span className="inline-block bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text text-transparent">
-                  Portfolio Templates
-                </span>
-              </motion.h1>
-
-              <motion.p variants={fromRightVariants} className="text-base md:text-lg max-w-3xl mx-auto mb-8 font-light tracking-wide"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-              >
-                Choose from our collection of professionally designed templates. Each template is fully customizable to match your institution&apos;s brand and requirements.
-              </motion.p>
-
-              {/* Two CTA Buttons */}
-              <motion.div variants={fromBottomVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                <button
-                  onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300"
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                    color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                  }}
-                >
-                  <span>Browse Templates</span>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-                
-                <button
-                  onClick={handleDesignClick}
-                  className="group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2"
-                  style={{
-                    borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                    color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  }}
-                >
-                  <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                  <span>Your Design</span>
-                </button>
-              </motion.div>
-
-              {/* Search and Filter Bar */}
-              <motion.div variants={fromBottomVariants} className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <div className="relative flex items-center gap-2">
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Search templates by name or description..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onFocus={() => setIsSearchFocused(true)}
-                        onBlur={() => setIsSearchFocused(false)}
-                        className="w-full rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none transition-colors duration-300 font-sans"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                          borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                          borderWidth: '1px',
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                        }}
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 transition-colors"
-                        >
-                          <X className="w-3.5 h-3.5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
-                        </button>
-                      )}
-                    </div>
-                    
-                    <button
-                      onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className="px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 font-sans"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-                      }}
-                    >
-                      <Filter className="w-4 h-4" />
-                      <span className="text-sm hidden sm:inline">Filter</span>
-                    </button>
-                  </div>
-                </div>
-
-                <AnimatePresence>
-                  {isFilterOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="mt-3 p-2 rounded-xl flex gap-2"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                      }}
-                    >
-                      <button
-                        onClick={() => setSelectedType('all')}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
-                        style={{
-                          backgroundColor: selectedType === 'all'
-                            ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
-                            : 'transparent',
-                          color: selectedType === 'all'
-                            ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
-                        }}
-                      >
-                        All Templates
-                      </button>
-                      <button
-                        onClick={() => setSelectedType('free')}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
-                        style={{
-                          backgroundColor: selectedType === 'free'
-                            ? '#22C55E'
-                            : 'transparent',
-                          color: selectedType === 'free'
-                            ? '#FFFFFF'
-                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
-                        }}
-                      >
-                        Free
-                      </button>
-                      <button
-                        onClick={() => setSelectedType('paid')}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-sans tracking-wide"
-                        style={{
-                          backgroundColor: selectedType === 'paid'
-                            ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF')
-                            : 'transparent',
-                          color: selectedType === 'paid'
-                            ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                            : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
-                        }}
-                      >
-                        Premium
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div className="flex justify-between items-center mt-3">
-                  <p className="text-xs font-sans tracking-wide"
-                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                  >
-                    {filteredTemplates.length} {filteredTemplates.length === 1 ? 'template' : 'templates'} available
-                  </p>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Templates Grid */}
-        <section id="templates-grid" className="py-8 md:py-10 lg:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {loadingTemplates ? (
-              <div className="flex justify-center items-center py-16">
-                <div className="w-10 h-10 border-4 rounded-full animate-spin"
-                  style={{
-                    borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 160, 255, 0.2)',
-                    borderTopColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  }}
-                />
-              </div>
-            ) : filteredTemplates.length > 0 ? (
-              <>
-                {/* Standard Templates */}
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-                >
-                  {filteredTemplates.map((template) => (
-                    <motion.div
-                      key={template.id}
-                      variants={itemVariants}
-                      whileHover={{ y: -8 }}
-                      className="group rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col h-full cursor-pointer"
-                      style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                        border: '1px solid',
-                        borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                      }}
-                    >
-                      <div className="h-48 relative overflow-hidden flex-shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10" />
-                        <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
-                          <Image
-                            src={template.image}
-                            alt={template.name}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className="object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
-                            }}
-                          />
-                        </div>
-                        
-                        <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                          <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
-                            Template
-                          </span>
-                          <span className={`text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
-                            template.type === 'free' 
-                              ? 'bg-green-500/80' 
-                              : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
-                          }`}>
-                            {template.type === 'free' ? 'Free' : 'Premium'}
-                          </span>
-                        </div>
-                        
-                        <button
-                          onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
-                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center cursor-pointer"
-                        >
-                          <div className="px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5"
-                            style={{
-                              backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                              color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                            }}
-                          >
-                            <Eye size={12} />
-                            Preview
-                          </div>
-                        </button>
-                      </div>
-
-                      <div className="p-6 flex flex-col flex-grow">
-                        <h3 className="text-xl font-bold mb-2 transition-colors duration-300"
-                          style={{
-                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                          }}
-                        >
-                          {template.name}
-                        </h3>
-                        
-                        <p className="text-sm leading-relaxed mb-4 line-clamp-2"
-                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                        >
-                          {template.description}
-                        </p>
-
-                        <div className="mt-auto pt-4 flex gap-2">
-                          <button
-                            onClick={() => handleDetailsClick(template)}
-                            className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
-                            style={{
-                              backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                              border: '1px solid',
-                              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                              color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                            }}
-                          >
-                            <Info size={14} />
-                            Details
-                          </button>
-                          <button
-                            onClick={() => handleBuyNowClick(template)}
-                            className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
-                            style={{
-                              backgroundColor: template.type === 'free'
-                                ? '#22C55E'
-                                : (theme === 'dark' ? '#E8CA5E' : '#00A0FF'),
-                              color: template.type === 'free'
-                                ? '#FFFFFF'
-                                : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
-                            }}
-                          >
-                            Buy Now
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* Featured Templates Section */}
-                {featuredTemplates.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="mt-16 pt-8 border-t"
-                    style={{
-                      borderColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,160,255,0.2)',
-                    }}
-                  >
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="w-1 h-8 rounded-full bg-gradient-to-b from-[#E8CA5E] to-[#00E0FF]" />
-                      <h2 className="text-2xl md:text-3xl font-bold font-serif">
-                        <span className="text-white">Featured</span>{' '}
-                        <span className="bg-gradient-to-r from-[#E8CA5E] to-[#00E0FF] bg-clip-text text-transparent">
-                          Premium Templates
-                        </span>
-                      </h2>
-                      <ChevronRight className="w-6 h-6 text-yellow-400 animate-pulse" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {featuredTemplates.map((template, idx) => (
-                        <motion.div
-                          key={template.id}
-                          initial={{ opacity: 0, x: idx === 0 ? -30 : 30 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: idx * 0.2 }}
-                          className="relative rounded-2xl overflow-hidden group"
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                            border: '1px solid',
-                            borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                            boxShadow: `0 0 20px ${theme === 'dark' ? 'rgba(232,202,94,0.1)' : 'rgba(0,160,255,0.1)'}`
-                          }}
-                        >
-                          <div className="absolute top-4 right-4 z-20">
-                            <div className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"
-                              style={{
-                                backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                                color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                              }}
-                            >
-                              <Star className="w-3 h-3" />
-                              Featured
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-col md:flex-row">
-                            <div className="md:w-2/5 h-56 md:h-auto relative overflow-hidden">
-                              <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
-                                <Image
-                                  src={template.image}
-                                  alt={template.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            </div>
-                            <div className="md:w-3/5 p-6">
-                              <h3 className="text-xl font-bold mb-2"
-                                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                              >
-                                {template.name}
-                              </h3>
-                              <p className="text-sm mb-4 line-clamp-3"
-                                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                              >
-                                {template.description}
-                              </p>
-                              <div className="flex flex-wrap gap-2 mb-4">
-                                <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400">Premium Design</span>
-                                <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">Fully Responsive</span>
-                                <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">Easy Customize</span>
-                              </div>
-                              <button
-                                onClick={() => handleBuyNowClick(template)}
-                                className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
-                                style={{
-                                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                                  color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                                }}
-                              >
-                                Buy Now
-                              </button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                    border: '1px solid',
-                    borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                  }}
-                >
-                  <Search className="w-6 h-6"
-                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                  />
-                </div>
-                <h3 className="text-lg font-bold mb-1 font-serif tracking-tight"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                >
-                  No templates found
-                </h3>
-                <p className="text-sm font-light tracking-wide"
-                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                >
-                  Try adjusting your search or filter to find what you&apos;re looking for.
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
       </main>
 
       <TestimonialSection />
-
-      {/* Contact Section before Footer */}
-      <section className="py-16 px-4 sm:px-6"
-        style={{
-          backgroundColor: theme === 'dark' ? '#0F172A' : '#F9FAFB',
-        }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
-                }}
-              >
-                <Mail className="w-3.5 h-3.5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }} />
-                <span className="text-xs font-medium" style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}>
-                  Contact Us
-                </span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif tracking-tight"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-              >
-                Have Questions?
-                <br />
-                <span className="bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] bg-clip-text text-transparent">
-                  We're Here to Help
-                </span>
-              </h2>
-              <p className="text-gray-400 mb-6 leading-relaxed">
-                Whether you're looking for a custom template, need assistance with your existing portfolio, or want to discuss your requirements, our team is ready to assist you.
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-blue-400" />
-                  <span className="text-gray-300">support@nesticktech.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300">+92 319 3236529</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-yellow-400" />
-                  <span className="text-gray-300">Mon-Fri, 9AM - 6PM PKT</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl p-6 md:p-8"
-              style={{
-                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                border: '1px solid',
-                borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-              }}
-            >
-              {contactSuccess ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <CheckCircle className="w-8 h-8 text-green-500" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
-                    Message Sent!
-                  </h3>
-                  <p className="text-gray-400">We'll get back to you within 24 hours.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleContactSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium mb-1.5 text-gray-400">Full Name *</label>
-                    <input
-                      type="text"
-                      value={contactForm.name}
-                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      required
-                      className="w-full px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-[#00A0FF] transition-all"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
-                      placeholder="John Doe"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5 text-gray-400">Email *</label>
-                      <input
-                        type="email"
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                        required
-                        className="w-full px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-[#00A0FF] transition-all"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                          borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                          borderWidth: '1px',
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                        }}
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1.5 text-gray-400">Phone *</label>
-                      <input
-                        type="tel"
-                        value={contactForm.phone}
-                        onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
-                        required
-                        className="w-full px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-[#00A0FF] transition-all"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                          borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                          borderWidth: '1px',
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                        }}
-                        placeholder="+92 300 1234567"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium mb-1.5 text-gray-400">Message *</label>
-                    <textarea
-                      rows={4}
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                      required
-                      className="w-full px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-[#00A0FF] transition-all resize-none"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
-                        borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                      }}
-                      placeholder="Tell us about your requirements..."
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={contactSubmitting}
-                    className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                      color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                    }}
-                  >
-                    {contactSubmitting ? 'Sending...' : 'Send Message'}
-                    <Send size={14} />
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <ContactSection theme={theme} />
       <Footer />
 
       {/* Preview Modal */}
@@ -1385,7 +648,7 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Details Modal */}
+      {/* Details Modal - Keep as is */}
       <AnimatePresence>
         {detailsModal.isOpen && detailsModal.template && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setDetailsModal({ isOpen: false, template: null })}>
@@ -1574,7 +837,7 @@ export default function TemplatesPage() {
         )}
       </AnimatePresence>
 
-      {/* Buy Now Modal - Scrollable Form with top margin */}
+      {/* Buy Now Modal - Keep as is */}
       {isBuyNowModalOpen && selectedTemplate && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
           <motion.div
@@ -1954,7 +1217,7 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Design Modal - Scrollable Form */}
+      {/* Design Modal - Keep as is */}
       <AnimatePresence>
         {isDesignModalOpen && (
           <motion.div

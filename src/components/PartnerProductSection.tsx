@@ -1,255 +1,268 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 
-const products = ["Neezamiya", "Advance POS", "MarX", "Build N"];
-
-const partnerLogos= [
-    { id: 1, name: "Saqfiyat", image: "/p1.jpg" },
-    { id: 2, name: "Skeler Security", image: "/p2.jpg" },
-    { id: 3, name: "Futurizm", image: "/p3.jpg" },
-    { id: 4, name: "Pixsy Studio", image: "/p4.jpg" },
-  ]; 
-
-interface SliderProps {
-  items: React.ReactNode[];
-  direction: 'left' | 'right';
-  speed?: number;
+interface Stat {
+  value: string;
+  label: string;
+  target: number;
+  suffix: string;
 }
 
-function Slider({ items, direction, speed = 50 }: SliderProps) {
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
+const stats: Stat[] = [
+  { value: '500+', label: 'Clients', target: 500, suffix: '+' },
+  { value: '30+', label: 'Templates', target: 30, suffix: '+' },
+  { value: '20K+', label: 'Active Users', target: 20000, suffix: 'K+' },
+  { value: '99%', label: 'Success Rate', target: 99, suffix: '%' },
+];
 
+export default function SocialProofBar() {
+  const [counts, setCounts] = useState<number[]>([0, 0, 0, 0]);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.15,
+    rootMargin: '-50px 0px',
+  });
+
+  // Detect theme
   useEffect(() => {
-    setIsClient(true);
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
   }, []);
 
+  // Animate counter when in view
   useEffect(() => {
-    if (!isClient) return;
-    
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let animationId: number;
-    let startTime: number | null = null;
-    let paused = false;
-    let currentOffset = 0;
-
-    const totalWidth = slider.scrollWidth / 3;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
+    if (inView && !hasAnimated) {
+      setHasAnimated(true);
       
-      if (!paused) {
-        const elapsed = timestamp - startTime;
-        const distance = (elapsed / 1000) * speed;
-        
-        if (direction === 'left') {
-          currentOffset = -distance;
-        } else {
-          currentOffset = distance;
-        }
-        
-        if (Math.abs(currentOffset) >= totalWidth) {
-          startTime = timestamp;
-          currentOffset = 0;
-        }
-        
-        slider.style.transform = `translateX(${currentOffset}px)`;
-      }
-      
-      animationId = requestAnimationFrame(animate);
-    };
+      stats.forEach((stat, index) => {
+        const duration = 2000;
+        const steps = 60;
+        const increment = stat.target / steps;
+        let current = 0;
+        let step = 0;
 
-    animationId = requestAnimationFrame(animate);
+        const timer = setInterval(() => {
+          step++;
+          current += increment;
+          
+          if (step >= steps) {
+            current = stat.target;
+            clearInterval(timer);
+          }
+          
+          setCounts(prev => {
+            const newCounts = [...prev];
+            newCounts[index] = Math.floor(current);
+            return newCounts;
+          });
+        }, duration / steps);
+      });
+    }
+  }, [inView, hasAnimated]);
 
-    const handleMouseEnter = () => { paused = true; };
-    const handleMouseLeave = () => { 
-      paused = false; 
-      startTime = null;
-    };
-
-    slider.addEventListener('mouseenter', handleMouseEnter);
-    slider.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      slider.removeEventListener('mouseenter', handleMouseEnter);
-      slider.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [direction, speed, isClient]);
-
-  const duplicatedItems = [...items, ...items, ...items];
-
-  return (
-    <div className="relative overflow-hidden">
-      <div
-        ref={sliderRef}
-        className="flex gap-4 md:gap-6 will-change-transform"
-        style={{ width: 'fit-content' }}
-      >
-        {duplicatedItems.map((item, idx) => (
-          <div key={idx} className="flex-shrink-0">
-            {item}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function PartnerProductSection() {
-  const [colorPhase, setColorPhase] = useState(0);
-
-  // Continuous color animation between yellow and blue
-  useEffect(() => {
-    let animationFrameId: number;
-    const startTime = Date.now();
-    
-    const animateColor = () => {
-      const elapsed = (Date.now() - startTime) / 1000; // seconds elapsed
-      // Cycle every 8 seconds between 0 and 1
-      const phase = (elapsed % 8) / 8;
-      // Use sine wave for smooth back-and-forth transition
-      const smoothPhase = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
-      setColorPhase(smoothPhase);
-      
-      animationFrameId = requestAnimationFrame(animateColor);
-    };
-    
-    animationFrameId = requestAnimationFrame(animateColor);
-    
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, []);
-
-  // Interpolate between yellow (dark mode) and blue (light mode)
-  const getCurrentColor = () => {
-    // Yellow: RGB(232, 202, 94)
-    // Blue: RGB(0, 160, 255)
-    const r = Math.floor(232 + (0 - 232) * colorPhase);
-    const g = Math.floor(202 + (160 - 202) * colorPhase);
-    const b = Math.floor(94 + (255 - 94) * colorPhase);
-    return `rgba(${r}, ${g}, ${b}, 0.08)`;
-  };
-
-  const getGlowColor = () => {
-    // Yellow: RGB(232, 202, 94)
-    // Blue: RGB(0, 160, 255)
-    const r = Math.floor(232 + (0 - 232) * colorPhase);
-    const g = Math.floor(202 + (160 - 202) * colorPhase);
-    const b = Math.floor(94 + (255 - 94) * colorPhase);
-    return `rgba(${r}, ${g}, ${b}, 0.15)`;
-  };
-
-  const getRadialGradient = () => {
-    const mainColor = getCurrentColor();
-    const glowColor = getGlowColor();
-    return `radial-gradient(circle at center, ${glowColor} 0%, ${mainColor} 50%, transparent 100%)`;
-  };
-
-  const getProductBgColor = () => {
-    const r = Math.floor(232 + (0 - 232) * colorPhase);
-    const g = Math.floor(202 + (160 - 202) * colorPhase);
-    const b = Math.floor(94 + (255 - 94) * colorPhase);
-    return `rgba(${r}, ${g}, ${b}, 0.12)`;
-  };
-
-  const getProductTextColor = () => {
-    const r = Math.floor(232 + (0 - 232) * colorPhase);
-    const g = Math.floor(202 + (160 - 202) * colorPhase);
-    const b = Math.floor(94 + (255 - 94) * colorPhase);
-    return `rgb(${r}, ${g}, ${b})`;
+  const formatValue = (count: number, suffix: string) => {
+    if (suffix === 'K+') {
+      return (count / 1000).toFixed(1) + 'K+';
+    }
+    return count + suffix;
   };
 
   return (
-    <section className="relative py-6 md:py-8 overflow-hidden">
-      {/* Animated gradient background that smoothly transitions between yellow and blue */}
-      <div 
-        className="absolute inset-0 transition-all duration-300 ease-in-out"
-        style={{
-          background: getRadialGradient(),
-        }}
-      />
-
-      {/* Soft blur overlay for extra smoothness */}
-      <div 
-        className="absolute inset-0 backdrop-blur-[100px]"
-        style={{
-          background: 'transparent'
-        }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Section label - with animated color */}
-        <div className="text-center mb-4">
-          <p 
-            className="text-[11px] uppercase tracking-wider font-medium transition-all duration-300"
-            style={{ 
-              color: getProductTextColor(),
-            }}
-          >
-            Trusted Partners & Products
-          </p>
-        </div>
-
-        {/* Partners Slider */}
-        <div className="mb-4 relative">
-          <Slider items={partnerLogos.map((partner) => (
+    <section 
+      ref={ref}
+      className="py-16 relative overflow-hidden"
+      style={{
+        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+      }}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          className="
+            overflow-hidden
+            rounded-2xl
+            border
+            transition-all
+            duration-1000
+            ease-out
+            will-change-transform
+          "
+          style={{
+            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
+            borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+            boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+            opacity: inView ? 1 : 0,
+            transform: inView ? 'translateY(0) scale(1)' : 'translateY(120px) scale(0.95)',
+          }}
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-5">
+            
+            {/* Left Content */}
             <div
-              key={partner.id}
-              className="group relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-all duration-300 cursor-pointer"
+              className="
+                col-span-2
+                lg:col-span-1
+                flex
+                flex-col
+                items-center
+                justify-center
+                p-6
+                lg:p-8
+                border-b
+                lg:border-b-0
+                lg:border-r
+                transition-all
+                duration-1000
+                ease-out
+                will-change-transform
+              "
+              style={{
+                borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : '#FAFAFA',
+                opacity: inView ? 1 : 0,
+                transform: inView ? 'translateY(0)' : 'translateY(80px)',
+                transitionDelay: '100ms',
+              }}
             >
-              <div 
-                className="relative w-8 h-8 md:w-10 md:h-10 transition-all duration-300 group-hover:scale-110"
+              
+
+              <h3
+                className="
+                  text-center
+                  text-base
+                  font-bold
+                  transition-all
+                  duration-1000
+                  ease-out
+                  will-change-transform
+                "
+                style={{ 
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'translateY(0)' : 'translateY(60px)',
+                  transitionDelay: '300ms',
+                }}
               >
-                <Image
-                  src={partner.image}
-                  alt={partner.name}
-                  fill
-                  className="object-contain rounded-full"
+                Trusted Worldwide
+              </h3>
+            </div>
+
+            {/* Stats with Counter */}
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="
+                  group
+                  relative
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  p-4
+                  lg:p-6
+                  text-center
+                  transition-all
+                  duration-1000
+                  ease-out
+                  border-b
+                  lg:border-b-0
+                  lg:border-r
+                  last:border-r-0
+                  hover:z-10
+                  cursor-default
+                  will-change-transform
+                "
+                style={{
+                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? 'translateY(0) scale(1)' : `translateY(${100 + index * 20}px) scale(0.9)`,
+                  transitionDelay: `${(index + 1) * 150}ms`,
+                }}
+              >
+                <div className="absolute inset-0 transition-all duration-500 rounded-2xl will-change-transform"
                   style={{
-                    filter: 'none',
+                    backgroundColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' 
+                      ? 'rgba(255,255,255,0.03)' 
+                      : 'rgba(0,0,0,0.02)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                />
+                
+                <h4
+                  className="
+                    text-3xl
+                    lg:text-4xl
+                    font-bold
+                    font-serif
+                    transition-all
+                    duration-1000
+                    ease-out
+                    will-change-transform
+                  "
+                  style={{ 
+                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    transform: inView ? 'scale(1) translateY(0)' : 'scale(0.7) translateY(60px)',
+                    transitionDelay: `${(index + 1) * 200}ms`,
+                  }}
+                >
+                  {formatValue(counts[index], stat.suffix)}
+                </h4>
+
+                <p
+                  className="
+                    mt-1
+                    text-sm
+                    font-medium
+                    transition-all
+                    duration-1000
+                    ease-out
+                    will-change-transform
+                  "
+                  style={{ 
+                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                    opacity: inView ? 1 : 0,
+                    transform: inView ? 'translateY(0)' : 'translateY(50px)',
+                    transitionDelay: `${(index + 1) * 250}ms`,
+                  }}
+                >
+                  {stat.label}
+                </p>
+
+                {/* Underline Indicator */}
+                <div className="mt-3 w-10 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 will-change-transform"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
                   }}
                 />
               </div>
-            </div>
-          ))} direction="left" speed={25} />
-        </div>
-
-        {/* Products Slider with animated colors */}
-        <div className="relative">
-          <Slider items={products.map((product) => (
-            <div
-              key={product}
-              className="group relative px-3 py-1 md:px-4 md:py-1.5 rounded-full transition-all duration-300 cursor-pointer whitespace-nowrap"
-              style={{
-                backgroundColor: getProductBgColor(),
-              }}
-            >
-              <span 
-                className="text-sm md:text-base  font-semibold transition-all duration-300"
-                style={{
-                  color: getProductTextColor(),
-                }}
-              >
-                {product}
-              </span>
-            </div>
-          ))} direction="right" speed={30} />
+            ))}
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .will-change-transform {
-          will-change: transform;
-        }
-      `}</style>
     </section>
   );
 }

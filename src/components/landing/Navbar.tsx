@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, memo } from "react";
-import { LogOut, LayoutDashboard, Menu, X, MessageCircle, Sun, Moon, Code2, UserCircle, Shield, Sparkles, GraduationCap } from "lucide-react";
+import { LogOut, LayoutDashboard, Menu, X, Sun, Moon, Code2, UserCircle, Shield, Sparkles, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -36,20 +36,27 @@ function useTheme() {
   return { theme, toggleTheme, mounted };
 }
 
-// Simple nav item
-const NavItem = memo(({ item, isActive, onClick, theme }: { 
+// Simple nav item with slide animation
+const NavItem = memo(({ item, isActive, onClick, theme, index, isVisible }: { 
   item: { name: string; path: string }; 
   isActive: boolean; 
   onClick: () => void;
   theme: 'light' | 'dark';
+  index: number;
+  isVisible: boolean;
 }) => (
   <button
     onClick={onClick}
-    className={`relative px-4 py-2 transition-colors duration-200 group cursor-pointer ${
+    className={`relative px-4 py-2 transition-all duration-700 ease-out will-change-transform cursor-pointer ${
       isActive 
-        ? (theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00E0FF]')
+        ? (theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#0066FF]')
         : (theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-[#1F4381]')
     }`}
+    style={{
+      opacity: isVisible ? 1 : 0,
+      transform: isVisible ? 'translateY(0)' : 'translateY(-80px)',
+      transitionDelay: `${index * 100}ms`,
+    }}
   >
     <span className="font-medium text-sm uppercase tracking-wide">
       {item.name}
@@ -58,7 +65,7 @@ const NavItem = memo(({ item, isActive, onClick, theme }: {
       isActive ? 'w-full' : 'w-0 group-hover:w-full'
     }`}
     style={{
-      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00E0FF',
+      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
     }} />
   </button>
 ));
@@ -66,13 +73,13 @@ const NavItem = memo(({ item, isActive, onClick, theme }: {
 NavItem.displayName = 'NavItem';
 
 // Login Dropdown Component
-const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect: (route: string) => void }) => {
+const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'; onSelect: (route: string) => void; isVisible: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const roles = [
     { id: 'admin', name: 'Admin', icon: Shield, route: '/auth/login', color: '#F59E0B' },
     { id: 'developer', name: 'Developer', icon: Code2, route: '/designer/login?type=developer', color: '#8B5CF6' },
-    { id: 'designer', name: 'Designer', icon: Sparkles, route: '/designer/login', color: '#00A0FF' },
+    { id: 'designer', name: 'Designer', icon: Sparkles, route: '/designer/login', color: '#0066FF' },
     { id: 'principal', name: 'Principal Portal', icon: GraduationCap, route: '/College_Portfolio_Handler/login', color: '#10B981' }
   ];
 
@@ -80,10 +87,13 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md cursor-pointer"
+        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-700 ease-out will-change-transform cursor-pointer"
         style={{
-          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-60px) scale(0.8)',
+          transitionDelay: '500ms',
         }}
       >
         <UserCircle className="w-4 h-4" />
@@ -99,12 +109,12 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
           <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
             style={{
               backgroundColor: '#FFFFFF',
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
             }}
           >
             <div className="px-4 py-3 border-b"
               style={{
-                borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.1)',
+                borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
               }}
             >
               <p className="text-sm font-semibold text-gray-800">Login as</p>
@@ -125,7 +135,6 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
                   >
                     <Icon className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" style={{ color: role.color }} />
                     <span>{role.name}</span>
-                    {/* REMOVED: "New" badge for principal */}
                   </button>
                 );
               })}
@@ -146,6 +155,7 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<'admin' | 'designer' | 'developer' | 'principal' | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   // Simple scroll handler
@@ -158,11 +168,19 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Trigger animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Check user authentication from all storage locations
   useEffect(() => {
     const checkUserAuthentication = () => {
       try {
-        // Check for Principal (localStorage) - ADDED THIS
+        // Check for Principal (localStorage)
         const authCollege = localStorage.getItem('auth_college');
         if (authCollege) {
           const collegeData = JSON.parse(authCollege);
@@ -335,13 +353,15 @@ export default function Navbar() {
     { name: 'Home', path: '/' },
     { name: 'Vision', path: '/vision' },
     { name: 'Templates', path: '/templates' },
+    { name: 'Products', path: '/products' },
+    { name: 'Partner', path: '/about' },
     { name: 'About', path: '/about' },
   ];
 
   // Don't render until mounted
   if (!mounted) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1F4381]/90 backdrop-blur-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1F4381]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -361,7 +381,7 @@ export default function Navbar() {
       backgroundColor: theme === 'dark' 
         ? '#1F4381'
         : '#FFFFFF',
-      borderBottom: theme === 'dark' ? '1px solid rgba(232, 202, 94, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+      borderBottom: theme === 'dark' ? '1px solid rgba(232, 202, 94, 0.2)' : '1px solid rgba(0, 0, 0, 0.08)',
     }}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
@@ -376,10 +396,16 @@ export default function Navbar() {
                 handleLogoClick(e as unknown as React.MouseEvent);
               }
             }}
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-60px) scale(0.8)',
+              transition: 'all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              transitionDelay: '100ms',
+            }}
           >
             <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md cursor-pointer"
               style={{
-                boxShadow: theme === 'dark' ? '0 0 15px rgba(232, 202, 94, 0.2)' : '0 0 15px rgba(0, 160, 255, 0.2)',
+                boxShadow: theme === 'dark' ? '0 0 15px rgba(232, 202, 94, 0.2)' : '0 0 15px rgba(0, 100, 255, 0.15)',
               }}
             >
               <Image
@@ -393,7 +419,7 @@ export default function Navbar() {
             {/* Company name */}
             <span className="hidden sm:inline-block text-xl md:text-2xl font-bold font-serif tracking-tight cursor-pointer"
               style={{
-                color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
               }}
             >
               Portfolio Handler
@@ -402,13 +428,15 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <NavItem
                 key={item.name}
                 item={item}
                 isActive={pathname === item.path}
                 onClick={() => handleNavigation(item.path)}
                 theme={theme}
+                index={index}
+                isVisible={isVisible}
               />
             ))}
           </div>
@@ -418,38 +446,28 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl transition-all duration-200 hover:scale-110 cursor-pointer"
+              className="p-2 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
+                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
                 borderWidth: '1px',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
+                transitionDelay: '400ms',
               }}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
                 <Sun className="w-4 h-4 text-[#E8CA5E]" />
               ) : (
-                <Moon className="w-4 h-4 text-[#00A0FF]" />
+                <Moon className="w-4 h-4 text-[#0066FF]" />
               )}
             </button>
-
-            {/* Feedback Button */}
-            <Link
-              href="/feedback"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-105 hover:shadow-md cursor-pointer"
-              style={{
-                backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-              }}
-            >
-              <MessageCircle className="w-4 h-4" />
-              Feedback
-            </Link>
 
             {/* Desktop Login Button - Show when user is NOT logged in */}
             {!user && (
               <div className="hidden lg:block">
-                <LoginDropdown theme={theme} onSelect={handleRoleSelect} />
+                <LoginDropdown theme={theme} onSelect={handleRoleSelect} isVisible={isVisible} />
               </div>
             )}
 
@@ -458,18 +476,21 @@ export default function Navbar() {
               <div className="relative hidden lg:block">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
                   style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
-                    borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
+                    backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                    borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
                     borderWidth: '1px',
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
+                    transitionDelay: '500ms',
                   }}
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{
                       backgroundColor: userRole === 'admin' ? '#F59E0B' : 
                                      (userRole === 'developer' ? '#8B5CF6' : 
-                                     (userRole === 'principal' ? '#10B981' : '#00A0FF')),
+                                     (userRole === 'principal' ? '#10B981' : '#0066FF')),
                     }}
                   >
                     <span className="text-white font-bold text-sm">
@@ -493,12 +514,12 @@ export default function Navbar() {
                     <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
                       style={{
                         backgroundColor: '#FFFFFF',
-                        borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
+                        borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
                       }}
                     >
                       <div className="px-4 py-3 border-b"
                         style={{
-                          borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.1)',
+                          borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
                         }}
                       >
                         <p className="text-sm font-semibold text-gray-800">Signed in as</p>
@@ -543,18 +564,21 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl transition-all duration-200 hover:scale-110 cursor-pointer"
+              className="lg:hidden p-2.5 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 160, 255, 0.1)',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 160, 255, 0.3)',
+                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
                 borderWidth: '1px',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
+                transitionDelay: '600ms',
               }}
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }} />
+                <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }} />
               ) : (
-                <Menu className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }} />
+                <Menu className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }} />
               )}
             </button>
           </div>
@@ -573,7 +597,7 @@ export default function Navbar() {
           <div className="rounded-xl shadow-lg border overflow-hidden"
             style={{
               backgroundColor: '#FFFFFF',
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 160, 255, 0.3)',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
             }}
           >
             <div className="px-4 py-4 space-y-2">
@@ -585,7 +609,7 @@ export default function Navbar() {
                     onClick={() => handleNavigation(item.path)}
                     className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-200 cursor-pointer ${
                       isActive 
-                        ? 'bg-[#00A0FF]/20 text-[#00A0FF]'
+                        ? 'bg-[#0066FF]/10 text-[#0066FF]'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -608,7 +632,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: userRole === 'admin' ? '#F59E0B' : 
                                    (userRole === 'developer' ? '#8B5CF6' : 
-                                   (userRole === 'principal' ? '#10B981' : '#00A0FF')),
+                                   (userRole === 'principal' ? '#10B981' : '#0066FF')),
                     color: '#FFFFFF',
                   }}
                 >
@@ -674,7 +698,7 @@ export default function Navbar() {
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
                   style={{
-                    backgroundColor: '#00A0FF',
+                    backgroundColor: '#0066FF',
                     color: '#FFFFFF',
                   }}
                 >
@@ -701,7 +725,6 @@ export default function Navbar() {
                 >
                   <GraduationCap className="w-4 h-4" />
                   Principal Portal
-                  {/* REMOVED: "New" badge */}
                 </button>
               </div>
             )}
