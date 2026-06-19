@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import FeaturesSection from "./FeaturesSection";
+import HowItWorks from "./HowItWorks";
 
 interface OtherSectionsProps {
   featuresRef: React.RefObject<HTMLDivElement | null>;
@@ -124,20 +125,6 @@ const portals = [
   }
 ];
 
-const stats = [
-  { label: "Institutions Supported", value: "500+", description: "Colleges and educational institutes", icon: Building2 },
-  { label: "Active Portfolios", value: "50K+", description: "Student portfolios managed", icon: FileText },
-  { label: "System Uptime", value: "99.9%", description: "Reliable service availability", icon: Database },
-  { label: "Admin Satisfaction", value: "98%", description: "Positive feedback rate", icon: Users }
-];
-
-const steps = [
-  { step: "01", title: "Template Selection", description: "Colleges browse and select from professional portfolio templates tailored for education" },
-  { step: "02", title: "Centralized Approval", description: "Main admin reviews and approves template requests with customization options" },
-  { step: "03", title: "Content Management", description: "College admins manage their content through a secure, dedicated portal" },
-  { step: "04", title: "Live Publication", description: "Real-time updates ensure instant publication of portfolio content" }
-];
-
 export default function OtherSections({
   featuresRef,
   aboutRef,
@@ -186,6 +173,10 @@ export default function OtherSections({
     return theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
   };
 
+  const getPortalBg = () => {
+    return theme === 'dark' ? 'rgba(11, 15, 25, 0.3)' : 'rgba(248, 249, 250, 0.5)';
+  };
+
   return (
     <>
       {/* Features Section - Using separate component */}
@@ -196,7 +187,7 @@ export default function OtherSections({
       />
 
       {/* Packages Section */}
-      <section className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
+      <section className="py-12 md:py-16 lg:py-10 px-4 sm:px-6"
         style={{
           backgroundColor: getSectionBg(),
         }}
@@ -405,121 +396,13 @@ export default function OtherSections({
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Steps Section */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <h3 className="text-2xl md:text-3xl font-bold mb-6 flex items-center gap-2 font-serif"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-              >
-                <Zap className="w-6 h-6"
-                  style={{ color: getAccentColor() }}
-                />
-                How It Works
-              </h3>
-              <div className="space-y-6">
-                {steps.map((step, idx) => (
-                  <div key={step.step} className="flex items-start group">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 mr-4 group-hover:scale-110 transition-transform duration-300"
-                      style={{
-                        backgroundColor: getAccentColor(),
-                      }}
-                    >
-                      <span className="text-white font-bold text-lg">{step.step}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-bold mb-1"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                      >
-                        {step.title}
-                      </h4>
-                      <p style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Stats & Impact Section */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="rounded-2xl p-6 md:p-8"
-              style={{
-                backgroundColor: getCardBg(),
-                border: `1px solid ${getBorderColor()}`,
-                boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-              }}
-            >
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2 font-serif"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-              >
-                <BarChart3 className="w-6 h-6"
-                  style={{ color: getAccentColor() }}
-                />
-                System Impact & Reach
-              </h3>
-              <div className="space-y-4">
-                {stats.map((stat) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div key={stat.label} className="flex items-center p-4 rounded-xl"
-                      style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : '#F8F9FA',
-                      }}
-                    >
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mr-4"
-                        style={{
-                          backgroundColor: getAccentBg(),
-                        }}
-                      >
-                        <Icon className="w-6 h-6" style={{ color: getAccentColor() }} />
-                      </div>
-                      <div className="flex-grow">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm"
-                            style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                          >
-                            {stat.label}
-                          </span>
-                          <span className="text-xl font-bold"
-                            style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                          >
-                            {stat.value}
-                          </span>
-                        </div>
-                        <p className="text-sm"
-                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-                        >
-                          {stat.description}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
+          {/* How It Works - Full Width */}
+          <div className="w-full">
+            <HowItWorks />
           </div>
 
-          {/* Portal Architecture Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 rounded-2xl p-6 md:p-8"
-            style={{
-              backgroundColor: getCardBg(),
-              border: `1px solid ${getBorderColor()}`,
-              boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-            }}
-          >
+          {/* Portal Architecture Section - No card background */}
+          <div className="mt-12 md:mt-16">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif">
                 <span style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
@@ -542,9 +425,10 @@ export default function OtherSections({
                 return (
                   <div
                     key={portal.title}
-                    className="rounded-2xl p-6 transition-all duration-300 hover:scale-105"
+                    className="rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02]"
                     style={{
-                      backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : '#F8F9FA',
+                      backgroundColor: getPortalBg(),
+                      border: `1px solid ${getBorderColor()}`,
                     }}
                   >
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
@@ -569,7 +453,7 @@ export default function OtherSections({
                         <div key={idx} className="flex items-center text-sm"
                           style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 mr-2"
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-2 flex-shrink-0"
                             style={{ color: getAccentColor() }}
                           />
                           {feature}
@@ -580,7 +464,7 @@ export default function OtherSections({
                 );
               })}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </>

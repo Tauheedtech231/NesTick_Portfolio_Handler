@@ -11,6 +11,7 @@ import {
   BarChart3,
   LucideIcon,
 } from "lucide-react";
+import { TiArrowSortedDown } from "react-icons/ti";
 
 interface Feature {
   title: string;
@@ -141,7 +142,14 @@ export default function FeaturesSection({
 }: FeaturesSectionProps) {
   const [activeIdx, setActiveIdx] = useState<number>(0);
   const [typedText, setTypedText] = useState("");
-  const [cardPos, setCardPos] = useState<{ left: number; top: number; centerX: number; centerY: number } | null>(null);
+  const [cardPos, setCardPos] = useState<{ 
+    left: number; 
+    top: number; 
+    centerX: number; 
+    centerY: number;
+    topX: number;
+    topY: number;
+  } | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -248,6 +256,8 @@ export default function FeaturesSection({
       top: cardTop,
       centerX: cardLeft + CARD_W / 2,
       centerY: cardTop + CARD_H / 2,
+      topX: cardLeft + CARD_W / 2,
+      topY: cardTop,
     };
   }, []);
 
@@ -307,53 +317,59 @@ export default function FeaturesSection({
       ? Math.round((typedText.length / f.description.length) * 100)
       : 0;
 
-  // Get arrow path - from pie top to card center (with gap)
-  const getArrowPath = () => {
-    if (!cardPos) return '';
-    
-    const svgEl = svgRef.current;
-    if (!svgEl) return '';
-    
-    const svgRect = svgEl.getBoundingClientRect();
-    
-    const scaleX = SVG_W / svgRect.width;
-    const scaleY = SVG_H / svgRect.height;
-    
-    const startX = PIE_TOP_X;
-    const startY = PIE_TOP_Y;
-    
-    // End position - 30px before card center (gap)
-    const endX = (cardPos.centerX - 30) * scaleX;
-    const endY = cardPos.centerY * scaleY;
-    
-    // Control points for smooth curve
-    const midX = (startX + endX) / 2 + 10;
-    const midY = Math.min(startY, endY) - 40;
-    
-    return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`;
-  };
+  // Get arrow path - from pie top to arrow top (8px above card)
+// Get arrow path - from pie top to arrow top center edge
+const getArrowPath = () => {
+  if (!cardPos || !svgRef.current || !wrapRef.current) return '';
+  
+  const svgEl = svgRef.current;
+  const wrapRect = wrapRef.current.getBoundingClientRect();
+  const svgRect = svgEl.getBoundingClientRect();
+  
+  const scaleX = SVG_W / svgRect.width;
+  const scaleY = SVG_H / svgRect.height;
+  
+  const startX = PIE_TOP_X;
+  const startY = PIE_TOP_Y;
+  
+  const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
+  const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
+  
+  // Line ends at arrow top edge (12px above card center, which is arrow top)
+  // Arrow is 24px tall, so top is at -12px from center
+  const endX = cardXRelativeToSVG * scaleX;
+  const endY = (cardYRelativeToSVG - 12) * scaleY; // Arrow top edge
+  
+  const midX = (startX + endX) / 2;
+  const midY = Math.min(startY, endY) - 60;
+  
+  return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`;
+};
 
   const arrowPath = getArrowPath();
 
-  // Get arrow head position (end of line)
-  const getArrowHeadPos = () => {
-    if (!cardPos) return null;
-    
-    const svgEl = svgRef.current;
-    if (!svgEl) return null;
-    
-    const svgRect = svgEl.getBoundingClientRect();
-    
-    const scaleX = SVG_W / svgRect.width;
-    const scaleY = SVG_H / svgRect.height;
-    
-    return {
-      x: (cardPos.centerX - 30) * scaleX,
-      y: cardPos.centerY * scaleY,
-    };
+  // Get arrow position - above card top
+  // Get arrow position - arrow centered above card
+const getArrowPos = () => {
+  if (!cardPos || !svgRef.current || !wrapRef.current) return null;
+  
+  const svgEl = svgRef.current;
+  const wrapRect = wrapRef.current.getBoundingClientRect();
+  const svgRect = svgEl.getBoundingClientRect();
+  
+  const scaleX = SVG_W / svgRect.width;
+  const scaleY = SVG_H / svgRect.height;
+  
+  const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
+  const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
+  
+  return {
+    x: cardXRelativeToSVG * scaleX,
+    y: (cardYRelativeToSVG - 6) * scaleY, // Arrow center (12px above card top + 6px adjustment)
   };
+};
 
-  const arrowHeadPos = getArrowHeadPos();
+  const arrowPos = getArrowPos();
 
   return (
     <section
@@ -443,16 +459,16 @@ export default function FeaturesSection({
                 );
               })}
 
-              {/* SOLID Line (no gap) with Arrow - From pie top to card center with gap */}
-              {cardPos && arrowPath && arrowHeadPos && (
+              {/* Curved line + TiArrowSortedDown icon */}
+              {cardPos && arrowPath && arrowPos && (
                 <>
-                  {/* Main curved line - SOLID, NO GAP */}
+                  {/* Main curved line */}
                   <path
                     d={arrowPath}
                     fill="none"
                     stroke={f.stroke}
-                    strokeWidth={2}
-                    opacity={0.8}
+                    strokeWidth={1.5}
+                    opacity={0.6}
                     strokeLinecap="round"
                   />
                   
@@ -460,46 +476,52 @@ export default function FeaturesSection({
                   <circle
                     cx={PIE_TOP_X}
                     cy={PIE_TOP_Y}
-                    r="10"
+                    r="8"
                     fill={f.stroke}
-                    opacity={0.3}
+                    opacity={0.15}
                   >
-                    <animate attributeName="r" values="10;16;10" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="r" values="8;14;8" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.15;0.05;0.15" dur="1.5s" repeatCount="indefinite" />
                   </circle>
                   
                   {/* Solid dot at pie top */}
                   <circle
                     cx={PIE_TOP_X}
                     cy={PIE_TOP_Y}
-                    r="5"
+                    r="3.5"
                     fill={f.stroke}
-                    opacity={1}
+                    opacity={0.8}
                   />
                   <circle
                     cx={PIE_TOP_X}
                     cy={PIE_TOP_Y}
-                    r="2"
+                    r="1.5"
                     fill="#FFFFFF"
-                    opacity={0.9}
+                    opacity={0.7}
                   />
                   
-                  {/* ARROW at end of line - before card */}
-                  <g transform={`translate(${arrowHeadPos.x}, ${arrowHeadPos.y})`}>
-                    <polygon
-                      points="0,0 -12,-7 -12,7"
-                      fill={f.stroke}
-                      stroke={f.stroke}
-                      strokeWidth={1}
-                      strokeLinejoin="round"
-                      opacity={1}
-                    />
-                    <polygon
-                      points="-2,0 -12,-5 -12,5"
-                      fill={f.stroke}
-                      opacity={0.5}
-                    />
-                  </g>
+                  {/* TiArrowSortedDown icon - above card top */}
+                  <foreignObject
+                    x={arrowPos.x - 12}
+                    y={arrowPos.y - 12}
+                    width={24}
+                    height={24}
+                  >
+                    <div 
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: f.stroke,
+                        fontSize: '24px',
+                        opacity: 0.9,
+                      }}
+                    >
+                      <TiArrowSortedDown />
+                    </div>
+                  </foreignObject>
                 </>
               )}
             </svg>
@@ -518,7 +540,7 @@ export default function FeaturesSection({
                 }}
               >
                 <div
-                  className="rounded-xl p-5 shadow-lg"
+                  className="rounded-xl p-5 shadow-lg relative"
                   style={{
                     backgroundColor: colors.cardBg,
                     border: `2px solid ${f.stroke}`,

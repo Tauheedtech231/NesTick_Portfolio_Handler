@@ -1,8 +1,7 @@
 'use client';
 
-import { motion, useInView, Variants } from 'framer-motion';
+import { motion, useInView, Variants, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import Image from 'next/image';
 import { 
   Sparkles, 
   Rocket, 
@@ -15,11 +14,6 @@ import {
   Brain,
   Users,
   Crown,
-  Briefcase,
-  Code,
-  Palette,
-  Megaphone,
-  Star,
   Mail,
   Phone,
   MapPin,
@@ -39,6 +33,38 @@ interface ContactFormData {
   message: string;
 }
 
+// Actual team data with avatar colors
+const teamMembers = [
+  {
+    id: 1,
+    name: 'Talha Zaheer',
+    role: 'CTO',
+    avatarColor: '#6366F1',
+    initials: 'TZ',
+  },
+  {
+    id: 2,
+    name: 'Abdullah Amin',
+    role: 'Founder',
+    avatarColor: '#8B5CF6',
+    initials: 'AA',
+  },
+  {
+    id: 3,
+    name: 'Nimra Ali',
+    role: 'Creative Lead',
+    avatarColor: '#EC4899',
+    initials: 'NA',
+  },
+  {
+    id: 4,
+    name: 'Muhammad Tauheed',
+    role: 'Senior Developer',
+    avatarColor: '#06B6D4',
+    initials: 'MT',
+  },
+];
+
 export default function AboutPage() {
   const heroRef = useRef(null);
   const missionRef = useRef(null);
@@ -47,11 +73,27 @@ export default function AboutPage() {
   const contactRef = useRef(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   
+  // Team slider state
+  const [duplicatedTeam, setDuplicatedTeam] = useState<typeof teamMembers>([]);
+  
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
   const missionInView = useInView(missionRef, { once: true, amount: 0.3 });
   const journeyInView = useInView(journeyRef, { once: true, amount: 0.2 });
   const teamInView = useInView(teamRef, { once: true, amount: 0.2 });
   const contactInView = useInView(contactRef, { once: true, amount: 0.2 });
+
+  // Scroll parallax for team slider (like PartnersSlider)
+  const { scrollYProgress } = useScroll({
+    target: teamRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Horizontal movement based on scroll
+  const sliderX = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    [0, -200, -400, -600, -800]
+  );
 
   // Detect theme changes
   useEffect(() => {
@@ -74,6 +116,12 @@ export default function AboutPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Create seamless infinite loop for team
+  useEffect(() => {
+    const copies = [...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers];
+    setDuplicatedTeam(copies);
+  }, []);
+
   // Contact Form State
   const [contactFormData, setContactFormData] = useState<ContactFormData>({
     name: '',
@@ -83,58 +131,6 @@ export default function AboutPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
-  // Team members data
-  const teamMembers = [
-    {
-      id: 1,
-      name: 'Hamza Hassan',
-      role: 'Chief Executive Officer',
-      level: 'executive',
-      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1887&auto=format&fit=crop',
-      icon: Crown,
-    },
-    {
-      id: 2,
-      name: 'Abdullah Amin',
-      role: 'Senior Business Analyst',
-      level: 'management',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop',
-      icon: Briefcase,
-    },
-    {
-      id: 3,
-      name: 'Haris Ashar',
-      role: 'Business Developer',
-      level: 'management',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1887&auto=format&fit=crop',
-      icon: Briefcase,
-    },
-    {
-      id: 4,
-      name: 'Tauheed',
-      role: 'Web Developer',
-      level: 'technical',
-      image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1887&auto=format&fit=crop',
-      icon: Code,
-    },
-    {
-      id: 5,
-      name: 'Miss Maryam',
-      role: 'Creative Lead',
-      level: 'creative',
-      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1887&auto=format&fit=crop',
-      icon: Palette,
-    },
-    {
-      id: 6,
-      name: 'Miss Palwasha',
-      role: 'Marketing Lead',
-      level: 'marketing',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop',
-      icon: Megaphone,
-    },
-  ];
 
   // Contact Info
   const contactInfo = [
@@ -237,56 +233,63 @@ export default function AboutPage() {
   };
 
   // Journey Timeline Data
- const journeyMilestones = [
-  { 
-    year: "'21", 
-    title: "Start of NestickTech", 
-    description: "Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions.", 
-    icon: Rocket 
-  },
-  { 
-    year: "'22", 
-    title: "Good Client Base Established", 
-    description: "Successfully built a strong client base across Pakistan, earning trust through quality service and support.", 
-    icon: Award 
-  },
-  { 
-    year: "'23", 
-    title: "Global Expansion", 
-    description: "Expanded operations internationally, serving clients worldwide with customized digital solutions.", 
-    icon: Globe 
-  },
-  { 
-    year: "'24", 
-    title: "Launch of 1st Product — Neezamiya", 
-    description: "Launched our flagship product 'Neezamiya' - a comprehensive educational management system.", 
-    icon: Brain 
-  },
-  { 
-    year: "'25", 
-    title: "Launch of PBM", 
-    description: "Introduced Portfolio Business Manager (PBM) - revolutionizing portfolio handling for institutions.", 
-    icon: TrendingUp 
-  },
-  { 
-    year: "'26", 
-    title: "Ready to Conquer This Year", 
-    description: "Setting our sights on new heights with AI-powered solutions and global market leadership.", 
-    icon: Infinity 
-  },
-];
+  const journeyMilestones = [
+    { 
+      year: "'21", 
+      title: "Start of NestickTech", 
+      description: "Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions.", 
+      icon: Rocket 
+    },
+    { 
+      year: "'22", 
+      title: "Good Client Base Established", 
+      description: "Successfully built a strong client base across Pakistan, earning trust through quality service and support.", 
+      icon: Award 
+    },
+    { 
+      year: "'23", 
+      title: "Global Expansion", 
+      description: "Expanded operations internationally, serving clients worldwide with customized digital solutions.", 
+      icon: Globe 
+    },
+    { 
+      year: "'24", 
+      title: "Launch of 1st Product — Neezamiya", 
+      description: "Launched our flagship product 'Neezamiya' - a comprehensive educational management system.", 
+      icon: Brain 
+    },
+    { 
+      year: "'25", 
+      title: "Launch of PBM", 
+      description: "Introduced Portfolio Business Manager (PBM) - revolutionizing portfolio handling for institutions.", 
+      icon: TrendingUp 
+    },
+    { 
+      year: "'26", 
+      title: "Ready to Conquer This Year", 
+      description: "Setting our sights on new heights with AI-powered solutions and global market leadership.", 
+      icon: Infinity 
+    },
+  ];
+
+  // Theme-based colors - SINGLE UNIFIED BACKGROUND
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F5F5F5';
+  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
+  const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
+  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
+  const getAccentColor = () => theme === 'dark' ? '#E8CA5E' : '#00A0FF';
+  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.3)' : 'rgba(0, 0, 0, 0.06)';
+  const getInputBg = () => theme === 'dark' ? 'rgba(15, 23, 42, 0.5)' : '#E5E7EB';
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen pt-16 lg:pt-20 overflow-hidden"
-        style={{
-          backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-        }}
+      <main 
+        className="min-h-screen pt-16 lg:pt-20 overflow-hidden"
+        style={{ backgroundColor: getBgColor() }}
       >
         {/* Hero Section with Galaxy Image Background */}
         <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[50vh]">
-          {/* Galaxy Image Background instead of Particles */}
           <div className="absolute inset-0 z-0">
             <div 
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -308,12 +311,12 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full mb-4 mx-auto w-fit"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                   border: 'none',
                 }}
               >
                 <Sparkles className="w-3.5 h-3.5"
-                  style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-medium font-sans tracking-wide"
                   style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
@@ -326,7 +329,7 @@ export default function AboutPage() {
                 <span className="block">
                   Building{' '}
                   <span className="inline-block"
-                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    style={{ color: getAccentColor() }}
                   >
                     Digital Futures
                   </span>
@@ -347,111 +350,83 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Mission & Vision Section */}
+        {/* Mission & Vision Section - Same background as main */}
         <section ref={missionRef} className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-              {/* Mission Card */}
+              {/* Mission */}
               <motion.div
                 initial="hidden"
                 animate={missionInView ? "visible" : "hidden"}
                 variants={fadeInLeftVariants}
-                whileHover={{ y: -5, transition: { duration: 0.3 } }}
-                className="group relative"
+                className="group"
               >
-                <div className="relative rounded-2xl p-6 md:p-8 transition-all duration-300"
-                  style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                    border: '1px solid',
-                    borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                  }}
-                >
+                <div className="p-6 md:p-8">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                        backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                       }}
                     >
                       <Target className="w-6 h-6"
-                        style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                        style={{ color: getAccentColor() }}
                       />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight"
-                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                      style={{ color: getTextColor() }}
                     >
                       Our Mission
                     </h2>
                   </div>
                   <p className="leading-relaxed text-base md:text-lg font-light tracking-wide"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ color: getTextSecondary() }}
                   >
                     To empower educational institutions with cutting-edge portfolio management technology 
                     that simplifies administration, enhances student visibility, and creates lasting digital 
                     legacies for academic achievements.
                   </p>
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Star className="w-4 h-4"
-                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                    />
-                  </div>
                 </div>
               </motion.div>
 
-              {/* Vision Card */}
+              {/* Vision */}
               <motion.div
                 initial="hidden"
                 animate={missionInView ? "visible" : "hidden"}
                 variants={fadeInRightVariants}
-                whileHover={{ y: -5, transition: { duration: 0.3 } }}
-                className="group relative"
+                className="group"
               >
-                <div className="relative rounded-2xl p-6 md:p-8 transition-all duration-300"
-                  style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                    border: '1px solid',
-                    borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                  }}
-                >
+                <div className="p-6 md:p-8">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                        backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                       }}
                     >
                       <Eye className="w-6 h-6"
-                        style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                        style={{ color: getAccentColor() }}
                       />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight"
-                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                      style={{ color: getTextColor() }}
                     >
                       Our Vision
                     </h2>
                   </div>
                   <p className="leading-relaxed text-base md:text-lg font-light tracking-wide"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ color: getTextSecondary() }}
                   >
                     To become the global standard for educational portfolio management, connecting 
                     institutions, students, and opportunities through innovative technology that 
                     showcases potential and celebrates achievement.
                   </p>
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Star className="w-4 h-4"
-                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                    />
-                  </div>
                 </div>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Journey Timeline Section */}
-        <section ref={journeyRef} className="py-12 md:py-16 overflow-hidden"
-          style={{
-            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.5)' : 'rgba(0, 0, 0, 0.02)',
-          }}
-        >
+        {/* Journey Timeline Section - Same background */}
+        <section ref={journeyRef} className="py-12 md:py-16 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -461,38 +436,37 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                   border: 'none',
                 }}
               >
                 <Rocket className="w-3.5 h-3.5"
-                  style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  style={{ color: getTextMuted() }}
                 >
                   Our Journey
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ color: getTextColor() }}
               >
                 The Story of{' '}
                 <span className="inline-block"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 >
                   Growth & Innovation
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                style={{ color: getTextMuted() }}
               >
                 From humble beginnings to transforming portfolio management across institutions worldwide.
               </p>
             </motion.div>
 
             <div className="relative">
-              {/* Dynamic Center Line */}
               <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full">
                 <motion.div 
                   className="w-full h-full"
@@ -502,7 +476,7 @@ export default function AboutPage() {
                   transition={{ duration: 1.5, ease: "easeOut" }}
                   style={{
                     transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                    backgroundColor: getAccentColor(),
                   }}
                 />
               </div>
@@ -525,35 +499,31 @@ export default function AboutPage() {
                       <div className={`flex-1 w-full ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                         <motion.div 
                           className="rounded-xl p-4 md:p-5 transition-all duration-300 group"
-                          style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                            border: '1px solid',
-                            borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                          }}
-                          whileHover={{ x: index % 2 === 0 ? -5 : 5, transition: { duration: 0.3 } }}
                         >
                           <div className={`flex items-center gap-2 mb-2 ${index % 2 === 0 ? 'md:justify-end' : 'md:justify-start'} justify-start`}>
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform"
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                               style={{
-                                backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                                backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                               }}
                             >
                               <Icon className="w-4 h-4"
-                                style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                                style={{ color: getAccentColor() }}
                               />
                             </div>
                             <span className="text-sm font-bold font-sans"
-                              style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                              style={{ color: getAccentColor() }}
                             >
                               {milestone.year}
                             </span>
                           </div>
                           <h3 className={`text-base md:text-lg font-bold mb-1 font-sans tracking-wide ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}
-                            style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                            style={{ color: getTextColor() }}
                           >
                             {milestone.title}
                           </h3>
-                          <p className={`text-gray-400 text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed font-light`}>
+                          <p className={`text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed font-light`}
+                            style={{ color: getTextMuted() }}
+                          >
                             {milestone.description}
                           </p>
                         </motion.div>
@@ -564,7 +534,7 @@ export default function AboutPage() {
                           className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                           whileHover={{ scale: 1.2, transition: { duration: 0.3 } }}
                           style={{
-                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                            backgroundColor: getAccentColor(),
                           }}
                         >
                           <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
@@ -587,15 +557,15 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                   border: 'none',
                 }}
               >
                 <Infinity className="w-4 h-4"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-sans tracking-wide"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  style={{ color: getTextMuted() }}
                 >
                   And beyond... The journey continues
                 </span>
@@ -608,7 +578,7 @@ export default function AboutPage() {
           console.log('New partner application:', data);
         }} />
 
-        {/* Team Structure Tree */}
+        {/* Team Slider Section - Same background */}
         <section ref={teamRef} className="py-12 md:py-16 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -620,349 +590,95 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                   border: 'none',
                 }}
               >
                 <Users className="w-3.5 h-3.5"
-                  style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  style={{ color: getTextMuted() }}
                 >
                   Our Team
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ color: getTextColor() }}
               >
-                Team{' '}
+                Meet Our{' '}
                 <span className="inline-block"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 >
-                  Structure
+                  Leadership
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                style={{ color: getTextMuted() }}
               >
-                Meet the passionate team behind Portfolio Handler
+                The passionate team driving innovation at Portfolio Handler
               </p>
             </motion.div>
 
-            {/* Tree Container */}
-            <div className="relative flex flex-col items-center">
-              {/* Level 1: CEO */}
+            {/* Team Slider with Parallax Scroll */}
+            <div className="relative w-full overflow-hidden">
               <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="relative z-10 mb-8"
+                className="relative w-full"
+                style={{ x: sliderX }}
               >
-                <div className="relative">
-                  <motion.div 
-                    initial={{ scaleY: 0 }}
-                    whileInView={{ scaleY: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4, duration: 0.6 }}
-                    className="absolute -bottom-6 left-1/2 w-0.5 h-6"
-                    style={{
-                      transformOrigin: 'top',
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                    }}
-                  />
-                  
-                  <div className="rounded-2xl hover:scale-105 transition-transform duration-300"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                      padding: '2px',
-                    }}
-                  >
-                    <div className="rounded-2xl p-4 w-72"
-                      style={{
-                        backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                      }}
+                <div className="flex gap-6 md:gap-8 lg:gap-10 items-stretch py-4 w-max">
+                  {duplicatedTeam.map((member, index) => (
+                    <div
+                      key={`${member.id}-${index}`}
+                      className="flex-shrink-0 group w-[180px] md:w-[200px] lg:w-[220px]"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-14 h-14 rounded-full overflow-hidden border-2"
-                          style={{ borderColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                        >
-                          <Image
-                            src={teamMembers[0].image}
-                            alt={teamMembers[0].name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-base font-bold font-sans tracking-wide"
-                            style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                          >
-                            {teamMembers[0].name}
-                          </p>
-                          <p className="text-xs font-medium tracking-wide"
-                            style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                          >
-                            {teamMembers[0].role}
-                          </p>
-                        </div>
-                        <Crown className="w-5 h-5"
-                          style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Horizontal line connector */}
-              <div className="relative w-full max-w-2xl h-0.5 mb-8">
-                <motion.div 
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
-                  className="absolute top-0 left-0 w-full h-0.5"
-                  style={{
-                    transformOrigin: 'left',
-                    background: `linear-gradient(90deg, transparent, ${theme === 'dark' ? '#E8CA5E' : '#00A0FF'}, transparent)`,
-                  }}
-                />
-                
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
-                  className="absolute -bottom-6 left-1/4 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
-                  }}
-                />
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
-                  className="absolute -bottom-6 right-1/4 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  }}
-                />
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
-                  className="absolute -bottom-6 left-1/2 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#00E0FF' : '#00A0FF',
-                  }}
-                />
-              </div>
-
-              {/* Level 2: Management */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 w-full max-w-4xl">
-                {teamMembers.slice(1, 4).map((member, index) => (
-                  <motion.div
-                    key={member.id}
-                    initial={{ y: 30, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.9 + index * 0.1, duration: 0.5 }}
-                    className="relative group"
-                    whileHover={{ y: -3 }}
-                  >
-                    <div className="relative">
-                      <motion.div 
-                        initial={{ scaleY: 0 }}
-                        whileInView={{ scaleY: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 1.2 + index * 0.1, duration: 0.6 }}
-                        className="absolute -bottom-6 left-1/2 w-0.5 h-6"
-                        style={{
-                          transformOrigin: 'top',
-                          backgroundColor: index === 0 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                      index === 1 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                      (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
-                        }}
-                      />
-                      
-                      <div className="rounded-xl hover:scale-105 transition-transform duration-300"
-                        style={{
-                          backgroundColor: theme === 'dark' ? 
-                            (index === 0 ? '#1F4381' : index === 1 ? '#E8CA5E' : '#00E0FF') : '#00A0FF',
-                          padding: '2px',
-                        }}
-                      >
-                        <div className="rounded-xl p-3"
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="relative w-10 h-10 rounded-full overflow-hidden border-2"
-                              style={{
-                                borderColor: index === 0 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                           index === 1 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                           (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
-                              }}
-                            >
-                              <Image
-                                src={member.image}
-                                alt={member.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold font-sans tracking-wide"
-                                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                              >
-                                {member.name}
-                              </p>
-                              <p className="text-[10px] font-medium tracking-wide"
-                                style={{
-                                  color: index === 0 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                         index === 1 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                         (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
-                                }}
-                              >
-                                {member.role}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Horizontal line connector */}
-              <div className="relative w-full max-w-4xl h-0.5 mb-8">
-                <motion.div 
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.4, duration: 0.8 }}
-                  className="absolute top-0 left-0 w-full h-0.5"
-                  style={{
-                    transformOrigin: 'left',
-                    background: `linear-gradient(90deg, ${theme === 'dark' ? '#1F4381' : '#00A0FF'}, ${theme === 'dark' ? '#E8CA5E' : '#00A0FF'}, ${theme === 'dark' ? '#00E0FF' : '#00A0FF'})`,
-                  }}
-                />
-                
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.6, duration: 0.6 }}
-                  className="absolute -bottom-6 left-1/4 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#00E0FF' : '#00A0FF',
-                  }}
-                />
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.7, duration: 0.6 }}
-                  className="absolute -bottom-6 left-1/2 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  }}
-                />
-                <motion.div 
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.8, duration: 0.6 }}
-                  className="absolute -bottom-6 right-1/4 w-0.5 h-6"
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
-                  }}
-                />
-              </div>
-
-              {/* Level 3 */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full max-w-4xl">
-                {teamMembers.slice(4, 7).map((member, index) => (
-                  <motion.div
-                    key={member.id}
-                    initial={{ y: 30, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 1.9 + index * 0.1, duration: 0.5 }}
-                    whileHover={{ y: -3 }}
-                  >
-                    <div className="rounded-xl hover:scale-105 transition-transform duration-300"
-                      style={{
-                        backgroundColor: index === 0 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                   index === 1 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                   (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
-                        padding: '2px',
-                      }}
-                    >
-                      <div className="rounded-xl p-3"
-                        style={{
-                          backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2"
+                      <div className="flex flex-col items-center transition-all duration-300">
+                        {/* Avatar Container */}
+                        <div className="relative mb-3">
+                          <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#6366F1]/20 to-[#8B5CF6]/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} />
+                          <div 
+                            className={`relative w-20 h-18 hover:cursor-pointer md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-[#6366F1]/20 overflow-hidden`}
                             style={{
-                              borderColor: index === 0 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                         index === 1 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                         (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
+                              backgroundColor: member.avatarColor,
+                              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)',
                             }}
                           >
-                            <Image
-                              src={member.image}
-                              alt={member.name}
-                              fill
-                              className="object-cover"
-                            />
+                            <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
+                              {member.initials}
+                            </span>
                           </div>
-                          <div>
-                            <p className="text-xs font-semibold font-sans tracking-wide"
-                              style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
-                            >
-                              {member.name}
-                            </p>
-                            <p className="text-[10px] font-medium tracking-wide"
-                              style={{
-                                color: index === 0 ? (theme === 'dark' ? '#E8CA5E' : '#00A0FF') : 
-                                       index === 1 ? (theme === 'dark' ? '#1F4381' : '#00A0FF') : 
-                                       (theme === 'dark' ? '#00E0FF' : '#00A0FF'),
-                              }}
-                            >
-                              {member.role}
-                            </p>
+                          
+                          {/* Role Badge */}
+                          <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[8px] md:text-[9px] font-medium whitespace-nowrap transition-all duration-300 group-hover:scale-105`}
+                            style={{
+                              backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
+                              color: '#FFFFFF',
+                              opacity: 0.95,
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                            }}
+                          >
+                            {member.role}
                           </div>
                         </div>
+                        
+                        {/* Name */}
+                        <span className={`text-sm md:text-base font-semibold font-sans tracking-wide ${theme === 'dark' ? 'text-[#E2E8F0]' : 'text-[#334155]'} group-hover:text-[#6366F1] transition-colors duration-300 text-center`}>
+                          {member.name}
+                        </span>
+                        
+                        {/* Underline animation */}
+                        <div className="w-0 h-0.5 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] group-hover:w-12 transition-all duration-300 mt-1 rounded-full" />
                       </div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Contact Form Section */}
-        <section ref={contactRef} className="py-12 md:py-16"
-          style={{
-            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.5)' : 'rgba(0, 0, 0, 0.02)',
-          }}
-        >
+        {/* Contact Section - Same background */}
+        <section ref={contactRef} className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -972,31 +688,31 @@ export default function AboutPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                   border: 'none',
                 }}
               >
                 <Mail className="w-3.5 h-3.5"
-                  style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                  style={{ color: getTextMuted() }}
                 >
                   Get In Touch
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ color: getTextColor() }}
               >
                 Let&apos;s{' '}
                 <span className="inline-block"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                  style={{ color: getAccentColor() }}
                 >
                   Connect
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                style={{ color: getTextMuted() }}
               >
                 Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond within 24 hours.
               </p>
@@ -1008,18 +724,13 @@ export default function AboutPage() {
                 initial={{ x: -50, opacity: 0 }}
                 animate={contactInView ? { x: 0, opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="rounded-2xl p-6 md:p-8 shadow-2xl"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                  border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                }}
+                className="p-6 md:p-8"
               >
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2 font-serif tracking-tight"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  style={{ color: getTextColor() }}
                 >
                   <Sparkles className="w-5 h-5"
-                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    style={{ color: getAccentColor() }}
                   />
                   Contact Information
                 </h3>
@@ -1029,40 +740,37 @@ export default function AboutPage() {
                     <div
                       key={index}
                       className="flex items-start gap-3 p-3 rounded-lg transition-all duration-300 group"
-                      style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.5)' : 'rgba(0, 0, 0, 0.02)',
-                      }}
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{
-                          backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.1)',
+                          backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
                         }}
                       >
                         <item.icon className="w-5 h-5"
-                          style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                          style={{ color: getAccentColor() }}
                         />
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xs font-medium mb-0.5 font-sans tracking-wide"
-                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                          style={{ color: getTextMuted() }}
                         >
                           {item.label}
                         </h3>
                         {item.href ? (
                           <a href={item.href} className="text-sm font-semibold hover:underline transition-colors block font-sans"
-                            style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                            style={{ color: getAccentColor() }}
                           >
                             {item.value}
                           </a>
                         ) : (
                           <p className="text-sm font-semibold font-sans"
-                            style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                            style={{ color: getTextColor() }}
                           >
                             {item.value}
                           </p>
                         )}
                         <p className="text-xs mt-1 font-light"
-                          style={{ color: theme === 'dark' ? '#6B7280' : '#9CA3AF' }}
+                          style={{ color: getTextMuted() }}
                         >
                           {item.description}
                         </p>
@@ -1077,18 +785,13 @@ export default function AboutPage() {
                 initial={{ x: 50, opacity: 0 }}
                 animate={contactInView ? { x: 0, opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="rounded-2xl p-6 md:p-8 shadow-2xl"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                  border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.05)',
-                }}
+                className="p-6 md:p-8"
               >
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2 font-serif tracking-tight"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  style={{ color: getTextColor() }}
                 >
                   <Mail className="w-5 h-5"
-                    style={{ color: theme === 'dark' ? '#00E0FF' : '#00A0FF' }}
+                    style={{ color: getAccentColor() }}
                   />
                   Send us a Message
                 </h3>
@@ -1096,7 +799,7 @@ export default function AboutPage() {
                 <form onSubmit={handleContactSubmit} className="space-y-5">
                   <div>
                     <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ color: getTextMuted() }}
                     >
                       Full Name *
                     </label>
@@ -1109,17 +812,17 @@ export default function AboutPage() {
                       placeholder="Enter your full name"
                       className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans placeholder:text-gray-500"
                       style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        backgroundColor: getInputBg(),
+                        borderColor: getBorderColor(),
                         borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: getTextColor(),
                       }}
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ color: getTextMuted() }}
                     >
                       Email Address *
                     </label>
@@ -1132,17 +835,17 @@ export default function AboutPage() {
                       placeholder="Enter your email address"
                       className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans placeholder:text-gray-500"
                       style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        backgroundColor: getInputBg(),
+                        borderColor: getBorderColor(),
                         borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: getTextColor(),
                       }}
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ color: getTextMuted() }}
                     >
                       Subject *
                     </label>
@@ -1153,10 +856,10 @@ export default function AboutPage() {
                       required
                       className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans"
                       style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        backgroundColor: getInputBg(),
+                        borderColor: getBorderColor(),
                         borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: getTextColor(),
                       }}
                     >
                       <option value="">Select a subject</option>
@@ -1170,7 +873,7 @@ export default function AboutPage() {
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ color: getTextMuted() }}
                     >
                       Message *
                     </label>
@@ -1183,10 +886,10 @@ export default function AboutPage() {
                       placeholder="Tell us about your inquiry..."
                       className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors resize-none font-sans placeholder:text-gray-500"
                       style={{
-                        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
-                        borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                        backgroundColor: getInputBg(),
+                        borderColor: getBorderColor(),
                         borderWidth: '1px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: getTextColor(),
                       }}
                     />
                   </div>
@@ -1196,7 +899,7 @@ export default function AboutPage() {
                     disabled={isSubmitting}
                     className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans"
                     style={{
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      backgroundColor: getAccentColor(),
                       color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
                     }}
                   >
