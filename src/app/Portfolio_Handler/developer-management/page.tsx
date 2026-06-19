@@ -357,7 +357,7 @@ export default function DeveloperManagementPage() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+            <h1 className="text-2xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <Code2 className="w-8 h-8 text-purple-500" />
               Developer Management
             </h1>

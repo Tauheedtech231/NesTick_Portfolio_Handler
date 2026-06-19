@@ -128,7 +128,7 @@ export default function DesignersPage() {
           {/* Header */}
           <div className="flex flex-wrap justify-between items-center gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Designers</h1>
+              <h1 className="text-2xl sm:text-2xl font-bold text-gray-900 dark:text-white">Designers</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage all registered designers</p>
             </div>
             <button

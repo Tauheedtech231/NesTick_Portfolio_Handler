@@ -66,9 +66,9 @@ const CustomTooltip = ({ active, payload, label, isDarkMode }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="p-3 rounded-xl shadow-xl border border-blue-500/30 bg-gray-900/95 backdrop-blur-sm">
-        <p className="font-semibold text-sm text-yellow-500 mb-1">{label}</p>
+        <p className="font-semibold text-xs text-yellow-500 mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color }} className="text-xs">
+          <p key={index} style={{ color: entry.color }} className="text-[11px]">
             {entry.name}: {entry.value}
           </p>
         ))}
@@ -396,7 +396,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <Loader2 size={48} className="animate-spin text-yellow-500 mx-auto mb-4" />
-            <p className="text-gray-400">Loading dashboard...</p>
+            <p className="text-xs text-gray-400">Loading dashboard...</p>
           </div>
         </div>
       </MainLayout>
@@ -413,13 +413,14 @@ export default function DashboardPage() {
             initial={{ opacity: 0, x: 50, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 50, scale: 0.9 }}
-            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border ${
+            className={`fixed top-20 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border cursor-pointer ${
               toast.type === 'success' 
                 ? 'bg-gray-900 border-blue-500' 
                 : toast.type === 'error'
                 ? 'bg-gray-900 border-red-500'
                 : 'bg-gray-900 border-yellow-500'
             } backdrop-blur-md`}
+            onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
           >
             {toast.type === 'success' ? (
               <CheckCircle size={18} className="text-blue-500" />
@@ -428,13 +429,16 @@ export default function DashboardPage() {
             ) : (
               <Bell size={18} className="text-yellow-500" />
             )}
-            <span className={`text-sm font-medium ${
+            <span className={`text-xs font-medium ${
               toast.type === 'success' ? 'text-white' : 
               toast.type === 'error' ? 'text-red-300' : 'text-yellow-300'
             }`}>
               {toast.message}
             </span>
-            <button onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}>
+            <button 
+              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+              className="cursor-pointer"
+            >
               <X size={14} className="text-gray-400 hover:text-white transition-colors" />
             </button>
           </motion.div>
@@ -452,13 +456,13 @@ export default function DashboardPage() {
           <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Crown size={32} className="text-yellow-500" />
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+                <Crown size={28} className="text-yellow-500" />
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                   Dashboard
                 </h1>
-                <Sparkles size={24} className="text-yellow-500" />
+                <Sparkles size={20} className="text-yellow-500" />
               </div>
-              <p className="text-sm text-gray-400 ml-12">
+              <p className="text-xs text-gray-400 ml-12">
                 Welcome back! Here's what's happening with your platform today
               </p>
             </div>
@@ -466,21 +470,21 @@ export default function DashboardPage() {
             {/* Search Bar */}
             <div className="relative w-full lg:w-96">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search size={18} className="text-yellow-500" />
+                <Search size={16} className="text-yellow-500" />
               </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search colleges, themes, or settings..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-all duration-300"
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-blue-500 transition-all duration-300 cursor-pointer"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                 >
-                  <X size={16} className="text-gray-400 hover:text-white transition-colors" />
+                  <X size={14} className="text-gray-400 hover:text-white transition-colors" />
                 </button>
               )}
             </div>
@@ -498,19 +502,22 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -4 }}
-                className="relative group overflow-hidden rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
+                className="relative group overflow-hidden rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all duration-300 cursor-pointer"
+                onClick={() => {
+                  // Add click functionality if needed
+                }}
               >
                 <div className="relative p-5">
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center shadow-lg`}>
-                      <Icon size={20} className="text-white" />
+                    <div className={`w-10 h-10 rounded-xl ${stat.bgColor} flex items-center justify-center shadow-lg`}>
+                      <Icon size={18} className="text-white" />
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-white">{stat.value}</div>
-                      <div className="text-xs text-gray-500 mt-1">{stat.trend}</div>
+                      <div className="text-xl font-bold text-white">{stat.value}</div>
+                      <div className="text-[10px] text-gray-500 mt-1">{stat.trend}</div>
                     </div>
                   </div>
-                  <h3 className="text-sm font-medium text-gray-400">{stat.title}</h3>
+                  <h3 className="text-xs font-medium text-gray-400">{stat.title}</h3>
                   <div className="mt-2 h-1 w-full bg-gray-800 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -528,11 +535,11 @@ export default function DashboardPage() {
         {/* Quick Actions - Tabbed Interface */}
         <div className="rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 transition-all duration-300 overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-800">
-            <h3 className="font-semibold text-lg text-white flex items-center gap-2">
-              <Zap size={18} className="text-yellow-500" />
+            <h3 className="font-semibold text-sm text-white flex items-center gap-2">
+              <Zap size={16} className="text-yellow-500" />
               Quick Actions
             </h3>
-            <p className="text-sm text-gray-500 mt-1">Manage requests and approvals</p>
+            <p className="text-[11px] text-gray-500 mt-1">Manage requests and approvals</p>
           </div>
           
           {/* Tabs */}
@@ -544,13 +551,13 @@ export default function DashboardPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveQuickTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-300 border-b-2 ${
+                  className={`flex items-center gap-2 px-4 py-3 text-xs font-medium transition-all duration-300 border-b-2 cursor-pointer ${
                     isActive
                       ? 'border-yellow-500 text-yellow-500'
                       : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600'
                   }`}
                 >
-                  <TabIcon size={16} />
+                  <TabIcon size={14} />
                   {tab.label}
                 </button>
               );
@@ -573,17 +580,17 @@ export default function DashboardPage() {
                   <button
                     key={idx}
                     onClick={() => router.push(action.href)}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-800/50 transition-all duration-300 cursor-pointer group"
+                    className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-800/50 transition-all duration-300 cursor-pointer group"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-yellow-500" />
                       <div className="text-left">
-                        <h4 className="font-medium text-white text-sm group-hover:text-yellow-500 transition-colors">
+                        <h4 className="font-medium text-white text-xs group-hover:text-yellow-500 transition-colors">
                           {action.label}
                         </h4>
                       </div>
                     </div>
-                    <ChevronRight size={16} className="text-gray-600 group-hover:text-yellow-500 transition-colors" />
+                    <ChevronRight size={14} className="text-gray-600 group-hover:text-yellow-500 transition-colors" />
                   </button>
                 );
               })}
@@ -603,22 +610,22 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="font-semibold text-lg flex items-center gap-2 text-white">
-                    <TrendingUp size={20} className="text-blue-500" />
+                  <h3 className="font-semibold text-sm flex items-center gap-2 text-white">
+                    <TrendingUp size={18} className="text-blue-500" />
                     Growth Trend
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-[11px] text-gray-500">
                     Monthly college registration growth
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    <span className="text-xs text-gray-400">Active</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                    <span className="text-[10px] text-gray-400">Active</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <span className="text-xs text-gray-400">Total</span>
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                    <span className="text-[10px] text-gray-400">Total</span>
                   </div>
                 </div>
               </div>
@@ -636,8 +643,8 @@ export default function DashboardPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-                    <YAxis stroke="#6B7280" fontSize={12} />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={11} />
+                    <YAxis stroke="#6B7280" fontSize={11} />
                     <Tooltip content={(props) => <CustomTooltip {...props} isDarkMode={isDarkMode} />} />
                     <Area type="monotone" dataKey="colleges" stroke="#EAB308" fill="url(#colorTotal)" name="Total Colleges" strokeWidth={2} />
                     <Area type="monotone" dataKey="active" stroke="#3B82F6" fill="url(#colorActive)" name="Active Colleges" strokeWidth={2} />
@@ -655,11 +662,11 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="font-semibold text-lg flex items-center gap-2 text-white">
-                    <Activity size={20} className="text-yellow-500" />
+                  <h3 className="font-semibold text-sm flex items-center gap-2 text-white">
+                    <Activity size={18} className="text-yellow-500" />
                     Status Distribution
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-[11px] text-gray-500">
                     Active vs Inactive colleges
                   </p>
                 </div>
@@ -692,12 +699,12 @@ export default function DashboardPage() {
               </div>
               <div className="mt-4 flex justify-center gap-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500" />
-                  <span className="text-sm text-gray-400">Active: {active}</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                  <span className="text-[11px] text-gray-400">Active: {active}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm text-gray-400">Inactive: {inactive}</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                  <span className="text-[11px] text-gray-400">Inactive: {inactive}</span>
                 </div>
               </div>
             </motion.div>
@@ -711,15 +718,15 @@ export default function DashboardPage() {
             <div className="w-20 h-20 mx-auto rounded-2xl bg-blue-500/20 flex items-center justify-center mb-4">
               <School size={40} className="text-yellow-500" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-lg font-semibold text-white mb-2">
               No College Data
             </h3>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-xs text-gray-500 mb-6">
               Start by adding your first college to see analytics
             </p>
             <button
               onClick={handleAdd}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300"
+              className="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-all duration-300 cursor-pointer"
             >
               + Add College
             </button>
@@ -734,13 +741,13 @@ export default function DashboardPage() {
             transition={{ delay: 0.4 }}
             className="p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-blue-500/30 transition-all duration-300"
           >
-            <h3 className="font-semibold mb-4 flex items-center gap-2 text-white">
-              <Activity size={18} className="text-yellow-500" />
+            <h3 className="font-semibold text-sm mb-4 flex items-center gap-2 text-white">
+              <Activity size={16} className="text-yellow-500" />
               Performance Summary
             </h3>
             <div className="space-y-4">
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between text-xs mb-2">
                   <span className="text-gray-400">Active Colleges</span>
                   <span className="text-blue-500 font-semibold">{active}</span>
                 </div>
@@ -754,7 +761,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div>
-                <div className="flex justify-between text-sm mb-2">
+                <div className="flex justify-between text-xs mb-2">
                   <span className="text-gray-400">Inactive Colleges</span>
                   <span className="text-yellow-500 font-semibold">{inactive}</span>
                 </div>
@@ -768,11 +775,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="pt-3 mt-2 border-t border-gray-800">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-gray-400">Total Institutions</span>
                   <span className="text-white font-semibold">{total}</span>
                 </div>
-                <div className="flex justify-between text-sm mt-2">
+                <div className="flex justify-between text-xs mt-2">
                   <span className="text-gray-400">Success Rate</span>
                   <span className="text-yellow-500 font-semibold">{activePercentage}%</span>
                 </div>

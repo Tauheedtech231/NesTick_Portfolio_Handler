@@ -383,7 +383,7 @@ export default function CollegesPage() {
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               College Management
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -445,7 +445,7 @@ export default function CollegesPage() {
           
           <motion.div 
             whileHover={{ y: -2 }}
-            className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-green-200 dark:border-green-700"
+            className="bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm border border-green-200 dark:border-green-700"
           >
             <p className="text-sm text-green-600 dark:text-green-400">Active</p>
             <p className="text-2xl font-bold text-green-700 dark:text-green-300">{stats.active}</p>

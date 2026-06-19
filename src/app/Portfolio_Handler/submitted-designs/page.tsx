@@ -197,7 +197,7 @@ export default function SubmittedDesignsPage() {
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+            <h1 className="text-2xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
               <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
               Submitted Designs
             </h1>

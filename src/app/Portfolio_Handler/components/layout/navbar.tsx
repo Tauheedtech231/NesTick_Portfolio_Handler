@@ -79,26 +79,30 @@ export function Navbar() {
               </div>
             </Link>
 
-            {/* Center - Desktop Navigation */}
-            <div className="hidden md:flex items-center justify-center gap-6">
-              {/* Dynamic Nav Links from Sidebar - Only when dropdown is active */}
+            {/* Center - Desktop Navigation - Now left-aligned */}
+            <div className="hidden md:flex items-center justify-start flex-1 ml-8 gap-4">
+              {/* Dynamic Nav Links from Sidebar - Now as simple links */}
               {hasNavLinks && (
                 <>
                   {navLinks.map((link, index) => (
                     <Link
                       key={index}
                       href={link.href}
-                      className={`group relative flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
+                      className={`relative px-3 py-2 text-sm font-medium transition-all duration-300 ${
                         pathname === link.href
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                          ? isDarkMode 
+                            ? 'text-blue-400' 
+                            : 'text-blue-600'
                           : isDarkMode
-                            ? 'bg-gray-800 border border-gray-700 hover:border-blue-500 text-gray-300 hover:text-white hover:shadow-lg hover:shadow-blue-500/20'
-                            : 'bg-gray-100 border border-gray-200 hover:border-yellow-500 text-gray-700 hover:text-gray-900 hover:shadow-lg hover:shadow-yellow-500/20'
+                            ? 'text-gray-300 hover:text-white'
+                            : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
-                      <span className="text-sm font-medium">{link.label}</span>
+                      {link.label}
                       {pathname === link.href && (
-                        <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-600" />
+                        <span className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 rounded-full ${
+                          isDarkMode ? 'bg-blue-400' : 'bg-blue-600'
+                        }`} />
                       )}
                     </Link>
                   ))}
@@ -106,7 +110,7 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Right side - Empty (College Portfolio Button Removed) */}
+            {/* Right side - Empty */}
             <div className="hidden md:flex items-center">
               {/* College Portfolio Button REMOVED */}
             </div>
@@ -128,10 +132,10 @@ export function Navbar() {
 
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
-            <div className={`md:hidden mt-4 pt-4 border-t space-y-3 animate-slideDown ${
+            <div className={`md:hidden mt-4 pt-4 border-t space-y-2 animate-slideDown ${
               isDarkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
-              {/* Dynamic Nav Links for Mobile */}
+              {/* Dynamic Nav Links for Mobile - Simple links */}
               {hasNavLinks && (
                 <>
                   {navLinks.map((link, index) => (
@@ -139,21 +143,21 @@ export function Navbar() {
                       key={index}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+                      className={`block px-3 py-2 text-sm font-medium transition-all duration-300 ${
                         pathname === link.href
-                          ? 'bg-blue-600 text-white'
+                          ? isDarkMode 
+                            ? 'text-blue-400' 
+                            : 'text-blue-600'
                           : isDarkMode
-                            ? 'bg-gray-800 border border-gray-700 text-gray-300'
-                            : 'bg-gray-100 border border-gray-200 text-gray-700'
+                            ? 'text-gray-300 hover:text-white'
+                            : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
-                      <span>{link.label}</span>
+                      {link.label}
                     </Link>
                   ))}
                 </>
               )}
-
-              {/* College Portfolio Button REMOVED from mobile also */}
             </div>
           )}
         </div>

@@ -86,34 +86,34 @@ export default function ThemeList() {
     return (
       <div className="bg-[#0F172A] rounded-2xl shadow-xl border border-[#1E293B] overflow-hidden">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
-          <div className="p-6 border-b border-[#1E293B]">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
+          <div className="p-4 sm:p-5 border-b border-[#1E293B]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
-                  <Sparkles className="w-5 h-5 text-black" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
+                  <Sparkles className="w-4 h-4 text-black" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-base sm:text-lg font-bold text-white">
                     Uploaded Templates
                   </h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-gray-500 mt-0.5">
                     Manage your template collection
                   </p>
                 </div>
               </div>
               <button
                 onClick={fetchTemplates}
-                className="p-2 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300"
+                className="p-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300 cursor-pointer"
               >
-                <RefreshCcw size={18} className="animate-spin" />
+                <RefreshCcw size={15} className="animate-spin" />
               </button>
             </div>
           </div>
         </div>
-        <div className="text-center py-12">
-          <div className="w-12 h-12 border-3 border-[#1E293B] border-t-[#FFD700] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-sm text-gray-500">Loading templates...</p>
+        <div className="text-center py-10">
+          <div className="w-10 h-10 border-3 border-[#1E293B] border-t-[#FFD700] rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-[11px] text-gray-500">Loading templates...</p>
         </div>
       </div>
     );
@@ -123,51 +123,51 @@ export default function ThemeList() {
     return (
       <div className="bg-[#0F172A] rounded-2xl shadow-xl border border-[#1E293B] overflow-hidden">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
-          <div className="p-6 border-b border-[#1E293B]">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
+          <div className="p-4 sm:p-5 border-b border-[#1E293B]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
-                  <Sparkles className="w-5 h-5 text-black" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
+                  <Sparkles className="w-4 h-4 text-black" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-base sm:text-lg font-bold text-white">
                     Uploaded Templates
                   </h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-gray-500 mt-0.5">
                     Manage your template collection
                   </p>
                 </div>
               </div>
               <button
                 onClick={fetchTemplates}
-                className="p-2 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300"
+                className="p-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300 cursor-pointer"
               >
-                <RefreshCcw size={18} />
+                <RefreshCcw size={15} />
               </button>
             </div>
           </div>
         </div>
         
         {error ? (
-          <div className="text-center py-12">
-            <div className="text-red-400 mb-3 text-sm">⚠️ {error}</div>
+          <div className="text-center py-10">
+            <div className="text-red-400 mb-2.5 text-[11px]">⚠️ {error}</div>
             <button
               onClick={fetchTemplates}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black rounded-xl font-semibold text-sm shadow-lg shadow-[#FFD700]/30 hover:shadow-xl transition-all duration-300"
+              className="px-4 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black rounded-xl font-semibold text-[11px] shadow-lg shadow-[#FFD700]/30 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               Try Again
             </button>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-[#0B0F19] border border-[#1E293B] flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-gray-600" />
+          <div className="text-center py-10">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-[#0B0F19] border border-[#1E293B] flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-gray-600" />
             </div>
-            <p className="text-gray-400 text-sm mb-2">
+            <p className="text-gray-400 text-[11px] mb-1.5">
               No templates uploaded yet
             </p>
-            <p className="text-xs text-gray-600">
+            <p className="text-[10px] text-gray-600">
               Upload your first template using the form above
             </p>
           </div>
@@ -180,18 +180,18 @@ export default function ThemeList() {
     <>
       <div className="bg-[#0F172A] rounded-2xl shadow-xl border border-[#1E293B] overflow-hidden">
         <div className="relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
-          <div className="p-6 border-b border-[#1E293B]">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FFD700] via-[#FFD700]/70 to-transparent" />
+          <div className="p-4 sm:p-5 border-b border-[#1E293B]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
-                  <Sparkles className="w-5 h-5 text-black" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFD700] to-[#FFD700]/70 flex items-center justify-center shadow-lg shadow-[#FFD700]/30">
+                  <Sparkles className="w-4 h-4 text-black" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-base sm:text-lg font-bold text-white">
                     Uploaded Templates
                   </h2>
-                  <p className="text-sm text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-gray-500 mt-0.5">
                     {templates.length} template{templates.length !== 1 ? 's' : ''} available
                   </p>
                 </div>
@@ -199,16 +199,16 @@ export default function ThemeList() {
               <button
                 onClick={fetchTemplates}
                 disabled={loading}
-                className="p-2 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300 disabled:opacity-50"
+                className="p-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-[#FFD700] hover:border-[#FFD700]/50 transition-all duration-300 disabled:opacity-50 cursor-pointer"
               >
-                <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
+                <RefreshCcw size={15} className={loading ? 'animate-spin' : ''} />
               </button>
             </div>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="p-4 sm:p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {templates.map((template, index) => (
               <motion.div
                 key={template.id}
@@ -218,8 +218,8 @@ export default function ThemeList() {
                 className="group relative bg-[#0B0F19] rounded-xl border border-[#1E293B] overflow-hidden hover:border-[#FFD700]/50 hover:shadow-xl hover:shadow-[#FFD700]/10 transition-all duration-300"
               >
                 {/* Type Badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${
+                <div className="absolute top-2.5 left-2.5 z-10">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium ${
                     template.type === 'paid' 
                       ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 text-yellow-400 border border-yellow-500/30' 
                       : 'bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-400 border border-green-500/30'
@@ -229,7 +229,7 @@ export default function ThemeList() {
                 </div>
 
                 {/* Template Image */}
-                <div className="relative h-48 bg-[#0F172A] overflow-hidden">
+                <div className="relative h-40 bg-[#0F172A] overflow-hidden">
                   <img
                     src={template.image}
                     alt={template.name}
@@ -241,26 +241,26 @@ export default function ThemeList() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
-                <div className="p-4">
-                  <h3 className="text-base font-semibold text-white mb-1 line-clamp-1">
+                <div className="p-3.5">
+                  <h3 className="text-[13px] font-semibold text-white mb-0.5 line-clamp-1">
                     {template.name}
                   </h3>
 
-                  <p className="text-xs text-gray-500 mb-3 line-clamp-2 min-h-[32px]">
+                  <p className="text-[10px] text-gray-500 mb-2 line-clamp-2 min-h-[28px]">
                     {template.description}
                   </p>
 
-                  <div className="flex items-center gap-2 text-xs text-gray-600 mb-4">
-                    <Calendar size={12} />
+                  <div className="flex items-center gap-1.5 text-[10px] text-gray-600 mb-3">
+                    <Calendar size={11} />
                     <span>{new Date(template.created_at).toLocaleDateString()}</span>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       onClick={() => openPreview(template)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black text-xs font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black text-[10px] font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer"
                     >
-                      <Eye size={12} />
+                      <Eye size={11} />
                       Preview
                     </button>
 
@@ -269,18 +269,18 @@ export default function ThemeList() {
                         href={template.live_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-[#1E293B] text-gray-400 text-xs font-semibold hover:border-[#FFD700]/50 hover:text-[#FFD700] hover:scale-105 transition-all duration-300"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#1E293B] text-gray-400 text-[10px] font-semibold hover:border-[#FFD700]/50 hover:text-[#FFD700] hover:scale-105 transition-all duration-300 cursor-pointer"
                       >
-                        <ExternalLink size={12} />
-                        Live Demo
+                        <ExternalLink size={11} />
+                        Live
                       </a>
                     )}
 
                     <button
                       onClick={() => handleDelete(template.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-semibold hover:bg-red-500/10 hover:scale-105 transition-all duration-300"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-400 text-[10px] font-semibold hover:bg-red-500/10 hover:scale-105 transition-all duration-300 cursor-pointer"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={11} />
                       Delete
                     </button>
                   </div>
@@ -302,38 +302,38 @@ export default function ThemeList() {
               className="relative bg-[#0F172A] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#1E293B]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-[#0F172A] border-b border-[#1E293B] p-6">
+              <div className="sticky top-0 bg-[#0F172A] border-b border-[#1E293B] p-4 sm:p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-white">{previewTemplate.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{previewTemplate.type === 'paid' ? 'Paid Template' : 'Free Template'}</p>
+                    <h3 className="text-lg font-bold text-white">{previewTemplate.name}</h3>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{previewTemplate.type === 'paid' ? 'Paid Template' : 'Free Template'}</p>
                   </div>
                   <button
                     onClick={closePreview}
-                    className="p-2 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-white hover:border-[#FFD700]/50 transition-all duration-300"
+                    className="p-1.5 rounded-lg bg-[#0B0F19] border border-[#1E293B] text-gray-400 hover:text-white hover:border-[#FFD700]/50 transition-all duration-300 cursor-pointer"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="rounded-xl overflow-hidden border border-[#1E293B] mb-4">
+              <div className="p-4 sm:p-5">
+                <div className="rounded-xl overflow-hidden border border-[#1E293B] mb-3">
                   <img
                     src={previewTemplate.image}
                     alt={previewTemplate.name}
                     className="w-full h-auto"
                   />
                 </div>
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-400 mb-2">Description</h4>
-                  <p className="text-gray-300 text-sm leading-relaxed">{previewTemplate.description}</p>
+                <div className="mb-3">
+                  <h4 className="text-[11px] font-semibold text-gray-400 mb-1.5">Description</h4>
+                  <p className="text-gray-300 text-[12px] leading-relaxed">{previewTemplate.description}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-400 mb-2">Type</h4>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium ${
+                    <h4 className="text-[11px] font-semibold text-gray-400 mb-1.5">Type</h4>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium ${
                       previewTemplate.type === 'paid' 
                         ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
                         : 'bg-green-500/20 text-green-400 border border-green-500/30'
@@ -342,19 +342,19 @@ export default function ThemeList() {
                     </span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-400 mb-2">Uploaded</h4>
-                    <p className="text-sm text-gray-300">{new Date(previewTemplate.created_at).toLocaleDateString()}</p>
+                    <h4 className="text-[11px] font-semibold text-gray-400 mb-1.5">Uploaded</h4>
+                    <p className="text-[12px] text-gray-300">{new Date(previewTemplate.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
                 {previewTemplate.live_url && (
-                  <div className="mt-6 pt-4 border-t border-[#1E293B]">
+                  <div className="mt-4 pt-3 border-t border-[#1E293B]">
                     <a
                       href={previewTemplate.live_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black rounded-xl font-semibold text-sm shadow-lg shadow-[#FFD700]/30 hover:shadow-xl transition-all duration-300"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#FFD700] to-[#FFD700]/90 text-black rounded-xl font-semibold text-[11px] shadow-lg shadow-[#FFD700]/30 hover:shadow-xl transition-all duration-300 cursor-pointer"
                     >
-                      <ExternalLink size={16} />
+                      <ExternalLink size={14} />
                       View Live Demo
                     </a>
                   </div>

@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import { Check, X, User, Building, Mail, Phone, Calendar, DollarSign, Tag, Trash2 } from 'lucide-react';
+import { Check, X, User, Building, Mail, Phone, Calendar, DollarSign, Tag, Trash2, Clock, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 /* eslint-disable */
 
@@ -36,29 +36,32 @@ export function TemplateRequestsTable({
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
-    // Default to 'pending' if status is undefined or invalid
     const safeStatus = status || 'pending';
     
     const statusConfig = {
       pending: { 
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', 
+        color: 'bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 border-yellow-500/30',
+        icon: Clock,
         label: 'Pending' 
       },
       approved: { 
-        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200', 
+        color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-green-500/30',
+        icon: Check,
         label: 'Approved' 
       },
       rejected: { 
-        color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200', 
+        color: 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400 border-red-500/30',
+        icon: X,
         label: 'Rejected' 
       }
     };
 
-    // Use the status if it exists in config, otherwise default to pending
     const config = statusConfig[safeStatus as keyof typeof statusConfig] || statusConfig.pending;
+    const Icon = config.icon;
     
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border ${config.color}`}>
+        <Icon size={10} />
         {config.label}
       </span>
     );
@@ -69,39 +72,38 @@ export function TemplateRequestsTable({
     
     const planConfig: Record<string, { color: string; label: string }> = {
       basic: { 
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', 
+        color: 'bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border-blue-500/30',
         label: 'Basic' 
       },
       professional: { 
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200', 
+        color: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 border-purple-500/30',
         label: 'Professional' 
       },
       enterprise: { 
-        color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200', 
+        color: 'bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 border-orange-500/30',
         label: 'Enterprise' 
       }
     };
 
     const config = planConfig[planValue.toLowerCase()] || planConfig.basic;
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border ${config.color}`}>
         {config.label}
       </span>
     );
   };
 
   const getTypeBadge = (type: string) => {
-    // Handle null/undefined type
     const safeType = type || 'free';
     
     const typeConfig = {
       free: { 
-        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+        color: 'bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-green-500/30',
         icon: Tag,
         label: 'Free'
       },
       paid: { 
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+        color: 'bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 border-purple-500/30',
         icon: DollarSign,
         label: 'Paid'
       }
@@ -111,14 +113,13 @@ export function TemplateRequestsTable({
     const Icon = config.icon;
     
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
-        <Icon size={12} className="mr-1" />
+      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium border ${config.color}`}>
+        <Icon size={10} />
         {config.label}
       </span>
     );
   };
 
-  // Format date
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -165,7 +166,7 @@ export function TemplateRequestsTable({
     return (
       <div className="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
         <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Loading template requests...</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400">Loading template requests...</p>
       </div>
     );
   }
@@ -174,17 +175,17 @@ export function TemplateRequestsTable({
     return (
       <div className="bg-white dark:bg-gray-800 p-8 rounded-xl border border-gray-200 dark:border-gray-700 text-center">
         <div className="text-gray-400 dark:text-gray-500 mb-4">
-          <Building size={48} className="mx-auto" />
+          <Building size={40} className="mx-auto" />
         </div>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           No template requests found.
         </p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
           Template requests will appear here when users submit them through the landing page.
         </p>
         <button
           onClick={onRefresh}
-          className="mt-4 text-blue-600 dark:text-blue-400 hover:underline text-sm"
+          className="mt-3 text-blue-600 dark:text-blue-400 hover:underline text-xs cursor-pointer"
         >
           Refresh
         </button>
@@ -193,238 +194,132 @@ export function TemplateRequestsTable({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-gray-700">
-      {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr>
-              {['Template', 'College', 'Contact', 'Plan', 'Type', 'Date', 'Status', 'Actions'].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {requests.map((request, index) => (
-              <motion.tr
-                key={request.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-300"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
-                      <Tag size={14} className="text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 block">
-                        {request.templateName}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        ID: {request.id}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Building size={14} className="text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-900 dark:text-gray-100">
-                      {request.representativeName}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {request.name}
-                  </div>
-                </td>
-
-                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="space-y-1">
-                    <div className="flex items-center">
-                      <Mail size={12} className="mr-1" />
-                      {request.email}
-                    </div>
-                    <div className="flex items-center">
-                      <Phone size={12} className="mr-1" />
-                      {request.phone}
-                    </div>
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  {getPlanBadge(request.plan)}
-                </td>
-
-                <td className="px-6 py-4">
-                  {getTypeBadge(request.type)}
-                </td>
-
-                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center">
-                    <Calendar size={12} className="mr-1" />
-                    {formatDate(request.createdAt)}
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  {getStatusBadge(request.status)}
-                </td>
-
-                <td className="px-6 py-4 text-sm font-medium flex flex-wrap items-center gap-2">
-                  {request.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => handleApprove(request.id)}
-                        disabled={processingRequest === request.id}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Approve Request"
-                      >
-                        {processingRequest === request.id ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
-                            <span>Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check size={14} />
-                            <span>Approve</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleReject(request.id)}
-                        disabled={processingRequest === request.id}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs sm:text-sm disabled:opacity-50"
-                        title="Reject Request"
-                      >
-                        <X size={14} />
-                        <span>Reject</span>
-                      </button>
-                    </>
-                  )}
-
-                  <button
-                    onClick={() => handleDelete(request.id)}
-                    disabled={processingRequest === request.id}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs sm:text-sm disabled:opacity-50"
-                    title="Delete Request"
-                  >
-                    <Trash2 size={14} />
-                    <span>Delete</span>
-                  </button>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile View */}
-      <div className="md:hidden space-y-4 p-4">
-        {requests.map((request, index) => (
-          <motion.div
-            key={request.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-          >
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {requests.map((request, index) => (
+        <motion.div
+          key={request.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          whileHover={{ y: -4 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:border-blue-500/50 dark:hover:border-blue-500/50 transition-all duration-300 overflow-hidden"
+        >
+          <div className="p-4 sm:p-5">
+            {/* Header - Name & Status */}
             <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 flex items-center justify-center flex-shrink-0">
                   <Tag size={16} className="text-blue-600 dark:text-blue-400" />
                 </div>
-                <div>
-                  <p className="text-base font-semibold text-gray-900 dark:text-white">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {request.templateName}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {request.representativeName}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Request ID: {request.id}
+                  </h3>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                    ID: {request.id.slice(0, 8)}...
                   </p>
                 </div>
               </div>
               {getStatusBadge(request.status)}
             </div>
 
-            <div className="space-y-2 text-sm mb-4">
-              <div className="flex items-center text-gray-600 dark:text-gray-400">
-                <User size={12} className="mr-2" />
-                {request.name}
-              </div>
-              <div className="flex items-center text-gray-600 dark:text-gray-400">
-                <Mail size={12} className="mr-2" />
-                {request.email}
-              </div>
-              <div className="flex items-center text-gray-600 dark:text-gray-400">
-                <Phone size={12} className="mr-2" />
-                {request.phone}
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex space-x-2">
-                  {getPlanBadge(request.plan)}
-                  {getTypeBadge(request.type)}
-                </div>
-                <span className="text-gray-500 dark:text-gray-400 text-xs">
-                  <Calendar size={10} className="inline mr-1" />
-                  {formatDate(request.createdAt)}
-                </span>
+            {/* College Info */}
+            <div className="flex items-start gap-2 mb-2.5 p-2.5 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+              <Building size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-medium text-gray-900 dark:text-white truncate">
+                  {request.representativeName}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate flex items-center gap-1">
+                  <User size={9} />
+                  {request.name}
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-              {request.status === 'pending' && (
+            {/* Contact Info */}
+            <div className="space-y-1.5 mb-3">
+              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <Mail size={12} className="text-gray-400 flex-shrink-0" />
+                <span className="truncate">{request.email}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <Phone size={12} className="text-gray-400 flex-shrink-0" />
+                <span>{request.phone}</span>
+              </div>
+            </div>
+
+            {/* Plan & Type Badges */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-3">
+              {getPlanBadge(request.plan)}
+              {getTypeBadge(request.type)}
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-auto flex items-center gap-1">
+                <Calendar size={10} />
+                {formatDate(request.createdAt)}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+              {request.status === 'pending' ? (
                 <>
                   <button
                     onClick={() => handleApprove(request.id)}
                     disabled={processingRequest === request.id}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-800/50 rounded-lg transition text-xs disabled:opacity-50"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400 hover:bg-green-500/20 dark:hover:bg-green-500/30 rounded-lg transition-all text-xs font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {processingRequest === request.id ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
-                        <span>Processing...</span>
-                      </>
+                      <div className="w-3.5 h-3.5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
-                        <Check size={14} />
-                        <span>Approve</span>
+                        <Check size={13} />
+                        Approve
                       </>
                     )}
                   </button>
                   <button
                     onClick={() => handleReject(request.id)}
                     disabled={processingRequest === request.id}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-800/50 rounded-lg transition text-xs disabled:opacity-50"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400 hover:bg-red-500/20 dark:hover:bg-red-500/30 rounded-lg transition-all text-xs font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <X size={14} />
-                    <span>Reject</span>
+                    <X size={13} />
+                    Reject
                   </button>
                 </>
+              ) : (
+                <span className="flex-1 text-center text-[10px] text-gray-500 dark:text-gray-400">
+                  {request.status === 'approved' ? '✓ Request Approved' : '✗ Request Rejected'}
+                </span>
               )}
+              
               <button
                 onClick={() => handleDelete(request.id)}
                 disabled={processingRequest === request.id}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition text-xs disabled:opacity-50"
+                className="p-1.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50"
+                title="Delete Request"
               >
                 <Trash2 size={14} />
-                <span>Delete</span>
               </button>
             </div>
-          </motion.div>
-        ))}
-      </div>
+
+            {request.status === 'approved' && (
+              <div className="mt-2 p-2 bg-green-500/5 border border-green-500/20 rounded-lg">
+                <p className="text-[10px] text-green-600 dark:text-green-400 text-center">
+                  ✓ Credentials have been sent to the user's email
+                </p>
+              </div>
+            )}
+
+            {request.status === 'rejected' && (
+              <div className="mt-2 p-2 bg-red-500/5 border border-red-500/20 rounded-lg">
+                <p className="text-[10px] text-red-600 dark:text-red-400 text-center">
+                  ✗ Request has been rejected
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 }

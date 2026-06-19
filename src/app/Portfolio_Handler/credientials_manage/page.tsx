@@ -334,7 +334,7 @@ export default function CredentialsManagePage() {
         {/* Header */}
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               Credentials Management
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">

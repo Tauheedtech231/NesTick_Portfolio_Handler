@@ -148,8 +148,6 @@ export function Sidebar() {
     fetchPendingCount();
     fetchPendingDesignsCount();
 
-    // ✅ REMOVED: Auto-open first dropdown
-    // Now only set navbar links if current path matches any dropdown child
     const currentPath = window.location.pathname;
     let foundLinks = false;
     
@@ -170,7 +168,6 @@ export function Sidebar() {
       }
     }
     
-    // If no matching path found, clear navbar links
     if (!foundLinks) {
       localStorage.removeItem('navbar_links');
       window.dispatchEvent(new Event('storage'));
@@ -210,10 +207,8 @@ export function Sidebar() {
 
   // Dropdown click - Redirect to first child AND update navbar
   const handleDropdownClick = (children: MenuItemLink[]) => {
-    // Get first child
     const firstChild = children[0];
     
-    // Check if already open (toggle)
     const currentLinks = localStorage.getItem('navbar_links');
     if (currentLinks) {
       try {
@@ -222,17 +217,14 @@ export function Sidebar() {
           parsed.every((link: any, index: number) => link.href === children[index].href);
         if (isSame) {
           clearNavbarLinks();
-          // ✅ Also navigate to Dashboard when closing
           router.push('/Portfolio_Handler');
           return;
         }
       } catch {}
     }
     
-    // Update navbar with all children
     updateNavbarLinks(children);
     
-    // ✅ Redirect to first child page only on dropdown click
     if (firstChild) {
       router.push(firstChild.href);
     }
@@ -300,7 +292,7 @@ export function Sidebar() {
                   <h1 className="text-lg font-extrabold text-white tracking-tight cursor-pointer">
                     Neezamiya
                   </h1>
-                  <p className="text-[10px] text-gray-500 -mt-1 cursor-default">Admin Portal</p>
+                  <p className="text-[12px] text-gray-500 -mt-1 cursor-default">Admin Portal</p>
                 </div>
               </motion.div>
             )}
@@ -314,7 +306,7 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar - Font size kept small */}
         {!collapsed && (
           <div className="relative mb-6">
             <input
@@ -322,7 +314,7 @@ export function Sidebar() {
               placeholder="Search menu..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-[#0F172A] border border-blue-600/30 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 transition-all duration-300 text-sm relative z-10 cursor-text"
+              className="w-full px-4 py-3 rounded-xl bg-[#0F172A] border border-blue-600/30 text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-500 transition-all duration-300 text-sm relative z-10 cursor-text"
             />
             <Search size={16} className="absolute right-3 top-2.5 text-gray-500 z-10 pointer-events-none" />
           </div>
@@ -366,7 +358,7 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Navigation - NO DROPDOWN ICON, NO EXPANSION */}
+        {/* Navigation - Increased font size */}
         <nav className="flex flex-col gap-1 flex-1">
           {filteredMenu.map((item) => {
             if (isDropdown(item)) {
@@ -376,7 +368,7 @@ export function Sidebar() {
                 <button
                   key={item.label}
                   onClick={() => handleDropdownClick(item.children)}
-                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300 cursor-pointer w-full text-left
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-medium transition-all duration-300 cursor-pointer w-full text-left
                     ${isActive
                       ? 'bg-blue-600/10 border-l-2 border-blue-600 text-blue-400'
                       : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
@@ -404,7 +396,7 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={handleLinkClick}
-                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-base font-medium transition-all duration-300 cursor-pointer
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-medium transition-all duration-300 cursor-pointer
                     ${isActive
                       ? 'bg-blue-600/10 border-l-2 border-blue-600 text-blue-400'
                       : 'text-gray-400 hover:bg-[#1E293B] hover:text-white'
@@ -421,14 +413,9 @@ export function Sidebar() {
                       {item.label}
                     </motion.span>
                   )}
-                  {item.label === 'Partners & Designers' && pendingCount > 0 && !collapsed && (
+                  {item.label === 'Partners ' && pendingCount > 0 && !collapsed && (
                     <span className="ml-auto px-1.5 py-0.5 rounded-full bg-yellow-500 text-black text-[10px] font-bold">
                       {pendingCount}
-                    </span>
-                  )}
-                  {item.label === 'Design Management' && pendingDesignsCount > 0 && !collapsed && (
-                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-purple-500 text-white text-[10px] font-bold">
-                      {pendingDesignsCount}
                     </span>
                   )}
                 </Link>
