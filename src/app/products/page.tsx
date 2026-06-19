@@ -6,31 +6,44 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { X, Send, CheckCircle } from 'lucide-react';
 
+// Product images (high-quality Unsplash)
+const PRODUCT_IMAGES: Record<string, string> = {
+  pgm: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format',
+  lms: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop&auto=format',
+  lrm: 'https://images.unsplash.com/photo-1552581234-26160f608093?w=600&h=400&fit=crop&auto=format',
+  epp: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=400&fit=crop&auto=format',
+  pas: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&h=400&fit=crop&auto=format',
+  ptmo: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&h=400&fit=crop&auto=format',
+  cosm: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop&auto=format',
+  muto: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=600&h=400&fit=crop&auto=format',
+  mutomai: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop&auto=format',
+};
+
 const PRODUCTS = [
-  { id: 'pgm',    label: 'PGM',     desc: 'Product Growth Management — plan and track product growth strategy.',    side: 'left',  dot: { bg: '#EAF3DE', color: '#3B6D11' }, lineColor: '#639922' },
-  { id: 'lms',    label: 'LMS',     desc: 'Learning Management System — deliver training and courses at scale.',     side: 'right', dot: { bg: '#E6F1FB', color: '#185FA5' }, lineColor: '#185FA5' },
-  { id: 'lrm',    label: 'LRM',     desc: 'Lead Relationship Management — nurture and convert leads efficiently.',   side: 'left',  dot: { bg: '#FAEEDA', color: '#854F0B' }, lineColor: '#BA7517' },
-  { id: 'epp',    label: 'EPP',     desc: 'Endpoint Protection Platform — secure every device in your network.',    side: 'right', dot: { bg: '#EEEDFE', color: '#534AB7' }, lineColor: '#534AB7' },
-  { id: 'pas',    label: 'PAS',     desc: 'Privileged Access Security — control sensitive system access tightly.',   side: 'left',  dot: { bg: '#FBEAF0', color: '#993556' }, lineColor: '#993556' },
-  { id: 'ptmo',   label: 'PTMO',    desc: 'Project & Task Management Office — keep projects on time and on budget.', side: 'right', dot: { bg: '#E1F5EE', color: '#0F6E56' }, lineColor: '#0F6E56' },
-  { id: 'cosm',   label: 'AI COSM', desc: 'AI-powered Cosmos platform — intelligent automation and insights.',      side: 'left',  dot: { bg: '#FAECE7', color: '#993C1D' }, lineColor: '#993C1D' },
-  { id: 'muto',   label: 'Muto',    desc: 'Muto messaging — real-time team communication and collaboration.',       side: 'right', dot: { bg: '#E6F1FB', color: '#185FA5' }, lineColor: '#185FA5' },
-  { id: 'mutomai',label: 'Mutomai', desc: 'Mutomai AI assistant — your intelligent productivity companion.',         side: 'left',  dot: { bg: '#EAF3DE', color: '#3B6D11' }, lineColor: '#639922' },
+  { id: 'pgm',    label: 'PGM',     desc: 'Product Growth Management — plan and track product growth strategy.',    dot: { bg: '#EAF3DE', color: '#3B6D11' } },
+  { id: 'lms',    label: 'LMS',     desc: 'Learning Management System — deliver training and courses at scale.',     dot: { bg: '#E6F1FB', color: '#185FA5' } },
+  { id: 'lrm',    label: 'LRM',     desc: 'Lead Relationship Management — nurture and convert leads efficiently.',   dot: { bg: '#FAEEDA', color: '#854F0B' } },
+  { id: 'epp',    label: 'EPP',     desc: 'Endpoint Protection Platform — secure every device in your network.',    dot: { bg: '#EEEDFE', color: '#534AB7' } },
+  { id: 'pas',    label: 'PAS',     desc: 'Privileged Access Security — control sensitive system access tightly.',   dot: { bg: '#FBEAF0', color: '#993556' } },
+  { id: 'ptmo',   label: 'PTMO',    desc: 'Project & Task Management Office — keep projects on time and on budget.', dot: { bg: '#E1F5EE', color: '#0F6E56' } },
+  { id: 'cosm',   label: 'AI COSM', desc: 'AI-powered Cosmos platform — intelligent automation and insights.',      dot: { bg: '#FAECE7', color: '#993C1D' } },
+  { id: 'muto',   label: 'Muto',    desc: 'Muto messaging — real-time team communication and collaboration.',       dot: { bg: '#E6F1FB', color: '#185FA5' } },
+  { id: 'mutomai',label: 'Mutomai', desc: 'Mutomai AI assistant — your intelligent productivity companion.',         dot: { bg: '#EAF3DE', color: '#3B6D11' } },
 ];
 
 export default function ProductZigzag() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const nezRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState(false);
-  const [nezMPosition, setNezMPosition] = useState<{ x: number; y: number } | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [typedText, setTypedText] = useState('');
+  const [scrollProgress, setScrollProgress] = useState(0);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const nezRef = useRef<HTMLDivElement>(null);
+  const [mPosition, setMPosition] = useState<{ x: number; y: number } | null>(null);
+  const [imagePositions, setImagePositions] = useState<{ x: number; y: number; color: string; label: string }[]>([]);
+  
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSubmitting, setModalSubmitting] = useState(false);
@@ -76,9 +89,10 @@ export default function ProductZigzag() {
         textSecondary: '#9CA3AF',
         textMuted: '#6B7280',
         cardHover: 'rgba(232, 202, 94, 0.05)',
-        nezColor: '#3B82F6',
         accent: '#E8CA5E',
         accentLight: 'rgba(232, 202, 94, 0.15)',
+        lineColor: 'rgba(59, 130, 246, 0.3)',
+        lineColorStrong: '#3B82F6',
       };
     } else {
       return {
@@ -89,81 +103,80 @@ export default function ProductZigzag() {
         textSecondary: '#6B7280',
         textMuted: '#9CA3AF',
         cardHover: 'rgba(0, 102, 255, 0.04)',
-        nezColor: '#2563EB',
         accent: '#0066FF',
         accentLight: 'rgba(0, 102, 255, 0.08)',
+        lineColor: 'rgba(59, 130, 246, 0.2)',
+        lineColorStrong: '#3B82F6',
       };
     }
   };
 
   const colors = getColors();
 
-  // Typewriter effect
-  useEffect(() => {
-    if (hoveredIndex === null) {
-      setTypedText('');
-      return;
-    }
-
-    const fullText = PRODUCTS[hoveredIndex].desc;
-    let index = 0;
-    setTypedText('');
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    const typeNextChar = () => {
-      if (index < fullText.length) {
-        setTypedText(fullText.substring(0, index + 1));
-        index++;
-        typingTimeoutRef.current = setTimeout(typeNextChar, 35);
+  // Get positions of all elements
+  const updatePositions = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    
+    // Get 'm' position
+    const nezElement = nezRef.current;
+    if (nezElement) {
+      const mSpan = nezElement.querySelector('span');
+      if (mSpan) {
+        const mRect = mSpan.getBoundingClientRect();
+        setMPosition({
+          x: mRect.left + mRect.width / 2 - containerRect.left,
+          y: mRect.top + mRect.height / 2 - containerRect.top,
+        });
       }
-    };
+    }
+    
+    // Get image positions
+    const imageElements = document.querySelectorAll('.image-card');
+    const positions: { x: number; y: number; color: string; label: string }[] = [];
+    
+    imageElements.forEach((img, index) => {
+      const rect = img.getBoundingClientRect();
+      const isEven = index % 2 === 0;
+      const x = isEven 
+        ? rect.left + rect.width - 20 - containerRect.left 
+        : rect.left + 20 - containerRect.left;
+      const y = rect.top + rect.height / 2 - containerRect.top;
+      
+      const colors_list = ['#3B6D11', '#185FA5', '#854F0B', '#534AB7', '#993556', '#0F6E56', '#993C1D', '#185FA5', '#3B6D11'];
+      positions.push({
+        x,
+        y,
+        color: colors_list[index % colors_list.length],
+        label: PRODUCTS[index]?.label || '',
+      });
+    });
+    
+    setImagePositions(positions);
+  };
 
-    typeNextChar();
-
-    return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-    };
-  }, [hoveredIndex]);
-
-  // Get Neezamiya 'm' position
+  // Update positions on resize and scroll
   useEffect(() => {
     if (!isClient) return;
     
-    const getMPosition = () => {
-      const wrapRect = wrapRef.current?.getBoundingClientRect();
-      if (!wrapRect) return;
-      
-      const nezElement = nezRef.current;
-      if (!nezElement) return;
-      
-      const mSpan = nezElement.querySelector('span');
-      if (!mSpan) return;
-      
-      const rect = mSpan.getBoundingClientRect();
-      setNezMPosition({
-        x: rect.left + rect.width / 2 - wrapRect.left,
-        y: rect.top + rect.height / 2 - wrapRect.top,
-      });
-    };
+    updatePositions();
+    const timeoutId = setTimeout(updatePositions, 100);
+    const timeoutId2 = setTimeout(updatePositions, 500);
     
-    getMPosition();
-    const timeoutId = setTimeout(getMPosition, 100);
-    const timeoutId2 = setTimeout(getMPosition, 500);
+    window.addEventListener('resize', updatePositions);
+    window.addEventListener('scroll', updatePositions);
     
-    window.addEventListener('resize', getMPosition);
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(timeoutId2);
-      window.removeEventListener('resize', getMPosition);
+      window.removeEventListener('resize', updatePositions);
+      window.removeEventListener('scroll', updatePositions);
     };
   }, [isClient, theme]);
 
-  // Smooth scroll tracking
+  // Scroll progress tracking
   useEffect(() => {
     if (!isClient) return;
 
@@ -172,13 +185,13 @@ export default function ProductZigzag() {
     let currentProgress = 0;
 
     const handleScroll = () => {
-      const wrap = wrapRef.current;
-      if (!wrap) return;
+      const container = containerRef.current;
+      if (!container) return;
 
-      const rect = wrap.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      const startOffset = 50;
+      const startOffset = 100;
       const endOffset = windowHeight - 100;
       
       const scrollPosition = -rect.top + startOffset;
@@ -217,184 +230,267 @@ export default function ProductZigzag() {
     };
   }, [isClient]);
 
-  function drawLines(progress: number) {
+  // Draw scroll-based beams
+  useEffect(() => {
+    if (!isClient || !mPosition || imagePositions.length === 0) return;
+
     const svg = svgRef.current;
-    const wrap = wrapRef.current;
-    if (!svg || !wrap) return;
-
-    svg.innerHTML = '';
-    const wRect = wrap.getBoundingClientRect();
-
-    type CardInfo = { cx: number; cy: number; side: string; color: string; label: string };
-    const cards: CardInfo[] = [];
-
-    cardRefs.current.forEach((card, i) => {
-      if (!card) return;
-      const r = card.getBoundingClientRect();
-      const isRight = PRODUCTS[i].side === 'right';
-      cards.push({
-        cx: (isRight ? r.left : r.right) - wRect.left,
-        cy: r.top + r.height / 2 - wRect.top,
-        side: isRight ? 'left' : 'right',
-        color: PRODUCTS[i].lineColor,
-        label: PRODUCTS[i].label,
-      });
-    });
-
-    let nezX: number, nezY: number;
-    if (nezMPosition) {
-      nezX = nezMPosition.x;
-      nezY = nezMPosition.y;
-    } else {
-      const nezElement = nezRef.current;
-      if (!nezElement) return;
-      
-      const mSpan = nezElement.querySelector('span');
-      if (mSpan) {
-        const mRect = mSpan.getBoundingClientRect();
-        nezX = mRect.left + mRect.width / 2 - wRect.left;
-        nezY = mRect.top + mRect.height / 2 - wRect.top;
-      } else {
-        const nezRect = nezElement.getBoundingClientRect();
-        nezX = nezRect.left + nezRect.width / 2 - wRect.left;
-        nezY = nezRect.top + 30 - wRect.top;
-      }
-    }
+    const container = containerRef.current;
+    if (!svg || !container) return;
 
     const ns = 'http://www.w3.org/2000/svg';
+    svg.innerHTML = '';
 
-    const segments: { d: string; color: string; startX: number; startY: number; endX: number; endY: number }[] = [];
-
-    for (let i = 0; i < cards.length - 1; i++) {
-      const a = cards[i];
-      const b = cards[i + 1];
-      const cpAx = a.side === 'right' ? a.cx + 90 : a.cx - 90;
-      const cpBx = b.side === 'right' ? b.cx + 90 : b.cx - 90;
-      const d = `M ${a.cx} ${a.cy} C ${cpAx} ${a.cy}, ${cpBx} ${b.cy}, ${b.cx} ${b.cy}`;
-      segments.push({ d, color: a.color, startX: a.cx, startY: a.cy, endX: b.cx, endY: b.cy });
-    }
-
-    const last = cards[cards.length - 1];
-    const cpLx = last.side === 'right' ? last.cx + 60 : last.cx - 60;
-    const dLast = `M ${last.cx} ${last.cy} C ${cpLx} ${last.cy + 60}, ${nezX} ${nezY - 60}, ${nezX} ${nezY}`;
-    segments.push({ 
-      d: dLast, 
-      color: colors.nezColor,
-      startX: last.cx, 
-      startY: last.cy, 
-      endX: nezX, 
-      endY: nezY 
-    });
-
-    const totalSegments = segments.length;
+    const progress = scrollProgress;
+    const totalSegments = imagePositions.length;
     const progressPerSegment = 1 / totalSegments;
 
-    segments.forEach((seg, idx) => {
-      const segmentStart = idx * progressPerSegment;
-      const segmentEnd = (idx + 1) * progressPerSegment;
+    // Add glow filter
+    const defs = document.createElementNS(ns, 'defs');
+    
+    const glowFilter = document.createElementNS(ns, 'filter');
+    glowFilter.setAttribute('id', 'beamGlow');
+    glowFilter.setAttribute('x', '-50%');
+    glowFilter.setAttribute('y', '-50%');
+    glowFilter.setAttribute('width', '200%');
+    glowFilter.setAttribute('height', '200%');
+    
+    const blur1 = document.createElementNS(ns, 'feGaussianBlur');
+    blur1.setAttribute('stdDeviation', '6');
+    blur1.setAttribute('result', 'blur1');
+    
+    const blur2 = document.createElementNS(ns, 'feGaussianBlur');
+    blur2.setAttribute('stdDeviation', '12');
+    blur2.setAttribute('result', 'blur2');
+    
+    const merge = document.createElementNS(ns, 'feMerge');
+    const mergeNode1 = document.createElementNS(ns, 'feMergeNode');
+    mergeNode1.setAttribute('in', 'blur2');
+    const mergeNode2 = document.createElementNS(ns, 'feMergeNode');
+    mergeNode2.setAttribute('in', 'blur1');
+    const mergeNode3 = document.createElementNS(ns, 'feMergeNode');
+    mergeNode3.setAttribute('in', 'SourceGraphic');
+    merge.appendChild(mergeNode1);
+    merge.appendChild(mergeNode2);
+    merge.appendChild(mergeNode3);
+    
+    glowFilter.appendChild(blur1);
+    glowFilter.appendChild(blur2);
+    glowFilter.appendChild(merge);
+    defs.appendChild(glowFilter);
+
+    const dotGlow = document.createElementNS(ns, 'filter');
+    dotGlow.setAttribute('id', 'dotGlow');
+    dotGlow.setAttribute('x', '-100%');
+    dotGlow.setAttribute('y', '-100%');
+    dotGlow.setAttribute('width', '300%');
+    dotGlow.setAttribute('height', '300%');
+    
+    const dotBlur = document.createElementNS(ns, 'feGaussianBlur');
+    dotBlur.setAttribute('stdDeviation', '8');
+    dotBlur.setAttribute('result', 'blur');
+    
+    const dotMerge = document.createElementNS(ns, 'feMerge');
+    const dotMerge1 = document.createElementNS(ns, 'feMergeNode');
+    dotMerge1.setAttribute('in', 'blur');
+    const dotMerge2 = document.createElementNS(ns, 'feMergeNode');
+    dotMerge2.setAttribute('in', 'SourceGraphic');
+    dotMerge.appendChild(dotMerge1);
+    dotMerge.appendChild(dotMerge2);
+    
+    dotGlow.appendChild(dotBlur);
+    dotGlow.appendChild(dotMerge);
+    defs.appendChild(dotGlow);
+    
+    svg.appendChild(defs);
+
+    // Draw beams based on scroll progress
+    let lastDrawnIndex = -1;
+    
+    for (let i = 0; i < imagePositions.length - 1; i++) {
+      const segmentStart = i * progressPerSegment;
+      const segmentEnd = (i + 1) * progressPerSegment;
       
       let segmentProgress = 0;
       if (progress > segmentStart) {
         segmentProgress = Math.min(1, (progress - segmentStart) / progressPerSegment);
       }
-
+      
       if (segmentProgress > 0) {
-        const path = document.createElementNS(ns, 'path');
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', seg.color);
-        path.setAttribute('stroke-width', '2.5');
-        path.setAttribute('stroke-opacity', '0.7');
-        path.setAttribute('d', seg.d);
+        lastDrawnIndex = i;
+        const start = imagePositions[i];
+        const end = imagePositions[i + 1];
         
-        const dx = seg.endX - seg.startX;
-        const dy = seg.endY - seg.startY;
-        const length = Math.sqrt(dx * dx + dy * dy) * 1.5;
+        const midX = (start.x + end.x) / 2;
+        const midY = (start.y + end.y) / 2 - 40;
         
-        path.setAttribute('stroke-dasharray', String(length));
-        path.setAttribute('stroke-dashoffset', String(length * (1 - segmentProgress)));
-        svg.appendChild(path);
-
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const pathLength = Math.sqrt(dx * dx + dy * dy) * 1.5;
+        
+        const d = `M ${start.x} ${start.y} C ${start.x + 60} ${start.y - 30}, ${midX - 60} ${midY}, ${midX} ${midY} C ${midX + 60} ${midY}, ${end.x - 60} ${end.y - 30}, ${end.x} ${end.y}`;
+        
+        // Thick beam with glow
+        const beam = document.createElementNS(ns, 'path');
+        beam.setAttribute('d', d);
+        beam.setAttribute('fill', 'none');
+        beam.setAttribute('stroke', start.color);
+        beam.setAttribute('stroke-width', '8');
+        beam.setAttribute('stroke-opacity', '0.3');
+        beam.setAttribute('filter', 'url(#beamGlow)');
+        beam.setAttribute('stroke-dasharray', String(pathLength));
+        beam.setAttribute('stroke-dashoffset', String(pathLength * (1 - segmentProgress)));
+        svg.appendChild(beam);
+        
+        // Inner beam
+        const innerBeam = document.createElementNS(ns, 'path');
+        innerBeam.setAttribute('d', d);
+        innerBeam.setAttribute('fill', 'none');
+        innerBeam.setAttribute('stroke', start.color);
+        innerBeam.setAttribute('stroke-width', '3');
+        innerBeam.setAttribute('stroke-opacity', '0.6');
+        innerBeam.setAttribute('stroke-dasharray', String(pathLength));
+        innerBeam.setAttribute('stroke-dashoffset', String(pathLength * (1 - segmentProgress)));
+        svg.appendChild(innerBeam);
+        
+        // Moving dot at the end of beam
         if (segmentProgress > 0.1 && segmentProgress < 1) {
           const dot = document.createElementNS(ns, 'circle');
           const t = segmentProgress;
-          const cx = seg.startX + (seg.endX - seg.startX) * t;
-          const cy = seg.startY + (seg.endY - seg.startY) * t;
-          dot.setAttribute('cx', String(cx));
-          dot.setAttribute('cy', String(cy));
-          dot.setAttribute('r', '5');
-          dot.setAttribute('fill', seg.color);
-          dot.setAttribute('opacity', '0.9');
-          dot.setAttribute('filter', 'url(#glow)');
+          const dotX = start.x + (end.x - start.x) * t;
+          const dotY = start.y + (end.y - start.y) * t - 30 * Math.sin(t * Math.PI);
+          dot.setAttribute('cx', String(dotX));
+          dot.setAttribute('cy', String(dotY));
+          dot.setAttribute('r', '6');
+          dot.setAttribute('fill', start.color);
+          dot.setAttribute('opacity', '0.8');
+          dot.setAttribute('filter', 'url(#dotGlow)');
           svg.appendChild(dot);
         }
       }
-
-      if (progress >= segmentEnd) {
-        const dot = document.createElementNS(ns, 'circle');
-        dot.setAttribute('cx', String(seg.endX));
-        dot.setAttribute('cy', String(seg.endY));
-        dot.setAttribute('r', '5');
-        dot.setAttribute('fill', seg.color);
-        dot.setAttribute('opacity', '0.9');
-        svg.appendChild(dot);
-      }
-    });
-
-    if (progress >= 0.98) {
-      const arr = document.createElementNS(ns, 'polygon');
-      const s = 8;
-      arr.setAttribute('points', `${nezX},${nezY} ${nezX - s / 2},${nezY - s} ${nezX + s / 2},${nezY - s}`);
-      arr.setAttribute('fill', colors.nezColor);
-      arr.setAttribute('opacity', '0.9');
-      svg.appendChild(arr);
-
-      const finalDot = document.createElementNS(ns, 'circle');
-      finalDot.setAttribute('cx', String(nezX));
-      finalDot.setAttribute('cy', String(nezY));
-      finalDot.setAttribute('r', '6');
-      finalDot.setAttribute('fill', colors.nezColor);
-      finalDot.setAttribute('opacity', '1');
-      finalDot.setAttribute('filter', 'url(#glow)');
-      svg.appendChild(finalDot);
     }
 
-    const defs = document.createElementNS(ns, 'defs');
-    const filter = document.createElementNS(ns, 'filter');
-    filter.setAttribute('id', 'glow');
-    filter.setAttribute('x', '-50%');
-    filter.setAttribute('y', '-50%');
-    filter.setAttribute('width', '200%');
-    filter.setAttribute('height', '200%');
-    
-    const blur = document.createElementNS(ns, 'feGaussianBlur');
-    blur.setAttribute('stdDeviation', '3');
-    blur.setAttribute('result', 'blur');
-    
-    const merge = document.createElementNS(ns, 'feMerge');
-    const mergeNode1 = document.createElementNS(ns, 'feMergeNode');
-    mergeNode1.setAttribute('in', 'blur');
-    const mergeNode2 = document.createElementNS(ns, 'feMergeNode');
-    mergeNode2.setAttribute('in', 'SourceGraphic');
-    merge.appendChild(mergeNode1);
-    merge.appendChild(mergeNode2);
-    
-    filter.appendChild(blur);
-    filter.appendChild(merge);
-    defs.appendChild(filter);
-    svg.appendChild(defs);
-  }
+    // Draw final beam to 'm'
+    if (progress >= 0.95 && imagePositions.length > 0) {
+      const last = imagePositions[imagePositions.length - 1];
+      const lastSegmentProgress = (progress - (imagePositions.length - 1) * progressPerSegment) / progressPerSegment;
+      
+      if (lastSegmentProgress > 0) {
+        const midX = (last.x + mPosition.x) / 2;
+        const midY = (last.y + mPosition.y) / 2 - 60;
+        
+        const d = `M ${last.x} ${last.y} C ${last.x + 80} ${last.y - 50}, ${midX - 80} ${midY}, ${midX} ${midY} C ${midX + 80} ${midY}, ${mPosition.x - 80} ${mPosition.y - 50}, ${mPosition.x} ${mPosition.y}`;
+        
+        const dx = mPosition.x - last.x;
+        const dy = mPosition.y - last.y;
+        const pathLength = Math.sqrt(dx * dx + dy * dy) * 2;
+        
+        // Thick beam with glow
+        const finalBeam = document.createElementNS(ns, 'path');
+        finalBeam.setAttribute('d', d);
+        finalBeam.setAttribute('fill', 'none');
+        finalBeam.setAttribute('stroke', '#3B82F6');
+        finalBeam.setAttribute('stroke-width', '10');
+        finalBeam.setAttribute('stroke-opacity', '0.25');
+        finalBeam.setAttribute('filter', 'url(#beamGlow)');
+        finalBeam.setAttribute('stroke-dasharray', String(pathLength));
+        finalBeam.setAttribute('stroke-dashoffset', String(pathLength * (1 - Math.min(1, lastSegmentProgress * 2))));
+        svg.appendChild(finalBeam);
+        
+        // Medium beam
+        const midBeam = document.createElementNS(ns, 'path');
+        midBeam.setAttribute('d', d);
+        midBeam.setAttribute('fill', 'none');
+        midBeam.setAttribute('stroke', '#3B82F6');
+        midBeam.setAttribute('stroke-width', '5');
+        midBeam.setAttribute('stroke-opacity', '0.5');
+        midBeam.setAttribute('stroke-dasharray', String(pathLength));
+        midBeam.setAttribute('stroke-dashoffset', String(pathLength * (1 - Math.min(1, lastSegmentProgress * 2))));
+        svg.appendChild(midBeam);
+        
+        // Inner bright beam
+        const innerBeam2 = document.createElementNS(ns, 'path');
+        innerBeam2.setAttribute('d', d);
+        innerBeam2.setAttribute('fill', 'none');
+        innerBeam2.setAttribute('stroke', '#60A5FA');
+        innerBeam2.setAttribute('stroke-width', '2');
+        innerBeam2.setAttribute('stroke-opacity', '0.8');
+        innerBeam2.setAttribute('stroke-dasharray', String(pathLength));
+        innerBeam2.setAttribute('stroke-dashoffset', String(pathLength * (1 - Math.min(1, lastSegmentProgress * 2))));
+        svg.appendChild(innerBeam2);
+        
+        // Moving dot on final beam
+        if (lastSegmentProgress > 0.1) {
+          const dot = document.createElementNS(ns, 'circle');
+          const t = Math.min(1, lastSegmentProgress * 1.5);
+          const dotX = last.x + (mPosition.x - last.x) * t;
+          const dotY = last.y + (mPosition.y - last.y) * t - 50 * Math.sin(t * Math.PI);
+          dot.setAttribute('cx', String(dotX));
+          dot.setAttribute('cy', String(dotY));
+          dot.setAttribute('r', '8');
+          dot.setAttribute('fill', '#3B82F6');
+          dot.setAttribute('filter', 'url(#dotGlow)');
+          svg.appendChild(dot);
+        }
+        
+        // Glow ring at 'm' when fully connected
+        if (lastSegmentProgress >= 1) {
+          const ring = document.createElementNS(ns, 'circle');
+          ring.setAttribute('cx', String(mPosition.x));
+          ring.setAttribute('cy', String(mPosition.y));
+          ring.setAttribute('r', '16');
+          ring.setAttribute('fill', 'none');
+          ring.setAttribute('stroke', '#3B82F6');
+          ring.setAttribute('stroke-width', '3');
+          ring.setAttribute('stroke-opacity', '0.4');
+          ring.setAttribute('filter', 'url(#beamGlow)');
+          svg.appendChild(ring);
+          
+          const ring2 = document.createElementNS(ns, 'circle');
+          ring2.setAttribute('cx', String(mPosition.x));
+          ring2.setAttribute('cy', String(mPosition.y));
+          ring2.setAttribute('r', '10');
+          ring2.setAttribute('fill', 'none');
+          ring2.setAttribute('stroke', '#60A5FA');
+          ring2.setAttribute('stroke-width', '2');
+          ring2.setAttribute('stroke-opacity', '0.6');
+          svg.appendChild(ring2);
+        }
+      }
+    }
+  }, [scrollProgress, imagePositions, mPosition, isClient]);
 
+  // Typewriter effect
   useEffect(() => {
-    if (!isClient) return;
-    drawLines(scrollProgress);
-  }, [scrollProgress, theme, isClient, nezMPosition]);
+    if (hoveredIndex === null) {
+      setTypedText('');
+      return;
+    }
 
-  useEffect(() => {
-    if (!isClient) return;
-    const handleResize = () => drawLines(scrollProgress);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [scrollProgress, isClient]);
+    const fullText = PRODUCTS[hoveredIndex].desc;
+    let index = 0;
+    setTypedText('');
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    const typeNextChar = () => {
+      if (index < fullText.length) {
+        setTypedText(fullText.substring(0, index + 1));
+        index++;
+        typingTimeoutRef.current = setTimeout(typeNextChar, 35);
+      }
+    };
+
+    typeNextChar();
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [hoveredIndex]);
 
   // Modal handlers
   const openModal = () => {
@@ -450,7 +546,7 @@ export default function ProductZigzag() {
     exit: { opacity: 0, transition: { duration: 0.2 } }
   };
 
-  const modalContentVariants:Variants = {
+  const modalContentVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9, y: 20 },
     visible: { 
       opacity: 1, 
@@ -474,11 +570,6 @@ export default function ProductZigzag() {
   return (
     <>
       <style jsx global>{`
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.5); opacity: 0.1; }
-          100% { transform: scale(1); opacity: 0.4; }
-        }
         @keyframes blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
@@ -486,39 +577,137 @@ export default function ProductZigzag() {
         .cursor-blink {
           animation: blink 0.7s step-end infinite;
         }
+        .product-row {
+          position: relative;
+          z-index: 2;
+        }
+        .product-image {
+          border-radius: 16px;
+          object-fit: cover;
+          width: 100%;
+          height: 260px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          transition: transform 0.5s ease, box-shadow 0.3s ease;
+          cursor: pointer;
+        }
+        .product-image:hover {
+          transform: scale(1.02);
+          box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+        }
+        .image-card {
+          border-radius: 16px;
+          overflow: hidden;
+          background: ${colors.cardBg};
+          border: 1px solid ${colors.border};
+          box-shadow: ${theme === 'dark' ? '0 4px 20px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.06)'};
+          transition: transform 0.3s, box-shadow 0.3s;
+          height: 260px;
+          position: relative;
+          cursor: pointer;
+        }
+        .image-card:hover {
+          transform: translateY(-4px);
+          box-shadow: ${theme === 'dark' ? '0 12px 40px rgba(0,0,0,0.4)' : '0 12px 40px rgba(0,0,0,0.1)'};
+        }
+        .text-section {
+          background: transparent !important;
+          padding: 20px 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 260px;
+          border: none !important;
+          box-shadow: none !important;
+          cursor: pointer;
+        }
+        .product-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 80px;
+          align-items: center;
+          padding: 0 10px;
+        }
+        .product-layout.reverse {
+          direction: rtl;
+        }
+        .product-layout.reverse .text-section {
+          direction: ltr;
+        }
+        .product-layout.reverse .image-card {
+          direction: ltr;
+        }
+        /* Product dot cursor */
+        .product-dot {
+          cursor: pointer;
+        }
+        /* Buy button cursor */
+        .buy-button {
+          cursor: pointer !important;
+        }
+        @media (max-width: 768px) {
+          .product-layout {
+            grid-template-columns: 1fr;
+            gap: 24px;
+          }
+          .product-layout.reverse {
+            direction: ltr;
+          }
+          .text-section {
+            min-height: auto;
+            padding: 12px 0;
+          }
+          .image-card {
+            height: 220px;
+          }
+          .product-image {
+            height: 220px;
+          }
+        }
       `}</style>
-      <Navbar/>
+      
+      <Navbar />
+      
       <div 
-        ref={wrapRef} 
+        ref={containerRef}
         style={{ 
-          padding: '80px 16px 40px', 
+          padding: '80px 0 40px',
           position: 'relative',
           backgroundColor: colors.bg,
           minHeight: '100vh',
+          overflow: 'hidden',
         }}
       >
-        {/* SVG overlay for lines */}
+        {/* SVG for scroll-based beams */}
         <svg
           ref={svgRef}
           style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '100%', height: '100%',
-            pointerEvents: 'none', overflow: 'visible',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: 1,
+            overflow: 'visible',
           }}
         />
 
         {/* Products Header */}
         <div style={{
           width: '100%',
-          maxWidth: '900px',
-          margin: '0 auto 30px',
+          maxWidth: '1100px',
+          margin: '0 auto 50px',
           textAlign: 'center',
           boxSizing: 'border-box',
+          position: 'relative',
+          zIndex: 3,
+          padding: '0 10px',
         }}>
           <div 
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
             style={{
               backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+              cursor: 'default',
             }}
           >
             <span className="text-xs font-medium" style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}>
@@ -527,7 +716,7 @@ export default function ProductZigzag() {
           </div>
           
           <h2 style={{ 
-            fontSize: '2.25rem',
+            fontSize: '2.5rem',
             fontWeight: 700,
             margin: 0,
             color: colors.text,
@@ -546,83 +735,123 @@ export default function ProductZigzag() {
           </p>
         </div>
 
-        {/* Product cards */}
+        {/* Product rows */}
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column', 
-          gap: 80, 
+          gap: 70,
           position: 'relative',
-          maxWidth: '900px',
+          maxWidth: '1100px',
           margin: '0 auto',
+          zIndex: 2,
         }}>
-          {PRODUCTS.map((p, i) => (
-            <div
-              key={p.id}
-              style={{
-                display: 'flex',
-                justifyContent: p.side === 'left' ? 'flex-start' : 'flex-end',
-                paddingLeft:  p.side === 'left'  ? 20 : 0,
-                paddingRight: p.side === 'right' ? 20 : 0,
-              }}
-            >
+          {PRODUCTS.map((p, i) => {
+            const isEven = i % 2 === 0;
+            
+            return (
               <div
-                ref={el => { cardRefs.current[i] = el; }}
-                onClick={() => console.log(`Clicked: ${p.label}`)}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                style={{
-                  width: 220,
-                  background: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: 14,
-                  padding: '16px 20px',
-                  cursor: 'pointer',
-                  transition: 'transform .18s, box-shadow .18s',
-                  boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                  minHeight: '100px',
-                }}
-                onMouseOverCapture={e => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
-                }}
-                onMouseMoveCapture={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
-                }}
+                key={p.id}
+                className="product-row"
               >
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: p.dot.bg, color: p.dot.color,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, marginBottom: 10,
-                }} />
-                <h3 style={{ 
-                  fontSize: 14, 
-                  fontWeight: 600, 
-                  margin: '0 0 6px',
-                  color: colors.text,
-                }}>
-                  {p.label}
-                </h3>
-                <p style={{ 
-                  fontSize: 12, 
-                  color: colors.textSecondary, 
-                  margin: 0, 
-                  lineHeight: 1.5,
-                  minHeight: '50px',
-                }}>
-                  {hoveredIndex === i ? (
-                    <>
-                      {typedText}
-                      <span className="cursor-blink" style={{ color: colors.nezColor }}>|</span>
-                    </>
-                  ) : (
-                    p.desc
-                  )}
-                </p>
+                <div 
+                  className={`product-layout ${!isEven ? 'reverse' : ''}`}
+                  style={{
+                    position: 'relative',
+                    zIndex: 2,
+                  }}
+                >
+                  {/* Text Section */}
+                  <div 
+                    className="text-section"
+                    onMouseEnter={() => setHoveredIndex(i)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    onClick={() => console.log(`Clicked: ${p.label}`)}
+                  >
+                    <div 
+                      className="product-dot"
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: '50%',
+                        background: p.dot.bg,
+                        color: p.dot.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 18,
+                        fontWeight: 700,
+                        marginBottom: 16,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {p.label.charAt(0)}
+                    </div>
+                    
+                    <h3 style={{ 
+                      fontSize: 24,
+                      fontWeight: 700,
+                      margin: '0 0 10px',
+                      color: colors.text,
+                      cursor: 'pointer',
+                    }}>
+                      {p.label}
+                    </h3>
+                    
+                    <p style={{ 
+                      fontSize: 15,
+                      color: colors.textSecondary,
+                      margin: 0,
+                      lineHeight: 1.7,
+                      minHeight: '70px',
+                      maxWidth: '90%',
+                      cursor: 'pointer',
+                    }}>
+                      {hoveredIndex === i ? (
+                        <>
+                          {typedText}
+                          <span className="cursor-blink" style={{ color: colors.accent }}>|</span>
+                        </>
+                      ) : (
+                        p.desc
+                      )}
+                    </p>
+                  </div>
+
+                  {/* Image Section */}
+                  <div 
+                    className="image-card"
+                    onClick={() => console.log(`Clicked image: ${p.label}`)}
+                  >
+                    <img
+                      src={PRODUCT_IMAGES[p.id]}
+                      alt={p.label}
+                      className="product-image"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
+                      }}
+                      loading="lazy"
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: `linear-gradient(135deg, ${p.dot.color}15, transparent 60%)`,
+                        pointerEvents: 'none',
+                        borderRadius: '16px',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Neezamiya with Buy Now Button */}
@@ -630,47 +859,49 @@ export default function ProductZigzag() {
           ref={nezRef}
           style={{
             width: '100%',
-            maxWidth: '900px',
-            margin: '30px auto 0',
+            maxWidth: '1100px',
+            margin: '60px auto 0',
             textAlign: 'center',
             boxSizing: 'border-box',
             position: 'relative',
-            zIndex: 2,
-            padding: '20px 0',
+            zIndex: 3,
+            padding: '30px 10px',
           }}
         >
           <h3 style={{ 
-            fontSize: '2.25rem',
+            fontSize: '2.5rem',
             fontWeight: 700,
-            margin: '0 0 16px',
+            margin: '0 0 20px',
             color: colors.text,
             fontFamily: 'serif',
             letterSpacing: '-0.025em',
+            position: 'relative',
           }}>
-            Neeza<span style={{ color: colors.nezColor, display: 'inline-block' }}>m</span>iya
+            Neeza<span style={{ color: '#3B82F6', display: 'inline-block', position: 'relative' }}>m</span>iya
           </h3>
           
           <button
+            className="buy-button"
             onClick={openModal}
             style={{
-              padding: '12px 40px',
+              padding: '14px 48px',
               borderRadius: '12px',
-              fontSize: '16px',
+              fontSize: '18px',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               backgroundColor: colors.accent,
               color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-              boxShadow: `0 4px 16px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)'}`,
+              boxShadow: `0 4px 20px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)'}`,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = `0 8px 32px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.4)' : 'rgba(0, 102, 255, 0.4)'}`;
+              e.currentTarget.style.boxShadow = `0 8px 40px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.4)' : 'rgba(0, 102, 255, 0.4)'}`;
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = `0 4px 16px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)'}`;
+              e.currentTarget.style.boxShadow = `0 4px 20px ${theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)'}`;
             }}
           >
             Buy Now
@@ -678,7 +909,7 @@ export default function ProductZigzag() {
         </div>
       </div>
 
-      {/* Smooth Modal with AnimatePresence */}
+      {/* Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div 
@@ -701,7 +932,6 @@ export default function ProductZigzag() {
               exit="exit"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header */}
               <div 
                 className="sticky top-0 p-4 border-b flex items-center justify-between"
                 style={{
@@ -714,13 +944,13 @@ export default function ProductZigzag() {
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="p-2 rounded-full hover:bg-black/10 transition-all duration-300 cursor-pointer"
+                  className="p-2 rounded-full hover:bg-black/10 transition-all duration-300"
+                  style={{ cursor: 'pointer' }}
                 >
                   <X className="w-5 h-5" style={{ color: colors.textSecondary }} />
                 </button>
               </div>
 
-              {/* Modal Content */}
               <div className="p-6">
                 {modalSuccess ? (
                   <motion.div 
@@ -757,6 +987,7 @@ export default function ProductZigzag() {
                           borderColor: modalErrors.name ? '#EF4444' : colors.border,
                           borderWidth: '1px',
                           color: colors.text,
+                          cursor: 'text',
                         }}
                         placeholder="John Doe"
                       />
@@ -780,6 +1011,7 @@ export default function ProductZigzag() {
                             borderColor: modalErrors.email ? '#EF4444' : colors.border,
                             borderWidth: '1px',
                             color: colors.text,
+                            cursor: 'text',
                           }}
                           placeholder="john@example.com"
                         />
@@ -801,6 +1033,7 @@ export default function ProductZigzag() {
                             borderColor: modalErrors.phone ? '#EF4444' : colors.border,
                             borderWidth: '1px',
                             color: colors.text,
+                            cursor: 'text',
                           }}
                           placeholder="+92 300 1234567"
                         />
@@ -823,6 +1056,7 @@ export default function ProductZigzag() {
                           borderColor: modalErrors.product ? '#EF4444' : colors.border,
                           borderWidth: '1px',
                           color: colors.text,
+                          cursor: 'pointer',
                         }}
                       >
                         <option value="">Select a product</option>
@@ -849,6 +1083,7 @@ export default function ProductZigzag() {
                           borderColor: modalErrors.message ? '#EF4444' : colors.border,
                           borderWidth: '1px',
                           color: colors.text,
+                          cursor: 'text',
                         }}
                         placeholder="Tell us about your requirements..."
                       />
@@ -864,6 +1099,7 @@ export default function ProductZigzag() {
                       style={{
                         backgroundColor: colors.accent,
                         color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                        cursor: modalSubmitting ? 'not-allowed' : 'pointer',
                       }}
                     >
                       {modalSubmitting ? 'Submitting...' : 'Submit Request'}
@@ -876,7 +1112,8 @@ export default function ProductZigzag() {
           </motion.div>
         )}
       </AnimatePresence>
-      <Footer/>
+      
+      <Footer />
     </>
   );
 }
