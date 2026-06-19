@@ -41,12 +41,12 @@ const features: Feature[] = [
     description:
       "Professional templates for colleges with standard sections: Home, About, Services, Faculty, Gallery, Contact. Easily customizable for any educational institute.",
     icon: Layout,
-    fill: "#CECBF6",
-    stroke: "#534AB7",
-    tagBg: "#EEEDFE",
-    tagColor: "#3C3489",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Templates",
-    bar: "#534AB7",
+    bar: "#0066FF",
     shortLabel: "Portfolio",
   },
   {
@@ -54,12 +54,12 @@ const features: Feature[] = [
     description:
       "Three-tier system: Generic Portal for previews, Main Admin Portal for centralized control, and College Admin Portal for individual institution management.",
     icon: Building2,
-    fill: "#9FE1CB",
-    stroke: "#0F6E56",
-    tagBg: "#E1F5EE",
-    tagColor: "#085041",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Architecture",
-    bar: "#1D9E75",
+    bar: "#0066FF",
     shortLabel: "Portals",
   },
   {
@@ -67,12 +67,12 @@ const features: Feature[] = [
     description:
       "Add/edit/delete colleges, approve template requests, upload new templates, and manage sections per college from a single dashboard.",
     icon: Settings,
-    fill: "#B5D4F4",
-    stroke: "#185FA5",
-    tagBg: "#E6F1FB",
-    tagColor: "#0C447C",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Core Hub",
-    bar: "#378ADD",
+    bar: "#0066FF",
     shortLabel: "Management",
   },
   {
@@ -80,12 +80,12 @@ const features: Feature[] = [
     description:
       "Changes made by college admins reflect instantly on live websites with live synchronization to the centralized database.",
     icon: Zap,
-    fill: "#F5C4B3",
-    stroke: "#993C1D",
-    tagBg: "#FAECE7",
-    tagColor: "#712B13",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Live Sync",
-    bar: "#D85A30",
+    bar: "#0066FF",
     shortLabel: "Live Sync",
   },
   {
@@ -93,12 +93,12 @@ const features: Feature[] = [
     description:
       "Three-tier access: Generic users view templates, College admins manage their content, Main admin has full system control.",
     icon: Shield,
-    fill: "#F4C0D1",
-    stroke: "#993556",
-    tagBg: "#FBEAF0",
-    tagColor: "#72243E",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Security",
-    bar: "#D4537E",
+    bar: "#0066FF",
     shortLabel: "Access Ctrl",
   },
   {
@@ -106,12 +106,12 @@ const features: Feature[] = [
     description:
       "Built to support multiple institutions simultaneously with independent workspaces and robust data management tools.",
     icon: BarChart3,
-    fill: "#C0DD97",
-    stroke: "#3B6D11",
-    tagBg: "#EAF3DE",
-    tagColor: "#27500A",
+    fill: "rgba(0, 102, 255, 0.15)",
+    stroke: "#0066FF",
+    tagBg: "rgba(0, 102, 255, 0.2)",
+    tagColor: "#0066FF",
     tag: "Scale",
-    bar: "#639922",
+    bar: "#0066FF",
     shortLabel: "Scalable",
   },
 ];
@@ -153,11 +153,13 @@ export default function FeaturesSection({
   const [isTyping, setIsTyping] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isCardVisible, setIsCardVisible] = useState(false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const typeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const { ref: headingRef, inView: headingInView } = useInView({
     triggerOnce: true,
@@ -193,7 +195,7 @@ export default function FeaturesSection({
       return {
         bg: '#0B0F19',
         cardBg: 'rgba(15, 23, 42, 0.95)',
-        border: 'rgba(30, 41, 59, 0.5)',
+        border: 'rgba(232, 202, 94, 0.2)',
         text: '#FFFFFF',
         textSecondary: '#9CA3AF',
         textMuted: '#6B7280',
@@ -201,23 +203,25 @@ export default function FeaturesSection({
         accentLight: 'rgba(232, 202, 94, 0.15)',
         heading: '#FFFFFF',
         subheading: '#9CA3AF',
-        cardBorder: 'rgba(30, 41, 59, 0.5)',
+        cardBorder: 'rgba(232, 202, 94, 0.3)',
         cardBgLight: 'rgba(15, 23, 42, 0.4)',
+        overlay: 'rgba(11, 15, 25, 0.85)',
       };
     } else {
       return {
         bg: '#FFFFFF',
         cardBg: '#FFFFFF',
-        border: 'rgba(0, 0, 0, 0.06)',
+        border: 'rgba(0, 102, 255, 0.2)',
         text: '#1F2937',
-        textSecondary: '#6B7280',
+        textSecondary: '#4B5563',
         textMuted: '#9CA3AF',
         accent: '#0066FF',
         accentLight: 'rgba(0, 102, 255, 0.08)',
         heading: '#1F2937',
         subheading: '#6B7280',
-        cardBorder: 'rgba(0, 0, 0, 0.06)',
-        cardBgLight: '#FAFAFA',
+        cardBorder: 'rgba(0, 102, 255, 0.2)',
+        cardBgLight: '#F3F4F6',
+        overlay: 'rgba(255, 255, 255, 0.85)',
       };
     }
   };
@@ -282,6 +286,7 @@ export default function FeaturesSection({
       setActiveIdx(idx);
       const pos = computeCardPosition();
       setCardPos(pos);
+      setIsCardVisible(true);
       startTyping(features[idx].description);
     },
     [activeIdx, computeCardPosition, startTyping]
@@ -292,6 +297,7 @@ export default function FeaturesSection({
       setIsInitialLoad(false);
       const pos = computeCardPosition();
       setCardPos(pos);
+      setIsCardVisible(true);
       startTyping(features[0].description);
     }
   }, [pieInView, isInitialLoad, computeCardPosition, startTyping]);
@@ -317,68 +323,88 @@ export default function FeaturesSection({
       ? Math.round((typedText.length / f.description.length) * 100)
       : 0;
 
-  // Get arrow path - from pie top to arrow top (8px above card)
-// Get arrow path - from pie top to arrow top center edge
-const getArrowPath = () => {
-  if (!cardPos || !svgRef.current || !wrapRef.current) return '';
-  
-  const svgEl = svgRef.current;
-  const wrapRect = wrapRef.current.getBoundingClientRect();
-  const svgRect = svgEl.getBoundingClientRect();
-  
-  const scaleX = SVG_W / svgRect.width;
-  const scaleY = SVG_H / svgRect.height;
-  
-  const startX = PIE_TOP_X;
-  const startY = PIE_TOP_Y;
-  
-  const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
-  const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
-  
-  // Line ends at arrow top edge (12px above card center, which is arrow top)
-  // Arrow is 24px tall, so top is at -12px from center
-  const endX = cardXRelativeToSVG * scaleX;
-  const endY = (cardYRelativeToSVG - 12) * scaleY; // Arrow top edge
-  
-  const midX = (startX + endX) / 2;
-  const midY = Math.min(startY, endY) - 60;
-  
-  return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`;
-};
+  // Get arrow path
+  const getArrowPath = () => {
+    if (!cardPos || !svgRef.current || !wrapRef.current) return '';
+    
+    const svgEl = svgRef.current;
+    const wrapRect = wrapRef.current.getBoundingClientRect();
+    const svgRect = svgEl.getBoundingClientRect();
+    
+    const scaleX = SVG_W / svgRect.width;
+    const scaleY = SVG_H / svgRect.height;
+    
+    const startX = PIE_TOP_X;
+    const startY = PIE_TOP_Y;
+    
+    const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
+    const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
+    
+    const endX = cardXRelativeToSVG * scaleX;
+    const endY = (cardYRelativeToSVG - 12) * scaleY;
+    
+    const midX = (startX + endX) / 2;
+    const midY = Math.min(startY, endY) - 60;
+    
+    return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`;
+  };
 
   const arrowPath = getArrowPath();
 
-  // Get arrow position - above card top
-  // Get arrow position - arrow centered above card
-const getArrowPos = () => {
-  if (!cardPos || !svgRef.current || !wrapRef.current) return null;
-  
-  const svgEl = svgRef.current;
-  const wrapRect = wrapRef.current.getBoundingClientRect();
-  const svgRect = svgEl.getBoundingClientRect();
-  
-  const scaleX = SVG_W / svgRect.width;
-  const scaleY = SVG_H / svgRect.height;
-  
-  const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
-  const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
-  
-  return {
-    x: cardXRelativeToSVG * scaleX,
-    y: (cardYRelativeToSVG - 6) * scaleY, // Arrow center (12px above card top + 6px adjustment)
+  const getArrowPos = () => {
+    if (!cardPos || !svgRef.current || !wrapRef.current) return null;
+    
+    const svgEl = svgRef.current;
+    const wrapRect = wrapRef.current.getBoundingClientRect();
+    const svgRect = svgEl.getBoundingClientRect();
+    
+    const scaleX = SVG_W / svgRect.width;
+    const scaleY = SVG_H / svgRect.height;
+    
+    const cardXRelativeToSVG = (cardPos.topX + wrapRect.left - svgRect.left);
+    const cardYRelativeToSVG = (cardPos.topY + wrapRect.top - svgRect.top);
+    
+    return {
+      x: cardXRelativeToSVG * scaleX,
+      y: (cardYRelativeToSVG - 6) * scaleY,
+    };
   };
-};
 
   const arrowPos = getArrowPos();
+
+  // Get active color based on theme
+  const getActiveColor = () => {
+    return theme === 'dark' ? '#E8CA5E' : '#0066FF';
+  };
+
+  const getActiveFill = () => {
+    return theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)';
+  };
+
+  const activeColor = getActiveColor();
+  const activeFill = getActiveFill();
 
   return (
     <section
       ref={featuresRef}
-      className="w-full py-16 px-4 overflow-hidden"
+      className="w-full py-16 px-4 overflow-hidden relative"
       style={{ backgroundColor: colors.bg }}
       aria-label="System features"
     >
-      <div className="max-w-6xl mx-auto">
+      {/* Overlay for dimming background when card is visible */}
+      {isCardVisible && (
+        <div 
+          ref={overlayRef}
+          className="absolute inset-0 z-5 transition-opacity duration-300"
+          style={{ 
+            backgroundColor: colors.overlay,
+            opacity: 0.6,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      <div className="max-w-6xl mx-auto relative z-10">
         <div
           ref={headingRef}
           className="text-center mb-10"
@@ -416,7 +442,7 @@ const getArrowPos = () => {
             <svg
               ref={svgRef}
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-              className="w-full block"
+              className="w-full block relative z-10"
               aria-hidden="true"
             >
               {features.map((feat, i) => {
@@ -435,12 +461,13 @@ const getArrowPos = () => {
                   >
                     <path
                       d={makeSegPath(PIE_CX, PIE_CY, PIE_R, a1, a2)}
-                      fill={feat.fill}
-                      stroke={feat.stroke}
-                      strokeWidth={2.5}
+                      fill={isActive ? activeFill : feat.fill}
+                      stroke={isActive ? activeColor : feat.stroke}
+                      strokeWidth={isActive ? 3 : 2.5}
                       style={{
-                        opacity: isDimmed ? 0.3 : 1,
-                        transition: "opacity 0.2s ease",
+                        opacity: isDimmed ? 0.25 : 1,
+                        transition: "all 0.3s ease",
+                        filter: isActive ? `drop-shadow(0 0 15px ${activeColor}44)` : 'none',
                       }}
                     />
                     <text
@@ -449,9 +476,13 @@ const getArrowPos = () => {
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fontSize={9}
-                      fontWeight={600}
-                      fill={feat.stroke}
-                      style={{ pointerEvents: "none", userSelect: "none" }}
+                      fontWeight={isActive ? 700 : 600}
+                      fill={isActive ? activeColor : feat.stroke}
+                      style={{ 
+                        pointerEvents: "none", 
+                        userSelect: "none",
+                        transition: "all 0.3s ease",
+                      }}
                     >
                       {feat.shortLabel}
                     </text>
@@ -459,46 +490,27 @@ const getArrowPos = () => {
                 );
               })}
 
-              {/* Curved line + TiArrowSortedDown icon */}
+              {/* Curved line - clean without shadow */}
               {cardPos && arrowPath && arrowPos && (
                 <>
-                  {/* Main curved line */}
+                  {/* Main curved line - flowing from pie to card */}
                   <path
                     d={arrowPath}
                     fill="none"
-                    stroke={f.stroke}
-                    strokeWidth={1.5}
+                    stroke={activeColor}
+                    strokeWidth={2}
                     opacity={0.6}
                     strokeLinecap="round"
-                  />
-                  
-                  {/* Glow dot at pie top */}
-                  <circle
-                    cx={PIE_TOP_X}
-                    cy={PIE_TOP_Y}
-                    r="8"
-                    fill={f.stroke}
-                    opacity={0.15}
+                    strokeDasharray="8 6"
                   >
-                    <animate attributeName="r" values="8;14;8" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.15;0.05;0.15" dur="1.5s" repeatCount="indefinite" />
-                  </circle>
-                  
-                  {/* Solid dot at pie top */}
-                  <circle
-                    cx={PIE_TOP_X}
-                    cy={PIE_TOP_Y}
-                    r="3.5"
-                    fill={f.stroke}
-                    opacity={0.8}
-                  />
-                  <circle
-                    cx={PIE_TOP_X}
-                    cy={PIE_TOP_Y}
-                    r="1.5"
-                    fill="#FFFFFF"
-                    opacity={0.7}
-                  />
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      from="14"
+                      to="0"
+                      dur="1.2s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
                   
                   {/* TiArrowSortedDown icon - above card top */}
                   <foreignObject
@@ -514,7 +526,7 @@ const getArrowPos = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: f.stroke,
+                        color: activeColor,
                         fontSize: '24px',
                         opacity: 0.9,
                       }}
@@ -526,7 +538,7 @@ const getArrowPos = () => {
               )}
             </svg>
 
-            {/* Card */}
+            {/* Card with pop-up animation and dominance */}
             {cardPos && f && (
               <div
                 ref={cardRef}
@@ -535,23 +547,35 @@ const getArrowPos = () => {
                   left: cardPos.left,
                   top: cardPos.top,
                   width: 360,
-                  animation: "popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
-                  zIndex: 10,
+                  animation: "popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                  zIndex: 50,
+                  filter: 'drop-shadow(0 20px 60px rgba(0,0,0,0.3))',
                 }}
               >
                 <div
-                  className="rounded-xl p-5 shadow-lg relative"
+                  className="rounded-xl p-5 shadow-2xl relative"
                   style={{
                     backgroundColor: colors.cardBg,
-                    border: `2px solid ${f.stroke}`,
+                    border: `2px solid ${activeColor}`,
+                    boxShadow: `0 0 40px ${activeColor}22, 0 10px 40px rgba(0,0,0,0.15)`,
                   }}
                 >
-                  <div className="flex items-center gap-2 mb-2">
+                  {/* Glowing border effect */}
+                  <div 
+                    className="absolute inset-0 rounded-xl pointer-events-none"
+                    style={{
+                      background: `radial-gradient(circle at 50% 0%, ${activeColor}33, transparent 70%)`,
+                      opacity: 0.3,
+                    }}
+                  />
+                  
+                  <div className="flex items-center gap-2 mb-2 relative z-10">
                     <span
                       className="w-3 h-3 rounded-full flex-shrink-0"
                       style={{
                         background: f.fill,
-                        border: `2px solid ${f.stroke}`,
+                        border: `2px solid ${activeColor}`,
+                        boxShadow: `0 0 20px ${activeColor}44`,
                       }}
                     />
                     <span
@@ -562,16 +586,19 @@ const getArrowPos = () => {
                     </span>
                     <span
                       className="text-[10px] px-2.5 py-0.5 rounded-full ml-auto flex-shrink-0 font-medium"
-                      style={{ background: f.tagBg, color: f.tagColor }}
+                      style={{ 
+                        background: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)',
+                        color: activeColor 
+                      }}
                     >
                       {f.tag}
                     </span>
                   </div>
 
-                  <div className="flex items-start gap-2.5 mb-3">
+                  <div className="flex items-start gap-2.5 mb-3 relative z-10">
                     <f.icon
                       size={16}
-                      style={{ color: f.stroke, marginTop: 2, flexShrink: 0 }}
+                      style={{ color: activeColor, marginTop: 2, flexShrink: 0 }}
                     />
                     <p
                       className="text-sm leading-relaxed min-h-[48px]"
@@ -590,14 +617,15 @@ const getArrowPos = () => {
                     </p>
                   </div>
 
-                  <div className="h-1 w-full rounded-full overflow-hidden"
+                  <div className="h-1 w-full rounded-full overflow-hidden relative z-10"
                     style={{ backgroundColor: colors.cardBgLight }}
                   >
                     <div
                       className="h-full rounded-full transition-all duration-75"
                       style={{
                         width: `${progress}%`,
-                        background: f.bar,
+                        background: activeColor,
+                        boxShadow: `0 0 20px ${activeColor}44`,
                       }}
                     />
                   </div>
@@ -610,8 +638,16 @@ const getArrowPos = () => {
 
       <style>{`
         @keyframes popIn {
-          from { opacity: 0; transform: scale(0.92) translateX(20px); }
-          to   { opacity: 1; transform: scale(1) translateX(0); }
+          from { 
+            opacity: 0; 
+            transform: scale(0.85) translateY(20px); 
+            filter: blur(4px);
+          }
+          to   { 
+            opacity: 1; 
+            transform: scale(1) translateY(0); 
+            filter: blur(0);
+          }
         }
         @keyframes blink {
           0%, 100% { opacity: 1; }

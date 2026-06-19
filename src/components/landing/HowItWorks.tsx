@@ -258,10 +258,10 @@ export default function HowItWorks() {
       ? canvas.parentElement.offsetWidth - 40
       : 600;
 
-    const GPO_W = 150, GPO_H = 135; // Increased
-    const COL_W = 90,  COL_H = 65; // Increased
-    const SW = 150,    SH = 195; // Increased
-    const H = 480; // Increased overall height
+    const GPO_W = 150, GPO_H = 135;
+    const COL_W = 90,  COL_H = 65;
+    const SW = 150,    SH = 195;
+    const H = 480;
     canvas.style.height = `${H}px`;
 
     const gpoX = 0;
@@ -275,12 +275,17 @@ export default function HowItWorks() {
       { x: W * 0.22, y: H * 0.78 },
     ];
 
+    // Calculate last card position - right edge with 0.1rem gap
+    // 0.1rem = approximately 1.6px (assuming 16px base font size)
+    const gapFromRight = 1.6; // 0.1rem in pixels
+    const lastCardX = W - SW - gapFromRight;
+
     const stepPos: StepPos[] = [
       { x: W * 0.41,       y: H * 0.04 },
       { x: W * 0.41,       y: H * 0.52 },
       { x: W * 0.65,       y: H * 0.04 },
       { x: W * 0.65,       y: H * 0.52 },
-      { x: W * 0.88 - SW,  y: H * 0.27 },
+      { x: lastCardX,      y: H * 0.27 }, // Dynamically positioned
     ];
 
     // ── SVG layer ──────────────────────────────────────────────────────────
@@ -313,10 +318,8 @@ export default function HowItWorks() {
     STEPS.forEach((s, i) => {
       const d = document.createElement("div");
       d.id = "sc" + i;
-      const isLast = i === STEPS.length - 1;
-      const leftOffset = isLast ? 50 : 0; // More left margin for last card
       
-      d.style.cssText = `position:absolute;left:${stepPos[i].x + leftOffset}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px)`;
+      d.style.cssText = `position:absolute;left:${stepPos[i].x}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px)`;
       
       const details = s.details
         .map(
@@ -362,7 +365,7 @@ export default function HowItWorks() {
     svgCurve(svg, stepPos[0].x + SW / 2, stepPos[0].y + SH, stepPos[1].x + SW / 2, stepPos[1].y, dim, "s01");
     svgCurve(svg, stepPos[1].x + SW, stepPos[1].y + SH / 2, stepPos[2].x, stepPos[2].y + SH / 2, dim, "s12");
     svgCurve(svg, stepPos[2].x + SW / 2, stepPos[2].y + SH, stepPos[3].x + SW / 2, stepPos[3].y, dim, "s23");
-    svgCurve(svg, stepPos[3].x + SW, stepPos[3].y + SH / 2, stepPos[4].x + SW / 2 + 50, stepPos[4].y + SH / 2, dim, "s34");
+    svgCurve(svg, stepPos[3].x + SW, stepPos[3].y + SH / 2, stepPos[4].x + SW / 2, stepPos[4].y + SH / 2, dim, "s34");
 
     // ── Animation Sequence ─────────────────────────────────────────────────
     const cnOn = (id: string) => {
