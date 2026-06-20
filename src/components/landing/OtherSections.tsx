@@ -180,11 +180,7 @@ export default function OtherSections({
   return (
     <>
       {/* Features Section - Using separate component */}
-      <FeaturesSection 
-        featuresRef={featuresRef}
-        addToRefs={addToRefs}
-        featureCardsRef={featureCardsRef}
-      />
+      <FeaturesSection />
 
       {/* Packages Section */}
       <section className="py-12 md:py-16 lg:py-10 px-4 sm:px-6"
