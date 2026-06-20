@@ -274,9 +274,9 @@ export default function TemplatesGrid({
                   boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
-                {/* Template Image - 85% height */}
+                {/* 🔥 Template Image - 16:9 Landscape */}
                 <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
-                  <div className="relative w-full" style={{ paddingBottom: '85%' }}>
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <Image
                       src={template.image}
                       alt={template.name}

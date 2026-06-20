@@ -221,9 +221,9 @@ export default function TemplatesSection({
                       boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                     }}
                   >
-                    {/* Template Image - 85% height */}
+                    {/* 🔥 Template Image - 16:9 Landscape */}
                     <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
-                      <div className="relative w-full" style={{ paddingBottom: '85%' }}>
+                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                         <Image
                           src={template.image}
                           alt={template.name}
@@ -354,7 +354,7 @@ export default function TemplatesSection({
                   }}
                 >
                   <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-gray-200 dark:bg-gray-700">
-                    <div className="relative w-full" style={{ paddingBottom: '85%' }}>
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-gray-500 text-sm">No Preview</span>
                       </div>
@@ -413,9 +413,9 @@ export default function TemplatesSection({
 
             {/* Modal Content */}
             <div className="p-4">
-              {/* Template Image - 85% height */}
+              {/* 🔥 Modal Image - 16:9 Landscape */}
               <div className="relative w-full rounded-lg overflow-hidden mb-4 bg-gray-200 dark:bg-gray-800">
-                <div className="relative w-full" style={{ paddingBottom: '85%' }}>
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <Image
                     src={selectedTemplate.image}
                     alt={selectedTemplate.name}

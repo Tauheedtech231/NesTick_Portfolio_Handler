@@ -959,7 +959,7 @@ export default function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDe
                   {formData.links.map((link, index) => (
                     <div key={index} className="flex gap-2 mb-2">
                       <div className="relative flex-1">
-                        <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5" style={{ color: getTextMuted() }} />
+                        
                         <input
                           type="url"
                           value={link}
