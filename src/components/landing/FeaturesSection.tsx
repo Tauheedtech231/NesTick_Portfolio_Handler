@@ -1,146 +1,39 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useInView } from 'react-intersection-observer';
-import {
-  Layout,
-  Building2,
-  Settings,
-  Zap,
-  Shield,
-  BarChart3,
-  LucideIcon,
-} from "lucide-react";
-import UniqueDiagram from "./UniqueDiagram";
+import React, { useEffect, useState } from "react";
 
-export interface Feature {
+interface Feature {
   title: string;
-  description: string;
-  icon: LucideIcon;
-  fill: string;
-  stroke: string;
-  tagBg: string;
-  tagColor: string;
-  tag: string;
-  bar: string;
   shortLabel: string;
-}
-
-interface FeaturesSectionProps {
-  featuresRef?: React.RefObject<HTMLDivElement | null>;
-  addToRefs?: (
-    el: HTMLDivElement | null,
-    refArray: React.MutableRefObject<HTMLDivElement[]>
-  ) => void;
-  featureCardsRef?: React.MutableRefObject<HTMLDivElement[]>;
 }
 
 const features: Feature[] = [
   {
     title: "Ready-Made Portfolio Templates",
-    description:
-      "Professional templates for colleges with standard sections: Home, About, Services, Faculty, Gallery, Contact. Easily customizable for any educational institute.",
-    icon: Layout,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Templates",
-    bar: "#0066FF",
     shortLabel: "Portfolio",
   },
   {
     title: "Multi-Portal Architecture",
-    description:
-      "Three-tier system: Generic Portal for previews, Main Admin Portal for centralized control, and College Admin Portal for individual institution management.",
-    icon: Building2,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Architecture",
-    bar: "#0066FF",
     shortLabel: "Multiportal",
   },
   {
     title: "Centralized Management",
-    description:
-      "Add/edit/delete colleges, approve template requests, upload new templates, and manage sections per college from a single dashboard.",
-    icon: Settings,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Core Hub",
-    bar: "#0066FF",
     shortLabel: "Centraliz",
   },
   {
     title: "Real-Time Content Updates",
-    description:
-      "Changes made by college admins reflect instantly on live websites with live synchronization to the centralized database.",
-    icon: Zap,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Live Sync",
-    bar: "#0066FF",
     shortLabel: "Live Sync",
   },
   {
     title: "Role-Based Access Control",
-    description:
-      "Three-tier access: Generic users view templates, College admins manage their content, Main admin has full system control.",
-    icon: Shield,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Security",
-    bar: "#0066FF",
     shortLabel: "Access Ctrl",
-  },
-  {
-    title: "Scalable Infrastructure",
-    description:
-      "Built to support multiple institutions simultaneously with independent workspaces and robust data management tools.",
-    icon: BarChart3,
-    fill: "rgba(0, 102, 255, 0.15)",
-    stroke: "#0066FF",
-    tagBg: "rgba(0, 102, 255, 0.2)",
-    tagColor: "#0066FF",
-    tag: "Scale",
-    bar: "#0066FF",
-    shortLabel: "Scalable",
   },
 ];
 
-export default function FeaturesSection({
-  featuresRef,
-  addToRefs,
-  featureCardsRef,
-}: FeaturesSectionProps) {
-  const [activeIdx, setActiveIdx] = useState<number>(0);
-  const [typedText, setTypedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+export default function FeaturesSection() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const typeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const { ref: headingRef, inView: headingInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-    rootMargin: '-50px 0px',
-  });
-
-  const { ref: pieRef, inView: pieInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-    rootMargin: '-50px 0px',
-  });
-
+  // Detect theme
   useEffect(() => {
     const checkTheme = () => {
       const isDark = document.documentElement.classList.contains('dark');
@@ -149,135 +42,185 @@ export default function FeaturesSection({
     
     checkTheme();
     
-    const observer = new MutationObserver(() => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setTheme(isDark ? 'dark' : 'light');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
+        }
+      });
     });
     
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 
-  const getColors = () => {
-    if (theme === 'dark') {
-      return {
-        bg: '#0B0F19',
-        heading: '#FFFFFF',
-        subheading: '#9CA3AF',
-        accent: '#E8CA5E',
-      };
-    } else {
-      return {
-        bg: '#FFFFFF',
-        heading: '#1F2937',
-        subheading: '#6B7280',
-        accent: '#0066FF',
-      };
-    }
-  };
-
-  const colors = getColors();
-
-  const startTyping = useCallback((text: string) => {
-    if (typeTimerRef.current) clearInterval(typeTimerRef.current);
-    setTypedText("");
-    setIsTyping(true);
-    let pos = 0;
-    typeTimerRef.current = setInterval(() => {
-      pos++;
-      setTypedText(text.slice(0, pos));
-      if (pos >= text.length) {
-        clearInterval(typeTimerRef.current!);
-        setIsTyping(false);
-      }
-    }, 18);
-  }, []);
-
-  const handleEnter = useCallback(
-    (idx: number) => {
-      if (activeIdx === idx) return;
-      setActiveIdx(idx);
-      startTyping(features[idx].description);
+  // 5 segments with positions - moved labels slightly left
+  const segments = [
+    { 
+      id: 0, 
+      path: "M 135 45 C 110 50, 75 110, 65 180 C 60 215, 75 240, 105 245 L 210 200 L 155 55 Z", 
+      label: features[0].shortLabel, 
+      x: 115, // Moved left from 130 to 115
+      y: 120,
     },
-    [activeIdx, startTyping]
-  );
+    { 
+      id: 1, 
+      path: "M 175 42 C 240 35, 330 65, 385 145 L 230 185 L 165 55 Z", 
+      label: features[1].shortLabel, 
+      x: 285, // Moved left from 300 to 285
+      y: 100,
+    },
+    { 
+      id: 2, 
+      path: "M 100 260 C 110 320, 150 380, 245 385 L 205 220 L 105 255 Z", 
+      label: features[2].shortLabel, 
+      x: 165, // Moved left from 180 to 165
+      y: 310,
+    },
+    { 
+      id: 3, 
+      path: "M 225 220 L 270 345 C 300 330, 330 300, 345 285 L 305 195 L 225 210 Z", 
+      label: features[3].shortLabel, 
+      x: 285, // Moved left from 300 to 285
+      y: 270,
+    },
+    { 
+      id: 4, 
+      path: "M 310 175 L 395 260 C 425 225, 435 175, 430 150 L 335 170 Z", 
+      label: features[4].shortLabel, 
+      x: 375, // Moved left from 390 to 375
+      y: 212,
+    },
+  ];
 
-  useEffect(() => {
-    if (pieInView && isInitialLoad) {
-      setIsInitialLoad(false);
-      startTyping(features[0].description);
-    }
-  }, [pieInView, isInitialLoad, startTyping]);
-
-  useEffect(() => {
-    return () => {
-      if (typeTimerRef.current) clearInterval(typeTimerRef.current);
-    };
-  }, []);
-
-  const progress =
-    typedText.length > 0
-      ? Math.round((typedText.length / features[activeIdx].description.length) * 100)
-      : 0;
+  const bgColor = theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+  const strokeColor = theme === 'dark' ? '#E8CA5E' : '#1F2937';
+  const textColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+  const headingColor = theme === 'dark' ? '#E8CA5E' : '#0066FF'; // Yellow in dark, Blue in light
 
   return (
-    <section
-      ref={featuresRef}
-      className="w-full py-16 px-4 overflow-hidden relative"
-      style={{ backgroundColor: colors.bg }}
-      aria-label="System features"
+    <div 
+      className="relative min-h-screen flex flex-col items-center justify-center p-4"
+      style={{ backgroundColor: bgColor }}
     >
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Heading */}
-        <div
-          ref={headingRef}
-          className="text-center mb-10"
-          style={{
-            opacity: headingInView ? 1 : 0,
-            transform: headingInView ? 'translateX(0)' : 'translateX(-150px)',
-            transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          }}
+      {/* Heading */}
+      <div className="text-center mb-8">
+        <h2 
+          className="text-3xl md:text-4xl font-bold font-serif tracking-tight"
+          style={{ color: headingColor }}
         >
-          <h2
-            className="text-3xl sm:text-4xl md:text-4xl font-bold font-serif tracking-tight"
-            style={{ color: colors.heading }}
-          >
-            Comprehensive <span style={{ color: colors.accent }}>System Features</span>
-          </h2>
-          <p
-            className="text-sm md:text-base mt-2 font-light"
-            style={{ color: colors.subheading }}
-          >
-            Hover over each feature to explore
-          </p>
-        </div>
-
-        {/* Diagram Section */}
-        <div
-          ref={pieRef}
-          className="relative w-full"
+          Comprehensive System Features
+        </h2>
+        <div 
+          className="w-20 h-1 mx-auto mt-3 rounded-full"
           style={{ 
-            minHeight: 500,
-            opacity: pieInView ? 1 : 0,
-            transform: pieInView ? 'translateY(0)' : 'translateY(120px)',
-            transition: 'all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            background: headingColor,
+            boxShadow: `0 0 20px ${headingColor}44`
           }}
-        >
-          <div className="relative flex items-center justify-center" style={{ minHeight: 500 }}>
-            <div className="relative" style={{ width: '100%', maxWidth: '550px' }}>
-              <UniqueDiagram
-                features={features}
-                activeIdx={activeIdx}
-                onHover={handleEnter}
-                theme={theme}
-                typedText={typedText}
-                isTyping={isTyping}
-                progress={progress}
-              />
-            </div>
-          </div>
-        </div>
+        />
       </div>
-    </section>
+
+      <div className="relative w-full max-w-[550px]">
+        <svg 
+          className="w-full h-auto" 
+          viewBox="0 0 436 397" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <filter id="roughness">
+              <feTurbulence baseFrequency="0.03" numOctaves="3" result="noise" type="fractalNoise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+            </filter>
+          </defs>
+          
+          <g 
+            fill="none" 
+            stroke={strokeColor} 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth="2.5"
+            style={{ filter: 'url(#roughness)' }}
+          >
+            {segments.map((segment) => (
+              <path
+                key={segment.id}
+                d={segment.path}
+                style={{
+                  animation: `subtleFade ${15 + segment.id * 1.5}s ease-in-out infinite`,
+                  animationDelay: `${segment.id * 2}s`,
+                  opacity: 0.3,
+                }}
+              />
+            ))}
+          </g>
+          
+          {/* Segment labels with fade in/out - left margin applied */}
+          {segments.map((segment) => (
+            <text
+              key={`label-${segment.id}`}
+              x={segment.x}
+              y={segment.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={segment.id === 4 ? "10" : "11"}
+              fontWeight="500"
+              fill={textColor}
+              style={{
+                fontFamily: "'Architects Daughter', cursive",
+                animation: `textFade ${15 + segment.id * 1.5}s ease-in-out infinite`,
+                animationDelay: `${segment.id * 2}s`,
+                opacity: 0.3,
+                pointerEvents: 'none',
+              }}
+            >
+              {segment.label}
+            </text>
+          ))}
+        </svg>
+      </div>
+
+      <style jsx global>{`
+        @keyframes subtleFade {
+          0% {
+            opacity: 0.2;
+            transform: scale(0.99);
+          }
+          25% {
+            opacity: 0.9;
+            transform: scale(1.01);
+          }
+          50% {
+            opacity: 0.5;
+            transform: scale(0.995);
+          }
+          75% {
+            opacity: 0.9;
+            transform: scale(1.01);
+          }
+          100% {
+            opacity: 0.2;
+            transform: scale(0.99);
+          }
+        }
+        
+        @keyframes textFade {
+          0% {
+            opacity: 0.15;
+          }
+          25% {
+            opacity: 0.85;
+          }
+          50% {
+            opacity: 0.4;
+          }
+          75% {
+            opacity: 0.85;
+          }
+          100% {
+            opacity: 0.15;
+          }
+        }
+      `}</style>
+    </div>
   );
 }

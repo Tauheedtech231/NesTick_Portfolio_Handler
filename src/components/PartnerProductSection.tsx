@@ -1,45 +1,57 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { useEffect, useState, useRef } from "react";
+import { useInView } from "react-intersection-observer";
+import {
+  Users,
+  Handshake,
+  FileText,
+  TrendingUp,
+} from "lucide-react";
 
-interface Stat {
+const HexCard = ({
+  title,
+  value,
+  icon,
+  className = "",
+  targetValue,
+  suffix,
+  isKFormat = false,
+  index = 0,
+  delay = 0,
+}: {
+  title: string;
   value: string;
-  label: string;
-  target: number;
+  icon: React.ReactNode;
+  className?: string;
+  targetValue: number;
   suffix: string;
-}
-
-const stats: Stat[] = [
-  { value: '500+', label: 'Clients', target: 500, suffix: '+' },
-  { value: '30+', label: 'Templates', target: 30, suffix: '+' },
-  { value: '20K+', label: 'Active Users', target: 20000, suffix: 'K+' },
-  { value: '99%', label: 'Success Rate', target: 99, suffix: '%' },
-];
-
-export default function SocialProofBar() {
-  const [counts, setCounts] = useState<number[]>([0, 0, 0, 0]);
+  isKFormat?: boolean;
+  index?: number;
+  delay?: number;
+}) => {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.15,
-    rootMargin: '-50px 0px',
+    rootMargin: "-50px 0px",
   });
 
   // Detect theme
   useEffect(() => {
     const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setTheme(isDark ? 'dark' : 'light');
+      const isDark = document.documentElement.classList.contains("dark");
+      setTheme(isDark ? "dark" : "light");
     };
     
     checkTheme();
     
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
+        if (mutation.attributeName === "class") {
           checkTheme();
         }
       });
@@ -54,215 +66,257 @@ export default function SocialProofBar() {
     if (inView && !hasAnimated) {
       setHasAnimated(true);
       
-      stats.forEach((stat, index) => {
-        const duration = 2000;
-        const steps = 60;
-        const increment = stat.target / steps;
-        let current = 0;
-        let step = 0;
+      const duration = 2000;
+      const steps = 60;
+      const increment = targetValue / steps;
+      let current = 0;
+      let step = 0;
 
-        const timer = setInterval(() => {
-          step++;
-          current += increment;
-          
-          if (step >= steps) {
-            current = stat.target;
-            clearInterval(timer);
-          }
-          
-          setCounts(prev => {
-            const newCounts = [...prev];
-            newCounts[index] = Math.floor(current);
-            return newCounts;
-          });
-        }, duration / steps);
-      });
+      const timer = setInterval(() => {
+        step++;
+        current += increment;
+        
+        if (step >= steps) {
+          current = targetValue;
+          clearInterval(timer);
+        }
+        
+        setCount(Math.floor(current));
+      }, duration / steps);
     }
-  }, [inView, hasAnimated]);
+  }, [inView, hasAnimated, targetValue]);
 
-  const formatValue = (count: number, suffix: string) => {
-    if (suffix === 'K+') {
-      return (count / 1000).toFixed(1) + 'K+';
+  const formatValue = (count: number) => {
+    if (isKFormat) {
+      return (count / 1000).toFixed(1) + "K+";
     }
     return count + suffix;
   };
 
   return (
-    <section 
+    <div 
       ref={ref}
-      className="py-16 relative overflow-hidden"
+      className={`absolute ${className} cursor-pointer transition-all duration-1000 ease-out will-change-transform`}
       style={{
-        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0) scale(1)" : `translateY(${150 + index * 30}px) scale(0.85)`,
+        transitionDelay: `${index * 150}ms`,
       }}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative w-[210px] h-[180px]">
+        {/* Outer Hex - Removed border */}
         <div
-          className="
-            overflow-hidden
-            rounded-2xl
-            border
-            transition-all
-            duration-1000
-            ease-out
-            will-change-transform
-          "
+          className="absolute inset-0"
           style={{
-            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
-            borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-            boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-            opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0) scale(1)' : 'translateY(120px) scale(0.95)',
+            clipPath:
+              "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
+          }}
+        />
+
+        {/* Inner Hex - With floating animation */}
+        <div
+          className="absolute inset-[10px] flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-105"
+          style={{
+            clipPath:
+              "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
+            backgroundColor: theme === "dark" ? "rgba(15, 23, 42, 0.9)" : "#F3F4F6",
+            border: theme === "dark" ? "1px solid rgba(30, 41, 59, 0.5)" : "1px solid rgba(0, 0, 0, 0.06)",
+            boxShadow: theme === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
+            cursor: "pointer",
+            animation: inView ? `float ${4 + delay}s ease-in-out infinite` : "none",
           }}
         >
-          <div className="grid grid-cols-2 lg:grid-cols-5">
-            
-            {/* Left Content */}
-            <div
-              className="
-                col-span-2
-                lg:col-span-1
-                flex
-                flex-col
-                items-center
-                justify-center
-                p-6
-                lg:p-8
-                border-b
-                lg:border-b-0
-                lg:border-r
-                transition-all
-                duration-1000
-                ease-out
-                will-change-transform
-              "
-              style={{
-                borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : '#FAFAFA',
-                opacity: inView ? 1 : 0,
-                transform: inView ? 'translateY(0)' : 'translateY(80px)',
-                transitionDelay: '100ms',
-              }}
-            >
-              
+          <p 
+            className="text-xs font-medium transition-all duration-300"
+            style={{ 
+              color: theme === "dark" ? "#9CA3AF" : "#6B7280"
+            }}
+          >
+            {title}
+          </p>
 
-              <h3
-                className="
-                  text-center
-                  text-base
-                  font-bold
-                  transition-all
-                  duration-1000
-                  ease-out
-                  will-change-transform
-                "
-                style={{ 
-                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                  opacity: inView ? 1 : 0,
-                  transform: inView ? 'translateY(0)' : 'translateY(60px)',
-                  transitionDelay: '300ms',
-                }}
-              >
-                Trusted Worldwide
-              </h3>
-            </div>
+          <h3 
+            className="text-2xl font-bold font-serif mt-1 transition-all duration-300"
+            style={{ 
+              color: theme === "dark" ? "#FFFFFF" : "#1F2937"
+            }}
+          >
+            {formatValue(count)}
+          </h3>
 
-            {/* Stats with Counter */}
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="
-                  group
-                  relative
-                  flex
-                  flex-col
-                  items-center
-                  justify-center
-                  p-4
-                  lg:p-6
-                  text-center
-                  transition-all
-                  duration-1000
-                  ease-out
-                  border-b
-                  lg:border-b-0
-                  lg:border-r
-                  last:border-r-0
-                  hover:z-10
-                  cursor-default
-                  will-change-transform
-                "
-                style={{
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                  opacity: inView ? 1 : 0,
-                  transform: inView ? 'translateY(0) scale(1)' : `translateY(${100 + index * 20}px) scale(0.9)`,
-                  transitionDelay: `${(index + 1) * 150}ms`,
-                }}
-              >
-                <div className="absolute inset-0 transition-all duration-500 rounded-2xl will-change-transform"
-                  style={{
-                    backgroundColor: 'transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'dark' 
-                      ? 'rgba(255,255,255,0.03)' 
-                      : 'rgba(0,0,0,0.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                />
-                
-                <h4
-                  className="
-                    text-3xl
-                    lg:text-4xl
-                    font-bold
-                    font-serif
-                    transition-all
-                    duration-1000
-                    ease-out
-                    will-change-transform
-                  "
-                  style={{ 
-                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                    transform: inView ? 'scale(1) translateY(0)' : 'scale(0.7) translateY(60px)',
-                    transitionDelay: `${(index + 1) * 200}ms`,
-                  }}
-                >
-                  {formatValue(counts[index], stat.suffix)}
-                </h4>
-
-                <p
-                  className="
-                    mt-1
-                    text-sm
-                    font-medium
-                    transition-all
-                    duration-1000
-                    ease-out
-                    will-change-transform
-                  "
-                  style={{ 
-                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? 'translateY(0)' : 'translateY(50px)',
-                    transitionDelay: `${(index + 1) * 250}ms`,
-                  }}
-                >
-                  {stat.label}
-                </p>
-
-                {/* Underline Indicator */}
-                <div className="mt-3 w-10 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 will-change-transform"
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  }}
-                />
-              </div>
-            ))}
+          <div 
+            className="mt-2 transition-all duration-300"
+            style={{ 
+              color: theme === "dark" ? "#FFFFFF" : "#1F2937"
+            }}
+          >
+            {icon}
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+export default function SocialProofBar() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const sectionRef = useRef<HTMLElement>(null);
+  
+  const { ref: centerRef, inView: centerInView } = useInView({
+    triggerOnce: true,
+    threshold: 0.15,
+    rootMargin: "-50px 0px",
+  });
+
+  // Detect theme
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setTheme(isDark ? "dark" : "light");
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          checkTheme();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section 
+      ref={sectionRef}
+      className="relative h-[510px] overflow-hidden transition-all duration-300"
+      style={{
+        backgroundColor: theme === "dark" ? "#0B0F19" : "#FFFFFF"
+      }}
+    >
+      {/* Left Top */}
+      <HexCard
+        title="Clients"
+        value="500+"
+        icon={<Handshake size={24} />}
+        className="left-[70px] top-[155px]"
+        targetValue={500}
+        suffix="+"
+        index={0}
+        delay={0}
+      />
+
+      {/* Left Bottom */}
+      <HexCard
+        title="Templates"
+        value="30+"
+        icon={<FileText size={24} />}
+        className="left-[260px] top-[260px]"
+        targetValue={30}
+        suffix="+"
+        index={1}
+        delay={0.5}
+      />
+
+      {/* Center Main - Fixed position with proper animation */}
+      <div 
+        ref={centerRef}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+      >
+        <div 
+          className="relative w-[330px] h-[280px] transition-all duration-1000 ease-out will-change-transform"
+          style={{
+            opacity: centerInView ? 1 : 0,
+            transform: centerInView ? "scale(1)" : "scale(0.85)",
+            transitionDelay: "300ms",
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              clipPath:
+                "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
+            }}
+          />
+
+          <div
+            className="absolute inset-[12px] transition-all duration-300 hover:scale-105"
+            style={{
+              clipPath:
+                "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
+              backgroundColor: theme === "dark" ? "rgba(15, 23, 42, 0.9)" : "#F3F4F6",
+              border: theme === "dark" ? "1px solid rgba(30, 41, 59, 0.5)" : "1px solid rgba(0, 0, 0, 0.06)",
+              boxShadow: theme === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
+              cursor: "pointer",
+              animation: centerInView ? "float 4.5s ease-in-out infinite" : "none",
+            }}
+          >
+            <div className="flex items-center justify-center h-full flex-col">
+              <h2 
+                className="text-3xl font-bold text-center leading-tight transition-all duration-300"
+                style={{ 
+                  color: theme === "dark" ? "#E8CA5E" : "#00A0FF",
+                  fontFamily: "serif"
+                }}
+              >
+                TRUSTED
+              </h2>
+              <h2 
+                className="text-3xl font-bold text-center leading-tight transition-all duration-300"
+                style={{ 
+                  color: theme === "dark" ? "#FFFFFF" : "#1F2937",
+                  fontFamily: "serif"
+                }}
+              >
+                WORLDWIDE
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Top */}
+      <HexCard
+        title="Active Users"
+        value="20.0K+"
+        icon={<Users size={24} />}
+        className="right-[260px] top-[80px]"
+        targetValue={20000}
+        suffix="K+"
+        isKFormat={true}
+        index={2}
+        delay={1}
+      />
+
+      {/* Right */}
+      <HexCard
+        title="Success Rate"
+        value="99%"
+        icon={<TrendingUp size={24} />}
+        className="right-[60px] top-[185px]"
+        targetValue={99}
+        suffix="%"
+        index={3}
+        delay={1.5}
+      />
+
+      {/* Add keyframe animation for floating */}
+      <style jsx>{`
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+      `}</style>
     </section>
   );
 }
