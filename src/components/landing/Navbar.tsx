@@ -354,7 +354,7 @@ export default function Navbar() {
     { name: 'Vision', path: '/vision' },
     { name: 'Templates', path: '/templates' },
     { name: 'Products', path: '/products' },
-    { name: 'Partner', path: '/about' },
+    { name: 'Partner', path: '/partner' },
     { name: 'About', path: '/about' },
   ];
 

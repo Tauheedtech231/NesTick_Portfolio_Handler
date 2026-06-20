@@ -34,8 +34,10 @@ import {
   Star,
   Clock,
 } from 'lucide-react';
-import { PartnerBenefitsCards } from './PartnerBenefitsCards';
-import { PartnerWhyChoose } from './PartnerWhyChoose';
+import { PartnerBenefitsCards } from '@/components/landing/PartnerBenefitsCards'; 
+import { PartnerWhyChoose } from '@/components/landing/PartnerWhyChoose'; 
+import Navbar from '@/components/landing/Navbar';
+import Footer from '@/components/landing/Footer';
 
 // Partner Types
 const partnerTypes = [
@@ -203,7 +205,7 @@ const partnershipBenefits = [
   }
 ];
 
-export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperSubmit }: PartnerSectionProps) {
+export default function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperSubmit }: PartnerSectionProps) {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -686,6 +688,8 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
   };
 
   return (
+   <>
+   <Navbar/>
     <section  id="partner-section" ref={sectionRef} className="py-12 md:py-20 px-4 sm:px-6 relative overflow-hidden"
       style={{ backgroundColor: getBgColor() }}
     >
@@ -695,7 +699,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 md:mb-10"
+          className="text-center mt-5 md:mb-10"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
             style={{
@@ -705,7 +709,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
             <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4"
               style={{ color: getAccentColor() }}
             />
-            <span className="text-xs md:text-sm font-medium font-sans tracking-wide"
+            <span className="text-xs  md:text-sm font-medium font-sans tracking-wide"
               style={{ color: getTextMuted() }}
             >
               Join Our Network
@@ -1658,5 +1662,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
         }
       `}</style>
     </section>
+   <Footer/>
+   </>
   );
 }
