@@ -34,6 +34,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import FeaturesSection from "./FeaturesSection";
 import HowItWorks from "./HowItWorks";
+import HowItWorksMobile from "./HowItWorksMobile";
 
 interface OtherSectionsProps {
   featuresRef: React.RefObject<HTMLDivElement | null>;
@@ -392,9 +393,17 @@ export default function OtherSections({
             </p>
           </motion.div>
 
-          {/* How It Works - Full Width */}
+          {/* How It Works - Desktop & Mobile */}
           <div className="w-full">
-            <HowItWorks />
+            {/* Desktop Version */}
+            <div className="hidden md:block">
+              <HowItWorks />
+            </div>
+            
+            {/* Mobile Version */}
+            <div className="block md:hidden">
+              <HowItWorksMobile />
+            </div>
           </div>
 
           {/* Portal Architecture Section - No card background */}

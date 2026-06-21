@@ -1,111 +1,319 @@
 <!DOCTYPE html>
 
-<html lang="en"><head>
+<html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Hand-Drawn Sketch Reproduction</title>
-<!-- Tailwind CSS v3 CDN -->
+<title>CORE_OS_METRICS - Mobile Interface</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style data-purpose="custom-layout-styles">
-    /* 
-       Applying a subtle paper-like texture to the background 
-       to match the organic feel of the original sketch.
-    */
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --primary-neon: #00f0ff;
+            --primary-neon-glow: rgba(0, 240, 255, 0.3);
+            --hex-bg: #0e0e0e;
+        }
+
+        body {
+            background-color: #000000;
+            color: #e2e2e2;
+            overflow-x: hidden;
+            font-family: 'Geist', sans-serif;
+        }
+
+        .hex-container {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            background: var(--hex-bg);
+            position: relative;
+        }
+
+        .hex-border {
+            position: relative;
+            background: #1A1A1A;
+            padding: 1px;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .hex-border::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary-neon) 0%, transparent 40%, transparent 60%, var(--primary-neon) 100%);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: var(--primary-neon);
+            opacity: 0.3;
+            box-shadow: 0 0 8px var(--primary-neon-glow);
+        }
+
+        .circuit-node {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-neon);
+            position: absolute;
+            box-shadow: 0 0 10px var(--primary-neon);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        .status-pulse {
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .glass-card {
+            background: rgba(19, 19, 19, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 73, 75, 0.5);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#e2e2e2",
+                        "inverse-surface": "#e2e2e2",
+                        "on-secondary": "#3c0090",
+                        "outline-variant": "#3b494b",
+                        "on-secondary-fixed-variant": "#5700c9",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed": "#002022",
+                        "surface": "#131313",
+                        "primary": "#dbfcff",
+                        "on-secondary-container": "#ddcdff",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#eac324",
+                        "on-tertiary": "#3b2f00",
+                        "tertiary-fixed": "#ffe179",
+                        "tertiary": "#fff5de",
+                        "primary-container": "#00f0ff",
+                        "secondary-fixed-dim": "#d1bcff",
+                        "on-tertiary-container": "#715d00",
+                        "on-primary": "#00363a",
+                        "background": "#131313",
+                        "primary-fixed-dim": "#00dbe9",
+                        "inverse-primary": "#006970",
+                        "outline": "#849495",
+                        "tertiary-container": "#fed639",
+                        "surface-dim": "#131313",
+                        "on-surface": "#e2e2e2",
+                        "secondary-container": "#7000ff",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#d1bcff",
+                        "on-secondary-fixed": "#23005b",
+                        "on-primary-fixed-variant": "#004f54",
+                        "on-tertiary-fixed": "#231b00",
+                        "error-container": "#93000a",
+                        "surface-tint": "#00dbe9",
+                        "surface-container": "#1f1f1f",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-low": "#1b1b1b",
+                        "on-error": "#690005",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#b9cacb",
+                        "primary-fixed": "#7df4ff",
+                        "on-primary-container": "#006970",
+                        "surface-bright": "#393939",
+                        "on-tertiary-fixed-variant": "#554500",
+                        "inverse-on-surface": "#303030",
+                        "surface-container-highest": "#353535"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "margin-safe": "32px",
+                        "hex-gap": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "metric-xl": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "metric-xl": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
     body {
-      background-color: #f0f0ee;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background-image: 
-        radial-gradient(#d1d1cf 1px, transparent 0),
-        radial-gradient(#d1d1cf 1px, transparent 0);
-      background-size: 40px 40px;
-      background-position: 0 0, 20px 20px;
-      background-attachment: fixed;
+      min-height: max(884px, 100dvh);
     }
-
-    /* Container for the SVG to maintain proportions */
-    .sketch-container {
-      width: 100%;
-      max-width: 550px;
-      padding: 3rem;
-      background: #fafafa;
-      box-shadow: 
-        0 10px 25px -5px rgba(0, 0, 0, 0.1),
-        0 8px 10px -6px rgba(0, 0, 0, 0.1),
-        inset 0 0 100px rgba(0,0,0,0.02);
-      border-radius: 4px;
-      position: relative;
-      border: 1px solid #e5e5e2;
-    }
-
-    /* Shaky line animation simulation or just irregular pathing */
-    .sketch-path {
-        filter: url(#roughness);
-    }
-</style>
+  </style>
 </head>
-<body>
-<!-- BEGIN: SketchWrapper -->
-<main class="sketch-container" data-purpose="sketch-main-content">
-<!-- 
-      The SVG recreates the hand-drawn organic shapes. 
-      Using 'stroke-linejoin="round"' and 'stroke-linecap="round"' 
-      to mimic the ink flow of a pen.
-    -->
-<svg class="w-full h-auto" data-purpose="organic-sketch-drawing" viewbox="0 0 436 397" xmlns="http://www.w3.org/2000/svg">
-<!-- Roughness filter for hand-drawn effect -->
-<defs>
-<filter id="roughness">
-<feturbulence basefrequency="0.03" numoctaves="3" result="noise" type="fractalNoise"></feturbulence>
-<fedisplacementmap in="SourceGraphic" in2="noise" scale="2"></fedisplacementmap>
-</filter>
-</defs>
-<!-- BEGIN: Ink Strokes Group -->
-<g class="sketch-path" fill="none" stroke="#121245" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5">
-<!-- 1. Top Left Segment -->
-<path d="M 135 45 
-             C 110 50, 75 110, 65 180 
-             C 60 215, 75 240, 105 245
-             L 210 200
-             L 155 55 
-             Z" data-purpose="segment-1"></path>
-<!-- 2. Top Right Segment -->
-<path d="M 175 42
-             C 240 35, 330 65, 385 145
-             L 230 185
-             L 165 55
-             Z" data-purpose="segment-2"></path>
-<!-- 3. Bottom Left Segment -->
-<path d="M 100 260
-             C 110 320, 150 380, 245 385
-             L 205 220
-             L 105 255
-             Z" data-purpose="segment-3"></path>
-<!-- 4. Bottom Center/Right Large Segment -->
-<path d="M 225 220
-             L 270 345
-             C 300 330, 330 300, 345 285
-             L 305 195
-             L 225 210
-             Z" data-purpose="segment-4"></path>
-<!-- 5. Far Right Small Wedge Segment -->
-<!-- This is the 5th segment missing from the previous version -->
-<path d="M 320 190
-             L 360 270
-             C 385 240, 395 190, 398 165
-             L 325 185
-             Z" data-purpose="segment-5-wedge"></path>
-</g>
-<!-- END: Ink Strokes Group -->
-<!-- Small center dot -->
-<circle cx="218" cy="205" fill="#121245" r="1.2"></circle>
-</svg>
-<div class="mt-10 text-center text-gray-400 italic text-xs tracking-wide">
-      A faithful reproduction of the original five-segment ink sketch.
-    </div>
+<body class="bg-background text-on-background min-h-screen pb-20">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant bg-background/80 backdrop-blur-md shadow-[0_0_15px_rgba(0,219,233,0.1)] flex justify-between items-center px-gutter h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="terminal">terminal</span>
+<h1 class="font-headline-md text-headline-md-mobile text-primary tracking-tighter uppercase">CORE_OS_METRICS</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="active:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors duration-300" data-icon="settings_input_component">settings_input_component</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-6 relative flex flex-col items-center">
+<!-- Background Animation Overlay -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+
+</div>
+<!-- Central Hub: TRUSTED WORLDWIDE -->
+<section class="relative z-10 w-full flex justify-center mb-16">
+<div class="hex-border w-56 h-56 flex items-center justify-center drop-shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+<div class="hex-container w-full h-full flex flex-col items-center justify-center p-6 text-center">
+<div class="circuit-node top-0 left-1/2 -translate-x-1/2 mt-2"></div>
+<span class="font-label-sm text-label-sm text-primary mb-2 opacity-60">SYSTEM_CORE</span>
+<h2 class="font-headline-md text-headline-md text-on-background leading-tight">TRUSTED WORLDWIDE</h2>
+<div class="status-pulse w-2 h-2 rounded-full bg-primary mt-4"></div>
+</div>
+</div>
+<!-- Vertical Circuit Lines to next metrics -->
+<div class="circuit-line w-px h-16 absolute bottom-[-64px] left-1/2 -translate-x-1/2"></div>
+<div class="circuit-node absolute bottom-[-64px] left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+</section>
+<!-- Metrics Grid (Vertical Stack/2x2 hybrid for mobile) -->
+<section class="relative z-10 w-full max-w-sm grid grid-cols-2 gap-x-4 gap-y-16 mt-8 pb-12">
+<!-- Metric 1: Clients -->
+<div class="flex flex-col items-center group">
+<div class="hex-border w-36 h-40">
+<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
+<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="hub">hub</span>
+<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">24</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Clients</div>
+</div>
+</div>
+<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
+</div>
+<!-- Metric 2: Success Rate -->
+<div class="flex flex-col items-center group">
+<div class="hex-border w-36 h-40">
+<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
+<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="shield">shield</span>
+<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">99%</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Uptime</div>
+</div>
+</div>
+<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
+</div>
+<!-- Metric 3: Active Users -->
+<div class="flex flex-col items-center group relative">
+<div class="hex-border w-36 h-40">
+<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
+<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="waves">waves</span>
+<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">12k</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Users</div>
+</div>
+</div>
+<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
+</div>
+<!-- Metric 4: Templates -->
+<div class="flex flex-col items-center group relative">
+<div class="hex-border w-36 h-40">
+<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
+<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="account_tree">account_tree</span>
+<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">150+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Nodes</div>
+</div>
+</div>
+<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
+</div>
+</section>
+<!-- Technical Detail Card -->
+<section class="relative z-10 w-full max-w-sm mt-8 mb-24 glass-card rounded-lg p-6 border-l-4 border-l-primary">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label-sm text-label-sm text-primary uppercase tracking-tighter">Live Network Status</h3>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-[10px] text-primary/60">ENCRYPTED</span>
+<span class="material-symbols-outlined text-xs text-primary" data-icon="lock" data-weight="fill">lock</span>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-[11px] font-label-sm">
+<span class="text-on-surface-variant">NODE_LATENCY:</span>
+<span class="text-primary">12ms</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-3/4 shadow-[0_0_8px_#00f0ff]"></div>
+</div>
+<div class="flex justify-between items-center text-[11px] font-label-sm">
+<span class="text-on-surface-variant">TRAFFIC_LOAD:</span>
+<span class="text-primary">42.8 GB/s</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-1/2 shadow-[0_0_8px_#00f0ff]"></div>
+</div>
+</div>
+</section>
 </main>
-<!-- END: SketchWrapper -->
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-background/90 dark:bg-background/90 border-t border-outline-variant backdrop-blur-xl z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(0,219,233,0.6)] active:scale-110 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics" data-weight="fill">analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+</a>
+</nav>
+<!-- Interactive Micro-interaction Script -->
+<script>
+        document.querySelectorAll('.hex-border').forEach(hex => {
+            hex.addEventListener('touchstart', () => {
+                hex.style.filter = 'brightness(1.5) drop-shadow(0 0 15px rgba(0, 240, 255, 0.4))';
+            });
+            hex.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    hex.style.filter = '';
+                }, 300);
+            });
+        });
+
+        // Simulating data updates
+        setInterval(() => {
+            const metrics = document.querySelectorAll('.text-metric-xl');
+            metrics.forEach(m => {
+                if (Math.random() > 0.8) {
+                    m.style.opacity = '0.7';
+                    setTimeout(() => m.style.opacity = '1', 100);
+                }
+            });
+        }, 2000);
+    </script>
 </body></html>

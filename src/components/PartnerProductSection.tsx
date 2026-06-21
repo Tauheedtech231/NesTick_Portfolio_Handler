@@ -1,54 +1,33 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import {
-  Users,
-  Handshake,
-  FileText,
-  TrendingUp,
-} from "lucide-react";
+import SocialProofBarMobile from "./landing/SocialProofBarMobile";
 
-const HexCard = ({
-  title,
-  value,
-  icon,
-  className = "",
-  targetValue,
-  suffix,
-  isKFormat = false,
-  index = 0,
-  delay = 0,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  className?: string;
-  targetValue: number;
-  suffix: string;
-  isKFormat?: boolean;
-  index?: number;
-  delay?: number;
-}) => {
+export default function SocialProofBar() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [count, setCount] = useState(0);
+  const [counts, setCounts] = useState({
+    clients: 0,
+    templates: 0,
+    activeUsers: 0,
+    successRate: 0,
+  });
   const [hasAnimated, setHasAnimated] = useState(false);
   
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.15,
+    threshold: 0.1,
     rootMargin: "-50px 0px",
   });
 
-  // Detect theme
   useEffect(() => {
     const checkTheme = () => {
       const isDark = document.documentElement.classList.contains("dark");
       setTheme(isDark ? "dark" : "light");
     };
-    
+
     checkTheme();
-    
+
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === "class") {
@@ -56,267 +35,388 @@ const HexCard = ({
         }
       });
     });
-    
+
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 
-  // Animate counter when in view
+  // Counter animation
   useEffect(() => {
     if (inView && !hasAnimated) {
       setHasAnimated(true);
       
+      const targets = {
+        clients: 500,
+        templates: 30,
+        activeUsers: 20000,
+        successRate: 99,
+      };
+      
       const duration = 2000;
       const steps = 60;
-      const increment = targetValue / steps;
-      let current = 0;
+      const increments = {
+        clients: targets.clients / steps,
+        templates: targets.templates / steps,
+        activeUsers: targets.activeUsers / steps,
+        successRate: targets.successRate / steps,
+      };
+      
+      const currentCounts = {
+        clients: 0,
+        templates: 0,
+        activeUsers: 0,
+        successRate: 0,
+      };
+      
       let step = 0;
-
+      
       const timer = setInterval(() => {
         step++;
-        current += increment;
+        
+        currentCounts.clients += increments.clients;
+        currentCounts.templates += increments.templates;
+        currentCounts.activeUsers += increments.activeUsers;
+        currentCounts.successRate += increments.successRate;
         
         if (step >= steps) {
-          current = targetValue;
+          currentCounts.clients = targets.clients;
+          currentCounts.templates = targets.templates;
+          currentCounts.activeUsers = targets.activeUsers;
+          currentCounts.successRate = targets.successRate;
           clearInterval(timer);
         }
         
-        setCount(Math.floor(current));
+        setCounts({
+          clients: Math.floor(currentCounts.clients),
+          templates: Math.floor(currentCounts.templates),
+          activeUsers: Math.floor(currentCounts.activeUsers),
+          successRate: Math.floor(currentCounts.successRate),
+        });
       }, duration / steps);
     }
-  }, [inView, hasAnimated, targetValue]);
+  }, [inView, hasAnimated]);
 
-  const formatValue = (count: number) => {
-    if (isKFormat) {
-      return (count / 1000).toFixed(1) + "K+";
+  // Theme-based colors
+  const bgColor = theme === "dark" ? "#0B0F19" : "#FFFFFF";
+  const hexBgColor = theme === "dark" ? "#0b1120" : "#F3F4F6";
+  const textColor = theme === "dark" ? "#FFFFFF" : "#1F2937";
+  const textGray = theme === "dark" ? "#9CA3AF" : "#6B7280";
+  const neonBlue = "#4cc9f0";
+  const yellowColor = "#E8CA5E";
+
+  // Format values
+  const formatValue = (value: number, type: string) => {
+    if (type === 'activeUsers') {
+      return (value / 1000).toFixed(1) + 'K+';
     }
-    return count + suffix;
+    return value + '+';
   };
 
   return (
-    <div 
-      ref={ref}
-      className={`absolute ${className} cursor-pointer transition-all duration-1000 ease-out will-change-transform`}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0) scale(1)" : `translateY(${150 + index * 30}px) scale(0.85)`,
-        transitionDelay: `${index * 150}ms`,
-      }}
-    >
-      <div className="relative w-[210px] h-[180px]">
-        {/* Outer Hex - Removed border */}
-        <div
-          className="absolute inset-0"
+    <>
+     <SocialProofBarMobile />
+      {/* Desktop only - hidden on mobile */}
+      <div className="hidden md:block">
+        <section
+          ref={ref}
+          className="w-full min-h-[510px] flex items-center justify-center relative overflow-hidden"
           style={{
-            clipPath:
-              "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
-          }}
-        />
-
-        {/* Inner Hex - With floating animation */}
-        <div
-          className="absolute inset-[10px] flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-105"
-          style={{
-            clipPath:
-              "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
-            backgroundColor: theme === "dark" ? "rgba(15, 23, 42, 0.9)" : "#F3F4F6",
-            border: theme === "dark" ? "1px solid rgba(30, 41, 59, 0.5)" : "1px solid rgba(0, 0, 0, 0.06)",
-            boxShadow: theme === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
-            cursor: "pointer",
-            animation: inView ? `float ${4 + delay}s ease-in-out infinite` : "none",
+            backgroundColor: bgColor,
           }}
         >
-          <p 
-            className="text-xs font-medium transition-all duration-300"
-            style={{ 
-              color: theme === "dark" ? "#9CA3AF" : "#6B7280"
-            }}
-          >
-            {title}
-          </p>
-
-          <h3 
-            className="text-2xl font-bold font-serif mt-1 transition-all duration-300"
-            style={{ 
-              color: theme === "dark" ? "#FFFFFF" : "#1F2937"
-            }}
-          >
-            {formatValue(count)}
-          </h3>
-
-          <div 
-            className="mt-2 transition-all duration-300"
-            style={{ 
-              color: theme === "dark" ? "#FFFFFF" : "#1F2937"
-            }}
-          >
-            {icon}
+          {/* Background Connection SVG Layer */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 1000">
+              <path
+                className="connector-line"
+                d="M 500 500 C 400 500, 350 450, 250 350"
+                fill="none"
+                stroke={neonBlue}
+                strokeWidth="1"
+                opacity="0.4"
+                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
+              />
+              <path
+                className="connector-line"
+                d="M 500 500 C 400 500, 350 550, 250 650"
+                fill="none"
+                stroke={neonBlue}
+                strokeWidth="1"
+                opacity="0.4"
+                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
+              />
+              <path
+                className="connector-line"
+                d="M 500 500 C 600 500, 650 450, 750 350"
+                fill="none"
+                stroke={neonBlue}
+                strokeWidth="1"
+                opacity="0.4"
+                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
+              />
+              <path
+                className="connector-line"
+                d="M 500 500 C 600 500, 650 550, 750 650"
+                fill="none"
+                stroke={neonBlue}
+                strokeWidth="1"
+                opacity="0.4"
+                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
+              />
+            </svg>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-export default function SocialProofBar() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const sectionRef = useRef<HTMLElement>(null);
-  
-  const { ref: centerRef, inView: centerInView } = useInView({
-    triggerOnce: true,
-    threshold: 0.15,
-    rootMargin: "-50px 0px",
-  });
-
-  // Detect theme
-  useEffect(() => {
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
-    };
-    
-    checkTheme();
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          checkTheme();
-        }
-      });
-    });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section 
-      ref={sectionRef}
-      className="relative h-[510px] overflow-hidden transition-all duration-300"
-      style={{
-        backgroundColor: theme === "dark" ? "#0B0F19" : "#FFFFFF"
-      }}
-    >
-      {/* Left Top */}
-      <HexCard
-        title="Clients"
-        value="500+"
-        icon={<Handshake size={24} />}
-        className="left-[70px] top-[155px]"
-        targetValue={500}
-        suffix="+"
-        index={0}
-        delay={0}
-      />
-
-      {/* Left Bottom */}
-      <HexCard
-        title="Templates"
-        value="30+"
-        icon={<FileText size={24} />}
-        className="left-[260px] top-[260px]"
-        targetValue={30}
-        suffix="+"
-        index={1}
-        delay={0.5}
-      />
-
-      {/* Center Main - Fixed position with proper animation */}
-      <div 
-        ref={centerRef}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-      >
-        <div 
-          className="relative w-[330px] h-[280px] transition-all duration-1000 ease-out will-change-transform"
-          style={{
-            opacity: centerInView ? 1 : 0,
-            transform: centerInView ? "scale(1)" : "scale(0.85)",
-            transitionDelay: "300ms",
-          }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              clipPath:
-                "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
-            }}
-          />
-
-          <div
-            className="absolute inset-[12px] transition-all duration-300 hover:scale-105"
-            style={{
-              clipPath:
-                "polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)",
-              backgroundColor: theme === "dark" ? "rgba(15, 23, 42, 0.9)" : "#F3F4F6",
-              border: theme === "dark" ? "1px solid rgba(30, 41, 59, 0.5)" : "1px solid rgba(0, 0, 0, 0.06)",
-              boxShadow: theme === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
-              cursor: "pointer",
-              animation: centerInView ? "float 4.5s ease-in-out infinite" : "none",
-            }}
-          >
-            <div className="flex items-center justify-center h-full flex-col">
-              <h2 
-                className="text-3xl font-bold text-center leading-tight transition-all duration-300"
-                style={{ 
-                  color: theme === "dark" ? "#E8CA5E" : "#00A0FF",
-                  fontFamily: "serif"
+          {/* Stats Layout Container */}
+          <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 items-center px-4">
+            {/* Left Side Column - Animates from Left */}
+            <div 
+              className="flex flex-col items-center md:items-end gap-16"
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateX(0)" : "translateX(-200px)",
+                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transitionDelay: "200ms",
+              }}
+            >
+              {/* Clients */}
+              <div
+                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: neonBlue,
+                  padding: "1px",
+                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
                 }}
               >
-                TRUSTED
-              </h2>
-              <h2 
-                className="text-3xl font-bold text-center leading-tight transition-all duration-300"
-                style={{ 
-                  color: theme === "dark" ? "#FFFFFF" : "#1F2937",
-                  fontFamily: "serif"
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center p-4"
+                  style={{
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    background: hexBgColor,
+                  }}
+                >
+                  <span
+                    className="text-[8px] uppercase tracking-widest mb-1"
+                    style={{ color: textGray }}
+                  >
+                    Clients
+                  </span>
+                  <span
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: textColor }}
+                  >
+                    {formatValue(counts.clients, 'clients')}
+                  </span>
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ color: neonBlue }}
+                  >
+                    handshake
+                  </span>
+                </div>
+              </div>
+
+              {/* Templates */}
+              <div
+                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: neonBlue,
+                  padding: "1px",
+                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
                 }}
               >
-                WORLDWIDE
-              </h2>
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center p-4"
+                  style={{
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    background: hexBgColor,
+                  }}
+                >
+                  <span
+                    className="text-[8px] uppercase tracking-widest mb-1"
+                    style={{ color: textGray }}
+                  >
+                    Templates
+                  </span>
+                  <span
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: textColor }}
+                  >
+                    {formatValue(counts.templates, 'templates')}
+                  </span>
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ color: neonBlue }}
+                  >
+                    content_copy
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Center Main Hexagon - Animates from Bottom */}
+            <div 
+              className="flex justify-center"
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(250px)",
+                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transitionDelay: "400ms",
+              }}
+            >
+              <div
+                className="w-64 h-72 md:w-72 md:h-80 transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: "linear-gradient(135deg, #4cc9f0, #225a6e)",
+                  padding: "2px",
+                  boxShadow: "0 0 30px rgba(76, 201, 240, 0.3)",
+                }}
+              >
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center"
+                  style={{
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    background: theme === "dark" ? "#050a14" : "#F9FAFB",
+                  }}
+                >
+                  <h1
+                    className="text-3xl md:text-3xl font-black leading-tight tracking-tight"
+                    style={{ color: textColor }}
+                  >
+                    <span style={{ color: yellowColor }}>TRUSTED</span>
+                    <br />
+                    WORLDWIDE
+                  </h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side Column - Animates from Right */}
+            <div 
+              className="flex flex-col items-center md:items-start gap-16"
+              style={{
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateX(0)" : "translateX(200px)",
+                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transitionDelay: "200ms",
+              }}
+            >
+              {/* Active Users */}
+              <div
+                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: neonBlue,
+                  padding: "1px",
+                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
+                }}
+              >
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center p-4"
+                  style={{
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    background: hexBgColor,
+                  }}
+                >
+                  <span
+                    className="text-[8px] uppercase tracking-widest mb-1"
+                    style={{ color: textGray }}
+                  >
+                    Active Users
+                  </span>
+                  <span
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: textColor }}
+                  >
+                    {formatValue(counts.activeUsers, 'activeUsers')}
+                  </span>
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ color: neonBlue }}
+                  >
+                    group
+                  </span>
+                </div>
+              </div>
+
+              {/* Success Rate */}
+              <div
+                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
+                style={{
+                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                  background: neonBlue,
+                  padding: "1px",
+                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
+                }}
+              >
+                <div
+                  className="w-full h-full flex flex-col items-center justify-center p-4"
+                  style={{
+                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                    background: hexBgColor,
+                  }}
+                >
+                  <span
+                    className="text-[8px] uppercase tracking-widest mb-1"
+                    style={{ color: textGray }}
+                  >
+                    Success Rate
+                  </span>
+                  <span
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: textColor }}
+                  >
+                    {counts.successRate}%
+                  </span>
+                  <span
+                    className="material-symbols-outlined text-2xl"
+                    style={{ color: neonBlue }}
+                  >
+                    trending_up
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Add Material Icons and Animations */}
+          <style jsx global>{`
+            @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+
+            .material-symbols-outlined {
+              font-family: "Material Symbols Outlined";
+              font-weight: normal;
+              font-style: normal;
+              font-size: 24px;
+              line-height: 1;
+              letter-spacing: normal;
+              text-transform: none;
+              display: inline-block;
+              white-space: nowrap;
+              word-wrap: normal;
+              direction: ltr;
+              -webkit-font-feature-settings: "liga";
+              -webkit-font-smoothing: antialiased;
+            }
+
+            @keyframes subtle-pulse {
+              0%,
+              100% {
+                opacity: 0.4;
+              }
+              50% {
+                opacity: 0.7;
+              }
+            }
+            
+            .connector-line {
+              animation: subtle-pulse 5s infinite ease-in-out;
+            }
+          `}</style>
+        </section>
       </div>
-
-      {/* Right Top */}
-      <HexCard
-        title="Active Users"
-        value="20.0K+"
-        icon={<Users size={24} />}
-        className="right-[260px] top-[80px]"
-        targetValue={20000}
-        suffix="K+"
-        isKFormat={true}
-        index={2}
-        delay={1}
-      />
-
-      {/* Right */}
-      <HexCard
-        title="Success Rate"
-        value="99%"
-        icon={<TrendingUp size={24} />}
-        className="right-[60px] top-[185px]"
-        targetValue={99}
-        suffix="%"
-        index={3}
-        delay={1.5}
-      />
-
-      {/* Add keyframe animation for floating */}
-      <style jsx>{`
-        @keyframes float {
-          0% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-15px);
-          }
-          100% {
-            transform: translateY(0px);
-          }
-        }
-      `}</style>
-    </section>
+    </>
   );
 }

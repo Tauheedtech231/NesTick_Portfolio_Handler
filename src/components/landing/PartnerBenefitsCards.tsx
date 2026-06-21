@@ -32,7 +32,7 @@ const DEFAULT_BENEFITS: Benefit[] = [
 
 const CARD_W = 155;
 const CARD_H = 175;
-const AREA_H = 340;
+const AREA_H = 380; // Increased height for more spacing
 const SAMPLES = 1000;
 const EDGE_PADDING = 0.08;
 
@@ -100,12 +100,34 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
   const BENEFITS = benefits || DEFAULT_BENEFITS;
   const areaRef = useRef<HTMLDivElement>(null);
   const [positions, setPositions] = useState<CardPosition[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Get visible benefits based on device
+  const getVisibleBenefits = useCallback(() => {
+    if (isMobile) {
+      // Show only first 3 benefits on mobile
+      return BENEFITS.slice(0, 3);
+    }
+    return BENEFITS;
+  }, [isMobile, BENEFITS]);
+
+  const visibleBenefits = getVisibleBenefits();
 
   const recalculate = useCallback(() => {
     if (!areaRef.current) return;
     const W = areaRef.current.offsetWidth;
-    setPositions(computeCardPositions(W, AREA_H, BENEFITS.length));
-  }, []);
+    setPositions(computeCardPositions(W, AREA_H, visibleBenefits.length));
+  }, [visibleBenefits.length]);
 
   useEffect(() => {
     recalculate();
@@ -118,7 +140,55 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
   const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.3)' : 'rgba(0, 0, 0, 0.06)';
   const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
-  const LAST_CARD_LEFT_OFFSET = 20; // px: shift last card to the right
+  
+  // Adjust card size for mobile - SMALLER
+  const getCardDimensions = () => {
+    if (isMobile) {
+      return { width: 110, height: 130 };
+    }
+    return { width: CARD_W, height: CARD_H };
+  };
+
+  const { width: cardW, height: cardH } = getCardDimensions();
+  const LAST_CARD_LEFT_OFFSET = isMobile ? 5 : 20;
+
+  // Custom position adjustments for mobile to avoid overlap
+  const getCustomPosition = (index: number, originalX: number, originalY: number) => {
+    if (!isMobile) return { x: originalX, y: originalY };
+    
+    // Adjust these values to control spacing
+    const firstCardLeftGap = 20;      // Left gap for first card
+    const firstCardTopGap = 15;       // Top gap for first card
+    
+    const secondCardLeftGap = 20;    // More left gap for second card (negative = move left)
+    const secondCardTopGap = 0;       // Top gap for second card
+    
+    const thirdCardLeftGap = 20;      // Left gap for third card
+    const thirdCardTopGap = 20;      // Top gap for third card (negative = move up)
+    
+    let adjustedX = originalX;
+    let adjustedY = originalY;
+    
+    // First card (index 0): Add left and top gap
+    if (index === 0) {
+      adjustedX = originalX + firstCardLeftGap;
+      adjustedY = originalY + firstCardTopGap;
+    }
+    
+    // Second card (index 1): Move more to the left
+    if (index === 1) {
+      adjustedX = originalX + secondCardLeftGap;
+      adjustedY = originalY + secondCardTopGap;
+    }
+    
+    // Third card (index 2): Add top gap and left gap
+    if (index === 2 && visibleBenefits.length > 2) {
+      adjustedX = originalX + thirdCardLeftGap;
+      adjustedY = originalY + thirdCardTopGap;
+    }
+    
+    return { x: adjustedX, y: adjustedY };
+  };
 
   return (
     <section 
@@ -132,8 +202,10 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
         style={{ height: AREA_H }}
       >
         {positions.length > 0 &&
-          BENEFITS.map((benefit, i) => {
-            const pos = positions[i];
+          positions.map((pos, i) => {
+            const benefit = visibleBenefits[i];
+            if (!benefit) return null; // guard against race conditions where visibleBenefits grew
+            const customPos = getCustomPosition(i, pos.x, pos.y);
             const delay = 0.1 + (i * 0.08);
 
             return (
@@ -141,12 +213,12 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
                 key={benefit.id}
                 className="absolute group cursor-pointer rounded-xl text-center transition-all duration-500 hover:scale-105 hover:shadow-xl"
                 style={{
-                  left: pos.x + (i === BENEFITS.length - 1 ? LAST_CARD_LEFT_OFFSET : 0),
-                  top: pos.y,
-                  width: CARD_W,
-                  height: CARD_H,
+                  left: customPos.x + (i === visibleBenefits.length - 1 ? LAST_CARD_LEFT_OFFSET : 0),
+                  top: customPos.y,
+                  width: cardW,
+                  height: cardH,
                   zIndex: i + 1,
-                  padding: "20px 14px",
+                  padding: isMobile ? "10px 8px" : "20px 14px",
                   backgroundColor: getCardBg(),
                   border: `1px solid ${getBorderColor()}`,
                   opacity: isInView ? 1 : 0,
@@ -168,15 +240,21 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
 
                 <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
                   {/* Title */}
-                  <p className="text-xs md:text-sm font-bold leading-tight mb-1.5 font-sans tracking-wide text-center"
-                    style={{ color: getTextColor() }}
+                  <p className="font-bold leading-tight mb-1 font-sans tracking-wide text-center"
+                    style={{ 
+                      color: getTextColor(),
+                      fontSize: isMobile ? '9px' : '14px',
+                    }}
                   >
                     {benefit.title}
                   </p>
 
                   {/* Description */}
-                  <p className="text-[9px] md:text-[10px] leading-relaxed font-light text-center"
-                    style={{ color: getTextMuted() }}
+                  <p className="leading-relaxed font-light text-center"
+                    style={{ 
+                      color: getTextMuted(),
+                      fontSize: isMobile ? '7px' : '10px',
+                    }}
                   >
                     {benefit.description || benefit.desc}
                   </p>
@@ -185,6 +263,22 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
             );
           })}
       </div>
+
+      {/* Mobile indicator dots */}
+      {isMobile && visibleBenefits.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-3">
+          {visibleBenefits.map((_, idx) => (
+            <div
+              key={idx}
+              className="h-1 rounded-full transition-all duration-300"
+              style={{
+                width: idx === 0 ? '16px' : '5px',
+                background: idx === 0 ? '#E8CA5E' : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
+              }}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
