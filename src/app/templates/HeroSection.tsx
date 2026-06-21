@@ -116,7 +116,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
   const colors = getColors();
 
   return (
-    <section className="relative overflow-hidden py-10 md:py-14 lg:py-16 min-h-[75vh] flex items-center">
+    <section 
+      className="relative overflow-hidden py-10 md:py-14 lg:py-16 min-h-[75vh] flex items-center"
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+    >
       {/* Particle Network Background */}
       <div className="absolute inset-0 z-0">
         <ParticleNetwork theme={theme} />
@@ -150,7 +153,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{ color: colors.badgeColor }}
             />
             <span className="text-xs font-medium cursor-pointer"
-              style={{ color: colors.badgeColor }}
+              style={{ 
+                color: colors.badgeColor,
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               ✨ Ready-to-Use Portfolio Templates
             </span>
@@ -161,12 +167,18 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
             className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold mb-2 font-serif tracking-tight cursor-default leading-tight"
           >
             <span className="relative inline-block cursor-default"
-              style={{ color: colors.headingColor }}
+              style={{ 
+                color: colors.headingColor,
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               Beautiful
             </span>{' '}
             <span className="inline-block cursor-default"
-              style={{ color: colors.headingAccent }}
+              style={{ 
+                color: colors.headingAccent,
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               Portfolio Templates
             </span>
@@ -175,7 +187,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
           <motion.p 
             variants={fromRightVariants} 
             className="text-base md:text-lg max-w-2xl mx-auto mb-4 font-light tracking-wide cursor-default"
-            style={{ color: colors.textColor }}
+            style={{ 
+              color: colors.textColor,
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
           >
             Professionally designed templates for every academic discipline. 
             Fully customizable to match your institution's brand and requirements.
@@ -192,6 +207,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{
                 backgroundColor: colors.buttonBg,
                 color: colors.buttonText,
+                fontFamily: "'Poppins', sans-serif",
               }}
             >
               <span>Browse Templates</span>
@@ -205,6 +221,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{
                 borderColor: colors.borderColor,
                 color: colors.borderColor,
+                fontFamily: "'Poppins', sans-serif",
               }}
               animate={isPulsing ? {
                 scale: [1, 1.05, 1],
@@ -241,6 +258,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                   style={{
                     backgroundColor: colors.newBadgeBg,
                     color: colors.newBadgeText,
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   NEW

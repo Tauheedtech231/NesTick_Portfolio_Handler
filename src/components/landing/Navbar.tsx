@@ -56,6 +56,7 @@ const NavItem = memo(({ item, isActive, onClick, theme, index, isVisible }: {
       opacity: isVisible ? 1 : 0,
       transform: isVisible ? 'translateY(0)' : 'translateY(-80px)',
       transitionDelay: `${index * 100}ms`,
+      fontFamily: "'Poppins', sans-serif",
     }}
   >
     <span className="font-medium text-sm uppercase tracking-wide">
@@ -94,6 +95,7 @@ const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-60px) scale(0.8)',
           transitionDelay: '500ms',
+          fontFamily: "'Poppins', sans-serif",
         }}
       >
         <UserCircle className="w-4 h-4" />
@@ -117,8 +119,12 @@ const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'
                 borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
               }}
             >
-              <p className="text-sm font-semibold text-gray-800">Login as</p>
-              <p className="text-xs text-gray-500">Choose your role to continue</p>
+              <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                Login as
+              </p>
+              <p className="text-xs text-gray-500" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                Choose your role to continue
+              </p>
             </div>
             
             <div className="p-2">
@@ -132,6 +138,7 @@ const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'
                       setIsOpen(false);
                     }}
                     className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 hover:shadow-md cursor-pointer group"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
                     <Icon className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" style={{ color: role.color }} />
                     <span>{role.name}</span>
@@ -382,6 +389,7 @@ export default function Navbar() {
         ? '#1F4381'
         : '#FFFFFF',
       borderBottom: theme === 'dark' ? '1px solid rgba(232, 202, 94, 0.2)' : '1px solid rgba(0, 0, 0, 0.08)',
+      fontFamily: "'Poppins', sans-serif",
     }}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
@@ -420,6 +428,7 @@ export default function Navbar() {
             <span className="hidden sm:inline-block text-xl md:text-2xl font-bold font-serif tracking-tight cursor-pointer"
               style={{
                 color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                fontFamily: "'Poppins', sans-serif",
               }}
             >
               Portfolio Handler
@@ -484,6 +493,7 @@ export default function Navbar() {
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
                     transitionDelay: '500ms',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -522,9 +532,15 @@ export default function Navbar() {
                           borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
                         }}
                       >
-                        <p className="text-sm font-semibold text-gray-800">Signed in as</p>
-                        <p className="text-sm text-gray-600 truncate">{getUserName()}</p>
-                        <p className="text-xs text-gray-500 mt-1 capitalize">{userRole}</p>
+                        <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          Signed in as
+                        </p>
+                        <p className="text-sm text-gray-600 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          {getUserName()}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1 capitalize" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                          {userRole}
+                        </p>
                       </div>
                       
                       <div className="p-2">
@@ -535,6 +551,7 @@ export default function Navbar() {
                             setIsDropdownOpen(false);
                           }}
                           className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 cursor-pointer"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           <span>
@@ -550,6 +567,7 @@ export default function Navbar() {
                         <button
                           onClick={handleLogout}
                           className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-red-600 hover:bg-red-50 hover:scale-105 cursor-pointer"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Logout</span>
@@ -612,6 +630,7 @@ export default function Navbar() {
                         ? 'bg-[#0066FF]/10 text-[#0066FF]'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
                     {item.name}
                   </button>
@@ -634,6 +653,7 @@ export default function Navbar() {
                                    (userRole === 'developer' ? '#8B5CF6' : 
                                    (userRole === 'principal' ? '#10B981' : '#0066FF')),
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <LayoutDashboard className="w-4 h-4" />
@@ -652,6 +672,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: '#DC2626',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <LogOut className="w-4 h-4" />
@@ -670,6 +691,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: '#F59E0B',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <Shield className="w-4 h-4" />
@@ -685,6 +707,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: '#8B5CF6',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <Code2 className="w-4 h-4" />
@@ -700,6 +723,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: '#0066FF',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <Sparkles className="w-4 h-4" />
@@ -721,6 +745,7 @@ export default function Navbar() {
                   style={{
                     backgroundColor: '#10B981',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <GraduationCap className="w-4 h-4" />

@@ -366,6 +366,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
     color: getTextColor(),
     outline: 'none',
     transition: 'all 0.2s ease',
+    fontFamily: "'Calibri Light', sans-serif",
   });
 
   const getInputHoverStyle = {
@@ -687,7 +688,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
   return (
     <section  id="partner-section" ref={sectionRef} className="py-12 md:py-20 px-4 sm:px-6 relative overflow-hidden"
-      style={{ backgroundColor: getBgColor() }}
+      style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
     >
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header Section */}
@@ -705,22 +706,28 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
             <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4"
               style={{ color: getAccentColor() }}
             />
-            <span className="text-xs md:text-sm font-medium font-sans tracking-wide"
-              style={{ color: getTextMuted() }}
+            <span className="text-xs md:text-sm font-medium tracking-wide"
+              style={{ 
+                color: getTextMuted(),
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               Join Our Network
             </span>
           </div>
           
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight">
-            <span style={{ color: getTextColor() }}>Become a </span>
-            <span className="inline-block" style={{ color: getAccentColor() }}>
+            <span style={{ color: getTextColor(), fontFamily: "'Poppins', sans-serif" }}>Become a </span>
+            <span className="inline-block" style={{ color: getAccentColor(), fontFamily: "'Poppins', sans-serif" }}>
               Partner, Designer or Developer
             </span>
           </h2>
           
           <p className="text-sm md:text-base max-w-2xl mx-auto px-4 font-light tracking-wide"
-            style={{ color: getTextMuted() }}
+            style={{ 
+              color: getTextMuted(),
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
           >
             Join our ecosystem of partners, designers, and developers to revolutionize educational portfolio management.
           </p>
@@ -740,6 +747,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 ? 'bg-teal-500 text-white shadow-lg'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             <Building2 className="w-4 h-4" />
             Organization Partner
@@ -751,6 +759,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 ? 'bg-purple-500 text-white shadow-lg'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             <Palette className="w-4 h-4" />
             Designer / Template Creator
@@ -762,6 +771,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 ? 'bg-blue-500 text-white shadow-lg'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             <Code2 className="w-4 h-4" />
             Developer / Agency
@@ -804,14 +814,22 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                   <FileText className="w-5 h-5 md:w-6 md:h-6" style={{ color: getButtonText() }} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold font-serif tracking-tight"
-                  style={{ color: getTextColor() }}
+                  style={{ 
+                    color: getTextColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   {activeForm === 'partner' && 'Partner Application'}
                   {activeForm === 'designer' && 'Designer Registration'}
                   {activeForm === 'developer' && 'Developer Registration'}
                 </h3>
               </div>
-              <div className="text-[10px] md:text-xs font-sans" style={{ color: getTextMuted() }}>
+              <div className="text-[10px] md:text-xs"
+                style={{ 
+                  color: getTextMuted(),
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
+              >
                 * Required fields
               </div>
             </div>
@@ -820,7 +838,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
             {activeForm === 'partner' && (
               <form onSubmit={handlePartnerSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Partner Type *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Partner Type *</label>
                   <div className="grid grid-cols-2 gap-2">
                     {partnerTypes.map((type) => {
                       const Icon = type.icon;
@@ -843,7 +864,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                             className="hidden"
                           />
                           <Icon className="w-4 h-4" style={{ color: formData.partnerType === type.value ? '#00E0FF' : getTextMuted() }} />
-                          <span className="text-xs" style={{ color: getTextColor() }}>{type.label}</span>
+                          <span className="text-xs" style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}>{type.label}</span>
                         </label>
                       );
                     })}
@@ -852,7 +876,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 {formData.partnerType === 'other' && (
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Please specify your domain *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Please specify your domain *</label>
                     <input
                       type="text"
                       name="otherDomain"
@@ -869,7 +896,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 )}
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Organization Name *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Organization Name *</label>
                   <input
                     type="text"
                     name="organizationName"
@@ -885,7 +915,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Contact Person *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Contact Person *</label>
                   <input
                     type="text"
                     name="contactPerson"
@@ -902,7 +935,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Email *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Email *</label>
                     <input
                       type="email"
                       name="email"
@@ -917,7 +953,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Phone *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Phone *</label>
                     <input
                       type="tel"
                       name="phone"
@@ -934,7 +973,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Country *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Country *</label>
                   <select
                     name="country"
                     value={formData.country}
@@ -951,7 +993,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Links (Optional - Max 7)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Links (Optional - Max 7)</label>
                   {formData.links.map((link, index) => (
                     <div key={index} className="flex gap-2 mb-2">
                       <div className="relative flex-1">
@@ -983,6 +1028,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                       type="button"
                       onClick={addLinkField}
                       className="flex items-center gap-1 text-xs text-teal-400 hover:text-teal-300 transition-colors mt-1"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Add another link ({formData.links.length}/7)
@@ -991,7 +1037,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Upload Proposal (Optional - PDF/DOC/IMG, Max 20MB)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Upload Proposal (Optional - PDF/DOC/IMG, Max 20MB)</label>
                   <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
                     style={{
                       borderColor: getBorderColor(),
@@ -1010,7 +1059,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-teal-400" />
-                          <span className="text-xs" style={{ color: getTextColor() }}>{formData.proposalFileName}</span>
+                          <span className="text-xs" style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}>{formData.proposalFileName}</span>
                         </div>
                         <button
                           type="button"
@@ -1023,15 +1075,24 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     ) : (
                       <div className="flex flex-col items-center gap-1">
                         <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                        <p className="text-xs" style={{ color: getTextMuted() }}>Click to upload or drag and drop</p>
-                        <p className="text-[10px]" style={{ color: getTextMuted() }}>PDF, DOC, DOCX, JPG, PNG up to 20MB</p>
+                        <p className="text-xs" style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>Click to upload or drag and drop</p>
+                        <p className="text-[10px]" style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>PDF, DOC, DOCX, JPG, PNG up to 20MB</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Upload CV/Resume (Optional - Max 20MB)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Upload CV/Resume (Optional - Max 20MB)</label>
                   <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
                     style={{
                       borderColor: getBorderColor(),
@@ -1050,7 +1111,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-teal-400" />
-                          <span className="text-xs" style={{ color: getTextColor() }}>{formData.cvFileName}</span>
+                          <span className="text-xs" style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}>{formData.cvFileName}</span>
                         </div>
                         <button
                           type="button"
@@ -1063,14 +1127,20 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     ) : (
                       <div className="flex flex-col items-center gap-1">
                         <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                        <p className="text-xs" style={{ color: getTextMuted() }}>Upload your CV/Resume</p>
+                        <p className="text-xs" style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>Upload your CV/Resume</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Message / Partnership Interest *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Message / Partnership Interest *</label>
                   <textarea
                     name="message"
                     value={formData.message}
@@ -1092,6 +1162,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                   style={{
                     backgroundColor: getButtonBg(),
                     color: getButtonText(),
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   {isSubmitting ? (
@@ -1116,7 +1187,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
             {activeForm === 'designer' && (
               <form onSubmit={handleDesignerSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Full Name *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Full Name *</label>
                   <input
                     type="text"
                     name="name"
@@ -1133,7 +1207,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Email *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Email *</label>
                     <input
                       type="email"
                       name="email"
@@ -1148,7 +1225,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Password *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Password *</label>
                     <input
                       type="password"
                       name="password"
@@ -1166,7 +1246,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Phone *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Phone *</label>
                     <input
                       type="tel"
                       name="phone"
@@ -1181,7 +1264,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Company/Studio (Optional)</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Company/Studio (Optional)</label>
                     <input
                       type="text"
                       name="company"
@@ -1198,7 +1284,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Specialization *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Specialization *</label>
                     <select
                       name="specialization"
                       value={designerForm.specialization}
@@ -1214,7 +1303,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Experience (Years) *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Experience (Years) *</label>
                     <select
                       name="experience"
                       value={designerForm.experience}
@@ -1234,7 +1326,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Portfolio Link (Optional)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Portfolio Link (Optional)</label>
                   <input
                     type="url"
                     name="portfolio"
@@ -1249,7 +1344,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Upload CV/Resume (Optional - Max 20MB)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Upload CV/Resume (Optional - Max 20MB)</label>
                   <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-teal-500 transition-colors"
                     style={{
                       borderColor: getBorderColor(),
@@ -1268,7 +1366,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-teal-400" />
-                          <span className="text-xs" style={{ color: getTextColor() }}>{designerForm.cvFileName}</span>
+                          <span className="text-xs" style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}>{designerForm.cvFileName}</span>
                         </div>
                         <button
                           type="button"
@@ -1281,7 +1382,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     ) : (
                       <div className="flex flex-col items-center gap-1">
                         <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                        <p className="text-xs" style={{ color: getTextMuted() }}>Upload your CV/Resume</p>
+                        <p className="text-xs" style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>Upload your CV/Resume</p>
                       </div>
                     )}
                   </div>
@@ -1294,6 +1398,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                   style={{
                     backgroundColor: getButtonBg(),
                     color: getButtonText(),
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   {isSubmitting ? (
@@ -1319,7 +1424,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
               <form onSubmit={handleDeveloperSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Full Name *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Full Name *</label>
                     <input
                       type="text"
                       name="name"
@@ -1334,7 +1442,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Email *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Email *</label>
                     <input
                       type="email"
                       name="email"
@@ -1352,7 +1463,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Password *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Password *</label>
                     <input
                       type="password"
                       name="password"
@@ -1367,7 +1481,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Phone *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Phone *</label>
                     <input
                       type="tel"
                       name="phone"
@@ -1385,7 +1502,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Company Name (Optional)</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Company Name (Optional)</label>
                     <input
                       type="text"
                       name="companyName"
@@ -1399,7 +1519,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Location (Optional)</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Location (Optional)</label>
                     <input
                       type="text"
                       name="location"
@@ -1416,7 +1539,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Specialization *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Specialization *</label>
                     <select
                       name="specialization"
                       value={developerForm.specialization}
@@ -1432,7 +1558,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Experience *</label>
+                    <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>Experience *</label>
                     <select
                       name="experience"
                       value={developerForm.experience}
@@ -1450,7 +1579,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Skills *</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Skills *</label>
                   <div className="flex flex-wrap gap-2 p-3 rounded-lg border" style={{ borderColor: getBorderColor(), backgroundColor: getInputBg() }}>
                     {skillOptions.map((skill) => (
                       <label
@@ -1460,6 +1592,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
+                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       >
                         <input
                           type="checkbox"
@@ -1475,7 +1608,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Portfolio/GitHub Link (Optional)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Portfolio/GitHub Link (Optional)</label>
                   <input
                     type="url"
                     name="portfolio"
@@ -1490,7 +1626,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Bio / About You (Optional)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Bio / About You (Optional)</label>
                   <textarea
                     name="bio"
                     value={developerForm.bio}
@@ -1505,7 +1644,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Bank Account Details (For Payments - Optional)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Bank Account Details (For Payments - Optional)</label>
                   <textarea
                     name="bankAccountDetails"
                     value={developerForm.bankAccountDetails}
@@ -1520,7 +1662,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <div>
-                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ color: getTextMuted() }}>Upload CV/Resume (Optional - Max 20MB)</label>
+                  <label className="block text-[10px] md:text-xs font-medium mb-1" style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>Upload CV/Resume (Optional - Max 20MB)</label>
                   <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 transition-colors"
                     style={{
                       borderColor: getBorderColor(),
@@ -1539,7 +1684,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-blue-400" />
-                          <span className="text-xs" style={{ color: getTextColor() }}>{developerForm.cvFileName}</span>
+                          <span className="text-xs" style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}>{developerForm.cvFileName}</span>
                         </div>
                         <button
                           type="button"
@@ -1552,7 +1700,10 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                     ) : (
                       <div className="flex flex-col items-center gap-1">
                         <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                        <p className="text-xs" style={{ color: getTextMuted() }}>Upload your CV/Resume</p>
+                        <p className="text-xs" style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>Upload your CV/Resume</p>
                       </div>
                     )}
                   </div>
@@ -1565,6 +1716,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                   style={{
                     backgroundColor: '#3B82F6',
                     color: '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   {isSubmitting ? (
@@ -1590,7 +1742,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
               >
                 <XCircle className="w-3.5 h-3.5 text-red-400" />
-                <p className="text-red-400 text-[10px] md:text-xs">Failed to submit. Please try again.</p>
+                <p className="text-red-400 text-[10px] md:text-xs" style={{ fontFamily: "'Calibri Light', sans-serif" }}>Failed to submit. Please try again.</p>
               </div>
             )}
           </motion.div>
@@ -1610,14 +1762,20 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
               <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
             </div>
             <h3 className="text-lg md:text-xl font-bold mb-2 font-serif"
-              style={{ color: getTextColor() }}
+              style={{ 
+                color: getTextColor(),
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               {activeForm === 'partner' && 'Application Submitted!'}
               {activeForm === 'designer' && 'Registration Successful!'}
               {activeForm === 'developer' && 'Registration Submitted!'}
             </h3>
             <p className="text-xs md:text-sm mb-4 font-light"
-              style={{ color: getTextSecondary() }}
+              style={{ 
+                color: getTextSecondary(),
+                fontFamily: "'Calibri Light', sans-serif",
+              }}
             >
               {successMessage}
             </p>
@@ -1627,6 +1785,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
               style={{
                 backgroundColor: getButtonBg(),
                 color: getButtonText(),
+                fontFamily: "'Poppins', sans-serif",
               }}
             >
               Close

@@ -544,7 +544,7 @@ export default function TemplatesPage() {
   };
 
   return (
-    <>
+    <div style={{ fontFamily: "'Poppins', sans-serif" }}>
       <Navbar />
       <main className="min-h-screen pt-16 lg:pt-20 overflow-x-hidden"
         style={{
@@ -562,11 +562,11 @@ export default function TemplatesPage() {
           onDetailsClick={handleDetailsClick}
         />
 
-      <FeaturedTemplates
-  featuredTemplates={featuredTemplates}
-  theme={theme}
-  onBuyNowClick={handleBuyNowClick}
-/>
+        <FeaturedTemplates
+          featuredTemplates={featuredTemplates}
+          theme={theme}
+          onBuyNowClick={handleBuyNowClick}
+        />
 
       </main>
 
@@ -601,12 +601,18 @@ export default function TemplatesPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold"
-                    style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     {previewModal.templateName}
                   </h3>
                   <p className="text-xs"
-                    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}
                   >
                     Template Preview
                   </p>
@@ -623,12 +629,18 @@ export default function TemplatesPage() {
                 <Image src={previewModal.imageUrl} alt={previewModal.templateName} fill className="object-contain" />
               </div>
               <h4 className="text-base font-semibold mb-1"
-                style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                style={{ 
+                  color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 About this template
               </h4>
               <p className="text-sm leading-relaxed mb-4"
-                style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                style={{ 
+                  color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 {previewModal.description}
               </p>
@@ -637,6 +649,7 @@ export default function TemplatesPage() {
                   style={{
                     backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
                     color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <Eye size={14} />
@@ -648,7 +661,7 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Details Modal - Keep as is */}
+      {/* Details Modal */}
       <AnimatePresence>
         {detailsModal.isOpen && detailsModal.template && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setDetailsModal({ isOpen: false, template: null })}>
@@ -678,7 +691,10 @@ export default function TemplatesPage() {
                   <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
                 </button>
                 <h3 className="text-2xl font-bold pr-8 font-serif tracking-tight"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  style={{ 
+                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   {detailsModal.template.name}
                 </h3>
@@ -687,7 +703,9 @@ export default function TemplatesPage() {
                     detailsModal.template.type === 'free' 
                       ? 'bg-green-500 text-white' 
                       : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#00A0FF] text-white')
-                  }`}>
+                  }`}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
                     {detailsModal.template.type === 'free' ? 'Free Template' : 'Premium Template'}
                   </span>
                 </div>
@@ -706,12 +724,18 @@ export default function TemplatesPage() {
 
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2"
-                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     Description
                   </h4>
                   <p className="leading-relaxed"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}
                   >
                     {detailsModal.template.description}
                   </p>
@@ -719,7 +743,10 @@ export default function TemplatesPage() {
 
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-3"
-                    style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     Key Features
                   </h4>
@@ -730,7 +757,10 @@ export default function TemplatesPage() {
                           style={{ color: theme === 'dark' ? '#E8CA5E' : '#00A0FF' }}
                         />
                         <span className="text-sm"
-                          style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
                         >
                           {feature}
                         </span>
@@ -747,48 +777,72 @@ export default function TemplatesPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs mb-1"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         Template ID
                       </p>
                       <p className="text-sm"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         #{detailsModal.template.id}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs mb-1"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         Created
                       </p>
                       <p className="text-sm"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {new Date(detailsModal.template.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs mb-1"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         Type
                       </p>
                       <p className="text-sm capitalize"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {detailsModal.template.type}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs mb-1"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         Compatibility
                       </p>
                       <p className="text-sm"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         All Devices
                       </p>
@@ -808,6 +862,7 @@ export default function TemplatesPage() {
                       border: '1px solid',
                       borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
                       color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     <Eye size={16} />
@@ -826,6 +881,7 @@ export default function TemplatesPage() {
                       color: detailsModal.template.type === 'free'
                         ? '#FFFFFF'
                         : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     Buy Now
@@ -837,7 +893,7 @@ export default function TemplatesPage() {
         )}
       </AnimatePresence>
 
-      {/* Buy Now Modal - Keep as is */}
+      {/* Buy Now Modal */}
       {isBuyNowModalOpen && selectedTemplate && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
           <motion.div
@@ -868,18 +924,26 @@ export default function TemplatesPage() {
               }}
             >
               <h3 className="text-xl font-bold font-serif tracking-tight"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ 
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Get {selectedTemplate.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   selectedTemplate.type === 'free' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'
-                }`}>
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
                   {selectedTemplate.type === 'free' ? 'Free Template' : 'Premium Template'}
                 </span>
                 <p className="text-xs"
-                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                  style={{ 
+                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                    fontFamily: "'Calibri Light', sans-serif",
+                  }}
                 >
                   Fill the form to get started
                 </p>
@@ -892,7 +956,10 @@ export default function TemplatesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Full Name *
                     </label>
@@ -911,17 +978,23 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="Enter your full name"
                     />
                     {formErrors.name && touchedFields.name && (
-                      <p className="text-red-500 text-[10px] mt-1">{formErrors.name}</p>
+                      <p className="text-red-500 text-[10px] mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                        {formErrors.name}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Designation *
                     </label>
@@ -940,11 +1013,14 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="e.g., Principal, IT Head"
                     />
                     {formErrors.designation && touchedFields.designation && (
-                      <p className="text-red-500 text-[10px] mt-1">{formErrors.designation}</p>
+                      <p className="text-red-500 text-[10px] mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                        {formErrors.designation}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -952,7 +1028,10 @@ export default function TemplatesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       College Name *
                     </label>
@@ -971,17 +1050,23 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="Enter your college name"
                     />
                     {formErrors.college && touchedFields.college && (
-                      <p className="text-red-500 text-[10px] mt-1">{formErrors.college}</p>
+                      <p className="text-red-500 text-[10px] mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                        {formErrors.college}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       No. of Students
                     </label>
@@ -995,6 +1080,7 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
                       <option value="">Select range</option>
@@ -1010,7 +1096,10 @@ export default function TemplatesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Email Address *
                     </label>
@@ -1029,17 +1118,23 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="Enter your email"
                     />
                     {formErrors.email && touchedFields.email && (
-                      <p className="text-red-500 text-[10px] mt-1">{formErrors.email}</p>
+                      <p className="text-red-500 text-[10px] mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                        {formErrors.email}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium mb-1.5"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Phone Number *
                     </label>
@@ -1058,11 +1153,14 @@ export default function TemplatesPage() {
                         borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                         borderWidth: '1px',
                         color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="+92 300 1234567"
                     />
                     {formErrors.phone && touchedFields.phone && (
-                      <p className="text-red-500 text-[10px] mt-1">{formErrors.phone}</p>
+                      <p className="text-red-500 text-[10px] mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                        {formErrors.phone}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1071,7 +1169,10 @@ export default function TemplatesPage() {
                 {selectedTemplate.type === 'paid' && (
                   <div>
                     <label className="block text-xs font-medium mb-2"
-                      style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Select Your Plan *
                     </label>
@@ -1101,7 +1202,10 @@ export default function TemplatesPage() {
                             />
                             <div className="flex items-center gap-2 mb-2">
                               <PlanIcon className="w-4 h-4" style={{ color: plan.color }} />
-                              <span className="font-semibold text-sm" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+                              <span className="font-semibold text-sm" style={{ 
+                                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                                fontFamily: "'Poppins', sans-serif",
+                              }}>
                                 {plan.name}
                               </span>
                             </div>
@@ -1109,7 +1213,9 @@ export default function TemplatesPage() {
                               {plan.features.slice(0, 3).map((feature, idx) => (
                                 <div key={idx} className="flex items-center gap-1">
                                   <CheckCircle className="w-2.5 h-2.5" style={{ color: plan.color }} />
-                                  <span className="text-[10px] text-gray-400 truncate">{feature}</span>
+                                  <span className="text-[10px] text-gray-400 truncate" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                                    {feature}
+                                  </span>
                                 </div>
                               ))}
                             </div>
@@ -1122,7 +1228,10 @@ export default function TemplatesPage() {
 
                 <div>
                   <label className="block text-xs font-medium mb-1.5"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     Expected Timeline
                   </label>
@@ -1136,6 +1245,7 @@ export default function TemplatesPage() {
                       borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                       borderWidth: '1px',
                       color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                   >
                     <option value="">Select timeline</option>
@@ -1149,7 +1259,10 @@ export default function TemplatesPage() {
 
                 <div>
                   <label className="block text-xs font-medium mb-1.5"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     Specific Requirements
                   </label>
@@ -1164,6 +1277,7 @@ export default function TemplatesPage() {
                       borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                       borderWidth: '1px',
                       color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="Tell us about your specific needs..."
                   />
@@ -1171,7 +1285,10 @@ export default function TemplatesPage() {
 
                 <div>
                   <label className="block text-xs font-medium mb-1.5"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                    style={{ 
+                      color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
                   >
                     How did you hear about us?
                   </label>
@@ -1185,6 +1302,7 @@ export default function TemplatesPage() {
                       borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                       borderWidth: '1px',
                       color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                   >
                     <option value="">Select option</option>
@@ -1207,6 +1325,7 @@ export default function TemplatesPage() {
                     color: selectedTemplate.type === 'free'
                       ? '#FFFFFF'
                       : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Request'}
@@ -1217,7 +1336,7 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Design Modal - Keep as is */}
+      {/* Design Modal */}
       <AnimatePresence>
         {isDesignModalOpen && (
           <motion.div
@@ -1247,10 +1366,16 @@ export default function TemplatesPage() {
                     <Palette className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+                    <h2 className="text-xl font-bold" style={{ 
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>
                       Your Design
                     </h2>
-                    <p className="text-sm" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>
+                    <p className="text-sm" style={{ 
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}>
                       Share your creative vision with us
                     </p>
                   </div>
@@ -1270,10 +1395,13 @@ export default function TemplatesPage() {
                     <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
                       <CheckCircle className="w-8 h-8 text-green-500" />
                     </div>
-                    <h3 className="text-xl font-bold mb-2" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+                    <h3 className="text-xl font-bold mb-2" style={{ 
+                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>
                       Request Submitted!
                     </h3>
-                    <p className="text-gray-400">
+                    <p className="text-gray-400" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
                       Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
                     </p>
                   </div>
@@ -1282,7 +1410,10 @@ export default function TemplatesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-1.5"
-                          style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
                         >
                           Full Name *
                         </label>
@@ -1297,17 +1428,23 @@ export default function TemplatesPage() {
                           style={{
                             backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                             color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
                           }}
                           placeholder="Enter your full name"
                         />
                         {designFormErrors.name && (
-                          <p className="text-red-500 text-xs mt-1">{designFormErrors.name}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {designFormErrors.name}
+                          </p>
                         )}
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-1.5"
-                          style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
                         >
                           Email Address *
                         </label>
@@ -1322,11 +1459,14 @@ export default function TemplatesPage() {
                           style={{
                             backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                             color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
                           }}
                           placeholder="you@example.com"
                         />
                         {designFormErrors.email && (
-                          <p className="text-red-500 text-xs mt-1">{designFormErrors.email}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {designFormErrors.email}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1334,7 +1474,10 @@ export default function TemplatesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-1.5"
-                          style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
                         >
                           Phone Number *
                         </label>
@@ -1349,17 +1492,23 @@ export default function TemplatesPage() {
                           style={{
                             backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                             color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
                           }}
                           placeholder="+92 300 1234567"
                         />
                         {designFormErrors.phone && (
-                          <p className="text-red-500 text-xs mt-1">{designFormErrors.phone}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {designFormErrors.phone}
+                          </p>
                         )}
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-1.5"
-                          style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
                         >
                           Design Type *
                         </label>
@@ -1373,6 +1522,7 @@ export default function TemplatesPage() {
                           style={{
                             backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                             color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
                           }}
                         >
                           <option value="">Select design type</option>
@@ -1381,14 +1531,19 @@ export default function TemplatesPage() {
                           ))}
                         </select>
                         {designFormErrors.designType && (
-                          <p className="text-red-500 text-xs mt-1">{designFormErrors.designType}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {designFormErrors.designType}
+                          </p>
                         )}
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium mb-1.5"
-                        style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         What inspires you? (Optional)
                       </label>
@@ -1401,6 +1556,7 @@ export default function TemplatesPage() {
                         style={{
                           backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                           color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Calibri Light', sans-serif",
                         }}
                         placeholder="e.g., Modern minimalism, Nature, Technology, Art Deco..."
                       />
@@ -1408,7 +1564,10 @@ export default function TemplatesPage() {
 
                     <div>
                       <label className="block text-sm font-medium mb-1.5"
-                        style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         Describe your design requirements *
                       </label>
@@ -1423,11 +1582,14 @@ export default function TemplatesPage() {
                         style={{
                           backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
                           color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Calibri Light', sans-serif",
                         }}
                         placeholder="Tell us about your vision, preferred colors, style, features you need, etc..."
                       />
                       {designFormErrors.description && (
-                        <p className="text-red-500 text-xs mt-1">{designFormErrors.description}</p>
+                        <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                          {designFormErrors.description}
+                        </p>
                       )}
                     </div>
 
@@ -1435,6 +1597,7 @@ export default function TemplatesPage() {
                       type="submit"
                       disabled={isDesignSubmitting}
                       className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
                       {isDesignSubmitting ? (
                         <>
@@ -1474,11 +1637,17 @@ export default function TemplatesPage() {
                 <CheckCircle className="w-7 h-7 text-green-500" />
               </div>
               <h3 className="text-lg font-bold mb-2"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ 
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Request Submitted!
               </h3>
-              <p className="text-sm mb-4" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}>
+              <p className="text-sm mb-4" style={{ 
+                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                fontFamily: "'Calibri Light', sans-serif",
+              }}>
                 {successMessage}
               </p>
               <button
@@ -1490,6 +1659,7 @@ export default function TemplatesPage() {
                 style={{
                   backgroundColor: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
                   color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                  fontFamily: "'Poppins', sans-serif",
                 }}
               >
                 Close
@@ -1498,6 +1668,6 @@ export default function TemplatesPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

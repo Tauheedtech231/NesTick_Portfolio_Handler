@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import { motion, useInView, Variants, useScroll, useTransform } from 'framer-motion';
@@ -286,7 +287,7 @@ export default function AboutPage() {
       <Navbar />
       <main 
         className="min-h-screen pt-16 lg:pt-20 overflow-hidden"
-        style={{ backgroundColor: getBgColor() }}
+        style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
       >
         {/* Hero Section with Galaxy Image Background */}
         <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[50vh]">
@@ -318,15 +319,18 @@ export default function AboutPage() {
                 <Sparkles className="w-3.5 h-3.5"
                   style={{ color: getAccentColor() }}
                 />
-                <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
+                <span className="text-xs font-medium tracking-wide"
+                  style={{ 
+                    color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   About Us
                 </span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight max-w-3xl mx-auto font-serif tracking-tight">
-                <span className="block">
+                <span className="block" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   Building{' '}
                   <span className="inline-block"
                     style={{ color: getAccentColor() }}
@@ -334,7 +338,7 @@ export default function AboutPage() {
                     Digital Futures
                   </span>
                 </span>
-                <span className="block">Since 2021</span>
+                <span className="block" style={{ fontFamily: "'Poppins', sans-serif" }}>Since 2021</span>
               </h1>
             </motion.div>
 
@@ -343,7 +347,10 @@ export default function AboutPage() {
               animate={heroInView ? "visible" : "hidden"}
               variants={fromBottomVariants}
               className="text-base md:text-lg max-w-2xl mx-auto font-light tracking-wide"
-              style={{ color: theme === 'dark' ? '#D1D5DB' : '#E5E7EB' }}
+              style={{ 
+                color: theme === 'dark' ? '#D1D5DB' : '#E5E7EB',
+                fontFamily: "'Calibri Light', sans-serif",
+              }}
             >
               Helping institutions manage and showcase student portfolios — simply and efficiently.
             </motion.p>
@@ -373,13 +380,19 @@ export default function AboutPage() {
                       />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight"
-                      style={{ color: getTextColor() }}
+                      style={{ 
+                        color: getTextColor(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Our Mission
                     </h2>
                   </div>
                   <p className="leading-relaxed text-base md:text-lg font-light tracking-wide"
-                    style={{ color: getTextSecondary() }}
+                    style={{ 
+                      color: getTextSecondary(),
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}
                   >
                     To empower educational institutions with cutting-edge portfolio management technology 
                     that simplifies administration, enhances student visibility, and creates lasting digital 
@@ -407,13 +420,19 @@ export default function AboutPage() {
                       />
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight"
-                      style={{ color: getTextColor() }}
+                      style={{ 
+                        color: getTextColor(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Our Vision
                     </h2>
                   </div>
                   <p className="leading-relaxed text-base md:text-lg font-light tracking-wide"
-                    style={{ color: getTextSecondary() }}
+                    style={{ 
+                      color: getTextSecondary(),
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}
                   >
                     To become the global standard for educational portfolio management, connecting 
                     institutions, students, and opportunities through innovative technology that 
@@ -443,14 +462,20 @@ export default function AboutPage() {
                 <Rocket className="w-3.5 h-3.5"
                   style={{ color: getAccentColor() }}
                 />
-                <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: getTextMuted() }}
+                <span className="text-xs font-medium tracking-wide"
+                  style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Our Journey
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: getTextColor() }}
+                style={{ 
+                  color: getTextColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 The Story of{' '}
                 <span className="inline-block"
@@ -460,7 +485,10 @@ export default function AboutPage() {
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: getTextMuted() }}
+                style={{ 
+                  color: getTextMuted(),
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 From humble beginnings to transforming portfolio management across institutions worldwide.
               </p>
@@ -510,19 +538,28 @@ export default function AboutPage() {
                                 style={{ color: getAccentColor() }}
                               />
                             </div>
-                            <span className="text-sm font-bold font-sans"
-                              style={{ color: getAccentColor() }}
+                            <span className="text-sm font-bold"
+                              style={{ 
+                                color: getAccentColor(),
+                                fontFamily: "'Poppins', sans-serif",
+                              }}
                             >
                               {milestone.year}
                             </span>
                           </div>
-                          <h3 className={`text-base md:text-lg font-bold mb-1 font-sans tracking-wide ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}
-                            style={{ color: getTextColor() }}
+                          <h3 className={`text-base md:text-lg font-bold mb-1 tracking-wide ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}
+                            style={{ 
+                              color: getTextColor(),
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
                           >
                             {milestone.title}
                           </h3>
                           <p className={`text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed font-light`}
-                            style={{ color: getTextMuted() }}
+                            style={{ 
+                              color: getTextMuted(),
+                              fontFamily: "'Calibri Light', sans-serif",
+                            }}
                           >
                             {milestone.description}
                           </p>
@@ -564,8 +601,11 @@ export default function AboutPage() {
                 <Infinity className="w-4 h-4"
                   style={{ color: getAccentColor() }}
                 />
-                <span className="text-xs font-sans tracking-wide"
-                  style={{ color: getTextMuted() }}
+                <span className="text-xs tracking-wide"
+                  style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Calibri Light', sans-serif",
+                  }}
                 >
                   And beyond... The journey continues
                 </span>
@@ -597,14 +637,20 @@ export default function AboutPage() {
                 <Users className="w-3.5 h-3.5"
                   style={{ color: getAccentColor() }}
                 />
-                <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: getTextMuted() }}
+                <span className="text-xs font-medium tracking-wide"
+                  style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Our Team
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: getTextColor() }}
+                style={{ 
+                  color: getTextColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Meet Our{' '}
                 <span className="inline-block"
@@ -614,7 +660,10 @@ export default function AboutPage() {
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: getTextMuted() }}
+                style={{ 
+                  color: getTextMuted(),
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 The passionate team driving innovation at Portfolio Handler
               </p>
@@ -643,7 +692,9 @@ export default function AboutPage() {
                               borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)',
                             }}
                           >
-                            <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
+                            <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-white"
+                              style={{ fontFamily: "'Poppins', sans-serif" }}
+                            >
                               {member.initials}
                             </span>
                           </div>
@@ -655,6 +706,7 @@ export default function AboutPage() {
                               color: '#FFFFFF',
                               opacity: 0.95,
                               boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                              fontFamily: "'Poppins', sans-serif",
                             }}
                           >
                             {member.role}
@@ -662,7 +714,9 @@ export default function AboutPage() {
                         </div>
                         
                         {/* Name */}
-                        <span className={`text-sm md:text-base font-semibold font-sans tracking-wide ${theme === 'dark' ? 'text-[#E2E8F0]' : 'text-[#334155]'} group-hover:text-[#6366F1] transition-colors duration-300 text-center`}>
+                        <span className={`text-sm md:text-base font-semibold tracking-wide ${theme === 'dark' ? 'text-[#E2E8F0]' : 'text-[#334155]'} group-hover:text-[#6366F1] transition-colors duration-300 text-center`}
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
                           {member.name}
                         </span>
                         
@@ -695,14 +749,20 @@ export default function AboutPage() {
                 <Mail className="w-3.5 h-3.5"
                   style={{ color: getAccentColor() }}
                 />
-                <span className="text-xs font-medium font-sans tracking-wide"
-                  style={{ color: getTextMuted() }}
+                <span className="text-xs font-medium tracking-wide"
+                  style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Get In Touch
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ color: getTextColor() }}
+                style={{ 
+                  color: getTextColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Let&apos;s{' '}
                 <span className="inline-block"
@@ -712,7 +772,10 @@ export default function AboutPage() {
                 </span>
               </h2>
               <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ color: getTextMuted() }}
+                style={{ 
+                  color: getTextMuted(),
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond within 24 hours.
               </p>
@@ -727,7 +790,10 @@ export default function AboutPage() {
                 className="p-6 md:p-8"
               >
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2 font-serif tracking-tight"
-                  style={{ color: getTextColor() }}
+                  style={{ 
+                    color: getTextColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   <Sparkles className="w-5 h-5"
                     style={{ color: getAccentColor() }}
@@ -751,26 +817,38 @@ export default function AboutPage() {
                         />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xs font-medium mb-0.5 font-sans tracking-wide"
-                          style={{ color: getTextMuted() }}
+                        <h3 className="text-xs font-medium mb-0.5 tracking-wide"
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
                         >
                           {item.label}
                         </h3>
                         {item.href ? (
-                          <a href={item.href} className="text-sm font-semibold hover:underline transition-colors block font-sans"
-                            style={{ color: getAccentColor() }}
+                          <a href={item.href} className="text-sm font-semibold hover:underline transition-colors block"
+                            style={{ 
+                              color: getAccentColor(),
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
                           >
                             {item.value}
                           </a>
                         ) : (
-                          <p className="text-sm font-semibold font-sans"
-                            style={{ color: getTextColor() }}
+                          <p className="text-sm font-semibold"
+                            style={{ 
+                              color: getTextColor(),
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
                           >
                             {item.value}
                           </p>
                         )}
                         <p className="text-xs mt-1 font-light"
-                          style={{ color: getTextMuted() }}
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
                         >
                           {item.description}
                         </p>
@@ -788,7 +866,10 @@ export default function AboutPage() {
                 className="p-6 md:p-8"
               >
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2 font-serif tracking-tight"
-                  style={{ color: getTextColor() }}
+                  style={{ 
+                    color: getTextColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   <Mail className="w-5 h-5"
                     style={{ color: getAccentColor() }}
@@ -798,8 +879,11 @@ export default function AboutPage() {
                 
                 <form onSubmit={handleContactSubmit} className="space-y-5">
                   <div>
-                    <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: getTextMuted() }}
+                    <label className="block text-xs font-medium mb-1.5 tracking-wide"
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Full Name *
                     </label>
@@ -810,19 +894,23 @@ export default function AboutPage() {
                       onChange={handleContactInputChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans placeholder:text-gray-500"
+                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors placeholder:text-gray-500"
                       style={{
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         borderWidth: '1px',
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: getTextMuted() }}
+                    <label className="block text-xs font-medium mb-1.5 tracking-wide"
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Email Address *
                     </label>
@@ -833,19 +921,23 @@ export default function AboutPage() {
                       onChange={handleContactInputChange}
                       required
                       placeholder="Enter your email address"
-                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans placeholder:text-gray-500"
+                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors placeholder:text-gray-500"
                       style={{
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         borderWidth: '1px',
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: getTextMuted() }}
+                    <label className="block text-xs font-medium mb-1.5 tracking-wide"
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Subject *
                     </label>
@@ -854,12 +946,13 @@ export default function AboutPage() {
                       value={contactFormData.subject}
                       onChange={handleContactInputChange}
                       required
-                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors font-sans"
+                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors"
                       style={{
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         borderWidth: '1px',
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
                       <option value="">Select a subject</option>
@@ -872,8 +965,11 @@ export default function AboutPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium mb-1.5 font-sans tracking-wide"
-                      style={{ color: getTextMuted() }}
+                    <label className="block text-xs font-medium mb-1.5 tracking-wide"
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Message *
                     </label>
@@ -884,12 +980,13 @@ export default function AboutPage() {
                       required
                       rows={4}
                       placeholder="Tell us about your inquiry..."
-                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors resize-none font-sans placeholder:text-gray-500"
+                      className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 transition-colors resize-none placeholder:text-gray-500"
                       style={{
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         borderWidth: '1px',
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     />
                   </div>
@@ -897,10 +994,11 @@ export default function AboutPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans"
+                    className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     style={{
                       backgroundColor: getAccentColor(),
                       color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     {isSubmitting ? (
@@ -924,14 +1022,22 @@ export default function AboutPage() {
                   {submitStatus === 'success' && (
                     <div className="p-2.5 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-2">
                       <CheckCircle className="w-3.5 h-3.5 text-green-400" />
-                      <p className="text-green-400 text-xs font-sans">Thank you! We&lsquo;ll get back to you soon.</p>
+                      <p className="text-green-400 text-xs"
+                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
+                      >
+                        Thank you! We&lsquo;ll get back to you soon.
+                      </p>
                     </div>
                   )}
 
                   {submitStatus === 'error' && (
                     <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-2">
                       <XCircle className="w-3.5 h-3.5 text-red-400" />
-                      <p className="text-red-400 text-xs font-sans">Failed to send. Please try again.</p>
+                      <p className="text-red-400 text-xs"
+                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
+                      >
+                        Failed to send. Please try again.
+                      </p>
                     </div>
                   )}
                 </form>

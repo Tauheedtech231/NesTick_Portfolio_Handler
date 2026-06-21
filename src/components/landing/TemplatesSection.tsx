@@ -128,6 +128,7 @@ export default function TemplatesSection({
         className="py-12 md:py-16 px-4 sm:px-6 relative"
         style={{
           backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+          fontFamily: "'Poppins', sans-serif",
         }}
       >
         <div className="container mx-auto max-w-6xl relative z-10">
@@ -150,7 +151,10 @@ export default function TemplatesSection({
                 style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
               />
               <span className="text-xs font-medium"
-                style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+                style={{ 
+                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 ✨ Ready-to-Use Portfolio Templates
               </span>
@@ -164,6 +168,7 @@ export default function TemplatesSection({
                   opacity: headerInView ? 1 : 0,
                   transform: headerInView ? 'translateX(0)' : 'translateX(-150px)',
                   transitionDelay: '200ms',
+                  fontFamily: "'Poppins', sans-serif",
                 }}
               >
                 Beautiful
@@ -175,6 +180,7 @@ export default function TemplatesSection({
                   opacity: headerInView ? 1 : 0,
                   transform: headerInView ? 'translateX(0)' : 'translateX(-120px)',
                   transitionDelay: '300ms',
+                  fontFamily: "'Poppins', sans-serif",
                 }}
               >
                 Portfolio Templates
@@ -188,6 +194,7 @@ export default function TemplatesSection({
                 opacity: headerInView ? 1 : 0,
                 transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
                 transitionDelay: '400ms',
+                fontFamily: "'Calibri Light', sans-serif",
               }}
             >
               {templates.length > 0
@@ -224,31 +231,35 @@ export default function TemplatesSection({
                     {/* 🔥 Template Image - 16:9 Landscape */}
                     <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
                       <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                        <Image
-                          src={template.image}
-                          alt={template.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          priority={index < 3}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
-                          }}
-                        />
+                     <Image
+  src={template.image}
+  alt={template.name}
+  fill
+  className="object-contain"  // Changed from object-cover
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  priority={index < 3}
+  onError={(e) => {
+    (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
+  }}
+/>
                       </div>
                       
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 pointer-events-none" />
                       
                       {/* Badges */}
                       <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                        <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
                           Template
                         </span>
                         <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm ${
                           template.type === 'free' 
                             ? 'bg-green-500/80' 
                             : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
-                        }`}>
+                        }`}
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
                           {template.type === 'free' ? 'Free' : 'Premium'}
                         </span>
                       </div>
@@ -262,6 +273,7 @@ export default function TemplatesSection({
                           style={{
                             backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                             color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           <Eye size={16} />
@@ -273,13 +285,19 @@ export default function TemplatesSection({
                     {/* Content area */}
                     <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
                       <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {template.name}
                       </h3>
                       
                       <p className="leading-relaxed text-base mb-4 line-clamp-2"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         {template.description}
                       </p>
@@ -294,6 +312,7 @@ export default function TemplatesSection({
                             border: '1px solid',
                             borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
                             color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           <Info size={14} />
@@ -309,6 +328,7 @@ export default function TemplatesSection({
                             color: template.type === 'free'
                               ? '#FFFFFF'
                               : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           <Sparkles size={14} />
@@ -329,6 +349,7 @@ export default function TemplatesSection({
                     style={{
                       backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                       color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     <span>View More Templates</span>
@@ -360,8 +381,16 @@ export default function TemplatesSection({
                       </div>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-gray-500">{template.name}</h3>
-                  <p className="text-base text-gray-500">{template.description}</p>
+                  <h3 className="text-xl font-bold mb-2 text-gray-500"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    {template.name}
+                  </h3>
+                  <p className="text-base text-gray-500"
+                    style={{ fontFamily: "'Calibri Light', sans-serif" }}
+                  >
+                    {template.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -369,14 +398,15 @@ export default function TemplatesSection({
         </div>
       </section>
 
-      {/* Details Modal */}
+      {/* Details Modal - Increased Width */}
       {isModalOpen && selectedTemplate && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
           onClick={closeModal}
+          style={{ fontFamily: "'Poppins', sans-serif" }}
         >
           <div
-            className="relative rounded-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+            className="relative rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             style={{
               backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
               border: '1px solid',
@@ -385,7 +415,7 @@ export default function TemplatesSection({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 p-4 border-b"
+            <div className="sticky top-0 p-5 border-b"
               style={{
                 backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
                 borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 0, 0, 0.06)',
@@ -393,28 +423,33 @@ export default function TemplatesSection({
             >
               <button
                 onClick={closeModal}
-                className="absolute right-3 top-3 p-1.5 rounded-full hover:bg-black/10 transition-all duration-300 cursor-pointer"
+                className="absolute right-4 top-4 p-1.5 rounded-full hover:bg-black/10 transition-all duration-300 cursor-pointer"
               >
-                <X className="w-4 h-4" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
+                <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
               </button>
-              <h3 className="text-xl font-bold pr-6" style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+              <h3 className="text-2xl font-bold pr-6" style={{ 
+                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                fontFamily: "'Poppins', sans-serif",
+              }}>
                 {selectedTemplate.name}
               </h3>
-              <div className="flex gap-2 mt-1">
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+              <div className="flex gap-2 mt-1.5">
+                <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
                   selectedTemplate.type === 'free' 
                     ? 'bg-green-500 text-white' 
                     : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
-                }`}>
+                }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
                   {selectedTemplate.type === 'free' ? 'Free' : 'Premium'}
                 </span>
               </div>
             </div>
 
             {/* Modal Content */}
-            <div className="p-4">
-              {/* 🔥 Modal Image - 16:9 Landscape */}
-              <div className="relative w-full rounded-lg overflow-hidden mb-4 bg-gray-200 dark:bg-gray-800">
+            <div className="p-6">
+              {/* 🔥 Modal Image - 16:9 Landscape with larger size */}
+              <div className="relative w-full rounded-xl overflow-hidden mb-6 bg-gray-200 dark:bg-gray-800">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <Image
                     src={selectedTemplate.image}
@@ -428,55 +463,74 @@ export default function TemplatesSection({
                 </div>
               </div>
 
-              {/* Description */}
-              <div className="mb-4">
-                <h4 className="text-base font-semibold mb-1"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-                >
-                  Description
-                </h4>
-                <p className="text-sm" style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}>
-                  {selectedTemplate.description}
-                </p>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Description */}
+                <div>
+                  <h4 className="text-base font-semibold mb-2"
+                    style={{ 
+                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    Description
+                  </h4>
+                  <p className="text-sm leading-relaxed" style={{ 
+                    color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                    fontFamily: "'Calibri Light', sans-serif",
+                  }}>
+                    {selectedTemplate.description}
+                  </p>
+                </div>
 
-              {/* Key Features */}
-              <div className="mb-4">
-                <h4 className="text-base font-semibold mb-2"
-                  style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-                >
-                  Features
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {getTemplateFeatures(selectedTemplate.name).slice(0, 6).map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-1.5">
-                      <CheckCircle className="w-3 h-3 flex-shrink-0"
-                        style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-                      />
-                      <span className="text-xs" style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}>
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
+                {/* Key Features */}
+                <div>
+                  <h4 className="text-base font-semibold mb-2"
+                    style={{ 
+                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    Features
+                  </h4>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {getTemplateFeatures(selectedTemplate.name).slice(0, 6).map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5"
+                          style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+                        />
+                        <span className="text-sm" style={{ 
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}>
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-3 pt-6 mt-4 border-t"
+                style={{
+                  borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 0, 0, 0.06)',
+                }}
+              >
                 <button
                   onClick={() => {
                     closeModal();
                     handlePreviewClick(selectedTemplate.image, selectedTemplate.name, selectedTemplate.description, selectedTemplate.live_url);
                   }}
-                  className="flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                   style={{
                     backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                     border: '1px solid',
                     borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
                     color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  <Eye size={14} />
+                  <Eye size={16} />
                   Preview
                 </button>
                 <button
@@ -484,7 +538,7 @@ export default function TemplatesSection({
                     closeModal();
                     handleBuyNowClick(selectedTemplate);
                   }}
-                  className="flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                   style={{
                     backgroundColor: selectedTemplate.type === 'free'
                       ? '#22C55E'
@@ -492,9 +546,10 @@ export default function TemplatesSection({
                     color: selectedTemplate.type === 'free'
                       ? '#FFFFFF'
                       : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  <Sparkles size={14} />
+                  <Sparkles size={16} />
                   {selectedTemplate.type === 'free' ? 'Use Free' : 'Buy Now'}
                 </button>
               </div>

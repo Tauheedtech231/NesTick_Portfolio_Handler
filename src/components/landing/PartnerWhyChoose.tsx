@@ -52,6 +52,7 @@ export function PartnerWhyChoose({
       style={{
         backgroundColor: 'transparent',
         border: 'none',
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       <div className="flex items-center gap-3 mb-4 md:mb-6">
@@ -63,7 +64,10 @@ export function PartnerWhyChoose({
         </div>
         <h3
           className="text-lg md:text-xl font-bold font-serif tracking-tight"
-          style={{ color: getTextColor() }}
+          style={{ 
+            color: getTextColor(),
+            fontFamily: "'Poppins', sans-serif",
+          }}
         >
           {categoryContent.title}
         </h3>
@@ -72,7 +76,10 @@ export function PartnerWhyChoose({
       <div className="space-y-4 md:space-y-6">
         <p
           className="text-sm md:text-base leading-relaxed font-light tracking-wide"
-          style={{ color: getTextSecondary() }}
+          style={{ 
+            color: getTextSecondary(),
+            fontFamily: "'Calibri Light', sans-serif",
+          }}
         >
           {categoryContent.description}
         </p>
@@ -94,7 +101,10 @@ export function PartnerWhyChoose({
                 />
                 <span
                   className="text-[10px] md:text-xs font-medium"
-                  style={{ color: getTextSecondary() }}
+                  style={{ 
+                    color: getTextSecondary(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   {benefit.text}
                 </span>
@@ -112,7 +122,10 @@ export function PartnerWhyChoose({
         >
           <p
             className="text-[11px] md:text-sm italic leading-relaxed font-light"
-            style={{ color: getTextSecondary() }}
+            style={{ 
+              color: getTextSecondary(),
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
           >
             "{categoryContent.quote}"
           </p>

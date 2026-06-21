@@ -1,422 +1,519 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import SocialProofBarMobile from "./landing/SocialProofBarMobile";
+import React, { useEffect, useState } from "react";
+
+/**
+ * SocialProofBar
+ * Hexagon stat cluster — "Trusted Worldwide"
+ * Built with Next.js + TypeScript + Tailwind CSS
+ *
+ * Layout (left -> right):
+ *  Clients (500+) -> Templates (30+) -> TRUSTED WORLDWIDE (center) -> Active Users (20.0K+) -> Success Rate (99%)
+ *
+ * Connecting gradient glow lines run between hexagons, with a dotted world-map
+ * background.
+ */
+
+interface HexStatProps {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  size: "sm" | "lg" | "xl";
+  className?: string;
+  theme?: 'light' | 'dark';
+}
+
+function HexStat({ label, value, icon, size, className = "", theme = 'dark' }: HexStatProps) {
+  const dims =
+    size === "xl"
+      ? "w-[265px] h-[300px]"
+      : size === "lg"
+      ? "w-[200px] h-[225px]"
+      : "w-[178px] h-[200px]";
+
+  // Get colors based on theme
+  const getColors = () => {
+    if (theme === 'dark') {
+      return {
+        stroke: '#3fd0ff',
+        innerStroke: '#1c5670',
+        fill: '#07111f',
+        labelColor: '#E5E7EB',
+        valueColor: '#FFFFFF',
+      };
+    } else {
+      return {
+        stroke: '#0066FF',
+        innerStroke: '#60A5FA',
+        fill: '#F8FAFC',
+        labelColor: '#4B5563',
+        valueColor: '#1F2937',
+      };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className={`absolute ${dims} ${className}`} style={{ fontFamily: "'Poppins', sans-serif" }}>
+      <svg
+        viewBox="0 0 200 230"
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full"
+      >
+        <polygon
+          points="100,2 197,58 197,172 100,228 3,172 3,58"
+          fill={colors.fill}
+          stroke={colors.stroke}
+          strokeWidth="2.5"
+        />
+        <polygon
+          points="100,16 184,64 184,166 100,214 16,166 16,64"
+          fill="none"
+          stroke={colors.innerStroke}
+          strokeWidth="1"
+        />
+      </svg>
+
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1 text-center">
+        <span className="text-[11px] font-normal" style={{ 
+          color: colors.labelColor,
+          fontFamily: "'Poppins', sans-serif",
+        }}>
+          {label}
+        </span>
+        <span className="text-[22px] font-extrabold tracking-wide" style={{ 
+          color: colors.valueColor,
+          fontFamily: "'Poppins', sans-serif",
+        }}>
+          {value}
+        </span>
+        <div className="mt-0.5">{icon}</div>
+      </div>
+    </div>
+  );
+}
+
+function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  // Get colors based on theme
+  const getColors = () => {
+    if (theme === 'dark') {
+      return {
+        stroke: '#3fd0ff',
+        innerStroke: '#1c5670',
+        fill: '#07111f',
+        textColor: '#FFFFFF',
+      };
+    } else {
+      return {
+        stroke: '#0066FF',
+        innerStroke: '#60A5FA',
+        fill: '#F8FAFC',
+        textColor: '#1F2937',
+      };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className="absolute left-[443px] top-[107px] h-[300px] w-[265px]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+      <svg
+        viewBox="0 0 265 300"
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full"
+      >
+        <polygon
+          points="132,3 262,75 262,225 132,297 2,225 2,75"
+          fill={colors.fill}
+          stroke={colors.stroke}
+          strokeWidth="3"
+        />
+        <polygon
+          points="132,20 245,84 245,216 132,280 19,216 19,84"
+          fill="none"
+          stroke={colors.innerStroke}
+          strokeWidth="1"
+        />
+      </svg>
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center text-center">
+        <span className="text-[26px] font-extrabold leading-tight tracking-wide" style={{ 
+          color: colors.textColor,
+          fontFamily: "'Poppins', sans-serif",
+        }}>
+          TRUSTED
+          <br />
+          WORLDWIDE
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function HandshakeIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  return (
+    <svg width="28" height="18" viewBox="0 0 34 22" fill="none">
+      <path d="M2 11 L9 6 L15 11 L9 16 Z" fill={color} opacity="0.95" />
+      <path d="M32 11 L25 6 L19 11 L25 16 Z" fill={color} opacity="0.95" />
+      <rect x="13" y="9.5" width="8" height="3" rx="1.5" fill={color} />
+    </svg>
+  );
+}
+
+function TemplatesIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  return (
+    <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+      <rect
+        x="5"
+        y="2"
+        width="14"
+        height="18"
+        rx="1.5"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.6"
+      />
+      <line x1="8" y1="7" x2="16" y2="7" stroke={color} strokeWidth="1.3" />
+      <line x1="8" y1="10.5" x2="16" y2="10.5" stroke={color} strokeWidth="1.3" />
+      <line x1="8" y1="14" x2="13" y2="14" stroke={color} strokeWidth="1.3" />
+    </svg>
+  );
+}
+
+function UsersIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  const colorDim = theme === 'dark' ? '#ffffff' : '#4B5563';
+  return (
+    <svg width="26" height="18" viewBox="0 0 30 22" fill="none">
+      <circle cx="15" cy="6" r="4" fill={color} />
+      <path d="M5 20 C5 14 10 12 15 12 C20 12 25 14 25 20 Z" fill={color} />
+      <circle cx="4" cy="9" r="3" fill={colorDim} opacity="0.85" />
+      <path
+        d="M-2 20 C-2 16 1 14 4 14 C5.5 14 6.8 14.5 7.7 15.4 C5.5 16.6 4.5 18 4.3 20 Z"
+        fill={colorDim}
+        opacity="0.85"
+      />
+      <circle cx="26" cy="9" r="3" fill={colorDim} opacity="0.85" />
+      <path
+        d="M32 20 C32 16 29 14 26 14 C24.5 14 23.2 14.5 22.3 15.4 C24.5 16.6 25.5 18 25.7 20 Z"
+        fill={colorDim}
+        opacity="0.85"
+      />
+    </svg>
+  );
+}
+
+function SuccessIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  return (
+    <svg width="22" height="18" viewBox="0 0 28 22" fill="none">
+      <polyline
+        points="1,20 9,11 14,15 26,2"
+        stroke={color}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <polyline
+        points="18,2 26,2 26,10"
+        stroke={color}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function DottedWorldMap({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const dotColor = theme === 'dark' ? '#16456b' : '#93C5FD';
+  
+  const mask = [
+    "0000111100000000000001111111000000000000000000000000000000000",
+    "0001111110000000111111111111110000000000111111110000000000000",
+    "0011111111000011111111111111111000000001111111111100000000000",
+    "0111111111100111111111111111111100000111111111111111000000000",
+    "0111111111111111111111111111111110001111111111111111100000000",
+    "0011111111111111111111111111111111111111111111111111110000000",
+    "0001111111110011111111111111111111111111111111111111111000000",
+    "0000011111000001111111111111111111111111111111111111111100000",
+    "0000001110000000111111111111111111111111111111111111111110000",
+    "0000000000000001111111111111111111111111111111111111111111000",
+    "0000000111000011111111111111111111111111111111111111111111100",
+    "0000001111100011111111111111111111111111111111111111111111000",
+    "0000011111110001111111111111111111111111111111111111111100000",
+    "0000111111111001111111111111111111111111111111111111111000000",
+    "0000111111111111111111111111111111111111111111111110000000000",
+    "0000011111111111111111111111111111111111111111110000000000000",
+    "0000001111111111111111111111111111111111111111000000000000000",
+    "0000000111111111111111111111111111111111111100000000000000000",
+    "0000000011111111111111111111111111111111110000000000000000000",
+    "0000000001111111111111111111111111111111000000000000000000000",
+    "0000000000111111111111111111111111111110000000000000000000000",
+    "0000000000011111111111111111111111111100000000000000000000000",
+    "0000000000001111111111111111111111110000000000000000000000000",
+    "0000000000000111111111111111111111000000000000000000000000000",
+    "0000000000000011111111111111111100000000000000000000000000000",
+    "0000000000000001111111111111110000000000000000000000000000000",
+    "0000000000000000111111111111000000000000000000000000000000000",
+    "0000000000000000001111111100000000000000000000000000000000000",
+  ];
+
+  const gridCols = mask[0].length;
+  const gridRows = mask.length;
+  const scaleX = 1153 / gridCols;
+  const scaleY = 514 / gridRows;
+
+  const dots: { x: number; y: number; r: number; o: number }[] = [];
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
+  for (let r = 0; r < gridRows; r++) {
+    for (let c = 0; c < gridCols; c++) {
+      if (mask[r][c] === "1") {
+        if (rand() < 0.18) continue;
+        const x = c * scaleX + rand() * scaleX * 0.4;
+        const y = r * scaleY + rand() * scaleY * 0.4;
+        dots.push({ x, y, r: 1.1 + rand() * 0.6, o: 0.5 + rand() * 0.5 });
+      }
+    }
+  }
+
+  return (
+    <svg
+      viewBox="0 0 1153 514"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-55"
+    >
+      {dots.map((d, i) => (
+        <circle
+          key={i}
+          cx={d.x.toFixed(1)}
+          cy={d.y.toFixed(1)}
+          r={d.r.toFixed(1)}
+          fill={dotColor}
+          opacity={d.o.toFixed(2)}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function ConnectingLines({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const getColors = () => {
+    if (theme === 'dark') {
+      return {
+        gradientStart: '#3fd0ff',
+        gradientMid: '#7fe3ff',
+        gradientEnd: '#bff3ff',
+        stroke: '#3fd0ff',
+        sparkle1: '#bff3ff',
+        sparkle2: '#ffffff',
+      };
+    } else {
+      return {
+        gradientStart: '#0066FF',
+        gradientMid: '#3B82F6',
+        gradientEnd: '#60A5FA',
+        stroke: '#0066FF',
+        sparkle1: '#60A5FA',
+        sparkle2: '#1F2937',
+      };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <svg
+      viewBox="0 0 1153 514"
+      className="pointer-events-none absolute inset-0 z-[1] h-full w-full"
+    >
+      <defs>
+        <linearGradient id="streakGradL" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={colors.gradientStart} stopOpacity="0.15" />
+          <stop offset="60%" stopColor={colors.gradientMid} stopOpacity="1" />
+          <stop offset="100%" stopColor={colors.gradientEnd} stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="streakGradR" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={colors.gradientEnd} stopOpacity="1" />
+          <stop offset="40%" stopColor={colors.gradientMid} stopOpacity="1" />
+          <stop offset="100%" stopColor={colors.gradientStart} stopOpacity="0.15" />
+        </linearGradient>
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="wideGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
+      </defs>
+
+      {/* Clients -> Center */}
+      <path
+        d="M 218 263 L 445 257"
+        stroke="url(#streakGradL)"
+        strokeWidth="2.5"
+        fill="none"
+        filter="url(#softGlow)"
+      />
+      <path
+        d="M 218 263 L 445 257"
+        stroke={colors.stroke}
+        strokeWidth="6"
+        fill="none"
+        filter="url(#wideGlow)"
+        opacity="0.35"
+      />
+
+      {/* Center -> Success Rate */}
+      <path
+        d="M 705 257 L 925 276"
+        stroke="url(#streakGradR)"
+        strokeWidth="2.5"
+        fill="none"
+        filter="url(#softGlow)"
+      />
+      <path
+        d="M 705 257 L 925 276"
+        stroke={colors.stroke}
+        strokeWidth="6"
+        fill="none"
+        filter="url(#wideGlow)"
+        opacity="0.35"
+      />
+
+      {/* Center -> Active Users */}
+      <path
+        d="M 600 150 C 610 110, 650 85, 690 95 C 715 102, 730 120, 735 145"
+        stroke="url(#streakGradR)"
+        strokeWidth="2.5"
+        fill="none"
+        filter="url(#softGlow)"
+      />
+      <path
+        d="M 600 150 C 610 110, 650 85, 690 95 C 715 102, 730 120, 735 145"
+        stroke={colors.stroke}
+        strokeWidth="6"
+        fill="none"
+        filter="url(#wideGlow)"
+        opacity="0.35"
+      />
+      <circle cx="630" cy="105" r="1.6" fill={colors.sparkle1} />
+      <circle cx="670" cy="90" r="1.2" fill={colors.sparkle2} opacity="0.8" />
+      <circle cx="715" cy="115" r="1.4" fill={colors.sparkle1} opacity="0.85" />
+
+      {/* Center -> Templates */}
+      <path
+        d="M 480 340 C 460 365, 430 380, 398 378"
+        stroke="url(#streakGradL)"
+        strokeWidth="2.5"
+        fill="none"
+        filter="url(#softGlow)"
+      />
+      <path
+        d="M 480 340 C 460 365, 430 380, 398 378"
+        stroke={colors.stroke}
+        strokeWidth="6"
+        fill="none"
+        filter="url(#wideGlow)"
+        opacity="0.35"
+      />
+      <circle cx="440" cy="372" r="1.4" fill={colors.sparkle1} opacity="0.85" />
+
+      {/* sparkle particles along straight connectors */}
+      <circle cx="260" cy="262" r="1.6" fill={colors.sparkle2} />
+      <circle cx="320" cy="260" r="1.2" fill={colors.sparkle2} opacity="0.8" />
+      <circle cx="380" cy="258" r="1.4" fill={colors.sparkle1} opacity="0.85" />
+      <circle cx="760" cy="262" r="1.6" fill={colors.sparkle2} />
+      <circle cx="820" cy="268" r="1.2" fill={colors.sparkle2} opacity="0.8" />
+      <circle cx="880" cy="273" r="1.4" fill={colors.sparkle1} opacity="0.85" />
+    </svg>
+  );
+}
 
 export default function SocialProofBar() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [counts, setCounts] = useState({
-    clients: 0,
-    templates: 0,
-    activeUsers: 0,
-    successRate: 0,
-  });
-  const [hasAnimated, setHasAnimated] = useState(false);
-  
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-    rootMargin: "-50px 0px",
-  });
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
+  // Detect theme changes
   useEffect(() => {
     const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
     };
-
+    
     checkTheme();
-
+    
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
+        if (mutation.attributeName === 'class') {
           checkTheme();
         }
       });
     });
-
+    
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 
-  // Counter animation
-  useEffect(() => {
-    if (inView && !hasAnimated) {
-      setHasAnimated(true);
-      
-      const targets = {
-        clients: 500,
-        templates: 30,
-        activeUsers: 20000,
-        successRate: 99,
-      };
-      
-      const duration = 2000;
-      const steps = 60;
-      const increments = {
-        clients: targets.clients / steps,
-        templates: targets.templates / steps,
-        activeUsers: targets.activeUsers / steps,
-        successRate: targets.successRate / steps,
-      };
-      
-      const currentCounts = {
-        clients: 0,
-        templates: 0,
-        activeUsers: 0,
-        successRate: 0,
-      };
-      
-      let step = 0;
-      
-      const timer = setInterval(() => {
-        step++;
-        
-        currentCounts.clients += increments.clients;
-        currentCounts.templates += increments.templates;
-        currentCounts.activeUsers += increments.activeUsers;
-        currentCounts.successRate += increments.successRate;
-        
-        if (step >= steps) {
-          currentCounts.clients = targets.clients;
-          currentCounts.templates = targets.templates;
-          currentCounts.activeUsers = targets.activeUsers;
-          currentCounts.successRate = targets.successRate;
-          clearInterval(timer);
-        }
-        
-        setCounts({
-          clients: Math.floor(currentCounts.clients),
-          templates: Math.floor(currentCounts.templates),
-          activeUsers: Math.floor(currentCounts.activeUsers),
-          successRate: Math.floor(currentCounts.successRate),
-        });
-      }, duration / steps);
-    }
-  }, [inView, hasAnimated]);
-
-  // Theme-based colors
-  const bgColor = theme === "dark" ? "#0B0F19" : "#FFFFFF";
-  const hexBgColor = theme === "dark" ? "#0b1120" : "#F3F4F6";
-  const textColor = theme === "dark" ? "#FFFFFF" : "#1F2937";
-  const textGray = theme === "dark" ? "#9CA3AF" : "#6B7280";
-  const neonBlue = "#4cc9f0";
-  const yellowColor = "#E8CA5E";
-
-  // Format values
-  const formatValue = (value: number, type: string) => {
-    if (type === 'activeUsers') {
-      return (value / 1000).toFixed(1) + 'K+';
-    }
-    return value + '+';
-  };
+  // Get background color based on theme
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFC';
 
   return (
-    <>
-     <SocialProofBarMobile />
-      {/* Desktop only - hidden on mobile */}
-      <div className="hidden md:block">
-        <section
-          ref={ref}
-          className="w-full min-h-[510px] flex items-center justify-center relative overflow-hidden"
-          style={{
-            backgroundColor: bgColor,
-          }}
-        >
-          {/* Background Connection SVG Layer */}
-          <div className="absolute inset-0 pointer-events-none z-0">
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 1000">
-              <path
-                className="connector-line"
-                d="M 500 500 C 400 500, 350 450, 250 350"
-                fill="none"
-                stroke={neonBlue}
-                strokeWidth="1"
-                opacity="0.4"
-                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
-              />
-              <path
-                className="connector-line"
-                d="M 500 500 C 400 500, 350 550, 250 650"
-                fill="none"
-                stroke={neonBlue}
-                strokeWidth="1"
-                opacity="0.4"
-                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
-              />
-              <path
-                className="connector-line"
-                d="M 500 500 C 600 500, 650 450, 750 350"
-                fill="none"
-                stroke={neonBlue}
-                strokeWidth="1"
-                opacity="0.4"
-                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
-              />
-              <path
-                className="connector-line"
-                d="M 500 500 C 600 500, 650 550, 750 650"
-                fill="none"
-                stroke={neonBlue}
-                strokeWidth="1"
-                opacity="0.4"
-                style={{ filter: "drop-shadow(0 0 2px #4cc9f0)" }}
-              />
-            </svg>
-          </div>
+    <div className="relative w-full overflow-hidden" style={{ 
+      backgroundColor: getBgColor(),
+      fontFamily: "'Poppins', sans-serif",
+      height: '514px',
+    }}>
+      <div className="relative mx-auto w-[1153px] max-w-full h-full">
+        <DottedWorldMap theme={theme} />
+        <ConnectingLines theme={theme} />
 
-          {/* Stats Layout Container */}
-          <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 items-center px-4">
-            {/* Left Side Column - Animates from Left */}
-            <div 
-              className="flex flex-col items-center md:items-end gap-16"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateX(0)" : "translateX(-200px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "200ms",
-              }}
-            >
-              {/* Clients */}
-              <div
-                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: neonBlue,
-                  padding: "1px",
-                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    background: hexBgColor,
-                  }}
-                >
-                  <span
-                    className="text-[8px] uppercase tracking-widest mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Clients
-                  </span>
-                  <span
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.clients, 'clients')}
-                  </span>
-                  <span
-                    className="material-symbols-outlined text-2xl"
-                    style={{ color: neonBlue }}
-                  >
-                    handshake
-                  </span>
-                </div>
-              </div>
-
-              {/* Templates */}
-              <div
-                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: neonBlue,
-                  padding: "1px",
-                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    background: hexBgColor,
-                  }}
-                >
-                  <span
-                    className="text-[8px] uppercase tracking-widest mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Templates
-                  </span>
-                  <span
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.templates, 'templates')}
-                  </span>
-                  <span
-                    className="material-symbols-outlined text-2xl"
-                    style={{ color: neonBlue }}
-                  >
-                    content_copy
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Center Main Hexagon - Animates from Bottom */}
-            <div 
-              className="flex justify-center"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(250px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "400ms",
-              }}
-            >
-              <div
-                className="w-64 h-72 md:w-72 md:h-80 transition-transform duration-300 hover:scale-105"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: "linear-gradient(135deg, #4cc9f0, #225a6e)",
-                  padding: "2px",
-                  boxShadow: "0 0 30px rgba(76, 201, 240, 0.3)",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    background: theme === "dark" ? "#050a14" : "#F9FAFB",
-                  }}
-                >
-                  <h1
-                    className="text-3xl md:text-3xl font-black leading-tight tracking-tight"
-                    style={{ color: textColor }}
-                  >
-                    <span style={{ color: yellowColor }}>TRUSTED</span>
-                    <br />
-                    WORLDWIDE
-                  </h1>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side Column - Animates from Right */}
-            <div 
-              className="flex flex-col items-center md:items-start gap-16"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateX(0)" : "translateX(200px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "200ms",
-              }}
-            >
-              {/* Active Users */}
-              <div
-                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: neonBlue,
-                  padding: "1px",
-                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    background: hexBgColor,
-                  }}
-                >
-                  <span
-                    className="text-[8px] uppercase tracking-widest mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Active Users
-                  </span>
-                  <span
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.activeUsers, 'activeUsers')}
-                  </span>
-                  <span
-                    className="material-symbols-outlined text-2xl"
-                    style={{ color: neonBlue }}
-                  >
-                    group
-                  </span>
-                </div>
-              </div>
-
-              {/* Success Rate */}
-              <div
-                className="w-40 h-44 transition-transform duration-300 hover:scale-105"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: neonBlue,
-                  padding: "1px",
-                  boxShadow: "0 0 15px rgba(76, 201, 240, 0.5)",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    background: hexBgColor,
-                  }}
-                >
-                  <span
-                    className="text-[8px] uppercase tracking-widest mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Success Rate
-                  </span>
-                  <span
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {counts.successRate}%
-                  </span>
-                  <span
-                    className="material-symbols-outlined text-2xl"
-                    style={{ color: neonBlue }}
-                  >
-                    trending_up
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Add Material Icons and Animations */}
-          <style jsx global>{`
-            @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
-
-            .material-symbols-outlined {
-              font-family: "Material Symbols Outlined";
-              font-weight: normal;
-              font-style: normal;
-              font-size: 24px;
-              line-height: 1;
-              letter-spacing: normal;
-              text-transform: none;
-              display: inline-block;
-              white-space: nowrap;
-              word-wrap: normal;
-              direction: ltr;
-              -webkit-font-feature-settings: "liga";
-              -webkit-font-smoothing: antialiased;
-            }
-
-            @keyframes subtle-pulse {
-              0%,
-              100% {
-                opacity: 0.4;
-              }
-              50% {
-                opacity: 0.7;
-              }
-            }
-            
-            .connector-line {
-              animation: subtle-pulse 5s infinite ease-in-out;
-            }
-          `}</style>
-        </section>
+        <div className="absolute inset-0 z-[2]">
+          <HexStat
+            label="Clients"
+            value="500+"
+            icon={<HandshakeIcon theme={theme} />}
+            size="sm"
+            className="left-[40px] top-[163px]"
+            theme={theme}
+          />
+          <HexStat
+            label="Templates"
+            value="30+"
+            icon={<TemplatesIcon theme={theme} />}
+            size="sm"
+            className="left-[220px] top-[268px]"
+            theme={theme}
+          />
+          <CenterHex theme={theme} />
+          <HexStat
+            label="Active Users"
+            value="20.0K+"
+            icon={<UsersIcon theme={theme} />}
+            size="lg"
+            className="left-[735px] top-[33px]"
+            theme={theme}
+          />
+          <HexStat
+            label="Success Rate"
+            value="99%"
+            icon={<SuccessIcon theme={theme} />}
+            size="lg"
+            className="left-[925px] top-[163px]"
+            theme={theme}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -83,9 +83,11 @@ export default function ContactSection({ theme }: ContactSectionProps) {
   };
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
+    <section 
+      className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
       style={{
         backgroundColor: colors.bg,
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -98,13 +100,19 @@ export default function ContactSection({ theme }: ContactSectionProps) {
               }}
             >
               <Mail className="w-3.5 h-3.5" style={{ color: colors.accent }} />
-              <span className="text-xs font-medium" style={{ color: colors.accent }}>
+              <span className="text-xs font-medium" style={{ 
+                color: colors.accent,
+                fontFamily: "'Poppins', sans-serif",
+              }}>
                 Contact Us
               </span>
             </div>
             
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 font-serif tracking-tight"
-              style={{ color: colors.text }}
+              style={{ 
+                color: colors.text,
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               Have Questions?
               <br />
@@ -114,7 +122,10 @@ export default function ContactSection({ theme }: ContactSectionProps) {
             </h2>
             
             <p className="mb-6 leading-relaxed"
-              style={{ color: colors.textSecondary }}
+              style={{ 
+                color: colors.textSecondary,
+                fontFamily: "'Calibri Light', sans-serif",
+              }}
             >
               Whether you're looking for a custom template, need assistance with your existing portfolio, or want to discuss your requirements, our team is ready to assist you.
             </p>
@@ -122,15 +133,30 @@ export default function ContactSection({ theme }: ContactSectionProps) {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5" style={{ color: colors.accent }} />
-                <span style={{ color: colors.textSecondary }}>support@nesticktech.com</span>
+                <span style={{ 
+                  color: colors.textSecondary,
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}>
+                  support@nesticktech.com
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5" style={{ color: colors.accent }} />
-                <span style={{ color: colors.textSecondary }}>+92 319 3236529</span>
+                <span style={{ 
+                  color: colors.textSecondary,
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}>
+                  +92 319 3236529
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5" style={{ color: colors.accent }} />
-                <span style={{ color: colors.textSecondary }}>Mon-Fri, 9AM - 6PM PKT</span>
+                <span style={{ 
+                  color: colors.textSecondary,
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}>
+                  Mon-Fri, 9AM - 6PM PKT
+                </span>
               </div>
             </div>
           </div>
@@ -150,15 +176,24 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                 >
                   <CheckCircle className="w-8 h-8" style={{ color: colors.accent }} />
                 </div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: colors.text }}>
+                <h3 className="text-xl font-bold mb-2" style={{ 
+                  color: colors.text,
+                  fontFamily: "'Poppins', sans-serif",
+                }}>
                   Message Sent!
                 </h3>
-                <p style={{ color: colors.textSecondary }}>We'll get back to you within 24 hours.</p>
+                <p style={{ 
+                  color: colors.textSecondary,
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}>We'll get back to you within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: colors.label }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ 
+                    color: colors.label,
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>
                     Full Name *
                   </label>
                   <input
@@ -172,6 +207,7 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                       borderColor: colors.border,
                       borderWidth: '1px',
                       color: colors.text,
+                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="John Doe"
                   />
@@ -179,7 +215,10 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: colors.label }}>
+                    <label className="block text-xs font-medium mb-1.5" style={{ 
+                      color: colors.label,
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>
                       Email *
                     </label>
                     <input
@@ -193,12 +232,16 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                         borderColor: colors.border,
                         borderWidth: '1px',
                         color: colors.text,
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="john@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1.5" style={{ color: colors.label }}>
+                    <label className="block text-xs font-medium mb-1.5" style={{ 
+                      color: colors.label,
+                      fontFamily: "'Poppins', sans-serif",
+                    }}>
                       Phone *
                     </label>
                     <input
@@ -212,6 +255,7 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                         borderColor: colors.border,
                         borderWidth: '1px',
                         color: colors.text,
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="+92 300 1234567"
                     />
@@ -219,7 +263,10 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: colors.label }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ 
+                    color: colors.label,
+                    fontFamily: "'Poppins', sans-serif",
+                  }}>
                     Message *
                   </label>
                   <textarea
@@ -233,6 +280,7 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                       borderColor: colors.border,
                       borderWidth: '1px',
                       color: colors.text,
+                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="Tell us about your requirements..."
                   />
@@ -245,6 +293,7 @@ export default function ContactSection({ theme }: ContactSectionProps) {
                   style={{
                     backgroundColor: colors.accent,
                     color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   {contactSubmitting ? 'Sending...' : 'Send Message'}

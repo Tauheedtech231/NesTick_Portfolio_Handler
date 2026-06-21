@@ -259,7 +259,10 @@ export default function FeaturesSection() {
     <div 
       ref={sectionRef}
       className="relative w-full flex items-center justify-center" 
-      style={{ minHeight: '500px' }}
+      style={{ 
+        minHeight: '500px',
+        fontFamily: "'Poppins', sans-serif",
+      }}
       onMouseLeave={handleMouseLeave}
     >
       <div className="flex items-center justify-center" style={{ gap: '0px', minWidth: '550px' }}>
@@ -388,7 +391,7 @@ export default function FeaturesSection() {
                     fontSize={pos.id === 4 ? "18" : pos.id === 1 ? "16" : "14"}
                     fontWeight={isActive ? "bold" : "600"}
                     style={{
-                      fontFamily: "'Architects Daughter', cursive",
+                      fontFamily: "'Poppins', sans-serif",
                       transition: "all 0.5s ease",
                       opacity: isDimmed ? 0.4 : 1,
                       filter: isActive ? `drop-shadow(0 0 8px ${activeColor}66)` : 'none',
@@ -457,14 +460,21 @@ export default function FeaturesSection() {
                         boxShadow: `0 0 15px ${activeColor}66`,
                       }}
                     />
-                    <span className="text-base font-semibold leading-tight flex-1" style={{ color: cardTextColor }}>
+                    <span 
+                      className="text-base font-semibold leading-tight flex-1" 
+                      style={{ 
+                        color: cardTextColor,
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                    >
                       {activeFeature.title}
                     </span>
                     <span
                       className="text-[10px] px-2.5 py-0.5 rounded-full ml-auto flex-shrink-0 font-medium"
                       style={{ 
                         background: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)',
-                        color: activeColor 
+                        color: activeColor,
+                        fontFamily: "'Poppins', sans-serif",
                       }}
                     >
                       {activeFeature.tag}
@@ -476,7 +486,13 @@ export default function FeaturesSection() {
                       className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
                       style={{ background: activeFeature.fill }}
                     />
-                    <p className="text-sm leading-relaxed min-h-[48px]" style={{ color: cardTextSecondary }}>
+                    <p 
+                      className="text-sm leading-relaxed min-h-[48px]" 
+                      style={{ 
+                        color: cardTextSecondary,
+                        fontFamily: "'Calibri Light', sans-serif",
+                      }}
+                    >
                       {typedText}
                       {isTyping && (
                         <span

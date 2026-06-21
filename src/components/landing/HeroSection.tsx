@@ -199,6 +199,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         id="home"
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
+        style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         {/* Video Background - Direct */}
         <div className="absolute inset-0 z-0 w-full h-full">
@@ -257,7 +258,9 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </div>
               <span className={`text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500 ${
                 theme === 'dark' ? 'text-white' : 'text-[#00A0FF]'
-              }`}>
+              }`}
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
                 🌟 Trusted by 500+ Educational Institutions
               </span>
             </div>
@@ -265,20 +268,26 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             {/* Headings */}
             <div className="mb-5 sm:mb-7">
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
-                <span className="block text-white font-serif tracking-tight drop-shadow-lg">
+                <span className="block text-white font-serif tracking-tight drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   Journey Through the
                 </span>
               </h1>
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
                 <span className="block">
-                  <span className="text-[#E8CA5E] font-serif drop-shadow-lg">Galaxy of</span>{' '}
-                  <span className="text-[#00E0FF] font-serif drop-shadow-lg">College Portfolios</span>
+                  <span className="text-[#E8CA5E] font-serif drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    Galaxy of
+                  </span>{' '}
+                  <span className="text-[#00E0FF] font-serif drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    College Portfolios
+                  </span>
                 </span>
               </h1>
             </div>
 
             {/* Subheading */}
-            <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md">
+            <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md"
+            style={{ fontFamily: "'Calibri Light', sans-serif" }}
+            >
               Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
               A centralized constellation where institutions create, customize, and control their digital 
               presence across the universe of learning.
@@ -293,6 +302,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     ? 'bg-[#E8CA5E] text-[#1F4381] hover:bg-[#E8CA5E]/90'
                     : 'bg-[#00A0FF] text-white hover:bg-[#00A0FF]/90'
                 }`}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
               >
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -301,6 +311,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               <button
                 onClick={handleDesignClick}
                 className="group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 hover:border-white"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
               >
                 <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 <span>Your Design</span>
@@ -312,7 +323,9 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         {/* Simple scroll hint */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
           <div className="flex flex-col items-center gap-1 opacity-50">
-            <span className="text-[9px] uppercase tracking-wider text-white">Scroll</span>
+            <span className="text-[9px] uppercase tracking-wider text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              Scroll
+            </span>
             <div className="w-4 h-6 border border-white rounded-full flex justify-center">
               <div className="w-0.5 h-1.5 bg-white rounded-full mt-1 animate-bounce" />
             </div>
@@ -346,6 +359,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[200] flex justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
             onClick={closeModal}
+            style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -362,8 +376,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     <Palette className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Your Design</h2>
-                    <p className="text-sm text-gray-400">Share your creative vision with us</p>
+                    <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      Your Design
+                    </h2>
+                    <p className="text-sm text-gray-400" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                      Share your creative vision with us
+                    </p>
                   </div>
                 </div>
                 <button
@@ -381,8 +399,10 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
                       <CheckCircle className="w-8 h-8 text-green-500" />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>
-                    <p className="text-gray-400">
+                    <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      Request Submitted!
+                    </h3>
+                    <p className="text-gray-400" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
                       Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
                     </p>
                   </div>
@@ -390,7 +410,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                           Full Name *
                         </label>
                         <input
@@ -402,14 +422,17 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                             formErrors.name ? 'border-red-500' : 'border-gray-700'
                           }`}
                           placeholder="Enter your full name"
+                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.name && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {formErrors.name}
+                          </p>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                           Email Address *
                         </label>
                         <input
@@ -421,16 +444,19 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                             formErrors.email ? 'border-red-500' : 'border-gray-700'
                           }`}
                           placeholder="you@example.com"
+                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.email && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {formErrors.email}
+                          </p>
                         )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                           Phone Number *
                         </label>
                         <input
@@ -442,14 +468,17 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                             formErrors.phone ? 'border-red-500' : 'border-gray-700'
                           }`}
                           placeholder="+92 300 1234567"
+                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.phone && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.phone}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {formErrors.phone}
+                          </p>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                           Design Type *
                         </label>
                         <select
@@ -459,6 +488,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
                             formErrors.designType ? 'border-red-500' : 'border-gray-700'
                           }`}
+                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         >
                           <option value="">Select design type</option>
                           {designTypes.map(type => (
@@ -466,13 +496,15 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           ))}
                         </select>
                         {formErrors.designType && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.designType}</p>
+                          <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                            {formErrors.designType}
+                          </p>
                         )}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                         What inspires you? (Optional)
                       </label>
                       <input
@@ -482,11 +514,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         onChange={handleInputChange}
                         className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                         placeholder="e.g., Modern minimalism, Nature, Technology, Art Deco..."
+                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
                         Describe your design requirements *
                       </label>
                       <textarea
@@ -498,9 +531,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           formErrors.description ? 'border-red-500' : 'border-gray-700'
                         }`}
                         placeholder="Tell us about your vision, preferred colors, style, features you need, etc..."
+                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       />
                       {formErrors.description && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>
+                        <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                          {formErrors.description}
+                        </p>
                       )}
                     </div>
 
@@ -508,6 +544,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       type="submit"
                       disabled={isSubmitting}
                       className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
                       {isSubmitting ? (
                         <>

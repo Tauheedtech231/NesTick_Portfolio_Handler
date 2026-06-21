@@ -1,319 +1,350 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CORE_OS_METRICS - Mobile Interface</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trusted Worldwide</title>
 <style>
-        :root {
-            --primary-neon: #00f0ff;
-            --primary-neon-glow: rgba(0, 240, 255, 0.3);
-            --hex-bg: #0e0e0e;
-        }
+  :root{
+    --bg:#000000;
+    --hex-fill:#0b1830;
+    --hex-stroke:#3fd0ff;
+    --hex-stroke-soft:#1f6f8f;
+    --text:#ffffff;
+    --map-dot:#13304a;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+  .stage{
+    position:relative;
+    width:1153px;
+    height:514px;
+    margin:0 auto;
+    background:#000000;
+    overflow:hidden;
+    font-family:'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+  }
 
-        body {
-            background-color: #000000;
-            color: #e2e2e2;
-            overflow-x: hidden;
-            font-family: 'Geist', sans-serif;
-        }
+  /* world map dotted background */
+  .map-bg{
+    position:absolute;
+    inset:0;
+    opacity:0.55;
+  }
 
-        .hex-container {
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            background: var(--hex-bg);
-            position: relative;
-        }
+  /* glow streak */
+  .glow-streak{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:1;
+  }
 
-        .hex-border {
-            position: relative;
-            background: #1A1A1A;
-            padding: 1px;
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-        }
+  .hex-wrap{
+    position:absolute;
+    inset:0;
+    z-index:2;
+  }
 
-        .hex-border::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, var(--primary-neon) 0%, transparent 40%, transparent 60%, var(--primary-neon) 100%);
-            opacity: 0.4;
-            pointer-events: none;
-        }
+  .hex{
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
 
-        .circuit-line {
-            position: absolute;
-            background: var(--primary-neon);
-            opacity: 0.3;
-            box-shadow: 0 0 8px var(--primary-neon-glow);
-        }
+  .hex svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
 
-        .circuit-node {
-            width: 6px;
-            height: 6px;
-            background: var(--primary-neon);
-            position: absolute;
-            box-shadow: 0 0 10px var(--primary-neon);
-        }
+  .hex-content{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
 
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.2); }
-        }
+  .hex-label{
+    font-size:15px;
+    font-weight:400;
+    color:#e8eef5;
+    letter-spacing:0.2px;
+  }
 
-        .status-pulse {
-            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+  .hex-number{
+    font-size:30px;
+    font-weight:800;
+    color:#ffffff;
+    letter-spacing:0.5px;
+  }
 
-        .glass-card {
-            background: rgba(19, 19, 19, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(59, 73, 75, 0.5);
-        }
+  .hex-icon{
+    margin-top:2px;
+  }
 
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-background": "#e2e2e2",
-                        "inverse-surface": "#e2e2e2",
-                        "on-secondary": "#3c0090",
-                        "outline-variant": "#3b494b",
-                        "on-secondary-fixed-variant": "#5700c9",
-                        "error": "#ffb4ab",
-                        "on-primary-fixed": "#002022",
-                        "surface": "#131313",
-                        "primary": "#dbfcff",
-                        "on-secondary-container": "#ddcdff",
-                        "on-error-container": "#ffdad6",
-                        "tertiary-fixed-dim": "#eac324",
-                        "on-tertiary": "#3b2f00",
-                        "tertiary-fixed": "#ffe179",
-                        "tertiary": "#fff5de",
-                        "primary-container": "#00f0ff",
-                        "secondary-fixed-dim": "#d1bcff",
-                        "on-tertiary-container": "#715d00",
-                        "on-primary": "#00363a",
-                        "background": "#131313",
-                        "primary-fixed-dim": "#00dbe9",
-                        "inverse-primary": "#006970",
-                        "outline": "#849495",
-                        "tertiary-container": "#fed639",
-                        "surface-dim": "#131313",
-                        "on-surface": "#e2e2e2",
-                        "secondary-container": "#7000ff",
-                        "surface-container-lowest": "#0e0e0e",
-                        "secondary": "#d1bcff",
-                        "on-secondary-fixed": "#23005b",
-                        "on-primary-fixed-variant": "#004f54",
-                        "on-tertiary-fixed": "#231b00",
-                        "error-container": "#93000a",
-                        "surface-tint": "#00dbe9",
-                        "surface-container": "#1f1f1f",
-                        "secondary-fixed": "#e9ddff",
-                        "surface-container-high": "#2a2a2a",
-                        "surface-container-low": "#1b1b1b",
-                        "on-error": "#690005",
-                        "surface-variant": "#353535",
-                        "on-surface-variant": "#b9cacb",
-                        "primary-fixed": "#7df4ff",
-                        "on-primary-container": "#006970",
-                        "surface-bright": "#393939",
-                        "on-tertiary-fixed-variant": "#554500",
-                        "inverse-on-surface": "#303030",
-                        "surface-container-highest": "#353535"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "unit": "4px",
-                        "gutter": "24px",
-                        "margin-safe": "32px",
-                        "hex-gap": "12px"
-                    },
-                    "fontFamily": {
-                        "headline-lg-mobile": ["Geist"],
-                        "headline-lg": ["Geist"],
-                        "label-sm": ["JetBrains Mono"],
-                        "headline-md": ["Geist"],
-                        "body-md": ["Geist"],
-                        "metric-xl": ["Geist"]
-                    },
-                    "fontSize": {
-                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
-                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
-                        "metric-xl": ["48px", {"lineHeight": "48px", "letterSpacing": "-0.04em", "fontWeight": "800"}]
-                    }
-                },
-            },
-        }
-    </script>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+  /* Center hex text */
+  .center-text{
+    font-size:34px;
+    font-weight:800;
+    line-height:1.25;
+    letter-spacing:1px;
+    color:#ffffff;
+    text-align:center;
+  }
+
+  /* Positions */
+  #hex-clients{ width:178px; height:200px; left:40px; top:163px; }
+  #hex-templates{ width:178px; height:200px; left:220px; top:268px; }
+  #hex-center{ width:265px; height:300px; left:443px; top:107px; }
+  #hex-active{ width:200px; height:225px; left:735px; top:33px; }
+  #hex-success{ width:200px; height:225px; left:925px; top:163px; }
+
+</style>
 </head>
-<body class="bg-background text-on-background min-h-screen pb-20">
-<!-- Top App Bar -->
-<header class="fixed top-0 w-full z-50 border-b border-outline-variant bg-background/80 backdrop-blur-md shadow-[0_0_15px_rgba(0,219,233,0.1)] flex justify-between items-center px-gutter h-16">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary" data-icon="terminal">terminal</span>
-<h1 class="font-headline-md text-headline-md-mobile text-primary tracking-tighter uppercase">CORE_OS_METRICS</h1>
-</div>
-<div class="flex items-center gap-4">
-<button class="active:opacity-80 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors duration-300" data-icon="settings_input_component">settings_input_component</span>
-</button>
-</div>
-</header>
-<!-- Main Content Canvas -->
-<main class="pt-24 px-6 relative flex flex-col items-center">
-<!-- Background Animation Overlay -->
-<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<body>
+<div class="stage" id="stage">
 
+  <!-- World map dotted background -->
+  <svg class="map-bg" viewBox="0 0 1153 514" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="dotPattern" width="9" height="9" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="1" fill="#1c3c5a"/>
+      </pattern>
+      <clipPath id="mapClip">
+        <!-- simplified world-continents silhouette built from blocky landmasses -->
+        <g id="continents"></g>
+      </clipPath>
+    </defs>
+    <!-- Blocky pixel-style world map made of small rects, mimicking the dotted-map look -->
+    <g fill="url(#dotPattern)" id="worldDots"></g>
+  </svg>
+
+  <!-- glow connecting lines between hexagons -->
+  <svg class="glow-streak" viewBox="0 0 1153 514" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="streakGradL" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3fd0ff" stop-opacity="0.15"/>
+        <stop offset="60%" stop-color="#7fe3ff" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#bff3ff" stop-opacity="1"/>
+      </linearGradient>
+      <linearGradient id="streakGradR" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#bff3ff" stop-opacity="1"/>
+        <stop offset="40%" stop-color="#7fe3ff" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#3fd0ff" stop-opacity="0.15"/>
+      </linearGradient>
+      <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="2.2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="wideGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5"/>
+      </filter>
+    </defs>
+
+    <!-- LEFT main horizontal line: Clients hex -> Center hex -->
+    <path d="M 218 258 L 443 258" stroke="url(#streakGradL)" stroke-width="2.5" fill="none" filter="url(#softGlow)"/>
+    <path d="M 218 258 L 443 258" stroke="#3fd0ff" stroke-width="6" fill="none" filter="url(#wideGlow)" opacity="0.35"/>
+
+    <!-- RIGHT main horizontal line: Center hex -> Active Users hex -->
+    <path d="M 708 215 L 925 215" stroke="url(#streakGradR)" stroke-width="2.5" fill="none" filter="url(#softGlow)"/>
+    <path d="M 708 215 L 925 215" stroke="#3fd0ff" stroke-width="6" fill="none" filter="url(#wideGlow)" opacity="0.35"/>
+
+    <!-- Curved swoosh: from below center hex, sweeping left under Templates, and continuing right under Active Users -->
+    <path d="M 175 290 C 260 320, 340 340, 400 330 C 470 318, 520 280, 565 250 C 610 220, 660 200, 700 195 C 760 188, 820 175, 880 150 C 920 132, 960 110, 990 95"
+          stroke="#3fd0ff" stroke-width="2" fill="none" filter="url(#softGlow)" opacity="0.85"/>
+    <path d="M 175 290 C 260 320, 340 340, 400 330 C 470 318, 520 280, 565 250 C 610 220, 660 200, 700 195 C 760 188, 820 175, 880 150 C 920 132, 960 110, 990 95"
+          stroke="#3fd0ff" stroke-width="7" fill="none" filter="url(#wideGlow)" opacity="0.3"/>
+
+    <!-- small particle dots along the swoosh for sparkle effect -->
+    <circle cx="300" cy="335" r="1.6" fill="#bff3ff"/>
+    <circle cx="340" cy="334" r="1.2" fill="#bff3ff" opacity="0.8"/>
+    <circle cx="600" cy="230" r="1.6" fill="#bff3ff"/>
+    <circle cx="640" cy="210" r="1.2" fill="#bff3ff" opacity="0.8"/>
+    <circle cx="850" cy="160" r="1.6" fill="#bff3ff"/>
+    <circle cx="260" cy="258" r="1.6" fill="#ffffff"/>
+    <circle cx="320" cy="258" r="1.2" fill="#ffffff" opacity="0.8"/>
+    <circle cx="780" cy="215" r="1.6" fill="#ffffff"/>
+    <circle cx="840" cy="215" r="1.2" fill="#ffffff" opacity="0.8"/>
+  </svg>
+
+  <div class="hex-wrap">
+
+    <!-- Clients -->
+    <div class="hex" id="hex-clients">
+      <svg viewBox="0 0 178 200" preserveAspectRatio="none">
+        <polygon points="89,2 176,50 176,150 89,198 2,150 2,50" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
+        <polygon points="89,14 165,56 165,144 89,186 13,144 13,56" fill="none" stroke="#1c5670" stroke-width="1"/>
+      </svg>
+      <div class="hex-content">
+        <div class="hex-label">Clients</div>
+        <div class="hex-number">500+</div>
+        <div class="hex-icon">
+          <svg width="34" height="22" viewBox="0 0 34 22" fill="none">
+            <path d="M2 11 L9 6 L15 11 L9 16 Z" fill="#ffffff" opacity="0.95"/>
+            <path d="M32 11 L25 6 L19 11 L25 16 Z" fill="#ffffff" opacity="0.95"/>
+            <rect x="13" y="9.5" width="8" height="3" rx="1.5" fill="#ffffff"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates -->
+    <div class="hex" id="hex-templates">
+      <svg viewBox="0 0 178 200" preserveAspectRatio="none">
+        <polygon points="89,2 176,50 176,150 89,198 2,150 2,50" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
+        <polygon points="89,14 165,56 165,144 89,186 13,144 13,56" fill="none" stroke="#1c5670" stroke-width="1"/>
+      </svg>
+      <div class="hex-content">
+        <div class="hex-label">Templates</div>
+        <div class="hex-number">30+</div>
+        <div class="hex-icon">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <rect x="5" y="2" width="14" height="18" rx="1.5" fill="none" stroke="#ffffff" stroke-width="1.6"/>
+            <line x1="8" y1="7" x2="16" y2="7" stroke="#ffffff" stroke-width="1.3"/>
+            <line x1="8" y1="10.5" x2="16" y2="10.5" stroke="#ffffff" stroke-width="1.3"/>
+            <line x1="8" y1="14" x2="13" y2="14" stroke="#ffffff" stroke-width="1.3"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Trusted Worldwide -->
+    <div class="hex" id="hex-center">
+      <svg viewBox="0 0 265 300" preserveAspectRatio="none">
+        <polygon points="132,3 262,75 262,225 132,297 2,225 2,75" fill="#07111f" stroke="#3fd0ff" stroke-width="3"/>
+        <polygon points="132,20 245,84 245,216 132,280 19,216 19,84" fill="none" stroke="#1c5670" stroke-width="1"/>
+      </svg>
+      <div class="hex-content">
+        <div class="center-text">TRUSTED<br>WORLDWIDE</div>
+      </div>
+    </div>
+
+    <!-- Active Users -->
+    <div class="hex" id="hex-active">
+      <svg viewBox="0 0 200 225" preserveAspectRatio="none">
+        <polygon points="100,2 197,57 197,168 100,223 3,168 3,57" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
+        <polygon points="100,15 184,63 184,162 100,210 16,162 16,63" fill="none" stroke="#1c5670" stroke-width="1"/>
+      </svg>
+      <div class="hex-content">
+        <div class="hex-label">Active Users</div>
+        <div class="hex-number">20.0K+</div>
+        <div class="hex-icon">
+          <svg width="30" height="22" viewBox="0 0 30 22" fill="none">
+            <circle cx="15" cy="6" r="4" fill="#ffffff"/>
+            <path d="M5 20 C5 14 10 12 15 12 C20 12 25 14 25 20 Z" fill="#ffffff"/>
+            <circle cx="4" cy="9" r="3" fill="#ffffff" opacity="0.85"/>
+            <path d="M-2 20 C-2 16 1 14 4 14 C5.5 14 6.8 14.5 7.7 15.4 C5.5 16.6 4.5 18 4.3 20 Z" fill="#ffffff" opacity="0.85"/>
+            <circle cx="26" cy="9" r="3" fill="#ffffff" opacity="0.85"/>
+            <path d="M32 20 C32 16 29 14 26 14 C24.5 14 23.2 14.5 22.3 15.4 C24.5 16.6 25.5 18 25.7 20 Z" fill="#ffffff" opacity="0.85"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Rate -->
+    <div class="hex" id="hex-success">
+      <svg viewBox="0 0 200 225" preserveAspectRatio="none">
+        <polygon points="100,2 197,57 197,168 100,223 3,168 3,57" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
+        <polygon points="100,15 184,63 184,162 100,210 16,162 16,63" fill="none" stroke="#1c5670" stroke-width="1"/>
+      </svg>
+      <div class="hex-content">
+        <div class="hex-label">Success Rate</div>
+        <div class="hex-number">99%</div>
+        <div class="hex-icon">
+          <svg width="28" height="22" viewBox="0 0 28 22" fill="none">
+            <polyline points="1,20 9,11 14,15 26,2" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="18,2 26,2 26,10" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-<!-- Central Hub: TRUSTED WORLDWIDE -->
-<section class="relative z-10 w-full flex justify-center mb-16">
-<div class="hex-border w-56 h-56 flex items-center justify-center drop-shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-<div class="hex-container w-full h-full flex flex-col items-center justify-center p-6 text-center">
-<div class="circuit-node top-0 left-1/2 -translate-x-1/2 mt-2"></div>
-<span class="font-label-sm text-label-sm text-primary mb-2 opacity-60">SYSTEM_CORE</span>
-<h2 class="font-headline-md text-headline-md text-on-background leading-tight">TRUSTED WORLDWIDE</h2>
-<div class="status-pulse w-2 h-2 rounded-full bg-primary mt-4"></div>
-</div>
-</div>
-<!-- Vertical Circuit Lines to next metrics -->
-<div class="circuit-line w-px h-16 absolute bottom-[-64px] left-1/2 -translate-x-1/2"></div>
-<div class="circuit-node absolute bottom-[-64px] left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-</section>
-<!-- Metrics Grid (Vertical Stack/2x2 hybrid for mobile) -->
-<section class="relative z-10 w-full max-w-sm grid grid-cols-2 gap-x-4 gap-y-16 mt-8 pb-12">
-<!-- Metric 1: Clients -->
-<div class="flex flex-col items-center group">
-<div class="hex-border w-36 h-40">
-<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
-<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="hub">hub</span>
-<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">24</div>
-<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Clients</div>
-</div>
-</div>
-<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
-</div>
-<!-- Metric 2: Success Rate -->
-<div class="flex flex-col items-center group">
-<div class="hex-border w-36 h-40">
-<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
-<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="shield">shield</span>
-<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">99%</div>
-<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Uptime</div>
-</div>
-</div>
-<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
-</div>
-<!-- Metric 3: Active Users -->
-<div class="flex flex-col items-center group relative">
-<div class="hex-border w-36 h-40">
-<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
-<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="waves">waves</span>
-<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">12k</div>
-<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Users</div>
-</div>
-</div>
-<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
-</div>
-<!-- Metric 4: Templates -->
-<div class="flex flex-col items-center group relative">
-<div class="hex-border w-36 h-40">
-<div class="hex-container w-full h-full flex flex-col items-center justify-center p-4">
-<span class="material-symbols-outlined text-primary/40 text-xl mb-1" data-icon="account_tree">account_tree</span>
-<div class="font-metric-xl text-metric-xl text-primary drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]">150+</div>
-<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">Nodes</div>
-</div>
-</div>
-<div class="circuit-line w-px h-16 absolute -top-16 opacity-40"></div>
-</div>
-</section>
-<!-- Technical Detail Card -->
-<section class="relative z-10 w-full max-w-sm mt-8 mb-24 glass-card rounded-lg p-6 border-l-4 border-l-primary">
-<div class="flex justify-between items-center mb-4">
-<h3 class="font-label-sm text-label-sm text-primary uppercase tracking-tighter">Live Network Status</h3>
-<div class="flex items-center gap-2">
-<span class="font-label-sm text-[10px] text-primary/60">ENCRYPTED</span>
-<span class="material-symbols-outlined text-xs text-primary" data-icon="lock" data-weight="fill">lock</span>
-</div>
-</div>
-<div class="space-y-3">
-<div class="flex justify-between items-center text-[11px] font-label-sm">
-<span class="text-on-surface-variant">NODE_LATENCY:</span>
-<span class="text-primary">12ms</span>
-</div>
-<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-<div class="bg-primary h-full w-3/4 shadow-[0_0_8px_#00f0ff]"></div>
-</div>
-<div class="flex justify-between items-center text-[11px] font-label-sm">
-<span class="text-on-surface-variant">TRAFFIC_LOAD:</span>
-<span class="text-primary">42.8 GB/s</span>
-</div>
-<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-<div class="bg-primary h-full w-1/2 shadow-[0_0_8px_#00f0ff]"></div>
-</div>
-</div>
-</section>
-</main>
-<!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-background/90 dark:bg-background/90 border-t border-outline-variant backdrop-blur-xl z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
-<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
-</a>
-<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(0,219,233,0.6)] active:scale-110 duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="analytics" data-weight="fill">analytics</span>
-</a>
-<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="security">security</span>
-</a>
-<a class="flex flex-col items-center justify-center text-outline hover:text-primary-fixed-dim transition-all active:scale-110 duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
-</a>
-</nav>
-<!-- Interactive Micro-interaction Script -->
+
 <script>
-        document.querySelectorAll('.hex-border').forEach(hex => {
-            hex.addEventListener('touchstart', () => {
-                hex.style.filter = 'brightness(1.5) drop-shadow(0 0 15px rgba(0, 240, 255, 0.4))';
-            });
-            hex.addEventListener('touchend', () => {
-                setTimeout(() => {
-                    hex.style.filter = '';
-                }, 300);
-            });
-        });
+// Generate a blocky dotted world map silhouette using a coarse grid mask,
+// approximating continent shapes (simplified, stylized world map dots).
+(function(){
+  const svg = document.querySelector('.map-bg');
+  const group = document.getElementById('worldDots');
+  const cell = 9;
+  const cols = Math.ceil(1153/cell);
+  const rows = Math.ceil(514/cell);
 
-        // Simulating data updates
-        setInterval(() => {
-            const metrics = document.querySelectorAll('.text-metric-xl');
-            metrics.forEach(m => {
-                if (Math.random() > 0.8) {
-                    m.style.opacity = '0.7';
-                    setTimeout(() => m.style.opacity = '1', 100);
-                }
-            });
-        }, 2000);
-    </script>
-</body></html>
+  // Simplified coarse world map mask (1 = land) on a 64x28 grid, hand approximated.
+  const mask = [
+"0000111100000000000001111111000000000000000000000000000000000",
+"0001111110000000111111111111110000000000111111110000000000000",
+"0011111111000011111111111111111000000001111111111100000000000",
+"0111111111100111111111111111111100000111111111111111000000000",
+"0111111111111111111111111111111110001111111111111111100000000",
+"0011111111111111111111111111111111111111111111111111110000000",
+"0001111111110011111111111111111111111111111111111111111000000",
+"0000011111000001111111111111111111111111111111111111111100000",
+"0000001110000000111111111111111111111111111111111111111110000",
+"0000000000000001111111111111111111111111111111111111111111000",
+"0000000111000011111111111111111111111111111111111111111111100",
+"0000001111100011111111111111111111111111111111111111111111000",
+"0000011111110001111111111111111111111111111111111111111100000",
+"0000111111111001111111111111111111111111111111111111111000000",
+"0000111111111111111111111111111111111111111111111110000000000",
+"0000011111111111111111111111111111111111111111110000000000000",
+"0000001111111111111111111111111111111111111111000000000000000",
+"0000000111111111111111111111111111111111111100000000000000000",
+"0000000011111111111111111111111111111111110000000000000000000",
+"0000000001111111111111111111111111111111000000000000000000000",
+"0000000000111111111111111111111111111110000000000000000000000",
+"0000000000011111111111111111111111111100000000000000000000000",
+"0000000000001111111111111111111111110000000000000000000000000",
+"0000000000000111111111111111111111000000000000000000000000000",
+"0000000000000011111111111111111100000000000000000000000000000",
+"0000000000000001111111111111110000000000000000000000000000000",
+"0000000000000000111111111111000000000000000000000000000000000",
+"0000000000000000001111111100000000000000000000000000000000000"
+  ];
+
+  const gridCols = mask[0].length;
+  const gridRows = mask.length;
+  const scaleX = 1153/gridCols;
+  const scaleY = 514/gridRows;
+
+  let html = '';
+  for(let r=0;r<gridRows;r++){
+    for(let c=0;c<gridCols;c++){
+      if(mask[r][c]==='1'){
+        // randomly skip some for organic dotted texture
+        if(Math.random() < 0.18) continue;
+        const x = c*scaleX + (Math.random()*scaleX*0.4);
+        const y = r*scaleY + (Math.random()*scaleY*0.4);
+        const radius = 1.1 + Math.random()*0.6;
+        html += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(1)}" fill="#16456b" opacity="${(0.5+Math.random()*0.5).toFixed(2)}"/>`;
+      }
+    }
+  }
+  group.innerHTML = html;
+})();
+</script>
+
+</body>
+</html>

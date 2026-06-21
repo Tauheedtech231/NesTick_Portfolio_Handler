@@ -276,8 +276,7 @@ export default function HowItWorks() {
     ];
 
     // Calculate last card position - right edge with 0.1rem gap
-    // 0.1rem = approximately 1.6px (assuming 16px base font size)
-    const gapFromRight = 1.6; // 0.1rem in pixels
+    const gapFromRight = 1.6;
     const lastCardX = W - SW - gapFromRight;
 
     const stepPos: StepPos[] = [
@@ -285,7 +284,7 @@ export default function HowItWorks() {
       { x: W * 0.41,       y: H * 0.52 },
       { x: W * 0.65,       y: H * 0.04 },
       { x: W * 0.65,       y: H * 0.52 },
-      { x: lastCardX,      y: H * 0.27 }, // Dynamically positioned
+      { x: lastCardX,      y: H * 0.27 },
     ];
 
     // ── SVG layer ──────────────────────────────────────────────────────────
@@ -297,10 +296,10 @@ export default function HowItWorks() {
     // ── PSM Box ────────────────────────────────────────────────────────────
     const gpo = document.createElement("div");
     gpo.id = "hiw-gpo";
-    gpo.style.cssText = `position:absolute;left:${gpoX}px;top:${gpoY}px;width:${GPO_W}px;height:${GPO_H}px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;border:2px solid ${colors.gpoBorder};background:${colors.gpoBg};transition:border-color .4s,box-shadow .4s`;
+    gpo.style.cssText = `position:absolute;left:${gpoX}px;top:${gpoY}px;width:${GPO_W}px;height:${GPO_H}px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;border:2px solid ${colors.gpoBorder};background:${colors.gpoBg};transition:border-color .4s,box-shadow .4s;font-family:'Poppins',sans-serif`;
     gpo.innerHTML = `
-      <div style="font-size:22px;font-weight:800;color:${colors.gpoText};letter-spacing:1px">PSM</div>
-      <div style="font-size:10px;color:${theme === 'dark' ? 'rgba(232,202,94,0.5)' : 'rgba(0,102,255,0.5)'}">System</div>
+      <div style="font-size:22px;font-weight:800;color:${colors.gpoText};letter-spacing:1px;font-family:'Poppins',sans-serif">PSM</div>
+      <div style="font-size:10px;color:${theme === 'dark' ? 'rgba(232,202,94,0.5)' : 'rgba(0,102,255,0.5)'};font-family:'Calibri Light',sans-serif">System</div>
       <div id="hiw-gpo-ring" style="width:8px;height:8px;border-radius:50%;background:${colors.accent};margin-top:2px;opacity:0;transition:opacity .4s"></div>
     `;
     canvas.appendChild(gpo);
@@ -309,8 +308,8 @@ export default function HowItWorks() {
     COLLEGES.forEach((c, i) => {
       const d = document.createElement("div");
       d.id = "cn" + i;
-      d.style.cssText = `position:absolute;left:${colPos[i].x}px;top:${colPos[i].y}px;width:${COL_W}px;height:${COL_H}px;border-radius:10px;border:1px solid ${colors.collegeBorder};background:${colors.collegeBg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:border-color .3s,box-shadow .3s`;
-      d.innerHTML = `<span style="font-size:19px">🎓</span><span style="font-size:9px;color:${colors.collegeText};font-weight:600">${c}</span>`;
+      d.style.cssText = `position:absolute;left:${colPos[i].x}px;top:${colPos[i].y}px;width:${COL_W}px;height:${COL_H}px;border-radius:10px;border:1px solid ${colors.collegeBorder};background:${colors.collegeBg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:border-color .3s,box-shadow .3s;font-family:'Poppins',sans-serif`;
+      d.innerHTML = `<span style="font-size:19px">🎓</span><span style="font-size:9px;color:${colors.collegeText};font-weight:600;font-family:'Poppins',sans-serif">${c}</span>`;
       canvas.appendChild(d);
     });
 
@@ -319,23 +318,23 @@ export default function HowItWorks() {
       const d = document.createElement("div");
       d.id = "sc" + i;
       
-      d.style.cssText = `position:absolute;left:${stepPos[i].x}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px)`;
+      d.style.cssText = `position:absolute;left:${stepPos[i].x}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px);font-family:'Poppins',sans-serif`;
       
       const details = s.details
         .map(
           (dt, j) =>
-            `<div id="dl${i}_${j}" style="display:flex;align-items:center;gap:5px;margin-top:6px;opacity:0;transform:translateX(-4px);transition:opacity .3s,transform .3s;font-size:9px;color:${colors.textMuted};justify-content:center"><span style="width:5px;height:5px;border-radius:50%;background:${colors.accent};flex-shrink:0;display:inline-block"></span>${dt}</div>`
+            `<div id="dl${i}_${j}" style="display:flex;align-items:center;gap:5px;margin-top:6px;opacity:0;transform:translateX(-4px);transition:opacity .3s,transform .3s;font-size:9px;color:${colors.textMuted};justify-content:center;font-family:'Calibri Light',sans-serif"><span style="width:5px;height:5px;border-radius:50%;background:${colors.accent};flex-shrink:0;display:inline-block"></span>${dt}</div>`
         )
         .join("");
       
       const badgeHtml = s.tag ? `
-        <span id="tag${i}" style="display:inline-block;margin-top:8px;font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 10px;border-radius:20px;background:${colors.liveBg};color:${colors.liveColor};opacity:0;transition:opacity .4s">${s.tag}</span>
+        <span id="tag${i}" style="display:inline-block;margin-top:8px;font-size:8.5px;font-weight:700;letter-spacing:1px;padding:2px 10px;border-radius:20px;background:${colors.liveBg};color:${colors.liveColor};opacity:0;transition:opacity .4s;font-family:'Poppins',sans-serif">${s.tag}</span>
       ` : '';
       
       d.innerHTML = `
-        <div style="font-size:11px;font-weight:700;color:${colors.accent};letter-spacing:2px;margin-bottom:4px">${s.num}</div>
-        <div style="font-size:12px;font-weight:700;color:${colors.text};margin-bottom:6px;line-height:1.2">${s.ttl}</div>
-        <div id="dsc${i}" style="font-size:9.5px;color:${colors.textMuted};line-height:1.6;min-height:42px"></div>
+        <div style="font-size:11px;font-weight:700;color:${colors.accent};letter-spacing:2px;margin-bottom:4px;font-family:'Poppins',sans-serif">${s.num}</div>
+        <div style="font-size:12px;font-weight:700;color:${colors.text};margin-bottom:6px;line-height:1.2;font-family:'Poppins',sans-serif">${s.ttl}</div>
+        <div id="dsc${i}" style="font-size:9.5px;color:${colors.textMuted};line-height:1.6;min-height:42px;font-family:'Calibri Light',sans-serif"></div>
         ${details}
         ${badgeHtml}
       `;
@@ -496,12 +495,18 @@ export default function HowItWorks() {
         {/* Heading */}
         <div className="mb-7 text-center">
           <span className="text-[10px] font-bold uppercase tracking-[3px]"
-            style={{ color: colors.accent }}
+            style={{ 
+              color: colors.accent,
+              fontFamily: "'Poppins', sans-serif",
+            }}
           >
             System Overview
           </span>
           <h2 className={`mt-2 text-3xl font-extrabold`}
-            style={{ color: colors.text }}
+            style={{ 
+              color: colors.text,
+              fontFamily: "'Poppins', sans-serif",
+            }}
           >
             How It{" "}
             <span style={{ color: colors.accent }}>

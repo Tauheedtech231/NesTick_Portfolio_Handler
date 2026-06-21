@@ -120,6 +120,7 @@ export default function TestimonialSection() {
       className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
       style={{
         backgroundColor: colors.bg,
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
@@ -181,7 +182,10 @@ export default function TestimonialSection() {
           >
             <span 
               className="text-xs font-medium"
-              style={{ color: colors.accent }}
+              style={{ 
+                color: colors.accent,
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               💬 Testimonials
             </span>
@@ -189,7 +193,10 @@ export default function TestimonialSection() {
 
           <h2 
             className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 font-serif"
-            style={{ color: colors.text }}
+            style={{ 
+              color: colors.text,
+              fontFamily: "'Poppins', sans-serif",
+            }}
           >
             What Our Students <br /> Say About Us
           </h2>
@@ -211,7 +218,10 @@ export default function TestimonialSection() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="text-base md:text-lg leading-relaxed mb-4"
-              style={{ color: colors.textSecondary }}
+              style={{ 
+                color: colors.textSecondary,
+                fontFamily: "'Calibri Light', sans-serif",
+              }}
             >
               {currentTestimonial.text}
             </motion.p>
@@ -234,13 +244,19 @@ export default function TestimonialSection() {
             >
               <h4 
                 className="font-semibold text-base"
-                style={{ color: colors.text }}
+                style={{ 
+                  color: colors.text,
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 {currentTestimonial.name}
               </h4>
               <p 
                 className="text-sm"
-                style={{ color: colors.textMuted }}
+                style={{ 
+                  color: colors.textMuted,
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 {currentTestimonial.role}
               </p>

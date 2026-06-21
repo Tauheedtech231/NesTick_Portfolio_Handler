@@ -48,6 +48,7 @@ export default function FeaturedTemplates({
       className="py-8 md:py-10 lg:py-12"
       style={{
         backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       {/* No padding on left/right */}
@@ -57,10 +58,16 @@ export default function FeaturedTemplates({
             style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
           />
           <h2 className="text-2xl md:text-3xl font-bold font-serif">
-            <span style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+            <span style={{ 
+              color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+              fontFamily: "'Poppins', sans-serif",
+            }}>
               Featured
             </span>{' '}
-            <span style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}>
+            <span style={{ 
+              color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+              fontFamily: "'Poppins', sans-serif",
+            }}>
               Premium Templates
             </span>
           </h2>
@@ -92,12 +99,17 @@ export default function FeaturedTemplates({
                 }}
               >
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-xs font-medium opacity-50">0{index + 1}</span>
+                  <span className="text-xs font-medium opacity-50"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    0{index + 1}
+                  </span>
                   <span className="text-sm font-medium truncate"
                     style={{
                       color: index === currentIndex
                         ? (theme === 'dark' ? '#E8CA5E' : '#0066FF')
                         : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     {template.name}
@@ -138,30 +150,37 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                             color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           <Star className="w-2.5 h-2.5" />
                           Featured
                         </div>
                       </div>
-                      <div className="w-full h-full">
+                      <div className="w-full h-full relative">
                         <Image
                           src={currentTemplate.image}
                           alt={currentTemplate.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"  // Changed from object-cover
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>
                     </div>
                     <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center items-start">
                       <h3 className="text-xl font-bold mb-2"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {currentTemplate.name}
                       </h3>
                       <p className="text-sm mb-3 leading-relaxed line-clamp-3"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         {currentTemplate.description}
                       </p>
@@ -170,6 +189,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Premium
@@ -178,6 +198,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(0,224,255,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#00E0FF' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Responsive
@@ -186,6 +207,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(34,197,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#22C55E' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Customizable
@@ -197,6 +219,7 @@ export default function FeaturedTemplates({
                         style={{
                           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          fontFamily: "'Poppins', sans-serif",
                         }}
                       >
                         Buy Now
@@ -208,12 +231,18 @@ export default function FeaturedTemplates({
                   <>
                     <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center items-start">
                       <h3 className="text-xl font-bold mb-2"
-                        style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {currentTemplate.name}
                       </h3>
                       <p className="text-sm mb-3 leading-relaxed line-clamp-3"
-                        style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                        style={{ 
+                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
                       >
                         {currentTemplate.description}
                       </p>
@@ -222,6 +251,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Premium
@@ -230,6 +260,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(0,224,255,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#00E0FF' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Responsive
@@ -238,6 +269,7 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(34,197,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#22C55E' : '#0066FF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           Customizable
@@ -249,6 +281,7 @@ export default function FeaturedTemplates({
                         style={{
                           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          fontFamily: "'Poppins', sans-serif",
                         }}
                       >
                         Buy Now
@@ -260,18 +293,19 @@ export default function FeaturedTemplates({
                           style={{
                             backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                             color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
                           <Star className="w-2.5 h-2.5" />
                           Featured
                         </div>
                       </div>
-                      <div className="w-full h-full">
+                      <div className="w-full h-full relative">
                         <Image
                           src={currentTemplate.image}
                           alt={currentTemplate.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"  // Changed from object-cover
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>

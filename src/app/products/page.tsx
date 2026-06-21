@@ -14,23 +14,24 @@ interface ProductSection {
   features: string[];
   buttonText: string;
   buttonVariant: 'primary' | 'outline';
-  accentColor: 'primary' | 'tertiary' | 'secondary' | 'error';
+  accentColor: 'primary' | 'tertiary' | 'secondary' | 'error' | 'success';
   imagePosition: 'left' | 'right';
 }
 
+// Real Products with realistic data
 const PRODUCTS: ProductSection[] = [
   {
-    id: "erp",
-    title: "PSM ERP",
-    subtitle: "Enterprise Core",
-    description: "A high-fidelity, modern SaaS ERP designed specifically for school management. Streamline complex administrative workflows with data-driven precision.",
+    id: "psm",
+    title: "Portfolio Site Management System",
+    subtitle: "Web Presence",
+    description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
     features: [
-      "Comprehensive Administration",
-      "Real-time Data Visualization",
-      "Advanced Sidebar Navigation",
-      "Premium Light UI",
-      "Centralized Resource Management"
+      "School/College Website Management",
+      "Real-time Content Updates",
+      "Digital Presence & Branding",
+      "Event & News Management",
+      "Media Gallery Integration"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -38,17 +39,17 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'left'
   },
   {
-    id: "lms",
-    title: "Learning Management System",
-    subtitle: "Digital Classroom",
-    description: "A sleek, modern LMS that bridges the gap between students and educators. Minimalist design meets powerful course management and interactive video modules.",
+    id: "ptms",
+    title: "Parent Teacher Management System",
+    subtitle: "Communication Hub",
+    description: "Bridge the gap between parents and teachers with seamless communication tools. Track attendance, monitor student progress, and foster collaborative engagement for better educational outcomes.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8ct-6ljgpbedqVzynuMqUA-N4P9vSJI2efu6wQXuGRI5tr0BZsaHYIu-1t5xcNGgXzK9SRb-oLPjps7ujmA6mvTVypHZxbyiYOizYHscgjebW6pB1c-Dx7gZUb62aR5FEogFjAORYt5d-vs93KLq6Oces-uxfUp0btjgUH5gWhLceN_zI9qS3BZ3NSY5s4SQoO4quhsYt-y53Bn-6vomE9VxIw3KJOHIRPw0VNEKVL-nBcg7pHnKUl8FGsdsuqzZgaW6QffTBwW2i",
     features: [
-      "Course Progress Tracking",
-      "Video Player Interface",
-      "Interactive Student Panels",
-      "High-end SaaS Aesthetic",
-      "Collaborative Assignments"
+      "Parent-Teacher Communication",
+      "Real-time Attendance Tracking",
+      "Student Progress Monitoring",
+      "Performance Reports",
+      "Meeting Scheduling"
     ],
     buttonText: "Learn More",
     buttonVariant: 'outline',
@@ -56,17 +57,17 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'right'
   },
   {
-    id: "admissions",
+    id: "aas",
     title: "Admission Automation System",
-    subtitle: "Growth Engine",
-    description: "Optimize your applicant journey from inquiry to enrollment. Enterprise-grade pipeline tracking ensures no candidate is left behind.",
+    subtitle: "Enrollment Engine",
+    description: "Streamline the entire admission process from application to enrollment. Automate application management, track candidate progress, and maintain comprehensive student records with ease.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0v_By-ZD17MH3x8-8ebL9kXpvq1ucsRAUKYF02VcOLnxE2_Mkn2v_ZKKDuLz_3MJ4N2tGarmuHavVvC6E7br6gVrFeto4EioicbeNtViS60Vzg9e79ihuJORKC9Yw7ivnTQt3Oy87qWlgO6qrjIsYaSKqx_XOeeGtTbQYbW6BvZUiSiibPhvvg938pDhO9h2OqWgZiA6Jl9PD7amnw3BXR6vzuGhe_FWjrJuHQ-PJNG6RcMM8OFDDfPPlb_dgR4v687A_8EPcUpb5",
     features: [
-      "Applicant Pipeline CRM",
-      "Status Tracker Dashboard",
-      "Predictive Data Analytics",
-      "Automated Enrollment",
-      "Communication Automation"
+      "Online Admissions Management",
+      "Application Tracking System",
+      "Student Record Management",
+      "Document Verification",
+      "Automated Communication"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -74,17 +75,17 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'left'
   },
   {
-    id: "exams",
-    title: "Examination Management System",
-    subtitle: "Academic Excellence",
-    description: "A sophisticated ecosystem for managing assessments. From scheduling to automated grading, ensure complete transparency and accuracy in academic evaluations.",
+    id: "lms",
+    title: "Learning Management System",
+    subtitle: "Digital Classroom",
+    description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDCw2tL4WpL8lFescTP3sJeJ2IgCWjPgVNOH6ghlxsiEIZrGGsZhwwTiEveJUbQIpPRVuMKvVKoelYJm2Jw4ERjlq2bYBAG8_bMWghIqdNLyUSKAGQ2j2r99CAO6q2VWraE5KBI-Ffz69jyH61tgHPFxajV2bmM7iOlwYtKwJxPkCFv6CPPTD3h-v5ecZoXct2qZYbulD63Tl7TVPL9-U-9Yh6bTWQpIws395-Qcs0P6_6-HFGwuA3kCJEmiDq3hhIm9kdqUg3bRKjg",
     features: [
-      "Automated Grading Charts",
-      "Dynamic Exam Scheduling",
-      "Performance Metrics",
-      "Secure Question Banks",
-      "Detailed Result Analytics"
+      "Online Classes & Lectures",
+      "Course Management System",
+      "Assignments & Quizzes",
+      "Automated Grading",
+      "Student Progress Analytics"
     ],
     buttonText: "Learn More",
     buttonVariant: 'outline',
@@ -92,35 +93,35 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'right'
   },
   {
-    id: "sis",
-    title: "Student Information System",
-    subtitle: "Single Source of Truth",
-    description: "A detailed 360-degree view of every learner. Manage demographics, academic history, and behavioral records in a single, secure environment.",
+    id: "lrm",
+    title: "Learning Resource Management",
+    subtitle: "Knowledge Hub",
+    description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content with students and faculty.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1NzzttGVTvPn_9eDP-JQt7blKhxBt3pP4800OJooC3M8YUCl_D82H5Wb-raXAHvysQfiDLsvKlB3A5xSs9B0Idi0oFQJZKHPMKgLmjNtBhMb6bTX8M7dJhwijiYvyUa4BYP-sGoRcRKzkJfRYJzzveXRYOu3-CikfxSlRvT8xU5_Z5diz6KrutY7y-nZVKl4ICm8vXH1GcoeQyQWWp_1e_iysVx4TJQtz_HN3Dw4lUKO4kMs13Y8y_sC9rE0r6IYIwxd9VceuS3yb",
     features: [
-      "Detailed Profile Views",
-      "Attendance Monitoring",
-      "Demographic Tracking",
-      "Academic History Archives",
-      "Behavior Logs"
+      "Digital Library Management",
+      "Content Storage & Sharing",
+      "Learning Material Organization",
+      "Resource Categorization",
+      "Faculty & Student Access"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
-    accentColor: 'primary',
+    accentColor: 'success',
     imagePosition: 'left'
   },
   {
-    id: "fees",
-    title: "Fee Management System",
-    subtitle: "Financial Integrity",
-    description: "Modern financial operations for the modern institution. Securely handle billing cycles, payment status, and institutional reporting.",
+    id: "ai-exam",
+    title: "AI Exam Generator",
+    subtitle: "Intelligent Assessment",
+    description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels and export to PDF format.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCD95CfUWzepGxHgvl-vqBNZ4fIM8DtX6OIAxsm03exAi-qKzGFICBrwKiLGGwDlojGz8ntEeOX1dNc5UpkyMl9xIvC834cUfOUcCgFFWpBcbi3gIa1QWABWwVVqZD3GiP-0zRN8ejBUc0ba_m74NnHYtJIttbLr5qWtx85x66-5Yq-Q0AbpQyslbSnWVssuRm0_ck5k-v4ws9RXeTA3OVQGXe0wZkDDVZY5dT2u0pNy1osh2TiFeQlDmqzYC1bzshBV5BY77plzLap",
     features: [
-      "Automated Billing Cycles",
-      "Real-time Payment Status",
-      "Financial Reporting Modules",
-      "Multi-Gateway Integration",
-      "Secure Transaction Audit"
+      "AI-Based Paper Generation",
+      "Syllabus-Aligned Exams",
+      "PDF Paper Export",
+      "Multiple Difficulty Levels",
+      "Question Bank Management"
     ],
     buttonText: "Learn More",
     buttonVariant: 'outline',
@@ -165,8 +166,8 @@ export default function ProductShowcase() {
   // Intersection Observer for scroll reveal
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
+      threshold: 0.15,
+      rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -219,20 +220,22 @@ export default function ProductShowcase() {
 
   const getAccentColor = (color: string) => {
     const colors: Record<string, string> = {
-      primary: theme === 'dark' ? '#004ac6' : '#2563eb',
-      tertiary: theme === 'dark' ? '#943700' : '#bc4800',
-      secondary: theme === 'dark' ? '#505f76' : '#54647a',
-      error: theme === 'dark' ? '#ba1a1a' : '#dc2626',
+      primary: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+      tertiary: theme === 'dark' ? '#F59E0B' : '#D97706',
+      secondary: theme === 'dark' ? '#60A5FA' : '#3B82F6',
+      error: theme === 'dark' ? '#EF4444' : '#DC2626',
+      success: theme === 'dark' ? '#22C55E' : '#16A34A',
     };
     return colors[color] || colors.primary;
   };
 
   const getAccentLight = (color: string) => {
     const colors: Record<string, string> = {
-      primary: theme === 'dark' ? 'rgba(0, 74, 198, 0.1)' : 'rgba(37, 99, 235, 0.1)',
-      tertiary: theme === 'dark' ? 'rgba(148, 55, 0, 0.1)' : 'rgba(188, 72, 0, 0.1)',
-      secondary: theme === 'dark' ? 'rgba(80, 95, 118, 0.1)' : 'rgba(84, 100, 122, 0.1)',
-      error: theme === 'dark' ? 'rgba(186, 26, 26, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+      primary: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+      tertiary: theme === 'dark' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(217, 119, 6, 0.08)',
+      secondary: theme === 'dark' ? 'rgba(96, 165, 250, 0.15)' : 'rgba(59, 130, 246, 0.08)',
+      error: theme === 'dark' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(220, 38, 38, 0.08)',
+      success: theme === 'dark' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(22, 163, 74, 0.08)',
     };
     return colors[color] || colors.primary;
   };
@@ -286,10 +289,10 @@ export default function ProductShowcase() {
       {/* Navbar */}
       <Navbar />
 
-      {/* Main Content with top margin */}
-      <div className="w-full pt-20 md:pt-24 lg:pt-28" style={{ backgroundColor: getSectionBg() }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 sm:space-y-16 lg:space-y-20">
-          {/* Product Sections with Continuous Fade Animation */}
+      {/* Main Content */}
+      <div className="w-full" style={{ backgroundColor: getSectionBg(), fontFamily: "'Poppins', sans-serif" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Product Sections */}
           {PRODUCTS.map((product, index) => {
             const isLeft = product.imagePosition === 'left';
             const accentColor = getAccentColor(product.accentColor);
@@ -305,101 +308,123 @@ export default function ProductShowcase() {
                   }
                 }}
                 data-section-id={product.id}
-                className={`transition-all duration-700 ease-out ${
+                className="min-h-screen flex items-center"
+                style={{
+                  marginTop: '2.5rem',
+                  padding: '1.5rem 0',
+                }}
+              >
+                <div className={`w-full transition-all duration-700 ease-out ${
                   isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{
                   transitionDelay: `${index * 100}ms`,
-                }}
-              >
-                <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center`}>
-                  {/* Image with Continuous Fade Animation */}
-                  <div className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group`}>
-                    <div
-                      className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
-                      style={{
-                        backgroundColor: accentLight,
-                        opacity: 0.5,
-                      }}
-                    />
-                    <div
-                      className="relative rounded-3xl overflow-hidden border cursor-pointer transition-transform duration-300 hover:scale-[1.02] animate-fade-in-out"
-                      style={{
-                        borderColor: getBorderColor(),
-                        boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                        animationDelay: `${index * 0.5}s`,
-                      }}
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="w-full h-auto object-cover aspect-video"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Content with Continuous Fade Animation */}
-                  <div 
-                    className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 animate-fade-in-out`}
-                    style={{
-                      animationDelay: `${index * 0.5 + 0.3}s`,
-                    }}
-                  >
-                    <span
-                      className="text-[10px] font-semibold uppercase tracking-widest cursor-default"
-                      style={{ color: accentColor }}
-                    >
-                      {product.subtitle}
-                    </span>
-                    <h2
-                      className="text-xl sm:text-2xl md:text-3xl font-bold font-serif cursor-default"
-                      style={{ color: getTextColor() }}
-                    >
-                      {product.title}
-                    </h2>
-                    <p
-                      className="text-sm sm:text-base leading-relaxed max-w-xl cursor-default"
-                      style={{ color: getTextMuted() }}
-                    >
-                      {product.description}
-                    </p>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
-                      {product.features.map((feature, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-center gap-2 text-xs sm:text-sm cursor-default"
-                          style={{ color: getTextMuted() }}
-                        >
-                          <span
-                            className="material-symbols-outlined cursor-default flex-shrink-0"
-                            style={{
-                              fontSize: '18px',
-                              color: accentColor,
-                            }}
-                          >
-                            check_circle
-                          </span>
-                          <span className="break-words">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="pt-3">
-                      <button
-                        onClick={scrollToCTA}
-                        className={`px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto ${
-                          product.buttonVariant === 'primary'
-                            ? 'text-white shadow-lg'
-                            : 'border'
-                        }`}
+                }}>
+                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-center`}>
+                    {/* Image - Reduced width, increased height */}
+                    <div className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'}`} style={isLeft ? { paddingLeft: '0.3rem' } : undefined}>
+                      <div
+                        className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
                         style={{
-                          backgroundColor: product.buttonVariant === 'primary' ? accentColor : 'transparent',
-                          color: product.buttonVariant === 'primary' ? '#FFFFFF' : getTextColor(),
-                          borderColor: product.buttonVariant === 'outline' ? getBorderColor() : 'transparent',
+                          backgroundColor: accentLight,
+                          opacity: 0.5,
+                        }}
+                      />
+                      <div
+                        className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02]"
+                        style={{
+                          borderColor: getBorderColor(),
+                          boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                       >
-                        {product.buttonText}
-                      </button>
+                        <div className="w-full relative" style={{ paddingBottom: '85%' }}>
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content - Wider, more space */}
+                    <div 
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-4 md:space-y-5 pl-0 lg:pl-4`}
+                      style={isLeft ? { paddingRight: '0.3rem' } : { paddingLeft: '0.3rem' }}
+                    >
+                      <span
+                        className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
+                        style={{ 
+                          color: accentColor,
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
+                      >
+                        {product.subtitle}
+                      </span>
+                      
+                      <h2
+                        className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif cursor-default leading-tight"
+                        style={{ 
+                          color: getTextColor(),
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
+                      >
+                        {product.title}
+                      </h2>
+                      
+                      <p
+                        className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default" 
+                        style={{ 
+                          color: getTextMuted(),
+                          fontFamily: "'Calibri Light', sans-serif",
+                        }}
+                      >
+                        {product.description}
+                      </p>
+                      
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        {product.features.map((feature, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-center gap-2 text-xs sm:text-sm cursor-default"
+                            style={{ 
+                              color: getTextMuted(),
+                              fontFamily: "'Calibri Light', sans-serif",
+                            }}
+                          >
+                            <span
+                              className="material-symbols-outlined cursor-default flex-shrink-0"
+                              style={{
+                                fontSize: '18px',
+                                color: accentColor,
+                              }}
+                            >
+                              check_circle
+                            </span>
+                            <span className="break-words">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <div className="pt-3">
+                        <button
+                          onClick={scrollToCTA}
+                          className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto ${
+                            product.buttonVariant === 'primary'
+                              ? 'text-white shadow-lg'
+                              : 'border'
+                          }`}
+                          style={{
+                            backgroundColor: product.buttonVariant === 'primary' ? accentColor : 'transparent',
+                            color: product.buttonVariant === 'primary' ? '#FFFFFF' : getTextColor(),
+                            borderColor: product.buttonVariant === 'outline' ? getBorderColor() : 'transparent',
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          {product.buttonText}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -407,24 +432,25 @@ export default function ProductShowcase() {
             );
           })}
 
-          {/* NEEZAMIYA - Large, centered at bottom */}
+          {/* NEEZAMIYA */}
           <div
             ref={neezamiyaRef}
             className={`relative w-full flex items-center justify-center transition-all duration-1000 ease-out ${
               isNeezamiyaVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
             }`}
             style={{
-              minHeight: '30vh',
-              padding: '2rem 0',
+              minHeight: '40vh',
+              padding: '4rem 0 3rem 0',
             }}
           >
-            <div className="text-center px-4 animate-fade-in-out">
+            <div className="text-center px-4">
               <span
                 className="font-bold font-serif tracking-tight block cursor-default"
                 style={{
                   fontSize: 'clamp(3rem, 12vw, 10rem)',
                   lineHeight: 1,
                   letterSpacing: '-0.03em',
+                  fontFamily: "'Poppins', sans-serif",
                 }}
               >
                 {neezamiyaChars.map((char, index) => {
@@ -443,7 +469,10 @@ export default function ProductShowcase() {
               </span>
               <span
                 className="block mt-3 sm:mt-4 text-xs sm:text-sm font-light tracking-[0.2em] uppercase cursor-default"
-                style={{ color: getTextMuted() }}
+                style={{ 
+                  color: getTextMuted(),
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 Enterprise Solutions
               </span>
@@ -453,24 +482,30 @@ export default function ProductShowcase() {
           {/* Call to Action Section with Form */}
           <div
             ref={ctaRef}
-            className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700"
+            className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 min-h-[50vh] flex items-center mb-8"
             style={{
               backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
               borderColor: getBorderColor(),
               borderWidth: '1px',
             }}
           >
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto w-full">
               <div className="text-center mb-8 sm:mb-10 lg:mb-12">
                 <h2
                   className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif mb-3 cursor-default"
-                  style={{ color: getTextColor() }}
+                  style={{ 
+                    color: getTextColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Ready to Transform Your Institution?
                 </h2>
                 <p
                   className="text-sm sm:text-base max-w-2xl mx-auto cursor-default"
-                  style={{ color: getTextMuted() }}
+                  style={{ 
+                    color: getTextMuted(),
+                    fontFamily: "'Calibri Light', sans-serif",
+                  }}
                 >
                   Get a personalized demo and discover how NEEZAMIYA's enterprise solutions can revolutionize your educational institution.
                 </p>
@@ -482,7 +517,10 @@ export default function ProductShowcase() {
                     <label
                       htmlFor="name"
                       className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ color: getTextMuted() }}
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Full Name *
                     </label>
@@ -498,6 +536,7 @@ export default function ProductShowcase() {
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="John Doe"
                     />
@@ -506,7 +545,10 @@ export default function ProductShowcase() {
                     <label
                       htmlFor="email"
                       className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ color: getTextMuted() }}
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Email Address *
                     </label>
@@ -522,6 +564,7 @@ export default function ProductShowcase() {
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="john@institution.com"
                     />
@@ -533,7 +576,10 @@ export default function ProductShowcase() {
                     <label
                       htmlFor="phone"
                       className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ color: getTextMuted() }}
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Phone Number
                     </label>
@@ -548,6 +594,7 @@ export default function ProductShowcase() {
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                       placeholder="+1 234 567 8900"
                     />
@@ -556,7 +603,10 @@ export default function ProductShowcase() {
                     <label
                       htmlFor="interest"
                       className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ color: getTextMuted() }}
+                      style={{ 
+                        color: getTextMuted(),
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       Product of Interest
                     </label>
@@ -570,6 +620,7 @@ export default function ProductShowcase() {
                         backgroundColor: getInputBg(),
                         borderColor: getBorderColor(),
                         color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
                       <option value="">Select a product</option>
@@ -588,6 +639,7 @@ export default function ProductShowcase() {
                     className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 text-white shadow-lg cursor-pointer"
                     style={{
                       backgroundColor: getAccent(),
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}
@@ -595,7 +647,10 @@ export default function ProductShowcase() {
                   {formSubmitted && (
                     <p
                       className="mt-3 text-sm text-center"
-                      style={{ color: getAccent() }}
+                      style={{ 
+                        color: getAccent(),
+                        fontFamily: "'Calibri Light', sans-serif",
+                      }}
                     >
                       Thank you! We'll be in touch shortly.
                     </p>

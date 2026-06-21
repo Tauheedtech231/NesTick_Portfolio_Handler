@@ -179,7 +179,7 @@ export default function OtherSections({
   };
 
   return (
-    <>
+    <div style={{ fontFamily: "'Poppins', sans-serif" }}>
       {/* Features Section - Using separate component */}
       <FeaturesSection />
 
@@ -206,7 +206,10 @@ export default function OtherSections({
                   style={{ color: getAccentColor() }}
                 />
                 <span className="text-xs font-medium"
-                  style={{ color: getAccentColor() }}
+                  style={{ 
+                    color: getAccentColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Pricing Plans
                 </span>
@@ -214,19 +217,28 @@ export default function OtherSections({
               
               <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
                 <span className="relative inline-block"
-                  style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                  style={{ 
+                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Choose Your
                 </span>{' '}
                 <span className="inline-block"
-                  style={{ color: getAccentColor() }}
+                  style={{ 
+                    color: getAccentColor(),
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   Perfect Plan
                 </span>
               </h2>
               
               <p className="text-lg md:text-xl font-light"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                style={{ 
+                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 Flexible solutions tailored to fit your institution&apos;s needs and scale
               </p>
@@ -261,6 +273,7 @@ export default function OtherSections({
                         style={{
                           backgroundColor: getAccentColor(),
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          fontFamily: "'Poppins', sans-serif",
                         }}
                       >
                         <Star className="w-3 h-3" />
@@ -278,19 +291,28 @@ export default function OtherSections({
                       <Icon className="w-7 h-7" style={{ color: getAccentColor() }} />
                     </div>
                     <h3 className="text-2xl font-bold mb-2"
-                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       {pkg.name}
                     </h3>
                     <div className="mb-2">
                       <span className="text-3xl font-bold"
-                        style={{ color: getAccentColor() }}
+                        style={{ 
+                          color: getAccentColor(),
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
                         {pkg.price}
                       </span>
                     </div>
                     <p className="text-sm"
-                      style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        fontFamily: "'Calibri Light', sans-serif",
+                      }}
                     >
                       {pkg.description}
                     </p>
@@ -313,7 +335,10 @@ export default function OtherSections({
                             )}
                           </div>
                           <FeatureIcon className="w-3.5 h-3.5" style={{ color: feature.included ? getAccentColor() : '#6B7280' }} />
-                          <span style={{ color: feature.included ? (theme === 'dark' ? '#D1D5DB' : '#4B5563') : '#6B7280' }}>
+                          <span style={{ 
+                            color: feature.included ? (theme === 'dark' ? '#D1D5DB' : '#4B5563') : '#6B7280',
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}>
                             {feature.text}
                           </span>
                         </div>
@@ -327,6 +352,7 @@ export default function OtherSections({
                       style={{
                         backgroundColor: pkg.popular ? getAccentColor() : (theme === 'dark' ? 'rgba(255,255,255,0.08)' : '#F5F5F5'),
                         color: pkg.popular ? (theme === 'dark' ? '#1F4381' : '#FFFFFF') : (theme === 'dark' ? '#D1D5DB' : '#4B5563'),
+                        fontFamily: "'Poppins', sans-serif",
                       }}
                     >
                       {pkg.ctaText}
@@ -365,7 +391,10 @@ export default function OtherSections({
                 style={{ color: getAccentColor() }}
               />
               <span className="text-xs font-medium"
-                style={{ color: getAccentColor() }}
+                style={{ 
+                  color: getAccentColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Three-Tier Architecture
               </span>
@@ -373,19 +402,28 @@ export default function OtherSections({
             
             <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
               <span className="relative inline-block"
-                style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                style={{ 
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Streamlined
               </span>{' '}
               <span className="inline-block"
-                style={{ color: getAccentColor() }}
+                style={{ 
+                  color: getAccentColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}
               >
                 Portfolio Management
               </span>
             </h2>
             
             <p className="text-lg md:text-xl max-w-4xl mx-auto font-light"
-              style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+              style={{ 
+                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                fontFamily: "'Calibri Light', sans-serif",
+              }}
             >
               The College Portfolio Handler System centralizes digital portfolios for educational institutions, 
               providing a comprehensive platform to create, manage, and showcase student achievements professionally 
@@ -410,15 +448,24 @@ export default function OtherSections({
           <div className="mt-12 md:mt-16">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif">
-                <span style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}>
+                <span style={{ 
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  fontFamily: "'Poppins', sans-serif",
+                }}>
                   Three-Tier
                 </span>{' '}
-                <span style={{ color: getAccentColor() }}>
+                <span style={{ 
+                  color: getAccentColor(),
+                  fontFamily: "'Poppins', sans-serif",
+                }}>
                   Portal Architecture
                 </span>
               </h3>
               <p className="max-w-3xl mx-auto font-light"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                style={{ 
+                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                  fontFamily: "'Calibri Light', sans-serif",
+                }}
               >
                 Our system is built on a robust multi-portal architecture designed for maximum efficiency and security
               </p>
@@ -444,19 +491,28 @@ export default function OtherSections({
                       <Icon className="w-6 h-6" style={{ color: getAccentColor() }} />
                     </div>
                     <h4 className="text-xl font-bold mb-3"
-                      style={{ color: theme === 'dark' ? '#FFFFFF' : '#1F2937' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
                     >
                       {portal.title}
                     </h4>
                     <p className="mb-4 text-sm"
-                      style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                      style={{ 
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        fontFamily: "'Calibri Light', sans-serif",
+                      }}
                     >
                       {portal.description}
                     </p>
                     <div className="space-y-2">
                       {portal.features.map((feature, idx) => (
                         <div key={idx} className="flex items-center text-sm"
-                          style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                          style={{ 
+                            color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 mr-2 flex-shrink-0"
                             style={{ color: getAccentColor() }}
@@ -472,6 +528,6 @@ export default function OtherSections({
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
