@@ -8,7 +8,7 @@ import {
   CheckCircle, Star, ArrowLeft, 
   Sparkles, Calendar, 
   Monitor, Smartphone, Tablet, Globe,
-  Award, Code, ChevronDown, Home
+  Award, Code, ChevronDown
 } from 'lucide-react';
 import { MdArrowRight } from 'react-icons/md';
 import Image from 'next/image';
@@ -176,46 +176,21 @@ export default function TemplateDetailsPage({ params }: { params: { id: string }
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Two Back Buttons */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            {/* Back to Home */}
-            <Link href="/">
-              <motion.button
-                whileHover={{ x: -4 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-2 text-sm font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                style={{
-                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-                  cursor: 'pointer',
-                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-                  border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                }}
-              >
-                <Home className="w-4 h-4" />
-                Back to Home
-              </motion.button>
-            </Link>
-
-            {/* Back to Templates */}
-            <Link href="/templates">
-              <motion.button
-                whileHover={{ x: -4 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-2 text-sm font-medium transition-colors duration-200 px-3 py-2 rounded-lg"
-                style={{
-                  color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                  cursor: 'pointer',
-                  backgroundColor: theme === 'dark' ? 'rgba(232,202,94,0.1)' : 'rgba(0,102,255,0.06)',
-                  border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,102,255,0.15)',
-                }}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Templates
-              </motion.button>
-            </Link>
-          </div>
+          {/* Back Button */}
+          <Link href="/">
+            <motion.button
+              whileHover={{ x: -4 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-2 text-sm font-medium mb-6 transition-colors duration-200"
+              style={{
+                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                cursor: 'pointer',
+              }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </motion.button>
+          </Link>
 
           {/* Main Content - NO CARDS */}
           <motion.div
@@ -535,4 +510,4 @@ export default function TemplateDetailsPage({ params }: { params: { id: string }
       <Footer />
     </div>
   );
-}
+} 
