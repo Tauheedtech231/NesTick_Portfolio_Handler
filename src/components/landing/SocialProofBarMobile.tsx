@@ -1,470 +1,470 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
+import React, { useEffect, useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
-export default function SocialProofBarMobile() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [counts, setCounts] = useState({
-    clients: 0,
-    templates: 0,
-    activeUsers: 0,
-    successRate: 0,
-  });
-  const [hasAnimated, setHasAnimated] = useState(false);
-  
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-    rootMargin: "-50px 0px",
-  });
+/**
+ * SocialProofBarMobile
+ * Mobile responsive hexagon stat cluster — "Trusted Worldwide"
+ * Built with Next.js + TypeScript + Tailwind CSS
+ */
+
+interface HexStatProps {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+  theme?: 'light' | 'dark';
+  delay?: number;
+  onClick?: () => void;
+}
+
+interface HexStatData {
+  label: string;
+  value: string;
+  iconType: 'handshake' | 'users' | 'templates' | 'success';
+  delay: number;
+}
+
+// Icons
+const HandshakeIcon = ({ color = '#ffffff' }: { color?: string }) => (
+  <svg width="26" height="18" viewBox="0 0 34 22" fill="none">
+    <path d="M2 11 L9 6 L15 11 L9 16 Z" fill={color} />
+    <path d="M32 11 L25 6 L19 11 L25 16 Z" fill={color} />
+    <rect x="13" y="9.5" width="8" height="3" rx="1.5" fill={color} />
+  </svg>
+);
+
+const UsersIcon = ({ color = '#ffffff' }: { color?: string }) => (
+  <svg width="26" height="18" viewBox="0 0 30 22" fill="none">
+    <circle cx="15" cy="6" r="4" fill={color} />
+    <path d="M5 20 C5 14 10 12 15 12 C20 12 25 14 25 20 Z" fill={color} />
+    <circle cx="4" cy="9" r="3" fill={color} opacity="0.8" />
+    <circle cx="26" cy="9" r="3" fill={color} opacity="0.8" />
+  </svg>
+);
+
+const TemplatesIcon = ({ color = '#ffffff' }: { color?: string }) => (
+  <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+    <rect x="5" y="2" width="14" height="18" rx="1.5" fill="none" stroke={color} strokeWidth="1.6" />
+    <line x1="8" y1="7" x2="16" y2="7" stroke={color} strokeWidth="1.3" />
+    <line x1="8" y1="10.5" x2="16" y2="10.5" stroke={color} strokeWidth="1.3" />
+    <line x1="8" y1="14" x2="13" y2="14" stroke={color} strokeWidth="1.3" />
+  </svg>
+);
+
+const SuccessIcon = ({ color = '#ffffff' }: { color?: string }) => (
+  <svg width="22" height="18" viewBox="0 0 28 22" fill="none">
+    <polyline points="1,20 9,11 14,15 26,2" stroke={color} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <polyline points="18,2 26,2 26,10" stroke={color} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const getIcon = (type: string, color: string) => {
+  switch(type) {
+    case 'handshake': return <HandshakeIcon color={color} />;
+    case 'users': return <UsersIcon color={color} />;
+    case 'templates': return <TemplatesIcon color={color} />;
+    case 'success': return <SuccessIcon color={color} />;
+    default: return null;
+  }
+};
+
+// Counter Component
+const Counter = ({ 
+  target, 
+  suffix, 
+  theme,
+  isInView 
+}: { 
+  target: number; 
+  suffix: string; 
+  theme: 'light' | 'dark';
+  isInView: boolean;
+}) => {
+  const [count, setCount] = useState(0);
+  const color = theme === 'dark' ? '#FFFFFF' : '#1F2937';
 
   useEffect(() => {
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
+    if (!isInView) return;
+
+    let startTime: number;
+    const duration = 1200;
+    let animationFrame: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(target * eased));
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
     };
 
-    checkTheme();
+    animationFrame = requestAnimationFrame(animate);
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
+  }, [isInView, target]);
 
+  const displayValue = count === 0 ? '0' : count + suffix;
+
+  return (
+    <span 
+      className="text-[20px] font-extrabold tracking-wide"
+      style={{ color, fontFamily: "'Poppins', sans-serif" }}
+    >
+      {isInView ? displayValue : '0'}
+    </span>
+  );
+};
+
+// Individual Hexagon Component
+const HexStat = ({ label, value, icon, theme = 'dark', delay = 0, onClick }: HexStatProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
+
+  const getColors = () => {
+    if (theme === 'dark') {
+      return {
+        stroke: '#3fd0ff',
+        innerStroke: '#1c5670',
+        fill: '#07111f',
+        labelColor: '#E5E7EB',
+        valueColor: '#FFFFFF',
+      };
+    } else {
+      return {
+        stroke: '#0066FF',
+        innerStroke: '#60A5FA',
+        fill: '#F8FAFC',
+        labelColor: '#4B5563',
+        valueColor: '#1F2937',
+      };
+    }
+  };
+
+  const colors = getColors();
+
+  // Parse value for counter
+  const parseValue = (val: string) => {
+    const match = val.match(/^([\d.]+)([+\s%]*)?/);
+    if (!match) return { number: 0, suffix: '' };
+    return {
+      number: parseFloat(match[1]),
+      suffix: val.replace(match[1], '')
+    };
+  };
+
+  const { number, suffix } = parseValue(value);
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative flex items-center justify-center cursor-pointer"
+      style={{ 
+        width: '140px', 
+        height: '158px',
+        fontFamily: "'Poppins', sans-serif"
+      }}
+      initial={{ opacity: 0, x: -50, scale: 0.8 }}
+      animate={isInView ? { opacity: 1, x: 0, scale: 1 } : { opacity: 0, x: -50, scale: 0.8 }}
+      transition={{ 
+        duration: 0.7, 
+        delay: delay, 
+        ease: [0.22, 1, 0.36, 1] 
+      }}
+      whileHover={{ 
+        scale: 1.08,
+        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+      }}
+      onClick={onClick}
+    >
+      <svg
+        width="140"
+        height="158"
+        viewBox="0 0 140 158"
+        className="absolute inset-0 h-full w-full"
+      >
+        <polygon
+          points="70,2 137,41.5 137,116.5 70,156 3,116.5 3,41.5"
+          fill={colors.fill}
+          stroke={colors.stroke}
+          strokeWidth="2"
+        />
+        <polygon
+          points="70,12 128,47.5 128,110.5 70,146 12,110.5 12,47.5"
+          fill="none"
+          stroke={colors.innerStroke}
+          strokeWidth="1"
+        />
+      </svg>
+
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none">
+        <span className="text-[10px] font-normal" style={{ 
+          color: colors.labelColor,
+          fontFamily: "'Poppins', sans-serif",
+          letterSpacing: '0.3px',
+        }}>
+          {label}
+        </span>
+        <Counter 
+          target={number} 
+          suffix={suffix} 
+          theme={theme}
+          isInView={isInView}
+        />
+        <div className="mt-0.5 flex items-center justify-center">
+          {icon}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Center Hexagon
+const CenterHex = ({ theme = 'dark', onClick }: { theme?: 'light' | 'dark'; onClick?: () => void }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
+
+  const getColors = () => {
+    if (theme === 'dark') {
+      return {
+        stroke: '#3fd0ff',
+        innerStroke: '#1c5670',
+        fill: '#07111f',
+        textColor: '#FFFFFF',
+      };
+    } else {
+      return {
+        stroke: '#0066FF',
+        innerStroke: '#60A5FA',
+        fill: '#F8FAFC',
+        textColor: '#1F2937',
+      };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative flex items-center justify-center cursor-pointer"
+      style={{ 
+        width: '170px', 
+        height: '195px',
+        fontFamily: "'Poppins', sans-serif",
+        zIndex: 2,
+      }}
+      initial={{ opacity: 0, scale: 0.5, y: 50 }}
+      animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.5, y: 50 }}
+      transition={{ 
+        duration: 0.9, 
+        delay: 0.4, 
+        ease: [0.22, 1, 0.36, 1] 
+      }}
+      whileHover={{ 
+        scale: 1.08,
+        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+      }}
+      onClick={onClick}
+    >
+      <svg
+        width="170"
+        height="195"
+        viewBox="0 0 170 195"
+        className="absolute inset-0 h-full w-full"
+      >
+        <polygon
+          points="85,3 167,51.75 167,143.25 85,192 3,143.25 3,51.75"
+          fill={colors.fill}
+          stroke={colors.stroke}
+          strokeWidth="2.5"
+        />
+        <polygon
+          points="85,14 158,58.5 158,136.5 85,182 12,136.5 12,58.5"
+          fill="none"
+          stroke={colors.innerStroke}
+          strokeWidth="1"
+        />
+      </svg>
+
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none">
+        <span className="text-[18px] font-extrabold leading-tight tracking-wider" style={{ 
+          color: colors.textColor,
+          fontFamily: "'Poppins', sans-serif",
+        }}>
+          TRUSTED
+          <br />
+          WORLDWIDE
+        </span>
+      </div>
+    </motion.div>
+  );
+};
+
+// World Map Dots Component (Background)
+const WorldMapDots = ({ theme = 'dark' }: { theme?: 'light' | 'dark' }) => {
+  const dotColor = theme === 'dark' ? '#16456b' : '#93C5FD';
+  const W = 400, H = 600;
+  const mask = [
+    "01111100011111111100",
+    "11111111111111111111",
+    "11111111111111111111",
+    "01111111111111111110",
+    "00111111111111111100",
+    "00011111111111111000",
+    "00001111111111110000",
+    "00000111111111100000",
+    "00000011111111000000",
+    "00000001111110000000",
+  ];
+
+  const dots: { x: number; y: number; r: number; o: number }[] = [];
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
+  for (let row = 0; row < mask.length; row++) {
+    for (let col = 0; col < mask[row].length; col++) {
+      if (mask[row][col] === '1' && rand() > 0.3) {
+        const x = (col / mask[0].length) * W + rand() * 15;
+        const y = (row / mask.length) * H + rand() * 40;
+        dots.push({ 
+          x, 
+          y, 
+          r: 1.2, 
+          o: 0.4 + rand() * 0.5 
+        });
+      }
+    }
+  }
+
+  return (
+    <svg
+      viewBox="0 0 400 600"
+      className="absolute inset-0 w-full h-full opacity-30 pointer-events-none"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      {dots.map((d, i) => (
+        <circle
+          key={i}
+          cx={d.x.toFixed(1)}
+          cy={d.y.toFixed(1)}
+          r={d.r.toFixed(1)}
+          fill={dotColor}
+          opacity={d.o.toFixed(2)}
+        />
+      ))}
+    </svg>
+  );
+};
+
+// Main Component
+export default function SocialProofBarMobile() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Detect theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
+        if (mutation.attributeName === 'class') {
           checkTheme();
         }
       });
     });
-
+    
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
 
-  // Counter animation
-  useEffect(() => {
-    if (inView && !hasAnimated) {
-      setHasAnimated(true);
-      
-      const targets = {
-        clients: 500,
-        templates: 30,
-        activeUsers: 20000,
-        successRate: 99,
-      };
-      
-      const duration = 2000;
-      const steps = 60;
-      const increments = {
-        clients: targets.clients / steps,
-        templates: targets.templates / steps,
-        activeUsers: targets.activeUsers / steps,
-        successRate: targets.successRate / steps,
-      };
-      
-      const currentCounts = {
-        clients: 0,
-        templates: 0,
-        activeUsers: 0,
-        successRate: 0,
-      };
-      
-      let step = 0;
-      
-      const timer = setInterval(() => {
-        step++;
-        
-        currentCounts.clients += increments.clients;
-        currentCounts.templates += increments.templates;
-        currentCounts.activeUsers += increments.activeUsers;
-        currentCounts.successRate += increments.successRate;
-        
-        if (step >= steps) {
-          currentCounts.clients = targets.clients;
-          currentCounts.templates = targets.templates;
-          currentCounts.activeUsers = targets.activeUsers;
-          currentCounts.successRate = targets.successRate;
-          clearInterval(timer);
-        }
-        
-        setCounts({
-          clients: Math.floor(currentCounts.clients),
-          templates: Math.floor(currentCounts.templates),
-          activeUsers: Math.floor(currentCounts.activeUsers),
-          successRate: Math.floor(currentCounts.successRate),
-        });
-      }, duration / steps);
-    }
-  }, [inView, hasAnimated]);
-
-  // Theme-based colors
-  const bgColor = theme === "dark" ? "#050a14" : "#F3F4F6";
-  const cardBg = theme === "dark" ? "rgba(10, 25, 47, 0.8)" : "rgba(243, 244, 246, 0.9)";
-  const textColor = theme === "dark" ? "#FFFFFF" : "#1F2937";
-  const textGray = theme === "dark" ? "#9CA3AF" : "#6B7280";
-  const neonBlue = "#4cc9f0";
-  const yellowColor = "#E8CA5E";
-
-  // Format values
-  const formatValue = (value: number, type: string) => {
-    if (type === 'activeUsers') {
-      return (value / 1000).toFixed(1) + 'K+';
-    }
-    return value + '+';
+  // Handle click events
+  const handleHexClick = (label: string) => {
+    console.log(`Clicked on ${label}`);
+    // Add your custom logic here
   };
 
+  // Stats data
+  const stats: HexStatData[] = [
+    { label: 'Clients', value: '500+', iconType: 'handshake', delay: 0 },
+    { label: 'Active Users', value: '20.0K+', iconType: 'users', delay: 0.35 },
+    { label: 'Templates', value: '30+', iconType: 'templates', delay: 0.7 },
+    { label: 'Success Rate', value: '99%', iconType: 'success', delay: 1.05 },
+  ];
+
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFC';
+  const iconColor = theme === 'dark' ? '#ffffff' : '#1F2937';
+
+  // Mobile layout: 2 rows with 2 items each, center in middle
+  const topRow = stats.slice(0, 2);
+  const bottomRow = stats.slice(2, 4);
+
   return (
-    <div className="block md:hidden">
-      <section
-        ref={ref}
-        className="relative w-full min-h-screen flex items-center justify-center p-4 overflow-hidden"
-        style={{
-          backgroundColor: bgColor,
-        }}
-      >
-        {/* Background Dots Pattern */}
-        <div 
-          className="absolute inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)`,
-            backgroundSize: '20px 20px',
-          }}
+    <div 
+      ref={containerRef}
+      className="relative w-full overflow-hidden"
+      style={{ 
+        backgroundColor: getBgColor(),
+        fontFamily: "'Poppins', sans-serif",
+        minHeight: '600px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px 0',
+      }}
+    >
+      {/* Background World Map Dots - No lines */}
+      <WorldMapDots theme={theme} />
+      
+      <div className="relative w-full max-w-[420px] flex flex-col items-center gap-0 z-[2]">
+        {/* Top Row - Slide from left */}
+        <div className="flex justify-center items-center gap-2 mb-[-18px]">
+          {topRow.map((stat, index) => (
+            <HexStat
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              icon={getIcon(stat.iconType, iconColor)}
+              theme={theme}
+              delay={stat.delay}
+              onClick={() => handleHexClick(stat.label)}
+            />
+          ))}
+        </div>
+
+        {/* Center Hex - Scale up from center */}
+        <CenterHex 
+          theme={theme}
+          onClick={() => handleHexClick('Trusted Worldwide')}
         />
 
-        {/* Connection Lines SVG */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <svg className="w-full h-full opacity-40" viewBox="0 0 400 800" fill="none">
-            <defs>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={neonBlue} stopOpacity="0" />
-                <stop offset="50%" stopColor={neonBlue} stopOpacity="1" />
-                <stop offset="100%" stopColor={neonBlue} stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            {/* Path from Central to Clients (Top Left) */}
-            <path d="M 200 150 Q 100 150 100 350" stroke="url(#lineGradient)" strokeWidth="2" filter="url(#glow)" />
-            {/* Path from Central to Active Users (Top Right) */}
-            <path d="M 200 150 Q 300 150 300 400" stroke="url(#lineGradient)" strokeWidth="2" filter="url(#glow)" />
-            {/* Path from Central to Templates (Bottom Left) */}
-            <path d="M 200 150 Q 100 250 100 550" stroke="url(#lineGradient)" strokeWidth="2" filter="url(#glow)" />
-            {/* Path from Central to Success Rate (Bottom Right) */}
-            <path d="M 200 150 Q 300 250 300 600" stroke="url(#lineGradient)" strokeWidth="2" filter="url(#glow)" />
-          </svg>
+        {/* Bottom Row - Slide from right */}
+        <div className="flex justify-center items-center gap-2 mt-[-18px]">
+          {bottomRow.map((stat, index) => (
+            <HexStat
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              icon={getIcon(stat.iconType, iconColor)}
+              theme={theme}
+              delay={stat.delay + 0.3}
+              onClick={() => handleHexClick(stat.label)}
+            />
+          ))}
         </div>
-
-        {/* Main Content */}
-        <div className="relative z-10 w-full max-w-md mx-auto py-12 flex flex-col items-center">
-          {/* Central Heading Section */}
-          <div 
-            className="mb-12 relative"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(150px)",
-              transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-              transitionDelay: "200ms",
-            }}
-          >
-            {/* Decorative light streak */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-1 bg-gradient-to-r from-transparent via-[#4cc9f0]/40 to-transparent blur-md" />
-            
-            <div
-              className="relative"
-              style={{
-                clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                background: "linear-gradient(135deg, #1e3a5f 0%, #4cc9f0 100%)",
-                padding: "2px",
-                boxShadow: "0 0 30px rgba(76, 201, 240, 0.15)",
-              }}
-            >
-              <div
-                className="px-10 py-16 flex items-center justify-center text-center"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  backgroundColor: theme === "dark" ? "#050a14" : "#F9FAFB",
-                }}
-              >
-                <h1 
-                  className="text-2xl font-black tracking-widest uppercase leading-tight"
-                  style={{ color: textColor }}
-                >
-                  <span style={{ color: yellowColor }}>Trusted</span>
-                  <br />
-                  Worldwide
-                </h1>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Grid */}
-          <div 
-            className="grid grid-cols-2 gap-4 w-full px-2"
-            style={{
-              opacity: inView ? 1 : 0,
-              transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-              transitionDelay: "400ms",
-            }}
-          >
-            {/* STAT: Clients */}
-            <div 
-              className="flex flex-col items-center"
-              style={{
-                transform: inView ? "translateX(0)" : "translateX(-80px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "500ms",
-              }}
-            >
-              <div
-                className="w-36 h-40"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: "linear-gradient(135deg, #1e3a5f 0%, #4cc9f0 100%)",
-                  padding: "2px",
-                  filter: "drop-shadow(0 0 8px rgba(76, 201, 240, 0.3))",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    backgroundColor: cardBg,
-                  }}
-                >
-                  <span 
-                    className="text-xs font-medium mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Clients
-                  </span>
-                  <span 
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.clients, 'clients')}
-                  </span>
-                  {/* Handshake Icon */}
-                  <svg 
-                    className="text-glow-blue" 
-                    fill="none" 
-                    height="24" 
-                    stroke="currentColor" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="1.5" 
-                    width="24" 
-                    style={{ color: neonBlue }}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M11 20v2" />
-                    <path d="M15 20v2" />
-                    <path d="M7 20v2" />
-                    <path d="M3 20v2" />
-                    <path d="M3 13h18" />
-                    <path d="m11 13 4.5-4.5" />
-                    <path d="m15 13-4.5-4.5" />
-                    <path d="M2 13h1" />
-                    <path d="M21 13h1" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* STAT: Active Users */}
-            <div 
-              className="flex flex-col items-center mt-8"
-              style={{
-                transform: inView ? "translateX(0)" : "translateX(80px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "600ms",
-              }}
-            >
-              <div
-                className="w-36 h-40"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: "linear-gradient(135deg, #1e3a5f 0%, #4cc9f0 100%)",
-                  padding: "2px",
-                  filter: "drop-shadow(0 0 8px rgba(76, 201, 240, 0.3))",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    backgroundColor: cardBg,
-                  }}
-                >
-                  <span 
-                    className="text-xs font-medium mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Active Users
-                  </span>
-                  <span 
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.activeUsers, 'activeUsers')}
-                  </span>
-                  {/* Users Icon */}
-                  <svg 
-                    className="text-glow-blue" 
-                    fill="none" 
-                    height="24" 
-                    stroke="currentColor" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="1.5" 
-                    width="24" 
-                    style={{ color: neonBlue }}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* STAT: Templates */}
-            <div 
-              className="flex flex-col items-center -mt-4"
-              style={{
-                transform: inView ? "translateX(0)" : "translateX(-80px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "700ms",
-              }}
-            >
-              <div
-                className="w-36 h-40"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: "linear-gradient(135deg, #1e3a5f 0%, #4cc9f0 100%)",
-                  padding: "2px",
-                  filter: "drop-shadow(0 0 8px rgba(76, 201, 240, 0.3))",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    backgroundColor: cardBg,
-                  }}
-                >
-                  <span 
-                    className="text-xs font-medium mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Templates
-                  </span>
-                  <span 
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {formatValue(counts.templates, 'templates')}
-                  </span>
-                  {/* Files Icon */}
-                  <svg 
-                    className="text-glow-blue" 
-                    fill="none" 
-                    height="24" 
-                    stroke="currentColor" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="1.5" 
-                    width="24" 
-                    style={{ color: neonBlue }}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h10.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z" />
-                    <path d="M15 2v5h5" />
-                    <path d="M9 18h10" />
-                    <path d="M9 14h10" />
-                    <path d="M9 10h1" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* STAT: Success Rate */}
-            <div 
-              className="flex flex-col items-center mt-4"
-              style={{
-                transform: inView ? "translateX(0)" : "translateX(80px)",
-                transition: "all 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDelay: "800ms",
-              }}
-            >
-              <div
-                className="w-36 h-40"
-                style={{
-                  clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                  background: "linear-gradient(135deg, #1e3a5f 0%, #4cc9f0 100%)",
-                  padding: "2px",
-                  filter: "drop-shadow(0 0 8px rgba(76, 201, 240, 0.3))",
-                }}
-              >
-                <div
-                  className="w-full h-full flex flex-col items-center justify-center p-4"
-                  style={{
-                    clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-                    backgroundColor: cardBg,
-                  }}
-                >
-                  <span 
-                    className="text-xs font-medium mb-1"
-                    style={{ color: textGray }}
-                  >
-                    Success Rate
-                  </span>
-                  <span 
-                    className="text-2xl font-bold mb-2"
-                    style={{ color: textColor }}
-                  >
-                    {counts.successRate}%
-                  </span>
-                  {/* Up Arrow Icon */}
-                  <svg 
-                    className="text-glow-blue" 
-                    fill="none" 
-                    height="24" 
-                    stroke="currentColor" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="2" 
-                    width="24" 
-                    style={{ color: neonBlue }}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="m22 7-8.5 8.5-5-5L2 17" />
-                    <polyline points="16 7 22 7 22 13" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Decorative background dots */}
-          <div className="mt-8 opacity-20 select-none pointer-events-none">
-            <svg className="text-gray-600" fill="currentColor" height="100" viewBox="0 0 200 100" width="200">
-              <circle cx="20" cy="30" r="1.5" />
-              <circle cx="50" cy="20" r="1.5" />
-              <circle cx="80" cy="40" r="1.5" />
-              <circle cx="110" cy="25" r="1.5" />
-              <circle cx="140" cy="50" r="1.5" />
-              <circle cx="170" cy="35" r="1.5" />
-              <circle cx="30" cy="60" r="1.5" />
-              <circle cx="60" cy="75" r="1.5" />
-              <circle cx="95" cy="65" r="1.5" />
-              <circle cx="130" cy="80" r="1.5" />
-              <circle cx="160" cy="70" r="1.5" />
-            </svg>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
