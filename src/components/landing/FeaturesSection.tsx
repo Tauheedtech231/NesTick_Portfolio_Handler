@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { TiArrowSortedDown } from "react-icons/ti";
 import { useInView } from "react-intersection-observer";
+import { Sparkles } from "lucide-react";
 
 interface Feature {
   id: number;
@@ -256,262 +257,327 @@ export default function FeaturesSection() {
   if (!isClient) return null;
 
   return (
-    <div 
+    <section
       ref={sectionRef}
-      className="relative w-full flex items-center justify-center" 
-      style={{ 
-        minHeight: '500px',
+      className="py-12 md:py-16 px-4 sm:px-6 relative"
+      style={{
+        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
         fontFamily: "'Poppins', sans-serif",
       }}
-      onMouseLeave={handleMouseLeave}
     >
-      <div className="flex items-center justify-center" style={{ gap: '0px', minWidth: '550px' }}>
-        {/* Diagram Container */}
-        <div ref={diagramContainerRef} className="relative w-[500px] h-[500px] flex-shrink-0">
-          <svg
-            ref={svgRef}
-            viewBox="0 0 550 500"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-full"
+      <div className="container mx-auto max-w-6xl relative z-10">
+        {/* Section Header */}
+        <div className="mb-10 md:mb-12 text-center">
+          <div 
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
+            style={{
+              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+              border: 'none',
+            }}
           >
-            {/* Main Circle */}
-            <circle
-              cx="250"
-              cy="250"
-              r="230"
-              fill="none"
-              stroke={activeIdx !== null ? activeColor : strokeColor}
-              strokeWidth={activeIdx !== null ? 3 : 2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{
-                transition: "all 0.5s ease",
-                filter: activeIdx !== null ? `drop-shadow(0 0 6px ${activeColor}44)` : 'none',
-              }}
+            <Sparkles className="w-3.5 h-3.5"
+              style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
             />
-
-            {/* Dividers */}
-            {[
-              { x1: 250, y1: 20, x2: 160, y2: 155 },
-              { x1: 160, y1: 155, x2: 330, y2: 210 },
-              { x1: 120, y1: 260, x2: 210, y2: 330 },
-              { x1: 210, y1: 330, x2: 480, y2: 250 },
-              { x1: 160, y1: 155, x2: 120, y2: 260 },
-              { x1: 330, y1: 210, x2: 480, y2: 250 },
-              { x1: 20, y1: 250, x2: 120, y2: 260 },
-              { x1: 210, y1: 330, x2: 140, y2: 452 },
-              { x1: 210, y1: 330, x2: 310, y2: 472 },
-            ].map((line, i) => (
-              <line
-                key={i}
-                x1={line.x1}
-                y1={line.y1}
-                x2={line.x2}
-                y2={line.y2}
-                stroke={activeIdx !== null ? activeColor : strokeColor}
-                strokeWidth={activeIdx !== null ? 3 : 2.5}
-                style={{
-                  transition: "all 0.5s ease",
-                  filter: activeIdx !== null ? `drop-shadow(0 0 4px ${activeColor}44)` : 'none',
-                }}
-              />
-            ))}
-
-            {/* Dotted Curved Arrow */}
-            {showCard && (
-              <>
-                <path
-                  d={arrowPath}
-                  fill="none"
-                  stroke={activeColor}
-                  strokeWidth={2.5}
-                  opacity={0.8}
-                  strokeLinecap="round"
-                  strokeDasharray="8 6"
-                >
-                  <animate
-                    attributeName="stroke-dashoffset"
-                    from="14"
-                    to="0"
-                    dur="1.2s"
-                    repeatCount="indefinite"
-                  />
-                </path>
-
-                <foreignObject
-                  x={arrowEnd.x - 14}
-                  y={arrowEnd.y - 14}
-                  width={28}
-                  height={28}
-                >
-                  <div 
-                    style={{
-                      width: '28px',
-                      height: '28px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: activeColor,
-                      fontSize: '28px',
-                      opacity: 0.9,
-                      transition: 'all 0.5s ease',
-                    }}
-                  >
-                    <TiArrowSortedDown />
-                  </div>
-                </foreignObject>
-              </>
-            )}
-
-            {/* Feature Labels */}
-            {featurePositions.map((pos) => {
-              const feature = features[pos.id];
-              if (!feature) return null;
-              
-              const isActive = activeIdx === pos.id;
-              const isDimmed = activeIdx !== null && !isActive;
-              
-              const textX = pos.x + pos.marginLeft;
-              const textY = pos.y + pos.marginTop;
-
-              return (
-                <g
-                  key={pos.id}
-                  style={{ cursor: "pointer" }}
-                  onMouseEnter={() => handleMouseEnter(pos.id)}
-                >
-                  <circle cx={pos.x} cy={pos.y} r="55" fill="transparent" />
-                  
-                  <text
-                    x={textX}
-                    y={textY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill={isActive ? activeColor : isDimmed ? dimTextColor : textColor}
-                    fontSize={pos.id === 4 ? "18" : pos.id === 1 ? "16" : "14"}
-                    fontWeight={isActive ? "bold" : "600"}
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      transition: "all 0.5s ease",
-                      opacity: isDimmed ? 0.4 : 1,
-                      filter: isActive ? `drop-shadow(0 0 8px ${activeColor}66)` : 'none',
-                      pointerEvents: "none",
-                    }}
-                  >
-                    {feature.shortLabel.split(" ").map((word: string, i: number) => (
-                      <tspan key={i} x={textX} dy={i === 0 ? 0 : 18}>
-                        {word}
-                      </tspan>
-                    ))}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
+            <span className="text-xs font-medium"
+              style={{ 
+                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              ✨ Powerful Features
+            </span>
+          </div>
+          
+          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
+            <span 
+              className="relative inline-block"
+              style={{ 
+                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Comprehensive
+            </span>{' '}
+            <span 
+              className="inline-block"
+              style={{ 
+                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              System Features
+            </span>
+          </h2>
+          
+          <p 
+            className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light"
+            style={{ 
+              color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
+          >
+            Explore the powerful features that make our platform stand out
+          </p>
         </div>
 
-        {/* Description Card */}
+        {/* Features Diagram */}
         <div 
-          className="flex-shrink-0 relative"
+          className="relative w-full flex items-center justify-center" 
           style={{ 
-            width: '340px',
-            minHeight: '300px',
-            marginLeft: '-14px',
+            minHeight: '500px',
+            fontFamily: "'Poppins', sans-serif",
           }}
+          onMouseLeave={handleMouseLeave}
         >
-          <div 
-            className="absolute inset-0 flex items-center"
-            style={{ pointerEvents: 'auto' }}
-          >
-            {showCard && activeFeature && (
-              <div 
-                ref={cardRef}
-                className="w-full"
-                style={{
-                  opacity: cardAnimating ? 1 : 0,
-                  transform: cardAnimating ? 'translateX(0) scale(1)' : 'translateX(-30px) scale(0.9)',
-                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  pointerEvents: 'auto',
-                }}
+          <div className="flex items-center justify-center" style={{ gap: '0px', minWidth: '550px' }}>
+            {/* Diagram Container */}
+            <div ref={diagramContainerRef} className="relative w-[500px] h-[500px] flex-shrink-0">
+              <svg
+                ref={svgRef}
+                viewBox="0 0 550 500"
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-full h-full"
               >
-                <div
-                  className="rounded-xl p-5 shadow-2xl relative"
+                {/* Main Circle */}
+                <circle
+                  cx="250"
+                  cy="250"
+                  r="230"
+                  fill="none"
+                  stroke={activeIdx !== null ? activeColor : strokeColor}
+                  strokeWidth={activeIdx !== null ? 3 : 2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   style={{
-                    backgroundColor: cardBgColor,
-                    border: `2px solid ${activeColor}`,
-                    boxShadow: `0 0 50px ${activeColor}33, 0 20px 60px rgba(0,0,0,0.3)`,
-                    width: '100%',
+                    transition: "all 0.5s ease",
+                    filter: activeIdx !== null ? `drop-shadow(0 0 6px ${activeColor}44)` : 'none',
                   }}
-                >
-                  <div 
-                    className="absolute inset-0 rounded-xl pointer-events-none"
+                />
+
+                {/* Dividers */}
+                {[
+                  { x1: 250, y1: 20, x2: 160, y2: 155 },
+                  { x1: 160, y1: 155, x2: 330, y2: 210 },
+                  { x1: 120, y1: 260, x2: 210, y2: 330 },
+                  { x1: 210, y1: 330, x2: 480, y2: 250 },
+                  { x1: 160, y1: 155, x2: 120, y2: 260 },
+                  { x1: 330, y1: 210, x2: 480, y2: 250 },
+                  { x1: 20, y1: 250, x2: 120, y2: 260 },
+                  { x1: 210, y1: 330, x2: 140, y2: 452 },
+                  { x1: 210, y1: 330, x2: 310, y2: 472 },
+                ].map((line, i) => (
+                  <line
+                    key={i}
+                    x1={line.x1}
+                    y1={line.y1}
+                    x2={line.x2}
+                    y2={line.y2}
+                    stroke={activeIdx !== null ? activeColor : strokeColor}
+                    strokeWidth={activeIdx !== null ? 3 : 2.5}
                     style={{
-                      background: `radial-gradient(circle at 50% 0%, ${activeColor}22, transparent 70%)`,
-                      opacity: 0.5,
+                      transition: "all 0.5s ease",
+                      filter: activeIdx !== null ? `drop-shadow(0 0 4px ${activeColor}44)` : 'none',
                     }}
                   />
+                ))}
+
+                {/* Dotted Curved Arrow */}
+                {showCard && (
+                  <>
+                    <path
+                      d={arrowPath}
+                      fill="none"
+                      stroke={activeColor}
+                      strokeWidth={2.5}
+                      opacity={0.8}
+                      strokeLinecap="round"
+                      strokeDasharray="8 6"
+                    >
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        from="14"
+                        to="0"
+                        dur="1.2s"
+                        repeatCount="indefinite"
+                      />
+                    </path>
+
+                    <foreignObject
+                      x={arrowEnd.x - 14}
+                      y={arrowEnd.y - 14}
+                      width={28}
+                      height={28}
+                    >
+                      <div 
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: activeColor,
+                          fontSize: '28px',
+                          opacity: 0.9,
+                          transition: 'all 0.5s ease',
+                        }}
+                      >
+                        <TiArrowSortedDown />
+                      </div>
+                    </foreignObject>
+                  </>
+                )}
+
+                {/* Feature Labels */}
+                {featurePositions.map((pos) => {
+                  const feature = features[pos.id];
+                  if (!feature) return null;
                   
-                  <div className="flex items-center gap-2 mb-3 relative z-10">
-                    <span
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{
-                        background: activeFeature.fill,
-                        border: `2px solid ${activeColor}`,
-                        boxShadow: `0 0 15px ${activeColor}66`,
-                      }}
-                    />
-                    <span 
-                      className="text-base font-semibold leading-tight flex-1" 
-                      style={{ 
-                        color: cardTextColor,
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      {activeFeature.title}
-                    </span>
-                    <span
-                      className="text-[10px] px-2.5 py-0.5 rounded-full ml-auto flex-shrink-0 font-medium"
-                      style={{ 
-                        background: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)',
-                        color: activeColor,
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      {activeFeature.tag}
-                    </span>
-                  </div>
+                  const isActive = activeIdx === pos.id;
+                  const isDimmed = activeIdx !== null && !isActive;
+                  
+                  const textX = pos.x + pos.marginLeft;
+                  const textY = pos.y + pos.marginTop;
 
-                  <div className="flex items-start gap-2.5 mb-3 relative z-10">
-                    <div 
-                      className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
-                      style={{ background: activeFeature.fill }}
-                    />
-                    <p 
-                      className="text-sm leading-relaxed min-h-[48px]" 
-                      style={{ 
-                        color: cardTextSecondary,
-                        fontFamily: "'Calibri Light', sans-serif",
-                      }}
+                  return (
+                    <g
+                      key={pos.id}
+                      style={{ cursor: "pointer" }}
+                      onMouseEnter={() => handleMouseEnter(pos.id)}
                     >
-                      {typedText}
-                      {isTyping && (
-                        <span
-                          className="inline-block w-0.5 h-4 ml-0.5 align-middle"
-                          style={{ background: cardTextSecondary, animation: "blink 0.7s step-end infinite" }}
-                        />
-                      )}
-                    </p>
-                  </div>
+                      <circle cx={pos.x} cy={pos.y} r="55" fill="transparent" />
+                      
+                      <text
+                        x={textX}
+                        y={textY}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill={isActive ? activeColor : isDimmed ? dimTextColor : textColor}
+                        fontSize={pos.id === 4 ? "18" : pos.id === 1 ? "16" : "14"}
+                        fontWeight={isActive ? "bold" : "600"}
+                        style={{
+                          fontFamily: "'Poppins', sans-serif",
+                          transition: "all 0.5s ease",
+                          opacity: isDimmed ? 0.4 : 1,
+                          filter: isActive ? `drop-shadow(0 0 8px ${activeColor}66)` : 'none',
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {feature.shortLabel.split(" ").map((word: string, i: number) => (
+                          <tspan key={i} x={textX} dy={i === 0 ? 0 : 18}>
+                            {word}
+                          </tspan>
+                        ))}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
 
-                  <div className="h-1 w-full rounded-full overflow-hidden relative z-10" style={{ backgroundColor: cardBgLight }}>
+            {/* Description Card */}
+            <div 
+              className="flex-shrink-0 relative"
+              style={{ 
+                width: '340px',
+                minHeight: '300px',
+                marginLeft: '-14px',
+              }}
+            >
+              <div 
+                className="absolute inset-0 flex items-center"
+                style={{ pointerEvents: 'auto' }}
+              >
+                {showCard && activeFeature && (
+                  <div 
+                    ref={cardRef}
+                    className="w-full"
+                    style={{
+                      opacity: cardAnimating ? 1 : 0,
+                      transform: cardAnimating ? 'translateX(0) scale(1)' : 'translateX(-30px) scale(0.9)',
+                      transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      pointerEvents: 'auto',
+                    }}
+                  >
                     <div
-                      className="h-full rounded-full transition-all duration-75"
-                      style={{ width: `${progress}%`, background: activeColor, boxShadow: `0 0 15px ${activeColor}66` }}
-                    />
+                      className="rounded-xl p-5 shadow-2xl relative"
+                      style={{
+                        backgroundColor: cardBgColor,
+                        border: `2px solid ${activeColor}`,
+                        boxShadow: `0 0 50px ${activeColor}33, 0 20px 60px rgba(0,0,0,0.3)`,
+                        width: '100%',
+                      }}
+                    >
+                      <div 
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          background: `radial-gradient(circle at 50% 0%, ${activeColor}22, transparent 70%)`,
+                          opacity: 0.5,
+                        }}
+                      />
+                      
+                      <div className="flex items-center gap-2 mb-3 relative z-10">
+                        <span
+                          className="w-3 h-3 rounded-full flex-shrink-0"
+                          style={{
+                            background: activeFeature.fill,
+                            border: `2px solid ${activeColor}`,
+                            boxShadow: `0 0 15px ${activeColor}66`,
+                          }}
+                        />
+                        <span 
+                          className="text-base font-semibold leading-tight flex-1" 
+                          style={{ 
+                            color: cardTextColor,
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          {activeFeature.title}
+                        </span>
+                        <span
+                          className="text-[10px] px-2.5 py-0.5 rounded-full ml-auto flex-shrink-0 font-medium"
+                          style={{ 
+                            background: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)',
+                            color: activeColor,
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          {activeFeature.tag}
+                        </span>
+                      </div>
+
+                      <div className="flex items-start gap-2.5 mb-3 relative z-10">
+                        <div 
+                          className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
+                          style={{ background: activeFeature.fill }}
+                        />
+                        <p 
+                          className="text-sm leading-relaxed min-h-[48px]" 
+                          style={{ 
+                            color: cardTextSecondary,
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                        >
+                          {typedText}
+                          {isTyping && (
+                            <span
+                              className="inline-block w-0.5 h-4 ml-0.5 align-middle"
+                              style={{ background: cardTextSecondary, animation: "blink 0.7s step-end infinite" }}
+                            />
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="h-1 w-full rounded-full overflow-hidden relative z-10" style={{ backgroundColor: cardBgLight }}>
+                        <div
+                          className="h-full rounded-full transition-all duration-75"
+                          style={{ width: `${progress}%`, background: activeColor, boxShadow: `0 0 15px ${activeColor}66` }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -522,6 +588,6 @@ export default function FeaturesSection() {
           50%       { opacity: 0; }
         }
       `}</style>
-    </div>
+    </section>
   );
 }

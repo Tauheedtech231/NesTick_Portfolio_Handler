@@ -12,11 +12,10 @@ import TemplatesSection from "@/components/landing/TemplatesSection";
 import OtherSections from "@/components/landing/OtherSections";
 import Footer from "@/components/landing/Footer";
 import PreviewModal from "@/components/landing/PreviewModal";
-import BuyNowModal from "@/components/landing/BuyNowModal";
 import Navbar from "@/components/landing/Navbar";
 
 // Import interfaces
-import type { Template, BuyNowFormData, ContactFormData } from "@/app/types/landing";
+import type { Template, ContactFormData } from "@/app/types/landing";
 import PartnerProductSection from "@/components/PartnerProductSection";
 
 // Register GSAP plugins
@@ -43,8 +42,7 @@ export default function LandingPage() {
   // Templates state
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
-  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   
@@ -56,25 +54,6 @@ export default function LandingPage() {
     description: '',
     liveUrl: null as string | null,
   });
-  
-  // Updated BuyNowFormData with all new fields
-  const [buyNowFormData, setBuyNowFormData] = useState<BuyNowFormData>({
-    name: '',
-    college: '',
-    email: '',
-    phone: '',
-    designation: '',
-    studentCount: '',
-    selectedPlan: 'Most Featured',
-    templateName: '',
-    requirements: '',
-    timeline: '',
-    hearAbout: ''
-  });
-
-  // Form validation states
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   // Refs for animations
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -94,78 +73,6 @@ export default function LandingPage() {
   const addToRefs = (el: HTMLDivElement | null, refArray: React.MutableRefObject<HTMLDivElement[]>) => {
     if (el && !refArray.current.includes(el)) {
       refArray.current.push(el);
-    }
-  };
-
-  // Validation functions
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
-  };
-
-  const validateField = (name: string, value: string): string => {
-    switch (name) {
-      case 'email':
-        if (!value.trim()) return 'Email is required';
-        if (!validateEmail(value)) return 'Please enter a valid email';
-        return '';
-      case 'phone':
-        if (!value.trim()) return 'Phone number is required';
-        if (!validatePhone(value)) return 'Please enter a valid phone number';
-        return '';
-      case 'name':
-        if (!value.trim()) return 'Full name is required';
-        if (value.trim().length < 2) return 'Name must be at least 2 characters';
-        return '';
-      case 'college':
-        if (!value.trim()) return 'College name is required';
-        return '';
-      case 'designation':
-        if (!value.trim()) return 'Designation is required';
-        return '';
-      default:
-        return '';
-    }
-  };
-
-  // Check for duplicate email for free templates
-  const checkDuplicateRequest = async (email: string, templateId: number): Promise<boolean> => {
-    try {
-      const response = await fetch(`/api/templates/template-requests/check-duplicate?email=${encodeURIComponent(email)}&template_id=${templateId}`);
-      const data = await response.json();
-      return data.duplicate || false;
-    } catch (error) {
-      console.error('Error checking duplicate:', error);
-      return false;
-    }
-  };
-
-  // Handle input blur for validation
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setTouchedFields(prev => ({ ...prev, [name]: true }));
-    
-    const error = validateField(name, value);
-    setFormErrors(prev => ({ ...prev, [name]: error }));
-  };
-
-  // Handle buy now input change with validation (supports text, select, textarea)
-  const handleBuyNowInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setBuyNowFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when user starts typing
-    if (formErrors[name]) {
-      const error = validateField(name, value);
-      setFormErrors(prev => ({ ...prev, [name]: error }));
     }
   };
 
@@ -316,132 +223,18 @@ export default function LandingPage() {
     });
   };
 
-  // Buy Now Modal Handlers - FIXED VERSION
+  // UPDATED: Redirect to /buynow page
   const handleBuyNowClick = (template: Template) => {
-    setSelectedTemplate(template);
-    // Reset all form fields properly
-    setBuyNowFormData({
-      name: '',
-      college: '',
-      email: '',
-      phone: '',
-      designation: '',
-      studentCount: '',
-      selectedPlan: 'Most Featured',
-      templateName: template.name,
-      requirements: '',
-      timeline: '',
-      hearAbout: ''
-    });
-    setFormErrors({});
-    setTouchedFields({});
-    setIsBuyNowModalOpen(true);
-  };
-
-  const handleBuyNowSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const templateData = {
+      id: template.id,
+      name: template.name,
+      type: template.type,
+      image: template.image,
+      description: template.description
+    };
     
-    // Validate all fields including new ones
-    const errors: Record<string, string> = {};
-    const fieldsToValidate = ['name', 'college', 'email', 'phone', 'designation'];
-    
-    fieldsToValidate.forEach(key => {
-      const error = validateField(key, buyNowFormData[key as keyof BuyNowFormData] as string);
-      if (error) errors[key] = error;
-    });
-
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      // Mark all fields as touched to show errors
-      const allTouched = fieldsToValidate.reduce((acc, key) => {
-        acc[key] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
-      setTouchedFields(allTouched);
-      return;
-    }
-
-    // Check for duplicate email for free templates
-    if (selectedTemplate?.type === 'free') {
-      const isDuplicate = await checkDuplicateRequest(buyNowFormData.email, selectedTemplate.id);
-      if (isDuplicate) {
-        setFormErrors(prev => ({ 
-          ...prev, 
-          email: 'You have already submitted a request for this template with this email.' 
-        }));
-        return;
-      }
-    }
-    
-    // Submit request to API with new fields
-    try {
-      setIsSubmitting(true);
-      
-      const requestData = {
-        template_id: selectedTemplate!.id,
-        name: buyNowFormData.name.trim(),
-        college: buyNowFormData.college.trim(),
-        email: buyNowFormData.email.toLowerCase().trim(),
-        phone: buyNowFormData.phone.trim(),
-        designation: buyNowFormData.designation.trim(),
-        student_count: buyNowFormData.studentCount,
-        plan: selectedTemplate?.type === 'paid' ? buyNowFormData.selectedPlan : undefined,
-        type: selectedTemplate!.type,
-        requirements: buyNowFormData.requirements,
-        timeline: buyNowFormData.timeline,
-        hear_about: buyNowFormData.hearAbout
-      };
-
-      console.log('Submitting request:', requestData);
-
-      const response = await fetch('/api/templates/template-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Failed to submit request');
-      }
-
-      // Show success popup
-      setSuccessMessage(`Request submitted successfully! Our team will contact you shortly.`);
-      setShowSuccessPopup(true);
-      setIsBuyNowModalOpen(false);
-      
-      // Reset form with new fields
-      setBuyNowFormData({
-        name: '',
-        college: '',
-        email: '',
-        phone: '',
-        designation: '',
-        studentCount: '',
-        selectedPlan: 'Most Featured',
-        templateName: '',
-        requirements: '',
-        timeline: '',
-        hearAbout: ''
-      });
-      setFormErrors({});
-      setTouchedFields({});
-
-    } catch (error: any) {
-      console.error('Submit request error:', error);
-      alert(error.message || 'Failed to submit request. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Get user email
-  const getUserEmail = () => {
-    if (!user) return '';
-    return user.email || '';
+    sessionStorage.setItem('selectedTemplate', JSON.stringify(templateData));
+    window.location.href = '/buynow';
   };
 
   // Enhanced animations (only for sections, not navbar)
@@ -610,20 +403,6 @@ export default function LandingPage() {
         liveUrl={previewModal.liveUrl}
       />
 
-      {/* Buy Now Modal */}
-      <BuyNowModal
-        isOpen={isBuyNowModalOpen}
-        onClose={() => setIsBuyNowModalOpen(false)}
-        selectedTemplate={selectedTemplate}
-        formData={buyNowFormData}
-        formErrors={formErrors}
-        touchedFields={touchedFields}
-        isSubmitting={isSubmitting}
-        onInputChange={handleBuyNowInputChange}
-        onBlur={handleInputBlur}
-        onSubmit={handleBuyNowSubmit}
-      />
-
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
@@ -653,6 +432,7 @@ export default function LandingPage() {
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-[#38BDF8] hover:underline font-medium text-lg block mb-2"
+                  style={{ cursor: 'pointer' }}
                 >
                   https://nesticktech.com
                 </a>
@@ -667,6 +447,7 @@ export default function LandingPage() {
                   setSuccessMessage('');
                 }}
                 className="w-full bg-gradient-to-r from-[#1D4ED8] to-[#38BDF8] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
+                style={{ cursor: 'pointer' }}
               >
                 Close
               </button>

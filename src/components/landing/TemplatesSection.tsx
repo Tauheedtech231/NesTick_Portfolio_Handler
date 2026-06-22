@@ -34,8 +34,6 @@ export default function TemplatesSection({
   templateCardsRef
 }: TemplatesSectionProps) {
   const [showAll, setShowAll] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const router = useRouter();
   
@@ -72,14 +70,23 @@ export default function TemplatesSection({
     router.push('/templates');
   };
 
+  // UPDATED: Redirect to details page
   const handleDetailsClick = (template: Template) => {
-    setSelectedTemplate(template);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedTemplate(null);
+    // Store template data in sessionStorage
+    const templateData = {
+      id: template.id,
+      name: template.name,
+      type: template.type,
+      image: template.image,
+      description: template.description,
+      live_url: template.live_url,
+      created_at: template.created_at
+    };
+    
+    sessionStorage.setItem('selectedTemplateDetails', JSON.stringify(templateData));
+    
+    // Redirect to /details/[id]
+    window.location.href = `/details/${template.id}`;
   };
 
   const getTemplateFeatures = (templateName: string) => {
@@ -122,441 +129,285 @@ export default function TemplatesSection({
   };
 
   return (
-    <>
-      <section
-        id="templates"
-        className="py-12 md:py-16 px-4 sm:px-6 relative"
-        style={{
-          backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
-          fontFamily: "'Poppins', sans-serif",
-        }}
-      >
-        <div className="container mx-auto max-w-6xl relative z-10">
-          {/* Section Header - Left se slide */}
+    <section
+      id="templates"
+      className="py-12 md:py-16 px-4 sm:px-6 relative"
+      style={{
+        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+        fontFamily: "'Poppins', sans-serif",
+      }}
+    >
+      <div className="container mx-auto max-w-6xl relative z-10">
+        {/* Section Header - Left se slide */}
+        <div 
+          ref={headerRef}
+          className="mb-10 md:mb-12 text-center md:text-left overflow-hidden"
+        >
           <div 
-            ref={headerRef}
-            className="mb-10 md:mb-12 text-center md:text-left overflow-hidden"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto md:mx-0 w-fit transition-all duration-1000 ease-out will-change-transform"
+            style={{
+              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+              border: 'none',
+              opacity: headerInView ? 1 : 0,
+              transform: headerInView ? 'translateX(0) scale(1)' : 'translateX(-120px) scale(0.8)',
+              transitionDelay: '100ms',
+            }}
           >
-            <div 
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto md:mx-0 w-fit transition-all duration-1000 ease-out will-change-transform"
-              style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-                border: 'none',
-                opacity: headerInView ? 1 : 0,
-                transform: headerInView ? 'translateX(0) scale(1)' : 'translateX(-120px) scale(0.8)',
-                transitionDelay: '100ms',
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5"
-                style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-              />
-              <span className="text-xs font-medium"
-                style={{ 
-                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                ✨ Ready-to-Use Portfolio Templates
-              </span>
-            </div>
-            
-            <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight overflow-hidden">
-              <span 
-                className="relative inline-block transition-all duration-1000 ease-out will-change-transform"
-                style={{ 
-                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                  opacity: headerInView ? 1 : 0,
-                  transform: headerInView ? 'translateX(0)' : 'translateX(-150px)',
-                  transitionDelay: '200ms',
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                Beautiful
-              </span>{' '}
-              <span 
-                className="inline-block transition-all duration-1000 ease-out will-change-transform"
-                style={{ 
-                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                  opacity: headerInView ? 1 : 0,
-                  transform: headerInView ? 'translateX(0)' : 'translateX(-120px)',
-                  transitionDelay: '300ms',
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                Portfolio Templates
-              </span>
-            </h2>
-            
-            <p 
-              className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light transition-all duration-1000 ease-out will-change-transform"
+            <Sparkles className="w-3.5 h-3.5"
+              style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+            />
+            <span className="text-xs font-medium"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-                opacity: headerInView ? 1 : 0,
-                transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
-                transitionDelay: '400ms',
-                fontFamily: "'Calibri Light', sans-serif",
+                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                fontFamily: "'Poppins', sans-serif",
               }}
             >
-              {templates.length > 0
-                ? "Professionally designed templates for every academic discipline"
-                : loadingTemplates ? "Loading templates..." : "No templates uploaded yet."}
-            </p>
+              ✨ Ready-to-Use Portfolio Templates
+            </span>
           </div>
+          
+          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight overflow-hidden">
+            <span 
+              className="relative inline-block transition-all duration-1000 ease-out will-change-transform"
+              style={{ 
+                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                opacity: headerInView ? 1 : 0,
+                transform: headerInView ? 'translateX(0)' : 'translateX(-150px)',
+                transitionDelay: '200ms',
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Beautiful
+            </span>{' '}
+            <span 
+              className="inline-block transition-all duration-1000 ease-out will-change-transform"
+              style={{ 
+                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                opacity: headerInView ? 1 : 0,
+                transform: headerInView ? 'translateX(0)' : 'translateX(-120px)',
+                transitionDelay: '300ms',
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Portfolio Templates
+            </span>
+          </h2>
+          
+          <p 
+            className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light transition-all duration-1000 ease-out will-change-transform"
+            style={{ 
+              color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+              opacity: headerInView ? 1 : 0,
+              transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
+              transitionDelay: '400ms',
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
+          >
+            {templates.length > 0
+              ? "Professionally designed templates for every academic discipline"
+              : loadingTemplates ? "Loading templates..." : "No templates uploaded yet."}
+          </p>
+        </div>
 
-          {loadingTemplates ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="w-8 h-8 border-2 rounded-full animate-spin"
-                style={{
-                  borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.2)',
-                  borderTopColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                }}
-              />
-            </div>
-          ) : templates.length > 0 ? (
-            <>
-              {/* Templates Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {displayedTemplates.map((template, index) => (
-                  <div
-                    key={template.id}
-                    ref={el => addToRefs(el, templateCardsRef)}
-                    className="group relative rounded-2xl overflow-hidden flex flex-col cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                    style={{
-                      backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
-                      border: '1px solid',
-                      borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                      boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                    }}
-                  >
-                    {/* 🔥 Template Image - 16:9 Landscape */}
-                    <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
-                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                     <Image
-  src={template.image}
-  alt={template.name}
-  fill
-  className="object-contain"  // Changed from object-cover
-  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  priority={index < 3}
-  onError={(e) => {
-    (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
-  }}
-/>
-                      </div>
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 pointer-events-none" />
-                      
-                      {/* Badges */}
-                      <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                        <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          Template
-                        </span>
-                        <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm ${
-                          template.type === 'free' 
-                            ? 'bg-green-500/80' 
-                            : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
-                        }`}
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          {template.type === 'free' ? 'Free' : 'Premium'}
-                        </span>
-                      </div>
-                      
-                      {/* Preview Overlay - Smooth hover */}
-                      <button
-                        onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
-                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-all duration-300 ease-in-out cursor-pointer"
-                      >
-                        <div className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                            color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          <Eye size={16} />
-                          Preview
-                        </div>
-                      </button>
-                    </div>
-
-                    {/* Content area */}
-                    <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
-                      <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
-                        style={{ 
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                          fontFamily: "'Poppins', sans-serif",
-                        }}
-                      >
-                        {template.name}
-                      </h3>
-                      
-                      <p className="leading-relaxed text-base mb-4 line-clamp-2"
-                        style={{ 
-                          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-                          fontFamily: "'Calibri Light', sans-serif",
-                        }}
-                      >
-                        {template.description}
-                      </p>
-
-                      {/* Buttons */}
-                      <div className="mt-auto pt-2 flex gap-2">
-                        <button
-                          onClick={() => handleDetailsClick(template)}
-                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-                          style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
-                            border: '1px solid',
-                            borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
-                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          <Info size={14} />
-                          Details
-                        </button>
-                        <button
-                          onClick={() => handleBuyNowClick(template)}
-                          className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-                          style={{
-                            backgroundColor: template.type === 'free'
-                              ? '#22C55E'
-                              : (theme === 'dark' ? '#E8CA5E' : '#0066FF'),
-                            color: template.type === 'free'
-                              ? '#FFFFFF'
-                              : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          <Sparkles size={14} />
-                          {template.type === 'free' ? 'Use Free' : 'Buy Now'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* View More Button */}
-              {!showAll && templates.length > 3 && (
-                <div className="flex justify-center mt-12">
-                  <button
-                    onClick={handleViewMore}
-                    className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                      color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
-                    <span>View More Templates</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
+        {loadingTemplates ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="w-8 h-8 border-2 rounded-full animate-spin"
+              style={{
+                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.2)',
+                borderTopColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+              }}
+            />
+          </div>
+        ) : templates.length > 0 ? (
+          <>
+            {/* Templates Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[
-                { id: 1, name: "Modern Professional", description: "Clean, corporate design for business portfolios.", type: 'free' },
-                { id: 2, name: "Creative Arts", description: "Vibrant layout for art and design students.", type: 'paid' },
-                { id: 3, name: "Academic Classic", description: "Traditional layout for research portfolios.", type: 'free' },
-              ].map((template) => (
+              {displayedTemplates.map((template, index) => (
                 <div
                   key={template.id}
-                  className="rounded-2xl p-6 md:p-8 opacity-50 flex flex-col"
+                  ref={el => addToRefs(el, templateCardsRef)}
+                  className="group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   style={{
                     backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
                     border: '1px solid',
                     borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                    cursor: 'default',
                   }}
                 >
-                  <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-gray-200 dark:bg-gray-700">
+                  {/* Template Image - 16:9 Landscape */}
+                  <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-gray-500 text-sm">No Preview</span>
+                      <Image
+                        src={template.image}
+                        alt={template.name}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index < 3}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 pointer-events-none" />
+                    
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 flex gap-1.5 z-20">
+                      <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        Template
+                      </span>
+                      <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm ${
+                        template.type === 'free' 
+                          ? 'bg-green-500/80' 
+                          : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
+                      }`}
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {template.type === 'free' ? 'Free' : 'Premium'}
+                      </span>
+                    </div>
+                    
+                    {/* Preview Overlay - Smooth hover */}
+                    <button
+                      onClick={() => handlePreviewClick(template.image, template.name, template.description, template.live_url)}
+                      className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-all duration-300 ease-in-out"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
+                        style={{
+                          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                          color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          fontFamily: "'Poppins', sans-serif",
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Eye size={16} />
+                        Preview
                       </div>
+                    </button>
+                  </div>
+
+                  {/* Content area */}
+                  <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
+                    <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
+                      style={{ 
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                    >
+                      {template.name}
+                    </h3>
+                    
+                    <p className="leading-relaxed text-base mb-4 line-clamp-2"
+                      style={{ 
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        fontFamily: "'Calibri Light', sans-serif",
+                      }}
+                    >
+                      {template.description}
+                    </p>
+
+                    {/* Buttons */}
+                    <div className="mt-auto pt-2 flex gap-2">
+                      <button
+                        onClick={() => handleDetailsClick(template)}
+                        className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
+                        style={{
+                          backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
+                          border: '1px solid',
+                          borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          fontFamily: "'Poppins', sans-serif",
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Info size={14} />
+                        Details
+                      </button>
+                      <button
+                        onClick={() => handleBuyNowClick(template)}
+                        className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
+                        style={{
+                          backgroundColor: template.type === 'free'
+                            ? '#22C55E'
+                            : (theme === 'dark' ? '#E8CA5E' : '#0066FF'),
+                          color: template.type === 'free'
+                            ? '#FFFFFF'
+                            : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                          fontFamily: "'Poppins', sans-serif",
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Sparkles size={14} />
+                        {template.type === 'free' ? 'Use Free' : 'Buy Now'}
+                      </button>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-gray-500"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    {template.name}
-                  </h3>
-                  <p className="text-base text-gray-500"
-                    style={{ fontFamily: "'Calibri Light', sans-serif" }}
-                  >
-                    {template.description}
-                  </p>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* Details Modal - Increased Width */}
-      {isModalOpen && selectedTemplate && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-          onClick={closeModal}
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-        >
-          <div
-            className="relative rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            style={{
-              backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-              border: '1px solid',
-              borderColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="sticky top-0 p-5 border-b"
-              style={{
-                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <button
-                onClick={closeModal}
-                className="absolute right-4 top-4 p-1.5 rounded-full hover:bg-black/10 transition-all duration-300 cursor-pointer"
-              >
-                <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
-              </button>
-              <h3 className="text-2xl font-bold pr-6" style={{ 
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                fontFamily: "'Poppins', sans-serif",
-              }}>
-                {selectedTemplate.name}
-              </h3>
-              <div className="flex gap-2 mt-1.5">
-                <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
-                  selectedTemplate.type === 'free' 
-                    ? 'bg-green-500 text-white' 
-                    : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
-                }`}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+            {/* View More Button */}
+            {!showAll && templates.length > 3 && (
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={handleViewMore}
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                    color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    fontFamily: "'Poppins', sans-serif",
+                    cursor: 'pointer',
+                  }}
                 >
-                  {selectedTemplate.type === 'free' ? 'Free' : 'Premium'}
-                </span>
+                  <span>View More Templates</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              {/* 🔥 Modal Image - 16:9 Landscape with larger size */}
-              <div className="relative w-full rounded-xl overflow-hidden mb-6 bg-gray-200 dark:bg-gray-800">
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <Image
-                    src={selectedTemplate.image}
-                    alt={selectedTemplate.name}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/api/placeholder/400/300';
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Description */}
-                <div>
-                  <h4 className="text-base font-semibold mb-2"
-                    style={{ 
-                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
-                    Description
-                  </h4>
-                  <p className="text-sm leading-relaxed" style={{ 
-                    color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                    fontFamily: "'Calibri Light', sans-serif",
-                  }}>
-                    {selectedTemplate.description}
-                  </p>
-                </div>
-
-                {/* Key Features */}
-                <div>
-                  <h4 className="text-base font-semibold mb-2"
-                    style={{ 
-                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
-                    Features
-                  </h4>
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {getTemplateFeatures(selectedTemplate.name).slice(0, 6).map((feature, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5"
-                          style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-                        />
-                        <span className="text-sm" style={{ 
-                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                          fontFamily: "'Calibri Light', sans-serif",
-                        }}>
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-6 mt-4 border-t"
+            )}
+          </>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { id: 1, name: "Modern Professional", description: "Clean, corporate design for business portfolios.", type: 'free' },
+              { id: 2, name: "Creative Arts", description: "Vibrant layout for art and design students.", type: 'paid' },
+              { id: 3, name: "Academic Classic", description: "Traditional layout for research portfolios.", type: 'free' },
+            ].map((template) => (
+              <div
+                key={template.id}
+                className="rounded-2xl p-6 md:p-8 opacity-50 flex flex-col"
                 style={{
-                  borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 0, 0, 0.06)',
+                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
+                  border: '1px solid',
+                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
                 }}
               >
-                <button
-                  onClick={() => {
-                    closeModal();
-                    handlePreviewClick(selectedTemplate.image, selectedTemplate.name, selectedTemplate.description, selectedTemplate.live_url);
-                  }}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-                  style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
-                    border: '1px solid',
-                    borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
-                    color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
+                <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-gray-200 dark:bg-gray-700">
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">No Preview</span>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-gray-500"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
-                  <Eye size={16} />
-                  Preview
-                </button>
-                <button
-                  onClick={() => {
-                    closeModal();
-                    handleBuyNowClick(selectedTemplate);
-                  }}
-                  className="flex-1 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-                  style={{
-                    backgroundColor: selectedTemplate.type === 'free'
-                      ? '#22C55E'
-                      : (theme === 'dark' ? '#E8CA5E' : '#0066FF'),
-                    color: selectedTemplate.type === 'free'
-                      ? '#FFFFFF'
-                      : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
+                  {template.name}
+                </h3>
+                <p className="text-base text-gray-500"
+                  style={{ fontFamily: "'Calibri Light', sans-serif" }}
                 >
-                  <Sparkles size={16} />
-                  {selectedTemplate.type === 'free' ? 'Use Free' : 'Buy Now'}
-                </button>
+                  {template.description}
+                </p>
               </div>
-            </div>
+            ))}
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </section>
   );
 }
