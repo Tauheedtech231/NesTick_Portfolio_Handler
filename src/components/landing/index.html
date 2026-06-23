@@ -1,350 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Trusted Worldwide</title>
-<style>
-  :root{
-    --bg:#000000;
-    --hex-fill:#0b1830;
-    --hex-stroke:#3fd0ff;
-    --hex-stroke-soft:#1f6f8f;
-    --text:#ffffff;
-    --map-dot:#13304a;
-  }
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0;
-    padding:0;
-    background:var(--bg);
-    width:100%;
-    height:100%;
-    overflow:hidden;
-  }
-  .stage{
-    position:relative;
-    width:1153px;
-    height:514px;
-    margin:0 auto;
-    background:#000000;
-    overflow:hidden;
-    font-family:'Arial', 'Helvetica Neue', Helvetica, sans-serif;
-  }
-
-  /* world map dotted background */
-  .map-bg{
-    position:absolute;
-    inset:0;
-    opacity:0.55;
-  }
-
-  /* glow streak */
-  .glow-streak{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    z-index:1;
-  }
-
-  .hex-wrap{
-    position:absolute;
-    inset:0;
-    z-index:2;
-  }
-
-  .hex{
-    position:absolute;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .hex svg{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-  }
-
-  .hex-content{
-    position:relative;
-    z-index:2;
-    text-align:center;
-    color:var(--text);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-  }
-
-  .hex-label{
-    font-size:15px;
-    font-weight:400;
-    color:#e8eef5;
-    letter-spacing:0.2px;
-  }
-
-  .hex-number{
-    font-size:30px;
-    font-weight:800;
-    color:#ffffff;
-    letter-spacing:0.5px;
-  }
-
-  .hex-icon{
-    margin-top:2px;
-  }
-
-  /* Center hex text */
-  .center-text{
-    font-size:34px;
-    font-weight:800;
-    line-height:1.25;
-    letter-spacing:1px;
-    color:#ffffff;
-    text-align:center;
-  }
-
-  /* Positions */
-  #hex-clients{ width:178px; height:200px; left:40px; top:163px; }
-  #hex-templates{ width:178px; height:200px; left:220px; top:268px; }
-  #hex-center{ width:265px; height:300px; left:443px; top:107px; }
-  #hex-active{ width:200px; height:225px; left:735px; top:33px; }
-  #hex-success{ width:200px; height:225px; left:925px; top:163px; }
-
-</style>
-</head>
-<body>
-<div class="stage" id="stage">
-
-  <!-- World map dotted background -->
-  <svg class="map-bg" viewBox="0 0 1153 514" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="dotPattern" width="9" height="9" patternUnits="userSpaceOnUse">
-        <circle cx="1" cy="1" r="1" fill="#1c3c5a"/>
-      </pattern>
-      <clipPath id="mapClip">
-        <!-- simplified world-continents silhouette built from blocky landmasses -->
-        <g id="continents"></g>
-      </clipPath>
-    </defs>
-    <!-- Blocky pixel-style world map made of small rects, mimicking the dotted-map look -->
-    <g fill="url(#dotPattern)" id="worldDots"></g>
-  </svg>
-
-  <!-- glow connecting lines between hexagons -->
-  <svg class="glow-streak" viewBox="0 0 1153 514" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="streakGradL" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#3fd0ff" stop-opacity="0.15"/>
-        <stop offset="60%" stop-color="#7fe3ff" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#bff3ff" stop-opacity="1"/>
-      </linearGradient>
-      <linearGradient id="streakGradR" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#bff3ff" stop-opacity="1"/>
-        <stop offset="40%" stop-color="#7fe3ff" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#3fd0ff" stop-opacity="0.15"/>
-      </linearGradient>
-      <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="2.2" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-      <filter id="wideGlow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="5"/>
-      </filter>
-    </defs>
-
-    <!-- LEFT main horizontal line: Clients hex -> Center hex -->
-    <path d="M 218 258 L 443 258" stroke="url(#streakGradL)" stroke-width="2.5" fill="none" filter="url(#softGlow)"/>
-    <path d="M 218 258 L 443 258" stroke="#3fd0ff" stroke-width="6" fill="none" filter="url(#wideGlow)" opacity="0.35"/>
-
-    <!-- RIGHT main horizontal line: Center hex -> Active Users hex -->
-    <path d="M 708 215 L 925 215" stroke="url(#streakGradR)" stroke-width="2.5" fill="none" filter="url(#softGlow)"/>
-    <path d="M 708 215 L 925 215" stroke="#3fd0ff" stroke-width="6" fill="none" filter="url(#wideGlow)" opacity="0.35"/>
-
-    <!-- Curved swoosh: from below center hex, sweeping left under Templates, and continuing right under Active Users -->
-    <path d="M 175 290 C 260 320, 340 340, 400 330 C 470 318, 520 280, 565 250 C 610 220, 660 200, 700 195 C 760 188, 820 175, 880 150 C 920 132, 960 110, 990 95"
-          stroke="#3fd0ff" stroke-width="2" fill="none" filter="url(#softGlow)" opacity="0.85"/>
-    <path d="M 175 290 C 260 320, 340 340, 400 330 C 470 318, 520 280, 565 250 C 610 220, 660 200, 700 195 C 760 188, 820 175, 880 150 C 920 132, 960 110, 990 95"
-          stroke="#3fd0ff" stroke-width="7" fill="none" filter="url(#wideGlow)" opacity="0.3"/>
-
-    <!-- small particle dots along the swoosh for sparkle effect -->
-    <circle cx="300" cy="335" r="1.6" fill="#bff3ff"/>
-    <circle cx="340" cy="334" r="1.2" fill="#bff3ff" opacity="0.8"/>
-    <circle cx="600" cy="230" r="1.6" fill="#bff3ff"/>
-    <circle cx="640" cy="210" r="1.2" fill="#bff3ff" opacity="0.8"/>
-    <circle cx="850" cy="160" r="1.6" fill="#bff3ff"/>
-    <circle cx="260" cy="258" r="1.6" fill="#ffffff"/>
-    <circle cx="320" cy="258" r="1.2" fill="#ffffff" opacity="0.8"/>
-    <circle cx="780" cy="215" r="1.6" fill="#ffffff"/>
-    <circle cx="840" cy="215" r="1.2" fill="#ffffff" opacity="0.8"/>
-  </svg>
-
-  <div class="hex-wrap">
-
-    <!-- Clients -->
-    <div class="hex" id="hex-clients">
-      <svg viewBox="0 0 178 200" preserveAspectRatio="none">
-        <polygon points="89,2 176,50 176,150 89,198 2,150 2,50" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
-        <polygon points="89,14 165,56 165,144 89,186 13,144 13,56" fill="none" stroke="#1c5670" stroke-width="1"/>
-      </svg>
-      <div class="hex-content">
-        <div class="hex-label">Clients</div>
-        <div class="hex-number">500+</div>
-        <div class="hex-icon">
-          <svg width="34" height="22" viewBox="0 0 34 22" fill="none">
-            <path d="M2 11 L9 6 L15 11 L9 16 Z" fill="#ffffff" opacity="0.95"/>
-            <path d="M32 11 L25 6 L19 11 L25 16 Z" fill="#ffffff" opacity="0.95"/>
-            <rect x="13" y="9.5" width="8" height="3" rx="1.5" fill="#ffffff"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Templates -->
-    <div class="hex" id="hex-templates">
-      <svg viewBox="0 0 178 200" preserveAspectRatio="none">
-        <polygon points="89,2 176,50 176,150 89,198 2,150 2,50" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
-        <polygon points="89,14 165,56 165,144 89,186 13,144 13,56" fill="none" stroke="#1c5670" stroke-width="1"/>
-      </svg>
-      <div class="hex-content">
-        <div class="hex-label">Templates</div>
-        <div class="hex-number">30+</div>
-        <div class="hex-icon">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-            <rect x="5" y="2" width="14" height="18" rx="1.5" fill="none" stroke="#ffffff" stroke-width="1.6"/>
-            <line x1="8" y1="7" x2="16" y2="7" stroke="#ffffff" stroke-width="1.3"/>
-            <line x1="8" y1="10.5" x2="16" y2="10.5" stroke="#ffffff" stroke-width="1.3"/>
-            <line x1="8" y1="14" x2="13" y2="14" stroke="#ffffff" stroke-width="1.3"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Center: Trusted Worldwide -->
-    <div class="hex" id="hex-center">
-      <svg viewBox="0 0 265 300" preserveAspectRatio="none">
-        <polygon points="132,3 262,75 262,225 132,297 2,225 2,75" fill="#07111f" stroke="#3fd0ff" stroke-width="3"/>
-        <polygon points="132,20 245,84 245,216 132,280 19,216 19,84" fill="none" stroke="#1c5670" stroke-width="1"/>
-      </svg>
-      <div class="hex-content">
-        <div class="center-text">TRUSTED<br>WORLDWIDE</div>
-      </div>
-    </div>
-
-    <!-- Active Users -->
-    <div class="hex" id="hex-active">
-      <svg viewBox="0 0 200 225" preserveAspectRatio="none">
-        <polygon points="100,2 197,57 197,168 100,223 3,168 3,57" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
-        <polygon points="100,15 184,63 184,162 100,210 16,162 16,63" fill="none" stroke="#1c5670" stroke-width="1"/>
-      </svg>
-      <div class="hex-content">
-        <div class="hex-label">Active Users</div>
-        <div class="hex-number">20.0K+</div>
-        <div class="hex-icon">
-          <svg width="30" height="22" viewBox="0 0 30 22" fill="none">
-            <circle cx="15" cy="6" r="4" fill="#ffffff"/>
-            <path d="M5 20 C5 14 10 12 15 12 C20 12 25 14 25 20 Z" fill="#ffffff"/>
-            <circle cx="4" cy="9" r="3" fill="#ffffff" opacity="0.85"/>
-            <path d="M-2 20 C-2 16 1 14 4 14 C5.5 14 6.8 14.5 7.7 15.4 C5.5 16.6 4.5 18 4.3 20 Z" fill="#ffffff" opacity="0.85"/>
-            <circle cx="26" cy="9" r="3" fill="#ffffff" opacity="0.85"/>
-            <path d="M32 20 C32 16 29 14 26 14 C24.5 14 23.2 14.5 22.3 15.4 C24.5 16.6 25.5 18 25.7 20 Z" fill="#ffffff" opacity="0.85"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Success Rate -->
-    <div class="hex" id="hex-success">
-      <svg viewBox="0 0 200 225" preserveAspectRatio="none">
-        <polygon points="100,2 197,57 197,168 100,223 3,168 3,57" fill="#07111f" stroke="#3fd0ff" stroke-width="2.5"/>
-        <polygon points="100,15 184,63 184,162 100,210 16,162 16,63" fill="none" stroke="#1c5670" stroke-width="1"/>
-      </svg>
-      <div class="hex-content">
-        <div class="hex-label">Success Rate</div>
-        <div class="hex-number">99%</div>
-        <div class="hex-icon">
-          <svg width="28" height="22" viewBox="0 0 28 22" fill="none">
-            <polyline points="1,20 9,11 14,15 26,2" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <polyline points="18,2 26,2 26,10" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-// Generate a blocky dotted world map silhouette using a coarse grid mask,
-// approximating continent shapes (simplified, stylized world map dots).
-(function(){
-  const svg = document.querySelector('.map-bg');
-  const group = document.getElementById('worldDots');
-  const cell = 9;
-  const cols = Math.ceil(1153/cell);
-  const rows = Math.ceil(514/cell);
-
-  // Simplified coarse world map mask (1 = land) on a 64x28 grid, hand approximated.
-  const mask = [
-"0000111100000000000001111111000000000000000000000000000000000",
-"0001111110000000111111111111110000000000111111110000000000000",
-"0011111111000011111111111111111000000001111111111100000000000",
-"0111111111100111111111111111111100000111111111111111000000000",
-"0111111111111111111111111111111110001111111111111111100000000",
-"0011111111111111111111111111111111111111111111111111110000000",
-"0001111111110011111111111111111111111111111111111111111000000",
-"0000011111000001111111111111111111111111111111111111111100000",
-"0000001110000000111111111111111111111111111111111111111110000",
-"0000000000000001111111111111111111111111111111111111111111000",
-"0000000111000011111111111111111111111111111111111111111111100",
-"0000001111100011111111111111111111111111111111111111111111000",
-"0000011111110001111111111111111111111111111111111111111100000",
-"0000111111111001111111111111111111111111111111111111111000000",
-"0000111111111111111111111111111111111111111111111110000000000",
-"0000011111111111111111111111111111111111111111110000000000000",
-"0000001111111111111111111111111111111111111111000000000000000",
-"0000000111111111111111111111111111111111111100000000000000000",
-"0000000011111111111111111111111111111111110000000000000000000",
-"0000000001111111111111111111111111111111000000000000000000000",
-"0000000000111111111111111111111111111110000000000000000000000",
-"0000000000011111111111111111111111111100000000000000000000000",
-"0000000000001111111111111111111111110000000000000000000000000",
-"0000000000000111111111111111111111000000000000000000000000000",
-"0000000000000011111111111111111100000000000000000000000000000",
-"0000000000000001111111111111110000000000000000000000000000000",
-"0000000000000000111111111111000000000000000000000000000000000",
-"0000000000000000001111111100000000000000000000000000000000000"
-  ];
-
-  const gridCols = mask[0].length;
-  const gridRows = mask.length;
-  const scaleX = 1153/gridCols;
-  const scaleY = 514/gridRows;
-
-  let html = '';
-  for(let r=0;r<gridRows;r++){
-    for(let c=0;c<gridCols;c++){
-      if(mask[r][c]==='1'){
-        // randomly skip some for organic dotted texture
-        if(Math.random() < 0.18) continue;
-        const x = c*scaleX + (Math.random()*scaleX*0.4);
-        const y = r*scaleY + (Math.random()*scaleY*0.4);
-        const radius = 1.1 + Math.random()*0.6;
-        html += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${radius.toFixed(1)}" fill="#16456b" opacity="${(0.5+Math.random()*0.5).toFixed(2)}"/>`;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Handler - About Us Hero</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandDark: '#0B0F19',
+            brandYellow: '#FACC15',
+          }
+        }
       }
     }
-  }
-  group.innerHTML = html;
-})();
-</script>
+  </script>
+  <style>
+    /* Smooth floating animation for elements */
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(-6deg); }
+      50% { transform: translateY(-12px) rotate(-4deg); }
+    }
+    @keyframes float-faster {
+      0%, 100% { transform: translateY(0px) rotate(8deg); }
+      50% { transform: translateY(-15px) rotate(10deg); }
+    }
+    .animate-float-1 {
+      animation: float-slow 6s ease-in-out infinite;
+    }
+    .animate-float-2 {
+      animation: float-faster 7s ease-in-out infinite;
+    }
+    /* Rotating orbit line */
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 25s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-brandDark font-sans antialiased text-slate-200 selection:bg-brandYellow selection:text-brandDark">
+
+  <section class="relative min-h-screen w-full flex flex-col items-center justify-between overflow-hidden px-6 py-12 md:px-12 lg:px-24 select-none">
+    
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-[300px] h-[300px] bg-brandYellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <div class="w-full flex justify-start items-center z-10">
+      <div class="inline-flex items-center gap-2 border border-brandYellow/20 bg-brandYellow/5 px-4 py-1.5 rounded-full text-xs font-semibold text-brandYellow tracking-wide backdrop-blur-sm shadow-[0_0_15px_rgba(250,204,21,0.05)]">
+        <span>✧</span> Since 2021 <span>✧</span>
+      </div>
+    </div>
+
+    <div class="relative w-full max-w-4xl flex items-center justify-center my-auto z-10 min-h-[350px] md:min-h-[450px]">
+      
+      <div class="absolute w-[320px] md:w-[540px] h-[140px] md:h-[200px] border border-brandYellow/20 rounded-full -rotate-12 blur-[1px] animate-spin-slow"></div>
+      
+      <div class="relative z-20 transform hover:scale-[1.01] transition-transform duration-700 ease-out p-4">
+        <img 
+          src="hero-illustration.png" 
+          alt="Portfolio Handler Workspace" 
+          class="w-full max-w-2xl h-auto object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)]"
+          onerror="this.style.display='none';"
+        />
+        
+        <div class="absolute top-12 -left-6 md:left-0 w-36 h-44 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl animate-float-1">
+          <div class="w-8 h-8 rounded-full bg-slate-700/80 mb-3"></div>
+          <div class="w-full h-2 bg-white/20 rounded mb-2"></div>
+          <div class="w-3/4 h-2 bg-white/10 rounded"></div>
+        </div>
+        
+        <div class="absolute top-6 -right-6 md:right-0 w-40 h-48 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl animate-float-2">
+          <div class="w-full h-20 bg-slate-800/80 rounded-lg mb-3"></div>
+          <div class="w-full h-2 bg-white/20 rounded mb-2"></div>
+          <div class="w-1/2 h-2 bg-white/10 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full max-w-3xl text-center z-10 flex flex-col items-center mt-auto">
+      
+      <span class="text-brandYellow uppercase tracking-[0.2em] text-xs font-bold mb-3 block opacity-90">
+        About Us
+      </span>
+      
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.15] mb-4">
+        Building Digital Futures
+      </h1>
+      
+      <p class="text-slate-400 text-sm md:text-base lg:text-lg max-w-2xl font-normal leading-relaxed mb-6 opacity-80">
+        Helping institutions manage and showcase student portfolios — simply and efficiently.
+      </p>
+
+      <div class="absolute bottom-16 right-[12%] text-slate-600 opacity-40 animate-pulse">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
+        </svg>
+      </div>
+      <div class="absolute bottom-28 left-[10%] text-slate-700 opacity-30 scale-75">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
+        </svg>
+      </div>
+
+    </div>
+  </section>
 
 </body>
 </html>

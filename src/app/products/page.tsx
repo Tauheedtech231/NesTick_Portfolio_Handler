@@ -320,8 +320,9 @@ export default function ProductShowcase() {
                 style={{
                   transitionDelay: `${index * 100}ms`,
                 }}>
-                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-center`}>
-                    {/* Image - Reduced width, increased height */}
+                  {/* REDUCED GAP HERE - from gap-10 lg:gap-16 xl:gap-20 to gap-6 lg:gap-10 xl:gap-14 */}
+                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 xl:gap-14 items-start lg:items-stretch`}>
+                    {/* Image */}
                     <div className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'}`} style={isLeft ? { paddingLeft: '0.3rem' } : undefined}>
                       <div
                         className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
@@ -331,13 +332,13 @@ export default function ProductShowcase() {
                         }}
                       />
                       <div
-                        className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02]"
+                        className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02] h-full"
                         style={{
                           borderColor: getBorderColor(),
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                       >
-                        <div className="w-full relative" style={{ paddingBottom: '85%' }}>
+                        <div className="w-full h-full relative">
                           <img
                             src={product.image}
                             alt={product.title}
@@ -348,82 +349,84 @@ export default function ProductShowcase() {
                       </div>
                     </div>
 
-                    {/* Content - Wider, more space */}
+                    {/* Content */}
                     <div 
-                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-4 md:space-y-5 pl-0 lg:pl-4`}
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-4 md:space-y-5 pl-0 lg:pl-4 flex flex-col h-full`}
                       style={isLeft ? { paddingRight: '0.3rem' } : { paddingLeft: '0.3rem' }}
                     >
-                      <span
-                        className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
-                        style={{ 
-                          color: accentColor,
-                          fontFamily: "'Poppins', sans-serif",
-                        }}
-                      >
-                        {product.subtitle}
-                      </span>
-                      
-                      <h2
-                        className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif cursor-default leading-tight"
-                        style={{ 
-                          color: getTextColor(),
-                          fontFamily: "'Poppins', sans-serif",
-                        }}
-                      >
-                        {product.title}
-                      </h2>
-                      
-                      <p
-                        className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default" 
-                        style={{ 
-                          color: getTextMuted(),
-                          fontFamily: "'Calibri Light', sans-serif",
-                        }}
-                      >
-                        {product.description}
-                      </p>
-                      
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                        {product.features.map((feature, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center gap-2 text-xs sm:text-sm cursor-default"
-                            style={{ 
-                              color: getTextMuted(),
-                              fontFamily: "'Calibri Light', sans-serif",
-                            }}
-                          >
-                            <span
-                              className="material-symbols-outlined cursor-default flex-shrink-0"
-                              style={{
-                                fontSize: '18px',
-                                color: accentColor,
-                              }}
-                            >
-                              check_circle
-                            </span>
-                            <span className="break-words">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <div className="pt-3">
-                        <button
-                          onClick={scrollToCTA}
-                          className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto ${
-                            product.buttonVariant === 'primary'
-                              ? 'text-white shadow-lg'
-                              : 'border'
-                          }`}
-                          style={{
-                            backgroundColor: product.buttonVariant === 'primary' ? accentColor : 'transparent',
-                            color: product.buttonVariant === 'primary' ? '#FFFFFF' : getTextColor(),
-                            borderColor: product.buttonVariant === 'outline' ? getBorderColor() : 'transparent',
+                      <div className="flex-1 flex flex-col justify-center">
+                        <span
+                          className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
+                          style={{ 
+                            color: accentColor,
                             fontFamily: "'Poppins', sans-serif",
                           }}
                         >
-                          {product.buttonText}
-                        </button>
+                          {product.subtitle}
+                        </span>
+                        
+                        <h2
+                          className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif cursor-default leading-tight"
+                          style={{ 
+                            color: getTextColor(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          {product.title}
+                        </h2>
+                        
+                        <p
+                          className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default" 
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                        >
+                          {product.description}
+                        </p>
+                        
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          {product.features.map((feature, idx) => (
+                            <li
+                              key={idx}
+                              className="flex items-center gap-2 text-xs sm:text-sm cursor-default"
+                              style={{ 
+                                color: getTextMuted(),
+                                fontFamily: "'Calibri Light', sans-serif",
+                              }}
+                            >
+                              <span
+                                className="material-symbols-outlined cursor-default flex-shrink-0"
+                                style={{
+                                  fontSize: '18px',
+                                  color: accentColor,
+                                }}
+                              >
+                                check_circle
+                              </span>
+                              <span className="break-words">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        <div className="pt-3">
+                          <button
+                            onClick={scrollToCTA}
+                            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto ${
+                              product.buttonVariant === 'primary'
+                                ? 'text-white shadow-lg'
+                                : 'border'
+                            }`}
+                            style={{
+                              backgroundColor: product.buttonVariant === 'primary' ? accentColor : 'transparent',
+                              color: product.buttonVariant === 'primary' ? '#FFFFFF' : getTextColor(),
+                              borderColor: product.buttonVariant === 'outline' ? getBorderColor() : 'transparent',
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
+                          >
+                            {product.buttonText}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

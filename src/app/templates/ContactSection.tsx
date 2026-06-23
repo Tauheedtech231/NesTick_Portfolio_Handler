@@ -23,28 +23,28 @@ export default function ContactSection({ theme }: ContactSectionProps) {
     if (theme === 'dark') {
       return {
         bg: '#0B0F19',
-        cardBg: '#0F172A',
+        cardBg: '#0B0F19', // Changed to match section bg
         text: '#FFFFFF',
         textSecondary: '#9CA3AF',
         textMuted: '#6B7280',
         border: 'rgba(30, 41, 59, 0.5)',
         accent: '#E8CA5E',
         accentLight: 'rgba(232, 202, 94, 0.15)',
-        inputBg: '#0F172A',
+        inputBg: 'rgba(255,255,255,0.05)', // Slightly lighter for input visibility
         placeholder: '#6B7280',
         label: '#9CA3AF',
       };
     } else {
       return {
         bg: '#FFFFFF',
-        cardBg: '#F8F9FA',
+        cardBg: '#FFFFFF', // Changed to match section bg
         text: '#1F2937',
         textSecondary: '#6B7280',
         textMuted: '#9CA3AF',
         border: 'rgba(0, 0, 0, 0.06)',
         accent: '#0066FF',
         accentLight: 'rgba(0, 102, 255, 0.08)',
-        inputBg: '#F8F9FA',
+        inputBg: 'rgba(0,0,0,0.03)', // Slightly darker for input visibility
         placeholder: '#9CA3AF',
         label: '#6B7280',
       };
@@ -161,12 +161,11 @@ export default function ContactSection({ theme }: ContactSectionProps) {
             </div>
           </div>
 
-          {/* Right - Contact Form - Same bg as card */}
+          {/* Right - Contact Form - No card, flat design */}
           <div className="rounded-2xl p-6 md:p-8"
             style={{
-              backgroundColor: colors.cardBg,
-              border: '1px solid',
-              borderColor: colors.border,
+              backgroundColor: colors.cardBg, // Same as section bg
+              // Removed border for flat feel
             }}
           >
             {contactSuccess ? (

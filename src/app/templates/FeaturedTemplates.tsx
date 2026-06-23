@@ -40,20 +40,22 @@ export default function FeaturedTemplates({
 
   const isEven = currentIndex % 2 === 0;
 
+  // Get background color - same for both templates
+  const bgColor = theme === 'dark' ? '#0F172A' : '#F8F9FA';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="py-8 md:py-10 lg:py-12"
+      className="py-8 md:py-10 lg:py-12 px-4 sm:px-6 lg:px-8" // Added padding here
       style={{
         backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-      {/* No padding on left/right */}
-      <div>
-        <div className="flex items-center gap-3 mb-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto"> {/* Added container with max-width */}
+        <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-8 rounded-full"
             style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
           />
@@ -73,10 +75,10 @@ export default function FeaturedTemplates({
           </h2>
         </div>
 
-        {/* Card - Full width, no padding */}
-        <div className="rounded-2xl overflow-hidden mx-0"
+        {/* Single Card - Fixed background color */}
+        <div className="rounded-2xl overflow-hidden"
           style={{
-            backgroundColor: theme === 'dark' ? '#0F172A' : '#F8F9FA',
+            backgroundColor: bgColor, // Same for all templates
           }}
         >
           {/* Tab Headers - 2 Columns */}
@@ -91,9 +93,7 @@ export default function FeaturedTemplates({
                 onClick={() => goToSlide(index)}
                 className="relative py-4 px-6 text-center transition-all duration-300 cursor-pointer hover:bg-opacity-5 group"
                 style={{
-                  backgroundColor: index === currentIndex
-                    ? (theme === 'dark' ? 'rgba(232,202,94,0.08)' : 'rgba(0,102,255,0.04)')
-                    : 'transparent',
+                  backgroundColor: 'transparent', // Always transparent
                   borderRight: index === 0 ? '1px solid' : 'none',
                   borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
                 }}
@@ -130,7 +130,7 @@ export default function FeaturedTemplates({
             ))}
           </div>
 
-          {/* Content Area - No padding */}
+          {/* Content Area - No background change */}
           <div className="relative min-h-[320px]">
             <AnimatePresence mode="wait">
               <motion.div
@@ -162,7 +162,7 @@ export default function FeaturedTemplates({
                           src={currentTemplate.image}
                           alt={currentTemplate.name}
                           fill
-                          className="object-contain"  // Changed from object-cover
+                          className="object-contain"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>
@@ -305,7 +305,7 @@ export default function FeaturedTemplates({
                           src={currentTemplate.image}
                           alt={currentTemplate.name}
                           fill
-                          className="object-contain"  // Changed from object-cover
+                          className="object-contain"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>
