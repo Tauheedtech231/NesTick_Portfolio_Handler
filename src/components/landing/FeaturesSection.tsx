@@ -1,593 +1,642 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { TiArrowSortedDown } from "react-icons/ti";
-import { useInView } from "react-intersection-observer";
-import { Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
-interface Feature {
-  id: number;
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface SegmentData {
+  id: string;
+  startDeg: number;
+  endDeg: number;
+  label: string[];
+  centerDeg: number;
   title: string;
-  shortLabel: string;
-  tag: string;
-  fill: string;
   description: string;
 }
 
-export default function FeaturesSection() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [typedText, setTypedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [isClient, setIsClient] = useState(false);
+// ─── Data ────────────────────────────────────────────────────────────────────
 
-  // Theme detection
+const SEGMENTS: SegmentData[] = [
+  {
+    id: "01",
+    startDeg: 238,
+    endDeg: 302,
+    label: ["MULTI", "PORTAL"],
+    centerDeg: 270,
+    title: "MULTI-PORTAL ARCHITECTURE",
+    description:
+      "Build and manage multiple portals from a single codebase with shared components. Scale seamlessly across brands, regions, and user types without duplicating your infrastructure.",
+  },
+  {
+    id: "02",
+    startDeg: 310,
+    endDeg: 14,
+    label: ["CENTRALIZ"],
+    centerDeg: 342,
+    title: "CENTRALIZED MANAGEMENT",
+    description:
+      "Control all your portals, users, and configurations from one unified dashboard. Streamline operations and reduce overhead with a single source of truth for your entire platform.",
+  },
+  {
+    id: "03",
+    startDeg: 22,
+    endDeg: 86,
+    label: ["ACCESS", "CONTROL"],
+    centerDeg: 54,
+    title: "ACCESS CONTROL",
+    description:
+      "Define granular roles and permissions for every user across all portals. Protect sensitive data with enterprise-grade authentication and fine-grained authorization policies.",
+  },
+  {
+    id: "04",
+    startDeg: 94,
+    endDeg: 158,
+    label: ["LIVE", "SYNC"],
+    centerDeg: 126,
+    title: "LIVE SYNC",
+    description:
+      "Real-time data synchronization across all portals and devices. Changes propagate instantly so every user always sees the most current information without manual refresh.",
+  },
+  {
+    id: "05",
+    startDeg: 166,
+    endDeg: 230,
+    label: ["PORTFOLIO"],
+    centerDeg: 198,
+    title: "PORTFOLIO",
+    description:
+      "Showcase and manage your complete portfolio of projects within one cohesive platform. Present clients with a polished, branded experience that highlights your best work.",
+  },
+];
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const CX = 340;
+const CY = 340;
+const GOLD = "#c8921e";
+const BLUE = "#0066FF";
+const FILL = "#0f1e38";
+const FILL_HOVER = "#1a3060";
+const INNER_FILL = "#07101e";
+const BG = "#0B0F19";
+
+// Light mode colors
+const LIGHT_BG = "#FFFFFF";
+const LIGHT_FILL = "#f0f4ff";
+const LIGHT_FILL_HOVER = "#dce6ff";
+const LIGHT_INNER_FILL = "#f8faff";
+const LIGHT_DESC = "#6B7280";
+const LIGHT_CARD_BG = "#FFFFFF";
+
+const OUTER_R = 268;
+const STRIP_OUTER = 268;
+const STRIP_INNER = 246;
+const SEG_OUTER = 234;
+const SEG_INNER = 110;
+const INNER_CIRCLE_R = 98;
+const LABEL_R = 172;
+const NUM_R = (STRIP_OUTER + STRIP_INNER) / 2;
+
+// ─── SVG Helpers ─────────────────────────────────────────────────────────────
+
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+const polar = (r: number, deg: number) => ({
+  x: CX + r * Math.cos(toRad(deg)),
+  y: CY + r * Math.sin(toRad(deg)),
+});
+
+function arcPath(r: number, startDeg: number, endDeg: number): string {
+  let end = endDeg;
+  if (end < startDeg) end += 360;
+  const large = end - startDeg > 180 ? 1 : 0;
+  const s = polar(r, startDeg);
+  const e = polar(r, endDeg);
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+}
+
+function donutSegment(
+  outerR: number,
+  innerR: number,
+  startDeg: number,
+  endDeg: number
+): string {
+  let end = endDeg;
+  if (end < startDeg) end += 360;
+  const large = end - startDeg > 180 ? 1 : 0;
+  const os = polar(outerR, startDeg);
+  const oe = polar(outerR, endDeg);
+  const ie = polar(innerR, endDeg);
+  const is_ = polar(innerR, startDeg);
+  return [
+    `M ${os.x} ${os.y}`,
+    `A ${outerR} ${outerR} 0 ${large} 1 ${oe.x} ${oe.y}`,
+    `L ${ie.x} ${ie.y}`,
+    `A ${innerR} ${innerR} 0 ${large} 0 ${is_.x} ${is_.y}`,
+    "Z",
+  ].join(" ");
+}
+
+// ─── Typewriter Hook ──────────────────────────────────────────────────────────
+
+function useTypewriter(text: string, speed = 20) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    setIsClient(true);
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
-    };
-
-    checkTheme();
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === "class") {
-          checkTheme();
-        }
-      });
-    });
-
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
-  }, []);
-
-  const features: Feature[] = [
-    {
-      id: 0,
-      title: "Ready-Made Portfolio Templates",
-      shortLabel: "Portfolio",
-      tag: "Templates",
-      fill: "#4cc9f0",
-      description: "Choose from 30+ professionally designed templates to showcase your work in minutes."
-    },
-    {
-      id: 1,
-      title: "Multi-Portal Architecture",
-      shortLabel: "Multiportal",
-      tag: "Architecture",
-      fill: "#f72585",
-      description: "Build and manage multiple portals from a single codebase with shared components."
-    },
-    {
-      id: 2,
-      title: "Centralized Management",
-      shortLabel: "Centraliz",
-      tag: "Management",
-      fill: "#e8ca5e",
-      description: "Control all your portals, users, and content from one central dashboard."
-    },
-    {
-      id: 3,
-      title: "Real-Time Content Updates",
-      shortLabel: "Live Sync",
-      tag: "Real-Time",
-      fill: "#06d6a0",
-      description: "Content updates reflect instantly across all portals without any downtime."
-    },
-    {
-      id: 4,
-      title: "Role-Based Access Control",
-      shortLabel: "Access Ctrl",
-      tag: "Security",
-      fill: "#7209b7",
-      description: "Define granular permissions for users, teams, and roles with enterprise-grade security."
-    }
-  ];
-
-  // Typing animation
-  useEffect(() => {
-    const activeFeature = features[activeIdx];
-    if (!activeFeature) return;
-
-    const fullText = activeFeature.description;
-    setTypedText("");
-    setProgress(0);
-    setIsTyping(true);
-
-    let currentIndex = 0;
-    const typingSpeed = 30;
-
-    const interval = setInterval(() => {
-      if (currentIndex <= fullText.length) {
-        setTypedText(fullText.substring(0, currentIndex));
-        setProgress((currentIndex / fullText.length) * 100);
-        currentIndex++;
+    setDisplayed("");
+    setDone(false);
+    let i = 0;
+    const tick = () => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i < text.length) {
+        timerRef.current = setTimeout(tick, speed);
       } else {
-        setIsTyping(false);
-        clearInterval(interval);
+        setDone(true);
       }
-    }, typingSpeed);
-
-    return () => clearInterval(interval);
-  }, [activeIdx]);
-
-  const strokeColor = theme === 'dark' ? '#94a3b8' : '#1e293b';
-  const activeColor = theme === 'dark' ? '#E8CA5E' : '#0066FF';
-  const textColor = theme === 'dark' ? '#60A5FA' : '#1E3A8A';
-  const dimTextColor = theme === 'dark' ? '#60A5FA' : '#000000';
-  const cardBgColor = theme === 'dark' ? 'rgba(15, 23, 42, 0.97)' : 'rgba(255, 255, 255, 0.97)';
-  const cardTextColor = theme === 'dark' ? '#e2e8f0' : '#1e293b';
-  const cardTextSecondary = theme === 'dark' ? '#9CA3AF' : '#4B5563';
-  const cardBgLight = theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : '#F3F4F6';
-  
-  const svgRef = useRef<SVGSVGElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const diagramContainerRef = useRef<HTMLDivElement>(null);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const loopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  const { ref: sectionRef, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-  
-  const [showCard, setShowCard] = useState(true);
-  const [isHovering, setIsHovering] = useState(false);
-  const [cardAnimating, setCardAnimating] = useState(true);
-  const [userInteracted, setUserInteracted] = useState(false);
-
-  // Auto-loop through features
-  const startLoop = useCallback(() => {
-    if (loopTimerRef.current) clearInterval(loopTimerRef.current);
-    
-    loopTimerRef.current = setInterval(() => {
-      const nextIdx = (activeIdx + 1) % features.length;
-      setActiveIdx(nextIdx);
-    }, 4000);
-  }, [activeIdx, features.length]);
-
-  useEffect(() => {
-    startLoop();
-    return () => {
-      if (loopTimerRef.current) clearInterval(loopTimerRef.current);
     };
-  }, [startLoop]);
-
-  // Auto hide after description complete
-  useEffect(() => {
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
-    }
-
-    if (progress === 100 && !isHovering && !userInteracted) {
-      hideTimerRef.current = setTimeout(() => {
-        setCardAnimating(false);
-        setTimeout(() => {
-          const nextIdx = (activeIdx + 1) % features.length;
-          setActiveIdx(nextIdx);
-          setCardAnimating(true);
-        }, 500);
-      }, 1500);
-    }
-
+    timerRef.current = setTimeout(tick, speed);
     return () => {
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [progress, isHovering, userInteracted, activeIdx]);
+  }, [text, speed]);
 
-  useEffect(() => {
-    if (isHovering) {
-      setShowCard(true);
-      setCardAnimating(true);
-    } else {
-      setShowCard(true);
-      setCardAnimating(true);
-    }
-  }, [isHovering]);
+  return { displayed, done };
+}
 
-  // Arrow positions
-  const ARROW_START_X = 250;
-  const ARROW_START_Y = 20;
+// ─── Segment Preview (popup left side) ───────────────────────────────────────
 
-  const getArrowEndPosition = () => {
-    if (cardRef.current && svgRef.current && diagramContainerRef.current) {
-      const svgRect = svgRef.current.getBoundingClientRect();
-      const cardRect = cardRef.current.getBoundingClientRect();
-      const containerRect = diagramContainerRef.current.getBoundingClientRect();
-      
-      const scaleX = 550 / svgRect.width;
-      const scaleY = 500 / svgRect.height;
-      
-      const cardTopCenterX = (cardRect.left + cardRect.width / 2 - containerRect.left) * scaleX;
-      const cardTopY = (cardRect.top - containerRect.top - 10) * scaleY;
-      
-      return { x: Math.max(480, Math.min(cardTopCenterX, 540)), y: Math.max(20, cardTopY) };
-    }
-    
-    return { x: 502, y: 160 };
-  };
+function SegmentPreview({ seg, theme }: { seg: SegmentData; theme: 'light' | 'dark' }) {
+  const START = 238;
+  const END = 302;
+  const CENTER = 270;
 
-  const arrowEnd = getArrowEndPosition();
-  const arrowPath = `M ${ARROW_START_X} ${ARROW_START_Y} Q ${(ARROW_START_X + arrowEnd.x) / 2 + 40} ${Math.min(ARROW_START_Y, arrowEnd.y) - 60}, ${arrowEnd.x} ${arrowEnd.y}`;
+  const stripPath = donutSegment(STRIP_OUTER, STRIP_INNER, START, END);
+  const mainPath = donutSegment(SEG_OUTER, SEG_INNER, START, END);
 
-  // Fixed: Only 5 positions for 5 features
-  const featurePositions = [
-    { x: 115, y: 90, marginTop: 22, marginLeft: 0, id: 0 },
-    { x: 325, y: 110, marginTop: 0, marginLeft: 0, id: 1 },
-    { x: 235, y: 205, marginTop: 18, marginLeft: 0, id: 2 },
-    { x: 130, y: 295, marginTop: 18, marginLeft: 0, id: 3 },
-    { x: 180, y: 430, marginTop: 0, marginLeft: 25, id: 4 },
-  ];
+  const VB_X = 165;
+  const VB_Y = 68;
+  const VB_W = 350;
+  const VB_H = 282;
 
-  const activeFeature = features[activeIdx];
+  const numPos = polar(NUM_R, CENTER);
+  const lblPos = polar(LABEL_R, CENTER);
 
-  const handleMouseEnter = (idx: number) => {
-    setUserInteracted(true);
-    if (loopTimerRef.current) {
-      clearInterval(loopTimerRef.current);
-      loopTimerRef.current = null;
-    }
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
-    }
-    setIsHovering(true);
-    setActiveIdx(idx);
-    setShowCard(true);
-    setCardAnimating(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-    setUserInteracted(false);
-    startLoop();
-  };
-
-  useEffect(() => {
-    return () => {
-      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-      if (loopTimerRef.current) clearInterval(loopTimerRef.current);
-    };
-  }, []);
-
-  if (!isClient) return null;
+  const fillColor = theme === 'dark' ? FILL : LIGHT_FILL;
+  const innerFill = theme === 'dark' ? INNER_FILL : LIGHT_INNER_FILL;
+  const textColor = theme === 'dark' ? GOLD : BLUE;
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-12 md:py-16 px-4 sm:px-6 relative"
+    <svg
+      viewBox={`${VB_X} ${VB_Y} ${VB_W} ${VB_H}`}
+      width="100%"
+      height="100%"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {/* Strip */}
+      <path d={stripPath} fill={innerFill} stroke={textColor} strokeWidth="2" />
+      {/* Main segment */}
+      <path d={mainPath} fill={fillColor} stroke={textColor} strokeWidth="2" />
+
+      {/* Number */}
+      <text
+        x={numPos.x}
+        y={numPos.y}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={textColor}
+        fontFamily="Arial, sans-serif"
+        fontSize="20"
+        fontWeight="700"
+        letterSpacing="2"
+      >
+        {seg.id}
+      </text>
+
+      {/* Labels */}
+      {seg.label.map((line, i) => (
+        <text
+          key={i}
+          x={lblPos.x}
+          y={lblPos.y + (i - (seg.label.length - 1) / 2) * 24}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={textColor}
+          fontFamily="Arial, sans-serif"
+          fontSize="18"
+          fontWeight="700"
+          letterSpacing="3"
+        >
+          {line}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+// ─── Info Card ────────────────────────────────────────────────────────────────
+
+function InfoCard({ seg, theme }: { seg: SegmentData; theme: 'light' | 'dark' }) {
+  const { displayed, done } = useTypewriter(seg.description, 18);
+
+  const cardBg = theme === 'dark' ? '#0F172A' : LIGHT_CARD_BG;
+  const borderColor = theme === 'dark' ? GOLD : BLUE;
+  const titleColor = theme === 'dark' ? GOLD : BLUE;
+  const descColor = theme === 'dark' ? '#D1D5DB' : LIGHT_DESC;
+  const dotColor = theme === 'dark' ? GOLD : BLUE;
+
+  return (
+    <div
+      className="flex flex-col h-full p-6 rounded"
       style={{
-        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
-        fontFamily: "'Poppins', sans-serif",
+        border: `1px solid ${borderColor}`,
+        backgroundColor: cardBg,
+        minHeight: 220,
       }}
     >
-      <div className="container mx-auto max-w-6xl relative z-10">
-        {/* Section Header */}
-        <div className="mb-10 md:mb-12 text-center">
-          <div 
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
-            style={{
-              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-              border: 'none',
-            }}
-          >
-            <Sparkles className="w-3.5 h-3.5"
-              style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-            />
-            <span className="text-xs font-medium"
-              style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              ✨ Powerful Features
-            </span>
-          </div>
-          
-          <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
-            <span 
-              className="relative inline-block"
-              style={{ 
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              Comprehensive
-            </span>{' '}
-            <span 
-              className="inline-block"
-              style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              System Features
-            </span>
-          </h2>
-          
-          <p 
-            className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light"
-            style={{ 
-              color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
-              fontFamily: "'Calibri Light', sans-serif",
-            }}
-          >
-            Explore the powerful features that make our platform stand out
-          </p>
-        </div>
-
-        {/* Features Diagram */}
-        <div 
-          className="relative w-full flex items-center justify-center" 
-          style={{ 
-            minHeight: '500px',
-            fontFamily: "'Poppins', sans-serif",
+      {/* Title */}
+      <div className="flex items-start gap-3 mb-5">
+        <span
+          className="shrink-0 mt-1 rounded-full"
+          style={{ width: 12, height: 12, backgroundColor: dotColor }}
+        />
+        <p
+          style={{
+            color: titleColor,
+            fontFamily: "Arial, sans-serif",
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: 1,
+            lineHeight: 1.4,
           }}
-          onMouseLeave={handleMouseLeave}
         >
-          <div className="flex items-center justify-center" style={{ gap: '0px', minWidth: '550px' }}>
-            {/* Diagram Container */}
-            <div ref={diagramContainerRef} className="relative w-[500px] h-[500px] flex-shrink-0">
-              <svg
-                ref={svgRef}
-                viewBox="0 0 550 500"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-full"
-              >
-                {/* Main Circle */}
-                <circle
-                  cx="250"
-                  cy="250"
-                  r="230"
-                  fill="none"
-                  stroke={activeIdx !== null ? activeColor : strokeColor}
-                  strokeWidth={activeIdx !== null ? 3 : 2.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    transition: "all 0.5s ease",
-                    filter: activeIdx !== null ? `drop-shadow(0 0 6px ${activeColor}44)` : 'none',
-                  }}
-                />
+          {seg.title}
+        </p>
+      </div>
 
-                {/* Dividers */}
-                {[
-                  { x1: 250, y1: 20, x2: 160, y2: 155 },
-                  { x1: 160, y1: 155, x2: 330, y2: 210 },
-                  { x1: 120, y1: 260, x2: 210, y2: 330 },
-                  { x1: 210, y1: 330, x2: 480, y2: 250 },
-                  { x1: 160, y1: 155, x2: 120, y2: 260 },
-                  { x1: 330, y1: 210, x2: 480, y2: 250 },
-                  { x1: 20, y1: 250, x2: 120, y2: 260 },
-                  { x1: 210, y1: 330, x2: 140, y2: 452 },
-                  { x1: 210, y1: 330, x2: 310, y2: 472 },
-                ].map((line, i) => (
-                  <line
-                    key={i}
-                    x1={line.x1}
-                    y1={line.y1}
-                    x2={line.x2}
-                    y2={line.y2}
-                    stroke={activeIdx !== null ? activeColor : strokeColor}
-                    strokeWidth={activeIdx !== null ? 3 : 2.5}
-                    style={{
-                      transition: "all 0.5s ease",
-                      filter: activeIdx !== null ? `drop-shadow(0 0 4px ${activeColor}44)` : 'none',
-                    }}
-                  />
-                ))}
+      {/* Description — typewriter */}
+      <div className="flex items-start gap-3 mb-6 flex-1">
+        <span
+          className="shrink-0 mt-1 rounded-full"
+          style={{ width: 10, height: 10, backgroundColor: dotColor }}
+        />
+        <p
+          style={{
+            color: descColor,
+            fontFamily: "Arial, sans-serif",
+            fontSize: 13,
+            lineHeight: 1.7,
+            minHeight: 64,
+          }}
+        >
+          {displayed}
+          {!done && (
+            <span
+              className="inline-block align-middle ml-0.5 animate-pulse"
+              style={{
+                width: 2,
+                height: 14,
+                backgroundColor: dotColor,
+                display: "inline-block",
+              }}
+            />
+          )}
+        </p>
+      </div>
 
-                {/* Dotted Curved Arrow */}
-                {showCard && (
-                  <>
-                    <path
-                      d={arrowPath}
-                      fill="none"
-                      stroke={activeColor}
-                      strokeWidth={2.5}
-                      opacity={0.8}
-                      strokeLinecap="round"
-                      strokeDasharray="8 6"
-                    >
-                      <animate
-                        attributeName="stroke-dashoffset"
-                        from="14"
-                        to="0"
-                        dur="1.2s"
-                        repeatCount="indefinite"
-                      />
-                    </path>
+      {/* Bottom line */}
+      <div style={{ height: 1.5, width: "72%", backgroundColor: dotColor }} />
+    </div>
+  );
+}
 
-                    <foreignObject
-                      x={arrowEnd.x - 14}
-                      y={arrowEnd.y - 14}
-                      width={28}
-                      height={28}
-                    >
-                      <div 
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: activeColor,
-                          fontSize: '28px',
-                          opacity: 0.9,
-                          transition: 'all 0.5s ease',
-                        }}
-                      >
-                        <TiArrowSortedDown />
-                      </div>
-                    </foreignObject>
-                  </>
-                )}
+// ─── Popup ────────────────────────────────────────────────────────────────────
 
-                {/* Feature Labels */}
-                {featurePositions.map((pos) => {
-                  const feature = features[pos.id];
-                  if (!feature) return null;
-                  
-                  const isActive = activeIdx === pos.id;
-                  const isDimmed = activeIdx !== null && !isActive;
-                  
-                  const textX = pos.x + pos.marginLeft;
-                  const textY = pos.y + pos.marginTop;
+function FeaturePopup({
+  seg,
+  onClose,
+  theme,
+}: {
+  seg: SegmentData;
+  onClose: () => void;
+  theme: 'light' | 'dark';
+}) {
+  const bgColor = theme === 'dark' ? BG : LIGHT_BG;
+  const overlayColor = theme === 'dark' ? 'rgba(5,9,20,0.88)' : 'rgba(200,200,200,0.7)';
+  const borderColor = theme === 'dark' ? GOLD : BLUE;
+  const closeColor = theme === 'dark' ? GOLD : BLUE;
 
-                  return (
-                    <g
-                      key={pos.id}
-                      style={{ cursor: "pointer" }}
-                      onMouseEnter={() => handleMouseEnter(pos.id)}
-                    >
-                      <circle cx={pos.x} cy={pos.y} r="55" fill="transparent" />
-                      
-                      <text
-                        x={textX}
-                        y={textY}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill={isActive ? activeColor : isDimmed ? dimTextColor : textColor}
-                        fontSize={pos.id === 4 ? "18" : pos.id === 1 ? "16" : "14"}
-                        fontWeight={isActive ? "bold" : "600"}
-                        style={{
-                          fontFamily: "'Poppins', sans-serif",
-                          transition: "all 0.5s ease",
-                          opacity: isDimmed ? 0.4 : 1,
-                          filter: isActive ? `drop-shadow(0 0 8px ${activeColor}66)` : 'none',
-                          pointerEvents: "none",
-                        }}
-                      >
-                        {feature.shortLabel.split(" ").map((word: string, i: number) => (
-                          <tspan key={i} x={textX} dy={i === 0 ? 0 : 18}>
-                            {word}
-                          </tspan>
-                        ))}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      style={{ backgroundColor: overlayColor }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-3xl rounded"
+        style={{ border: `1px solid ${borderColor}` }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="rounded p-6" style={{ backgroundColor: bgColor }}>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute sm:mt-3 sm:mr-3 flex items-center justify-center rounded-full transition-opacity hover:opacity-60"
+            style={{
+              width: 34,
+              height: 34,
+              top: '12px',
+              right: '12px',
+              color: closeColor,
+              border: `1.5px solid ${closeColor}`,
+              fontSize: 20,
+              lineHeight: 1,
+              cursor: "pointer",
+              backgroundColor: "transparent",
+              zIndex: 10,
+            }}
+          >
+            ×
+          </button>
+
+          <div className="flex flex-col md:flex-row items-stretch gap-6">
+            {/* LEFT — segment preview */}
+            <div
+              className="shrink-0 flex items-center justify-center"
+              style={{ width: 260, minHeight: 220 }}
+            >
+              <SegmentPreview seg={seg} theme={theme} />
             </div>
 
-            {/* Description Card */}
-            <div 
-              className="flex-shrink-0 relative"
-              style={{ 
-                width: '340px',
-                minHeight: '300px',
-                marginLeft: '-14px',
-              }}
-            >
-              <div 
-                className="absolute inset-0 flex items-center"
-                style={{ pointerEvents: 'auto' }}
-              >
-                {showCard && activeFeature && (
-                  <div 
-                    ref={cardRef}
-                    className="w-full"
-                    style={{
-                      opacity: cardAnimating ? 1 : 0,
-                      transform: cardAnimating ? 'translateX(0) scale(1)' : 'translateX(-30px) scale(0.9)',
-                      transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      pointerEvents: 'auto',
-                    }}
-                  >
-                    <div
-                      className="rounded-xl p-5 shadow-2xl relative"
-                      style={{
-                        backgroundColor: cardBgColor,
-                        border: `2px solid ${activeColor}`,
-                        boxShadow: `0 0 50px ${activeColor}33, 0 20px 60px rgba(0,0,0,0.3)`,
-                        width: '100%',
-                      }}
-                    >
-                      <div 
-                        className="absolute inset-0 rounded-xl pointer-events-none"
-                        style={{
-                          background: `radial-gradient(circle at 50% 0%, ${activeColor}22, transparent 70%)`,
-                          opacity: 0.5,
-                        }}
-                      />
-                      
-                      <div className="flex items-center gap-2 mb-3 relative z-10">
-                        <span
-                          className="w-3 h-3 rounded-full flex-shrink-0"
-                          style={{
-                            background: activeFeature.fill,
-                            border: `2px solid ${activeColor}`,
-                            boxShadow: `0 0 15px ${activeColor}66`,
-                          }}
-                        />
-                        <span 
-                          className="text-base font-semibold leading-tight flex-1" 
-                          style={{ 
-                            color: cardTextColor,
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          {activeFeature.title}
-                        </span>
-                        <span
-                          className="text-[10px] px-2.5 py-0.5 rounded-full ml-auto flex-shrink-0 font-medium"
-                          style={{ 
-                            background: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)',
-                            color: activeColor,
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          {activeFeature.tag}
-                        </span>
-                      </div>
-
-                      <div className="flex items-start gap-2.5 mb-3 relative z-10">
-                        <div 
-                          className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
-                          style={{ background: activeFeature.fill }}
-                        />
-                        <p 
-                          className="text-sm leading-relaxed min-h-[48px]" 
-                          style={{ 
-                            color: cardTextSecondary,
-                            fontFamily: "'Calibri Light', sans-serif",
-                          }}
-                        >
-                          {typedText}
-                          {isTyping && (
-                            <span
-                              className="inline-block w-0.5 h-4 ml-0.5 align-middle"
-                              style={{ background: cardTextSecondary, animation: "blink 0.7s step-end infinite" }}
-                            />
-                          )}
-                        </p>
-                      </div>
-
-                      <div className="h-1 w-full rounded-full overflow-hidden relative z-10" style={{ backgroundColor: cardBgLight }}>
-                        <div
-                          className="h-full rounded-full transition-all duration-75"
-                          style={{ width: `${progress}%`, background: activeColor, boxShadow: `0 0 15px ${activeColor}66` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* RIGHT — info card */}
+            <div className="flex-1">
+              <InfoCard key={seg.id} seg={seg} theme={theme} />
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0; }
+// ─── Wheel SVG ────────────────────────────────────────────────────────────────
+
+function WheelSVG({
+  activeId,
+  onHover,
+  onClick,
+  theme,
+}: {
+  activeId: string | null;
+  onHover: (id: string | null) => void;
+  onClick: (seg: SegmentData) => void;
+  theme: 'light' | 'dark';
+}) {
+  const fillColor = theme === 'dark' ? FILL : LIGHT_FILL;
+  const fillHover = theme === 'dark' ? FILL_HOVER : LIGHT_FILL_HOVER;
+  const innerFill = theme === 'dark' ? INNER_FILL : LIGHT_INNER_FILL;
+  const textColor = theme === 'dark' ? GOLD : BLUE;
+
+  return (
+    <svg
+      width="100%"
+      viewBox="0 0 680 680"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {SEGMENTS.map((seg) => {
+        const isActive = activeId === seg.id;
+        const numPos = polar(NUM_R, seg.centerDeg);
+        const lblPos = polar(LABEL_R, seg.centerDeg);
+        const segFill = isActive ? fillHover : fillColor;
+
+        // ─── DIRECTION-AWARE LIFT ──────────────────────────────
+        // Calculate direction from center to segment center
+        const angleRad = toRad(seg.centerDeg);
+        // Move outward by 8px in the direction of the segment
+        const liftX = 8 * Math.cos(angleRad);
+        const liftY = 8 * Math.sin(angleRad);
+
+        return (
+          <g
+            key={seg.id}
+            onMouseEnter={() => onHover(seg.id)}
+            onMouseLeave={() => onHover(null)}
+            onClick={() => onClick(seg)}
+            style={{ 
+              cursor: "pointer",
+              transition: "transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              transform: isActive 
+                ? `translate(${liftX}px, ${liftY}px)` 
+                : "translate(0px, 0px)",
+            }}
+          >
+            {/* Outer arc */}
+            <path
+              d={arcPath(OUTER_R, seg.startDeg, seg.endDeg)}
+              fill="none"
+              stroke={textColor}
+              strokeWidth={isActive ? 2 : 1.3}
+            />
+
+            {/* Number strip */}
+            <path
+              d={donutSegment(STRIP_OUTER, STRIP_INNER, seg.startDeg, seg.endDeg)}
+              fill={segFill}
+              stroke={textColor}
+              strokeWidth="1.0"
+              style={{ transition: "fill 0.2s" }}
+            />
+            <path
+              d={arcPath(STRIP_INNER, seg.startDeg, seg.endDeg)}
+              fill="none"
+              stroke={textColor}
+              strokeWidth="1.0"
+            />
+
+            {/* Main segment */}
+            <path
+              d={donutSegment(SEG_OUTER, SEG_INNER, seg.startDeg, seg.endDeg)}
+              fill={segFill}
+              stroke={textColor}
+              strokeWidth="1.1"
+              style={{ transition: "fill 0.2s" }}
+            />
+            <path
+              d={arcPath(SEG_OUTER, seg.startDeg, seg.endDeg)}
+              fill="none"
+              stroke={textColor}
+              strokeWidth="1.0"
+            />
+            <path
+              d={arcPath(SEG_INNER, seg.startDeg, seg.endDeg)}
+              fill="none"
+              stroke={textColor}
+              strokeWidth="1.0"
+            />
+
+            {/* Number */}
+            <text
+              x={numPos.x}
+              y={numPos.y}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill={textColor}
+              fontFamily="Arial, sans-serif"
+              fontSize="12"
+              fontWeight="600"
+              letterSpacing="1"
+            >
+              {seg.id}
+            </text>
+
+            {/* Labels */}
+            {seg.label.map((line, i) => (
+              <text
+                key={i}
+                x={lblPos.x}
+                y={lblPos.y + (i - (seg.label.length - 1) / 2) * 19}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill={textColor}
+                fontFamily="Arial, sans-serif"
+                fontSize="13"
+                fontWeight="700"
+                letterSpacing="2"
+              >
+                {line}
+              </text>
+            ))}
+          </g>
+        );
+      })}
+
+      {/* Inner circle */}
+      <circle
+        cx={CX}
+        cy={CY}
+        r={INNER_CIRCLE_R}
+        fill={innerFill}
+        stroke={textColor}
+        strokeWidth="1.3"
+      />
+    </svg>
+  );
+}
+
+// ─── Main Export ──────────────────────────────────────────────────────────────
+
+export default function FeaturesSection() {
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const [activeSeg, setActiveSeg] = useState<SegmentData | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  // Detect theme changes
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          checkTheme();
         }
-      `}</style>
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
+  const handleClick = useCallback((seg: SegmentData) => {
+    setActiveSeg(seg);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setActiveSeg(null);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleClose]);
+
+  // Get colors based on theme
+  const bgColor = theme === 'dark' ? BG : LIGHT_BG;
+  const headingColor1 = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+  const headingColor2 = theme === 'dark' ? GOLD : BLUE;
+  const subColor = theme === 'dark' ? '#9CA3AF' : '#6B7280';
+  const lineColor = theme === 'dark' ? GOLD : BLUE;
+
+  return (
+    <section
+      className="flex flex-col items-center justify-center w-full min-h-screen py-12"
+      style={{ backgroundColor: bgColor }}
+    >
+      {/* ── Heading ── */}
+      <div className="mb-10 text-center px-4">
+        <h2
+          className="text-3xl sm:text-4xl md:text-4xl font-bold font-serif tracking-tight"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+        >
+          <span
+            className="relative inline-block"
+            style={{ 
+              color: headingColor1,
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          >
+            Comprehensive
+          </span>{' '}
+          <span
+            className="inline-block"
+            style={{ 
+              color: headingColor2,
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          >
+            System Features
+          </span>
+        </h2>
+        <p
+          className="mt-2 text-sm tracking-wide"
+          style={{
+            color: subColor,
+            fontFamily: "'Calibri Light', sans-serif",
+            letterSpacing: 1,
+          }}
+        >
+          Explore our powerful platform capabilities
+        </p>
+        <div
+          className="mx-auto mt-3"
+          style={{ height: 1.5, width: 160, backgroundColor: lineColor, opacity: 0.6 }}
+        />
+      </div>
+
+      {/* ── Wheel ── */}
+      <div className="w-full max-w-xl px-4">
+        <WheelSVG
+          activeId={hoverId}
+          onHover={setHoverId}
+          onClick={handleClick}
+          theme={theme}
+        />
+      </div>
+
+      {/* ── Popup ── */}
+      {activeSeg && (
+        <FeaturePopup seg={activeSeg} onClose={handleClose} theme={theme} />
+      )}
     </section>
   );
 }

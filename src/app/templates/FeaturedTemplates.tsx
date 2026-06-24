@@ -48,14 +48,15 @@ export default function FeaturedTemplates({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="py-8 md:py-10 lg:py-12 px-4 sm:px-6 lg:px-8" // Added padding here
+      className="py-12 md:py-16 lg:py-20 min-h-screen" // Full height, more padding
       style={{
         backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
         fontFamily: "'Poppins', sans-serif",
+        width: '100%', // Full width
       }}
     >
-      <div className="max-w-7xl mx-auto"> {/* Added container with max-width */}
-        <div className="flex items-center gap-3 mb-6">
+      <div className="w-full"> {/* No max-width, no padding */}
+        <div className="flex items-center gap-3 mb-8 px-4 sm:px-6 lg:px-8"> {/* Added padding only to heading */}
           <div className="w-1 h-8 rounded-full"
             style={{ backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
           />
@@ -75,8 +76,8 @@ export default function FeaturedTemplates({
           </h2>
         </div>
 
-        {/* Single Card - Fixed background color */}
-        <div className="rounded-2xl overflow-hidden"
+        {/* Single Card - No rounded corners, full width */}
+        <div
           style={{
             backgroundColor: bgColor, // Same for all templates
           }}
@@ -131,7 +132,7 @@ export default function FeaturedTemplates({
           </div>
 
           {/* Content Area - No background change */}
-          <div className="relative min-h-[320px]">
+          <div className="relative min-h-[400px]"> {/* Increased height for full screen feel */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -144,18 +145,9 @@ export default function FeaturedTemplates({
                 {isEven ? (
                   // Template 1: Image Left, Description Right
                   <>
-                    <div className="md:w-1/2 h-64 md:h-[340px] relative overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                    <div className="md:w-1/2 h-72 md:h-[420px] relative overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
                       <div className="absolute top-3 left-3 z-10">
-                        <div className="px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                            color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          <Star className="w-2.5 h-2.5" />
-                          Featured
-                        </div>
+                       
                       </div>
                       <div className="w-full h-full relative">
                         <Image
@@ -167,8 +159,8 @@ export default function FeaturedTemplates({
                         />
                       </div>
                     </div>
-                    <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center items-start">
-                      <h3 className="text-xl font-bold mb-2"
+                    <div className="md:w-1/2 p-10 md:p-14 lg:p-16 flex flex-col justify-center items-start"> {/* More padding */}
+                      <h3 className="text-2xl font-bold mb-3" 
                         style={{ 
                           color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
                           fontFamily: "'Poppins', sans-serif",
@@ -176,7 +168,7 @@ export default function FeaturedTemplates({
                       >
                         {currentTemplate.name}
                       </h3>
-                      <p className="text-sm mb-3 leading-relaxed line-clamp-3"
+                      <p className="text-base mb-4 leading-relaxed line-clamp-3"
                         style={{ 
                           color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                           fontFamily: "'Calibri Light', sans-serif",
@@ -184,8 +176,8 @@ export default function FeaturedTemplates({
                       >
                         {currentTemplate.description}
                       </p>
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
@@ -194,7 +186,7 @@ export default function FeaturedTemplates({
                         >
                           Premium
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(0,224,255,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#00E0FF' : '#0066FF',
@@ -203,7 +195,7 @@ export default function FeaturedTemplates({
                         >
                           Responsive
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(34,197,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#22C55E' : '#0066FF',
@@ -215,7 +207,7 @@ export default function FeaturedTemplates({
                       </div>
                       <button
                         onClick={() => onBuyNowClick(currentTemplate)}
-                        className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 w-fit"
+                        className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 w-fit"
                         style={{
                           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -229,8 +221,8 @@ export default function FeaturedTemplates({
                 ) : (
                   // Template 2: Description Left, Image Right
                   <>
-                    <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center items-start">
-                      <h3 className="text-xl font-bold mb-2"
+                    <div className="md:w-1/2 p-10 md:p-14 lg:p-16 flex flex-col justify-center items-start"> {/* More padding */}
+                      <h3 className="text-2xl font-bold mb-3" 
                         style={{ 
                           color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
                           fontFamily: "'Poppins', sans-serif",
@@ -238,7 +230,7 @@ export default function FeaturedTemplates({
                       >
                         {currentTemplate.name}
                       </h3>
-                      <p className="text-sm mb-3 leading-relaxed line-clamp-3"
+                      <p className="text-base mb-4 leading-relaxed line-clamp-3" 
                         style={{ 
                           color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                           fontFamily: "'Calibri Light', sans-serif",
@@ -246,8 +238,8 @@ export default function FeaturedTemplates({
                       >
                         {currentTemplate.description}
                       </p>
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(232,202,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
@@ -256,7 +248,7 @@ export default function FeaturedTemplates({
                         >
                           Premium
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(0,224,255,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#00E0FF' : '#0066FF',
@@ -265,7 +257,7 @@ export default function FeaturedTemplates({
                         >
                           Responsive
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full"
+                        <span className="text-[11px] px-2.5 py-1 rounded-full"
                           style={{
                             backgroundColor: theme === 'dark' ? 'rgba(34,197,94,0.2)' : 'rgba(0,102,255,0.08)',
                             color: theme === 'dark' ? '#22C55E' : '#0066FF',
@@ -277,7 +269,7 @@ export default function FeaturedTemplates({
                       </div>
                       <button
                         onClick={() => onBuyNowClick(currentTemplate)}
-                        className="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 w-fit"
+                        className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2 w-fit"
                         style={{
                           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -287,18 +279,9 @@ export default function FeaturedTemplates({
                         Buy Now
                       </button>
                     </div>
-                    <div className="md:w-1/2 h-64 md:h-[340px] relative overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                    <div className="md:w-1/2 h-72 md:h-[420px] relative overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
                       <div className="absolute top-3 left-3 z-10">
-                        <div className="px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                            color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                            fontFamily: "'Poppins', sans-serif",
-                          }}
-                        >
-                          <Star className="w-2.5 h-2.5" />
-                          Featured
-                        </div>
+                     
                       </div>
                       <div className="w-full h-full relative">
                         <Image
