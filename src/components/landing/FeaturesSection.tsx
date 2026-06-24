@@ -88,30 +88,41 @@ const LIGHT_INNER_FILL = "#f8faff";
 const LIGHT_DESC = "#6B7280";
 const LIGHT_CARD_BG = "#FFFFFF";
 
-const OUTER_R = 268;
-const STRIP_OUTER = 268;
-const STRIP_INNER = 246;
-const SEG_OUTER = 234;
-const SEG_INNER = 110;
-const INNER_CIRCLE_R = 98;
-const LABEL_R = 172;
+// ─── MAIN WHEEL SIZES (INCREASED) ──────────────────────────────────────────
+const OUTER_R = 320;        // Was 268
+const STRIP_OUTER = 320;    // Was 268
+const STRIP_INNER = 294;    // Was 246
+const SEG_OUTER = 278;      // Was 234
+const SEG_INNER = 130;      // Was 110
+const INNER_CIRCLE_R = 116; // Was 98
+const LABEL_R = 206;        // Was 172
 const NUM_R = (STRIP_OUTER + STRIP_INNER) / 2;
+
+// ─── POPUP PREVIEW SIZES (KEPT SAME) ──────────────────────────────────────
+const POPUP_OUTER_R = 268;
+const POPUP_STRIP_OUTER = 268;
+const POPUP_STRIP_INNER = 246;
+const POPUP_SEG_OUTER = 234;
+const POPUP_SEG_INNER = 110;
+const POPUP_INNER_CIRCLE_R = 98;
+const POPUP_LABEL_R = 172;
+const POPUP_NUM_R = (POPUP_STRIP_OUTER + POPUP_STRIP_INNER) / 2;
 
 // ─── SVG Helpers ─────────────────────────────────────────────────────────────
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
-const polar = (r: number, deg: number) => ({
-  x: CX + r * Math.cos(toRad(deg)),
-  y: CY + r * Math.sin(toRad(deg)),
+const polar = (r: number, deg: number, cx: number = CX, cy: number = CY) => ({
+  x: cx + r * Math.cos(toRad(deg)),
+  y: cy + r * Math.sin(toRad(deg)),
 });
 
-function arcPath(r: number, startDeg: number, endDeg: number): string {
+function arcPath(r: number, startDeg: number, endDeg: number, cx: number = CX, cy: number = CY): string {
   let end = endDeg;
   if (end < startDeg) end += 360;
   const large = end - startDeg > 180 ? 1 : 0;
-  const s = polar(r, startDeg);
-  const e = polar(r, endDeg);
+  const s = polar(r, startDeg, cx, cy);
+  const e = polar(r, endDeg, cx, cy);
   return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
 }
 
@@ -119,15 +130,17 @@ function donutSegment(
   outerR: number,
   innerR: number,
   startDeg: number,
-  endDeg: number
+  endDeg: number,
+  cx: number = CX,
+  cy: number = CY
 ): string {
   let end = endDeg;
   if (end < startDeg) end += 360;
   const large = end - startDeg > 180 ? 1 : 0;
-  const os = polar(outerR, startDeg);
-  const oe = polar(outerR, endDeg);
-  const ie = polar(innerR, endDeg);
-  const is_ = polar(innerR, startDeg);
+  const os = polar(outerR, startDeg, cx, cy);
+  const oe = polar(outerR, endDeg, cx, cy);
+  const ie = polar(innerR, endDeg, cx, cy);
+  const is_ = polar(innerR, startDeg, cx, cy);
   return [
     `M ${os.x} ${os.y}`,
     `A ${outerR} ${outerR} 0 ${large} 1 ${oe.x} ${oe.y}`,
@@ -166,23 +179,24 @@ function useTypewriter(text: string, speed = 20) {
   return { displayed, done };
 }
 
-// ─── Segment Preview (popup left side) ───────────────────────────────────────
+// ─── Segment Preview (popup left side - KEPT SAME SIZE) ───────────────────
 
 function SegmentPreview({ seg, theme }: { seg: SegmentData; theme: 'light' | 'dark' }) {
   const START = 238;
   const END = 302;
   const CENTER = 270;
 
-  const stripPath = donutSegment(STRIP_OUTER, STRIP_INNER, START, END);
-  const mainPath = donutSegment(SEG_OUTER, SEG_INNER, START, END);
+  // Using POPUP_* constants for preview
+  const stripPath = donutSegment(POPUP_STRIP_OUTER, POPUP_STRIP_INNER, START, END);
+  const mainPath = donutSegment(POPUP_SEG_OUTER, POPUP_SEG_INNER, START, END);
 
   const VB_X = 165;
   const VB_Y = 68;
   const VB_W = 350;
   const VB_H = 282;
 
-  const numPos = polar(NUM_R, CENTER);
-  const lblPos = polar(LABEL_R, CENTER);
+  const numPos = polar(POPUP_NUM_R, CENTER);
+  const lblPos = polar(POPUP_LABEL_R, CENTER);
 
   const fillColor = theme === 'dark' ? FILL : LIGHT_FILL;
   const innerFill = theme === 'dark' ? INNER_FILL : LIGHT_INNER_FILL;
@@ -363,7 +377,7 @@ function FeaturePopup({
           </button>
 
           <div className="flex flex-col md:flex-row items-stretch gap-6">
-            {/* LEFT — segment preview */}
+            {/* LEFT — segment preview (KEPT SAME SIZE) */}
             <div
               className="shrink-0 flex items-center justify-center"
               style={{ width: 260, minHeight: 220 }}
@@ -413,9 +427,7 @@ function WheelSVG({
         const segFill = isActive ? fillHover : fillColor;
 
         // ─── DIRECTION-AWARE LIFT ──────────────────────────────
-        // Calculate direction from center to segment center
         const angleRad = toRad(seg.centerDeg);
-        // Move outward by 8px in the direction of the segment
         const liftX = 8 * Math.cos(angleRad);
         const liftY = 8 * Math.sin(angleRad);
 

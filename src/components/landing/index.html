@@ -1,114 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio Handler - About Us Hero</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brandDark: '#0B0F19',
-            brandYellow: '#FACC15',
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    /* Smooth floating animation for elements */
-    @keyframes float-slow {
-      0%, 100% { transform: translateY(0px) rotate(-6deg); }
-      50% { transform: translateY(-12px) rotate(-4deg); }
-    }
-    @keyframes float-faster {
-      0%, 100% { transform: translateY(0px) rotate(8deg); }
-      50% { transform: translateY(-15px) rotate(10deg); }
-    }
-    .animate-float-1 {
-      animation: float-slow 6s ease-in-out infinite;
-    }
-    .animate-float-2 {
-      animation: float-faster 7s ease-in-out infinite;
-    }
-    /* Rotating orbit line */
-    @keyframes spin-slow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .animate-spin-slow {
-      animation: spin-slow 25s linear infinite;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Building Digital Futures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #050402; display: flex; justify-content: center; }
+  .stage { width: 100%; max-width: 480px; margin: 0 auto; }
+  svg { display: block; width: 100%; height: auto; }
+  .ttl { font-family: 'Poppins', sans-serif; }
+</style>
 </head>
-<body class="bg-brandDark font-sans antialiased text-slate-200 selection:bg-brandYellow selection:text-brandDark">
+<body>
+<div class="stage">
+<svg class="ttl" viewBox="0 0 440 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0703"/>
+      <stop offset="100%" stop-color="#040301"/>
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a9690f"/>
+      <stop offset="35%" stop-color="#f3b13b"/>
+      <stop offset="70%" stop-color="#ffe08a"/>
+      <stop offset="100%" stop-color="#caa24a"/>
+    </linearGradient>
+    <radialGradient id="circleFill" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#1c1712"/>
+      <stop offset="100%" stop-color="#070502"/>
+    </radialGradient>
+    <filter id="softGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="6" result="b1"/>
+      <feMerge><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="bigGlow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <filter id="ringGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+  </defs>
 
-  <section class="relative min-h-screen w-full flex flex-col items-center justify-between overflow-hidden px-6 py-12 md:px-12 lg:px-24 select-none">
-    
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-10 right-10 w-[300px] h-[300px] bg-brandYellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+  <rect x="0" y="0" width="440" height="700" fill="url(#bg)"/>
 
-    <div class="w-full flex justify-start items-center z-10">
-      <div class="inline-flex items-center gap-2 border border-brandYellow/20 bg-brandYellow/5 px-4 py-1.5 rounded-full text-xs font-semibold text-brandYellow tracking-wide backdrop-blur-sm shadow-[0_0_15px_rgba(250,204,21,0.05)]">
-        <span>✧</span> Since 2021 <span>✧</span>
-      </div>
-    </div>
+  <!-- ============ ROAD (top -> bottom, dissolving into particles) ============ -->
+  <path id="roadPath" d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
+        fill="none" stroke="#7a4e10" stroke-width="30" stroke-linecap="round" opacity="0.32" filter="url(#bigGlow)"/>
+  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
+        fill="none" stroke="#ffb238" stroke-width="14" stroke-linecap="round" opacity="0.55" filter="url(#softGlow)"/>
+  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
+        fill="none" stroke="url(#roadGrad)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
+        fill="none" stroke="#fff8e6" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
 
-    <div class="relative w-full max-w-4xl flex items-center justify-center my-auto z-10 min-h-[350px] md:min-h-[450px]">
-      
-      <div class="absolute w-[320px] md:w-[540px] h-[140px] md:h-[200px] border border-brandYellow/20 rounded-full -rotate-12 blur-[1px] animate-spin-slow"></div>
-      
-      <div class="relative z-20 transform hover:scale-[1.01] transition-transform duration-700 ease-out p-4">
-        <img 
-          src="hero-illustration.png" 
-          alt="Portfolio Handler Workspace" 
-          class="w-full max-w-2xl h-auto object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)]"
-          onerror="this.style.display='none';"
-        />
-        
-        <div class="absolute top-12 -left-6 md:left-0 w-36 h-44 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl animate-float-1">
-          <div class="w-8 h-8 rounded-full bg-slate-700/80 mb-3"></div>
-          <div class="w-full h-2 bg-white/20 rounded mb-2"></div>
-          <div class="w-3/4 h-2 bg-white/10 rounded"></div>
-        </div>
-        
-        <div class="absolute top-6 -right-6 md:right-0 w-40 h-48 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-3 shadow-2xl animate-float-2">
-          <div class="w-full h-20 bg-slate-800/80 rounded-lg mb-3"></div>
-          <div class="w-full h-2 bg-white/20 rounded mb-2"></div>
-          <div class="w-1/2 h-2 bg-white/10 rounded"></div>
-        </div>
-      </div>
-    </div>
+  <!-- particle dissipation trail beyond '26 -->
+  <g fill="#ffce5c">
+    <circle cx="112" cy="668" r="2.6" opacity="0.85"/>
+    <circle cx="96" cy="678" r="2.1" opacity="0.7"/>
+    <circle cx="140" cy="672" r="1.8" opacity="0.6"/>
+    <circle cx="80" cy="686" r="1.6" opacity="0.55"/>
+    <circle cx="156" cy="664" r="1.4" opacity="0.5"/>
+    <circle cx="65" cy="690" r="1.3" opacity="0.4"/>
+    <circle cx="172" cy="658" r="1.1" opacity="0.35"/>
+    <circle cx="50" cy="694" r="1" opacity="0.3"/>
+    <circle cx="125" cy="690" r="0.9" opacity="0.3"/>
+    <circle cx="35" cy="688" r="0.8" opacity="0.22"/>
+  </g>
 
-    <div class="w-full max-w-3xl text-center z-10 flex flex-col items-center mt-auto">
-      
-      <span class="text-brandYellow uppercase tracking-[0.2em] text-xs font-bold mb-3 block opacity-90">
-        About Us
-      </span>
-      
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.15] mb-4">
-        Building Digital Futures
-      </h1>
-      
-      <p class="text-slate-400 text-sm md:text-base lg:text-lg max-w-2xl font-normal leading-relaxed mb-6 opacity-80">
-        Helping institutions manage and showcase student portfolios — simply and efficiently.
-      </p>
+  <!-- ============ MILESTONE CIRCLES ============ -->
+  <g>
+    <circle cx="265" cy="55"  r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="265" cy="55"  r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="265" y="61" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'21</text>
 
-      <div class="absolute bottom-16 right-[12%] text-slate-600 opacity-40 animate-pulse">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
-        </svg>
-      </div>
-      <div class="absolute bottom-28 left-[10%] text-slate-700 opacity-30 scale-75">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4L12 0Z" />
-        </svg>
-      </div>
+    <circle cx="250" cy="178" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="250" cy="178" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="250" y="184" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'22</text>
 
-    </div>
-  </section>
+    <circle cx="305" cy="298" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="305" cy="298" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="305" y="304" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'23</text>
 
+    <circle cx="205" cy="393" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="205" cy="393" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="205" y="399" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'24</text>
+
+    <circle cx="265" cy="508" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="265" cy="508" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="265" y="514" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'25</text>
+
+    <circle cx="215" cy="600" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
+    <circle cx="215" cy="600" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
+    <text x="215" y="606" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'26</text>
+  </g>
+
+  <!-- ============ MILESTONE TEXT BLOCKS (populated by script) ============ -->
+  <g id="blocks"></g>
+
+  <!-- ============ HEADER ============ -->
+  <text x="20" y="28" font-size="12.5" font-weight="600" fill="#f3c14a">About Us</text>
+  <rect x="20" y="36" width="30" height="2.4" fill="#f3c14a"/>
+  <text x="18" y="68" font-size="27" font-weight="800" fill="#ffffff">Building</text>
+  <text x="18" y="100" font-size="27" font-weight="800" fill="#f3c14a">Digital</text>
+  <text x="18" y="132" font-size="27" font-weight="800" fill="#f3c14a">Futures</text>
+  <text x="20" y="155" font-size="14.5" font-weight="700" fill="#ffffff">Since <tspan fill="#f3c14a">2021</tspan></text>
+  <rect x="20" y="163" width="30" height="2.4" fill="#f3c14a"/>
+  <text x="20" y="184" font-size="10.3" fill="#cfcac0">
+    <tspan x="20" dy="0">Helping institutions</tspan>
+    <tspan x="20" dy="13">manage and showcase</tspan>
+    <tspan x="20" dy="13">student portfolios —</tspan>
+    <tspan x="20" dy="13">simply and efficiently.</tspan>
+  </text>
+
+</svg>
+</div>
+
+<script>
+const milestones = [
+  { cx:265, cy:55,  side:'R', title:"Start of NestickTech",
+    desc:"Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions." },
+  { cx:250, cy:178, side:'L', tx:142, title:"Good Client Base Established",
+    desc:"Successfully built a strong client base across Pakistan, earning trust through quality service and support." },
+  { cx:305, cy:298, side:'R', title:"Global Expansion",
+    desc:"Expanded operations internationally, serving clients worldwide with customized digital solutions." },
+  { cx:205, cy:393, side:'L', title:"Launch of 1st Product — Neezamiya",
+    desc:"Launched our flagship product 'Neezamiya' - a comprehensive educational management system." },
+  { cx:265, cy:508, side:'R', title:"Launch of PBM",
+    desc:"Introduced Portfolio Business Manager (PBM) – revolutionizing portfolio handling for institutions." },
+  { cx:215, cy:600, side:'L', title:"Ready to Conquer This Year",
+    desc:"Setting our sights on new heights with AI-powered solutions and global market leadership." }
+];
+
+const TITLE_SIZE = 12, DESC_SIZE = 9.4, TITLE_LH = 14.5, DESC_LH = 12.6, GAP = 8;
+const RIGHT_MAXW = 122, RIGHT_X = 320, LEFT_X = 20;
+
+function wrapLines(ctx, text, maxWidth, font) {
+  ctx.font = font;
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const test = cur ? cur + ' ' + w : w;
+    if (ctx.measureText(test).width <= maxWidth || !cur) {
+      cur = test;
+    } else {
+      lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function buildBlocks() {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const blocksG = document.getElementById('blocks');
+  blocksG.innerHTML = '';
+
+  milestones.forEach(m => {
+    const isRight = m.side === 'R';
+    const x = isRight ? RIGHT_X : LEFT_X;
+    const maxW = isRight ? RIGHT_MAXW : (m.cx - 22 - LEFT_X - 14);
+
+    const titleLines = wrapLines(ctx, m.title, maxW, `700 ${TITLE_SIZE}px Poppins`);
+    const descLines  = wrapLines(ctx, m.desc,  maxW, `400 ${DESC_SIZE}px Poppins`);
+
+    const totalH = titleLines.length * TITLE_LH + GAP + descLines.length * DESC_LH;
+    const blockTop = m.cy - totalH / 2;
+
+    const g = document.createElementNS(svgNS, 'g');
+
+    const dotX = isRight ? x - 8 : x + maxW + 8;
+    const dotY = blockTop + TITLE_LH * 0.4;
+    const circleEdgeX = isRight ? m.cx + 22 : m.cx - 22;
+    const midX = isRight ? circleEdgeX + (dotX - circleEdgeX) * 0.45 : circleEdgeX - (circleEdgeX - dotX) * 0.45;
+
+    const line = document.createElementNS(svgNS, 'path');
+    line.setAttribute('d', `M${circleEdgeX},${m.cy} L${midX},${m.cy} L${dotX},${dotY}`);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', '#caa24a');
+    line.setAttribute('stroke-width', '1.3');
+    line.setAttribute('opacity', '0.9');
+    g.appendChild(line);
+
+    const dot = document.createElementNS(svgNS, 'circle');
+    dot.setAttribute('cx', dotX); dot.setAttribute('cy', dotY); dot.setAttribute('r', 2.5);
+    dot.setAttribute('fill', '#f3c14a');
+    g.appendChild(dot);
+
+    const titleEl = document.createElementNS(svgNS, 'text');
+    titleEl.setAttribute('x', x);
+    titleEl.setAttribute('y', blockTop + TITLE_LH * 0.78);
+    titleEl.setAttribute('font-size', TITLE_SIZE);
+    titleEl.setAttribute('font-weight', '700');
+    titleEl.setAttribute('fill', '#f3c14a');
+    titleLines.forEach((line2, i) => {
+      const tspan = document.createElementNS(svgNS, 'tspan');
+      tspan.setAttribute('x', x);
+      tspan.setAttribute('dy', i === 0 ? 0 : TITLE_LH);
+      tspan.textContent = line2;
+      titleEl.appendChild(tspan);
+    });
+    g.appendChild(titleEl);
+
+    const descTop = blockTop + titleLines.length * TITLE_LH + GAP;
+    const descEl = document.createElementNS(svgNS, 'text');
+    descEl.setAttribute('x', x);
+    descEl.setAttribute('y', descTop + DESC_LH * 0.78);
+    descEl.setAttribute('font-size', DESC_SIZE);
+    descEl.setAttribute('fill', '#c9c4ba');
+    descLines.forEach((line2, i) => {
+      const tspan = document.createElementNS(svgNS, 'tspan');
+      tspan.setAttribute('x', x);
+      tspan.setAttribute('dy', i === 0 ? 0 : DESC_LH);
+      tspan.textContent = line2;
+      descEl.appendChild(tspan);
+    });
+    g.appendChild(descEl);
+
+    blocksG.appendChild(g);
+  });
+}
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(buildBlocks).catch(buildBlocks);
+  buildBlocks();
+} else {
+  buildBlocks();
+}
+</script>
 </body>
 </html>

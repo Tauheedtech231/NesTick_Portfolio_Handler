@@ -13,11 +13,23 @@ interface HexStatProps {
   theme?: 'light' | 'dark';
   delay?: number;
   index?: number;
+  segmentId?: string; // For direction-aware lift
 }
 
-function HexStat({ label, value, icon, size, className = "", theme = 'dark', delay = 0, index = 0 }: HexStatProps) {
+function HexStat({ 
+  label, 
+  value, 
+  icon, 
+  size, 
+  className = "", 
+  theme = 'dark', 
+  delay = 0, 
+  index = 0,
+  segmentId = ""
+}: HexStatProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
+  const [isHovered, setIsHovered] = useState(false);
 
   const dims =
     size === "xl"
@@ -28,26 +40,56 @@ function HexStat({ label, value, icon, size, className = "", theme = 'dark', del
 
   const getColors = () => {
     if (theme === 'dark') {
-      return { stroke: '#3fd0ff', innerStroke: '#1c5670', fill: '#07111f', labelColor: '#E5E7EB', valueColor: '#FFFFFF' };
+      return { 
+        stroke: '#E8CA5E', 
+        innerStroke: '#8B7A3A', 
+        fill: '#0F172A', 
+        labelColor: '#D1D5DB', 
+        valueColor: '#FFFFFF',
+        hoverFill: '#1A2744'
+      };
     }
-    return { stroke: '#0066FF', innerStroke: '#60A5FA', fill: '#F8FAFC', labelColor: '#4B5563', valueColor: '#1F2937' };
+    return { 
+      stroke: '#0066FF', 
+      innerStroke: '#60A5FA', 
+      fill: '#FFFFFF', 
+      labelColor: '#6B7280', 
+      valueColor: '#1F2937',
+      hoverFill: '#F0F4FF'
+    };
   };
 
   const colors = getColors();
 
+  // Direction-aware lift based on segment position
+  const getLiftDirection = () => {
+    // Center of hexagon positions
+    const positions: { [key: string]: { x: number; y: number } } = {
+      'clients': { x: -1, y: -1 },
+      'templates': { x: -0.7, y: -0.7 },
+      'active-users': { x: 0.7, y: -0.7 },
+      'success-rate': { x: 1, y: -1 },
+      'center': { x: 0, y: -1 },
+    };
+    return positions[segmentId] || { x: 0, y: -1 };
+  };
+
+  const direction = getLiftDirection();
+  const liftAmount = 10;
+
   // Determine animation direction based on index
   const getAnimation = () => {
-    if (index === 0) return { x: -100, y: 0 }; // Clients - from left
-    if (index === 1) return { x: -80, y: 30 }; // Templates - from left-bottom
-    if (index === 3) return { x: 80, y: -30 }; // Active Users - from right-top
-    if (index === 4) return { x: 100, y: 0 }; // Success Rate - from right
-    return { x: 0, y: 50 }; // Center - from bottom
+    if (index === 0) return { x: -100, y: 0 };
+    if (index === 1) return { x: -80, y: 30 };
+    if (index === 3) return { x: 80, y: -30 };
+    if (index === 4) return { x: 100, y: 0 };
+    return { x: 0, y: 50 };
   };
 
   const anim = getAnimation();
 
   // Smooth floating animation for hexagon only
-  const floatVariants:Variants = {
+  const floatVariants: Variants = {
     animate: {
       y: [0, -4, 0, 4, 0],
       transition: {
@@ -66,6 +108,7 @@ function HexStat({ label, value, icon, size, className = "", theme = 'dark', del
       style={{
         fontFamily: "'Poppins', sans-serif",
         cursor: 'pointer',
+        zIndex: 10,
       }}
       initial={{ opacity: 0, x: anim.x, y: anim.y, scale: 0.85 }}
       animate={isInView ? { 
@@ -84,9 +127,16 @@ function HexStat({ label, value, icon, size, className = "", theme = 'dark', del
         y: anim.y, 
         scale: 0.85 
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       whileHover={{ 
+        y: -liftAmount * Math.abs(direction.y),
+        x: liftAmount * direction.x,
         scale: 1.06,
-        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+        transition: { 
+          duration: 0.4, 
+          ease: [0.25, 0.46, 0.45, 0.94] 
+        }
       }}
       whileTap={{ scale: 0.95 }}
     >
@@ -97,8 +147,21 @@ function HexStat({ label, value, icon, size, className = "", theme = 'dark', del
         animate="animate"
       >
         <svg viewBox="0 0 200 230" preserveAspectRatio="none" className="h-full w-full">
-          <polygon points="100,2 197,58 197,172 100,228 3,172 3,58" fill={colors.fill} stroke={colors.stroke} strokeWidth="2.5" />
-          <polygon points="100,16 184,64 184,166 100,214 16,166 16,64" fill="none" stroke={colors.innerStroke} strokeWidth="1" />
+          <polygon 
+            points="100,2 197,58 197,172 100,228 3,172 3,58" 
+            fill={isHovered ? colors.hoverFill : colors.fill} 
+            stroke={colors.stroke} 
+            strokeWidth="2.5"
+            style={{ transition: 'fill 0.3s ease' }}
+          />
+          <polygon 
+            points="100,16 184,64 184,166 100,214 16,166 16,64" 
+            fill="none" 
+            stroke={colors.innerStroke} 
+            strokeWidth="1"
+            opacity={isHovered ? 0.8 : 0.6}
+            style={{ transition: 'opacity 0.3s ease' }}
+          />
         </svg>
       </motion.div>
 
@@ -175,14 +238,27 @@ function Counter({ value, theme, isInView }: { value: string; theme: 'light' | '
 function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
+  const [isHovered, setIsHovered] = useState(false);
 
   const getColors = () => {
-    if (theme === 'dark') return { stroke: '#3fd0ff', innerStroke: '#1c5670', fill: '#07111f', textColor: '#FFFFFF' };
-    return { stroke: '#0066FF', innerStroke: '#60A5FA', fill: '#F8FAFC', textColor: '#1F2937' };
+    if (theme === 'dark') return { 
+      stroke: '#E8CA5E', 
+      innerStroke: '#8B7A3A', 
+      fill: '#0F172A', 
+      textColor: '#FFFFFF',
+      hoverFill: '#1A2744'
+    };
+    return { 
+      stroke: '#0066FF', 
+      innerStroke: '#60A5FA', 
+      fill: '#FFFFFF', 
+      textColor: '#1F2937',
+      hoverFill: '#F0F4FF'
+    };
   };
   const colors = getColors();
 
-  const floatVariants:Variants = {
+  const floatVariants: Variants = {
     animate: {
       y: [0, -3, 0, 3, 0],
       transition: {
@@ -201,6 +277,7 @@ function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
       style={{
         fontFamily: "'Poppins', sans-serif",
         cursor: 'pointer',
+        zIndex: 10,
       }}
       initial={{ opacity: 0, scale: 0.6, y: 60 }}
       animate={isInView ? { 
@@ -217,9 +294,15 @@ function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
         scale: 0.6, 
         y: 60 
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       whileHover={{ 
+        y: -12,
         scale: 1.06,
-        transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+        transition: { 
+          duration: 0.4, 
+          ease: [0.25, 0.46, 0.45, 0.94] 
+        }
       }}
       whileTap={{ scale: 0.95 }}
     >
@@ -230,8 +313,21 @@ function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
         animate="animate"
       >
         <svg viewBox="0 0 265 300" preserveAspectRatio="none" className="h-full w-full">
-          <polygon points="132,3 262,75 262,225 132,297 2,225 2,75" fill={colors.fill} stroke={colors.stroke} strokeWidth="3" />
-          <polygon points="132,20 245,84 245,216 132,280 19,216 19,84" fill="none" stroke={colors.innerStroke} strokeWidth="1" />
+          <polygon 
+            points="132,3 262,75 262,225 132,297 2,225 2,75" 
+            fill={isHovered ? colors.hoverFill : colors.fill} 
+            stroke={colors.stroke} 
+            strokeWidth="3"
+            style={{ transition: 'fill 0.3s ease' }}
+          />
+          <polygon 
+            points="132,20 245,84 245,216 132,280 19,216 19,84" 
+            fill="none" 
+            stroke={colors.innerStroke} 
+            strokeWidth="1"
+            opacity={isHovered ? 0.8 : 0.6}
+            style={{ transition: 'opacity 0.3s ease' }}
+          />
         </svg>
       </motion.div>
       
@@ -246,7 +342,7 @@ function CenterHex({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 }
 
 function HandshakeIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  const color = theme === 'dark' ? '#E8CA5E' : '#0066FF';
   return (
     <svg width="28" height="18" viewBox="0 0 34 22" fill="none">
       <path d="M2 11 L9 6 L15 11 L9 16 Z" fill={color} opacity="0.95" />
@@ -257,7 +353,7 @@ function HandshakeIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 }
 
 function TemplatesIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  const color = theme === 'dark' ? '#E8CA5E' : '#0066FF';
   return (
     <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
       <rect x="5" y="2" width="14" height="18" rx="1.5" fill="none" stroke={color} strokeWidth="1.6" />
@@ -269,8 +365,8 @@ function TemplatesIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 }
 
 function UsersIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
-  const colorDim = theme === 'dark' ? '#ffffff' : '#4B5563';
+  const color = theme === 'dark' ? '#E8CA5E' : '#0066FF';
+  const colorDim = theme === 'dark' ? '#8B7A3A' : '#93C5FD';
   return (
     <svg width="26" height="18" viewBox="0 0 30 22" fill="none">
       <circle cx="15" cy="6" r="4" fill={color} />
@@ -284,7 +380,7 @@ function UsersIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 }
 
 function SuccessIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const color = theme === 'dark' ? '#ffffff' : '#1F2937';
+  const color = theme === 'dark' ? '#E8CA5E' : '#0066FF';
   return (
     <svg width="22" height="18" viewBox="0 0 28 22" fill="none">
       <polyline points="1,20 9,11 14,15 26,2" stroke={color} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -294,7 +390,7 @@ function SuccessIcon({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 }
 
 function DottedWorldMap({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const dotColor = theme === 'dark' ? '#16456b' : '#93C5FD';
+  const dotColor = theme === 'dark' ? '#1A2744' : '#93C5FD';
   const mask = [
     "0000111100000000000001111111000000000000000000000000000000000",
     "0001111110000000111111111111110000000000111111110000000000000",
@@ -343,7 +439,7 @@ function DottedWorldMap({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
     }
   }
   return (
-    <svg viewBox="0 0 1153 514" className="pointer-events-none absolute inset-0 h-full w-full opacity-55">
+    <svg viewBox="0 0 1153 514" className="pointer-events-none absolute inset-0 h-full w-full opacity-35">
       {dots.map((d, i) => (
         <circle key={i} cx={d.x.toFixed(1)} cy={d.y.toFixed(1)} r={d.r.toFixed(1)} fill={dotColor} opacity={d.o.toFixed(2)} />
       ))}
@@ -354,9 +450,23 @@ function DottedWorldMap({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
 function ConnectingLines({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
   const getColors = () => {
     if (theme === 'dark') {
-      return { gradientStart: '#3fd0ff', gradientMid: '#7fe3ff', gradientEnd: '#bff3ff', stroke: '#3fd0ff', sparkle1: '#bff3ff', sparkle2: '#ffffff' };
+      return { 
+        gradientStart: '#E8CA5E', 
+        gradientMid: '#C4A842', 
+        gradientEnd: '#8B7A3A', 
+        stroke: '#E8CA5E', 
+        sparkle1: '#E8CA5E', 
+        sparkle2: '#F5E6A3' 
+      };
     }
-    return { gradientStart: '#0066FF', gradientMid: '#3B82F6', gradientEnd: '#60A5FA', stroke: '#0066FF', sparkle1: '#60A5FA', sparkle2: '#1F2937' };
+    return { 
+      gradientStart: '#0066FF', 
+      gradientMid: '#3B82F6', 
+      gradientEnd: '#60A5FA', 
+      stroke: '#0066FF', 
+      sparkle1: '#60A5FA', 
+      sparkle2: '#93C5FD' 
+    };
   };
   const colors = getColors();
   return (
@@ -423,11 +533,12 @@ export default function SocialProofBar() {
     return () => observer.disconnect();
   }, []);
 
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFC';
+  // Match background with other sections
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
 
   return (
     <>
-      {/* Desktop Version - hidden on mobile, visible md and above */}
+      {/* Desktop Version */}
       <div
         className="relative w-full overflow-hidden hidden md:block"
         style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif", height: '514px' }}
@@ -446,6 +557,7 @@ export default function SocialProofBar() {
               theme={theme} 
               delay={0.1}
               index={0}
+              segmentId="clients"
             />
             <HexStat 
               label="Templates" 
@@ -456,6 +568,7 @@ export default function SocialProofBar() {
               theme={theme} 
               delay={0.25}
               index={1}
+              segmentId="templates"
             />
             <CenterHex theme={theme} />
             <HexStat 
@@ -467,6 +580,7 @@ export default function SocialProofBar() {
               theme={theme} 
               delay={0.45}
               index={3}
+              segmentId="active-users"
             />
             <HexStat 
               label="Success Rate" 
@@ -477,12 +591,13 @@ export default function SocialProofBar() {
               theme={theme} 
               delay={0.6}
               index={4}
+              segmentId="success-rate"
             />
           </div>
         </div>
       </div>
 
-      {/* Mobile Version - visible on mobile, hidden md and above */}
+      {/* Mobile Version */}
       <div className="block md:hidden">
         <SocialProofBarMobile />
       </div>

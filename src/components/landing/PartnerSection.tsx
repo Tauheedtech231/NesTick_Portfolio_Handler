@@ -687,7 +687,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
   };
 
   return (
-    <section  id="partner-section" ref={sectionRef} className="py-12 md:py-20 px-4 sm:px-6 relative overflow-hidden"
+    <section  id="partner-section" ref={sectionRef} className="py-12 md:py-12 px-4 sm:px-6 relative overflow-hidden"
       style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
     >
       <div className="max-w-7xl mx-auto relative z-10">

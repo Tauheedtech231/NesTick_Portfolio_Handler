@@ -26,6 +26,7 @@ import {
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { PartnerSection } from '@/components/landing/PartnerSection';
+import JourneySection from './JourneySection'; // 👈 Import new component
 
 interface ContactFormData {
   name: string;
@@ -69,7 +70,6 @@ const teamMembers = [
 export default function AboutPage() {
   const heroRef = useRef(null);
   const missionRef = useRef(null);
-  const journeyRef = useRef(null);
   const teamRef = useRef(null);
   const contactRef = useRef(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -79,17 +79,15 @@ export default function AboutPage() {
   
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
   const missionInView = useInView(missionRef, { once: true, amount: 0.3 });
-  const journeyInView = useInView(journeyRef, { once: true, amount: 0.2 });
   const teamInView = useInView(teamRef, { once: true, amount: 0.2 });
   const contactInView = useInView(contactRef, { once: true, amount: 0.2 });
 
-  // Scroll parallax for team slider (like PartnersSlider)
+  // Scroll parallax for team slider
   const { scrollYProgress } = useScroll({
     target: teamRef,
     offset: ["start end", "end start"]
   });
 
-  // Horizontal movement based on scroll
   const sliderX = useTransform(
     scrollYProgress,
     [0, 0.25, 0.5, 0.75, 1],
@@ -219,61 +217,7 @@ export default function AboutPage() {
     }
   };
 
-  const timelineItemVariants: Variants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.2,
-        duration: 0.6,
-        type: "spring",
-        stiffness: 50,
-      }
-    }),
-  };
-
-  // Journey Timeline Data
-  const journeyMilestones = [
-    { 
-      year: "'21", 
-      title: "Start of NestickTech", 
-      description: "Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions.", 
-      icon: Rocket 
-    },
-    { 
-      year: "'22", 
-      title: "Good Client Base Established", 
-      description: "Successfully built a strong client base across Pakistan, earning trust through quality service and support.", 
-      icon: Award 
-    },
-    { 
-      year: "'23", 
-      title: "Global Expansion", 
-      description: "Expanded operations internationally, serving clients worldwide with customized digital solutions.", 
-      icon: Globe 
-    },
-    { 
-      year: "'24", 
-      title: "Launch of 1st Product — Neezamiya", 
-      description: "Launched our flagship product 'Neezamiya' - a comprehensive educational management system.", 
-      icon: Brain 
-    },
-    { 
-      year: "'25", 
-      title: "Launch of PBM", 
-      description: "Introduced Portfolio Business Manager (PBM) - revolutionizing portfolio handling for institutions.", 
-      icon: TrendingUp 
-    },
-    { 
-      year: "'26", 
-      title: "Ready to Conquer This Year", 
-      description: "Setting our sights on new heights with AI-powered solutions and global market leadership.", 
-      icon: Infinity 
-    },
-  ];
-
-  // Theme-based colors - SINGLE UNIFIED BACKGROUND
+  // Theme-based colors
   const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F5F5F5';
   const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
@@ -289,7 +233,7 @@ export default function AboutPage() {
         className="min-h-screen pt-16 lg:pt-20 overflow-hidden"
         style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
       >
-        {/* Hero Section with Galaxy Image Background */}
+        {/* ─── Hero Section ─── */}
         <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[50vh]">
           <div className="absolute inset-0 z-0">
             <div 
@@ -357,7 +301,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Mission & Vision Section - Same background as main */}
+        {/* ─── Mission & Vision ─── */}
         <section ref={missionRef} className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -444,181 +388,15 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Journey Timeline Section - Same background */}
-        <section ref={journeyRef} className="py-12 md:py-16 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={journeyInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-10 md:mb-12"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
-                  border: 'none',
-                }}
-              >
-                <Rocket className="w-3.5 h-3.5"
-                  style={{ color: getAccentColor() }}
-                />
-                <span className="text-xs font-medium tracking-wide"
-                  style={{ 
-                    color: getTextMuted(),
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  Our Journey
-                </span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight"
-                style={{ 
-                  color: getTextColor(),
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                The Story of{' '}
-                <span className="inline-block"
-                  style={{ color: getAccentColor() }}
-                >
-                  Growth & Innovation
-                </span>
-              </h2>
-              <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
-                style={{ 
-                  color: getTextMuted(),
-                  fontFamily: "'Calibri Light', sans-serif",
-                }}
-              >
-                From humble beginnings to transforming portfolio management across institutions worldwide.
-              </p>
-            </motion.div>
+        {/* ─── Journey Section ─── */}
+        <JourneySection />
 
-            <div className="relative">
-              <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full">
-                <motion.div 
-                  className="w-full h-full"
-                  initial={{ scaleY: 0, opacity: 0 }}
-                  whileInView={{ scaleY: 1, opacity: 1 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
-                  style={{
-                    transformOrigin: 'top',
-                    backgroundColor: getAccentColor(),
-                  }}
-                />
-              </div>
-              
-              <div className="space-y-6 md:space-y-8">
-                {journeyMilestones.map((milestone, index) => {
-                  const Icon = milestone.icon;
-                  return (
-                    <motion.div
-                      key={milestone.year}
-                      custom={index}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true, amount: 0.3 }}
-                      variants={timelineItemVariants}
-                      className={`relative flex flex-col md:flex-row items-center gap-4 ${
-                        index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                      }`}
-                    >
-                      <div className={`flex-1 w-full ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                        <motion.div 
-                          className="rounded-xl p-4 md:p-5 transition-all duration-300 group"
-                        >
-                          <div className={`flex items-center gap-2 mb-2 ${index % 2 === 0 ? 'md:justify-end' : 'md:justify-start'} justify-start`}>
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                              style={{
-                                backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
-                              }}
-                            >
-                              <Icon className="w-4 h-4"
-                                style={{ color: getAccentColor() }}
-                              />
-                            </div>
-                            <span className="text-sm font-bold"
-                              style={{ 
-                                color: getAccentColor(),
-                                fontFamily: "'Poppins', sans-serif",
-                              }}
-                            >
-                              {milestone.year}
-                            </span>
-                          </div>
-                          <h3 className={`text-base md:text-lg font-bold mb-1 tracking-wide ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left`}
-                            style={{ 
-                              color: getTextColor(),
-                              fontFamily: "'Poppins', sans-serif",
-                            }}
-                          >
-                            {milestone.title}
-                          </h3>
-                          <p className={`text-xs md:text-sm ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-left leading-relaxed font-light`}
-                            style={{ 
-                              color: getTextMuted(),
-                              fontFamily: "'Calibri Light', sans-serif",
-                            }}
-                          >
-                            {milestone.description}
-                          </p>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="relative z-10">
-                        <motion.div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-                          whileHover={{ scale: 1.2, transition: { duration: 0.3 } }}
-                          style={{
-                            backgroundColor: getAccentColor(),
-                          }}
-                        >
-                          <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex-1 hidden md:block"></div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="mt-8 text-center"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
-                  border: 'none',
-                }}
-              >
-                <Infinity className="w-4 h-4"
-                  style={{ color: getAccentColor() }}
-                />
-                <span className="text-xs tracking-wide"
-                  style={{ 
-                    color: getTextMuted(),
-                    fontFamily: "'Calibri Light', sans-serif",
-                  }}
-                >
-                  And beyond... The journey continues
-                </span>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-        
+        {/* ─── Partner Section ─── */}
         <PartnerSection onPartnerSubmit={(data) => {
           console.log('New partner application:', data);
         }} />
 
-        {/* Team Slider Section - Same background */}
+        {/* ─── Team Slider ─── */}
         <section ref={teamRef} className="py-12 md:py-16 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -669,7 +447,7 @@ export default function AboutPage() {
               </p>
             </motion.div>
 
-            {/* Team Slider with Parallax Scroll */}
+            {/* Team Slider */}
             <div className="relative w-full overflow-hidden">
               <motion.div 
                 className="relative w-full"
@@ -682,7 +460,6 @@ export default function AboutPage() {
                       className="flex-shrink-0 group w-[180px] md:w-[200px] lg:w-[220px]"
                     >
                       <div className="flex flex-col items-center transition-all duration-300">
-                        {/* Avatar Container */}
                         <div className="relative mb-3">
                           <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#6366F1]/20 to-[#8B5CF6]/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} />
                           <div 
@@ -699,7 +476,6 @@ export default function AboutPage() {
                             </span>
                           </div>
                           
-                          {/* Role Badge */}
                           <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[8px] md:text-[9px] font-medium whitespace-nowrap transition-all duration-300 group-hover:scale-105`}
                             style={{
                               backgroundColor: theme === 'dark' ? '#1F4381' : '#00A0FF',
@@ -713,14 +489,12 @@ export default function AboutPage() {
                           </div>
                         </div>
                         
-                        {/* Name */}
                         <span className={`text-sm md:text-base font-semibold tracking-wide ${theme === 'dark' ? 'text-[#E2E8F0]' : 'text-[#334155]'} group-hover:text-[#6366F1] transition-colors duration-300 text-center`}
                           style={{ fontFamily: "'Poppins', sans-serif" }}
                         >
                           {member.name}
                         </span>
                         
-                        {/* Underline animation */}
                         <div className="w-0 h-0.5 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] group-hover:w-12 transition-all duration-300 mt-1 rounded-full" />
                       </div>
                     </div>
@@ -731,7 +505,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Contact Section - Same background */}
+        {/* ─── Contact Section ─── */}
         <section ref={contactRef} className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -764,7 +538,7 @@ export default function AboutPage() {
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
-                Let&apos;s{' '}
+                Let's{' '}
                 <span className="inline-block"
                   style={{ color: getAccentColor() }}
                 >
@@ -777,7 +551,7 @@ export default function AboutPage() {
                   fontFamily: "'Calibri Light', sans-serif",
                 }}
               >
-                Have questions? We&apos;d love to hear from you. Send us a message and we&apos;ll respond within 24 hours.
+                Have questions? We'd love to hear from you. Send us a message and we'll respond within 24 hours.
               </p>
             </motion.div>
 
@@ -1025,7 +799,7 @@ export default function AboutPage() {
                       <p className="text-green-400 text-xs"
                         style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       >
-                        Thank you! We&lsquo;ll get back to you soon.
+                        Thank you! We'll get back to you soon.
                       </p>
                     </div>
                   )}
