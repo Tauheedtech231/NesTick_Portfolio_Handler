@@ -1,237 +1,330 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Building Digital Futures</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #050402; display: flex; justify-content: center; }
-  .stage { width: 100%; max-width: 480px; margin: 0 auto; }
-  svg { display: block; width: 100%; height: auto; }
-  .ttl { font-family: 'Poppins', sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0B0F19; font-family: Arial, sans-serif; }
+  @keyframes tw-blink { 0%,100%{opacity:1} 50%{opacity:0} }
 </style>
 </head>
 <body>
-<div class="stage">
-<svg class="ttl" viewBox="0 0 440 700" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0a0703"/>
-      <stop offset="100%" stop-color="#040301"/>
-    </linearGradient>
-    <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#a9690f"/>
-      <stop offset="35%" stop-color="#f3b13b"/>
-      <stop offset="70%" stop-color="#ffe08a"/>
-      <stop offset="100%" stop-color="#caa24a"/>
-    </linearGradient>
-    <radialGradient id="circleFill" cx="50%" cy="40%" r="65%">
-      <stop offset="0%" stop-color="#1c1712"/>
-      <stop offset="100%" stop-color="#070502"/>
-    </radialGradient>
-    <filter id="softGlow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="6" result="b1"/>
-      <feMerge><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="bigGlow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="14"/>
-    </filter>
-    <filter id="ringGlow" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="3.2"/>
-    </filter>
-  </defs>
-
-  <rect x="0" y="0" width="440" height="700" fill="url(#bg)"/>
-
-  <!-- ============ ROAD (top -> bottom, dissolving into particles) ============ -->
-  <path id="roadPath" d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
-        fill="none" stroke="#7a4e10" stroke-width="30" stroke-linecap="round" opacity="0.32" filter="url(#bigGlow)"/>
-  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
-        fill="none" stroke="#ffb238" stroke-width="14" stroke-linecap="round" opacity="0.55" filter="url(#softGlow)"/>
-  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
-        fill="none" stroke="url(#roadGrad)" stroke-width="6" stroke-linecap="round"/>
-  <path d="M270,15 C275,35 260,45 265,55 C270,90 235,130 250,178 C265,220 320,250 305,298 C290,335 190,350 205,393 C220,430 280,460 265,508 C250,545 195,560 215,600 C228,622 165,638 128,660"
-        fill="none" stroke="#fff8e6" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
-
-  <!-- particle dissipation trail beyond '26 -->
-  <g fill="#ffce5c">
-    <circle cx="112" cy="668" r="2.6" opacity="0.85"/>
-    <circle cx="96" cy="678" r="2.1" opacity="0.7"/>
-    <circle cx="140" cy="672" r="1.8" opacity="0.6"/>
-    <circle cx="80" cy="686" r="1.6" opacity="0.55"/>
-    <circle cx="156" cy="664" r="1.4" opacity="0.5"/>
-    <circle cx="65" cy="690" r="1.3" opacity="0.4"/>
-    <circle cx="172" cy="658" r="1.1" opacity="0.35"/>
-    <circle cx="50" cy="694" r="1" opacity="0.3"/>
-    <circle cx="125" cy="690" r="0.9" opacity="0.3"/>
-    <circle cx="35" cy="688" r="0.8" opacity="0.22"/>
-  </g>
-
-  <!-- ============ MILESTONE CIRCLES ============ -->
-  <g>
-    <circle cx="265" cy="55"  r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="265" cy="55"  r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="265" y="61" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'21</text>
-
-    <circle cx="250" cy="178" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="250" cy="178" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="250" y="184" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'22</text>
-
-    <circle cx="305" cy="298" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="305" cy="298" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="305" y="304" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'23</text>
-
-    <circle cx="205" cy="393" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="205" cy="393" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="205" y="399" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'24</text>
-
-    <circle cx="265" cy="508" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="265" cy="508" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="265" y="514" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'25</text>
-
-    <circle cx="215" cy="600" r="23" fill="#caa24a" opacity="0.55" filter="url(#ringGlow)"/>
-    <circle cx="215" cy="600" r="20" fill="url(#circleFill)" stroke="#f3c14a" stroke-width="2.6"/>
-    <text x="215" y="606" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">'26</text>
-  </g>
-
-  <!-- ============ MILESTONE TEXT BLOCKS (populated by script) ============ -->
-  <g id="blocks"></g>
-
-  <!-- ============ HEADER ============ -->
-  <text x="20" y="28" font-size="12.5" font-weight="600" fill="#f3c14a">About Us</text>
-  <rect x="20" y="36" width="30" height="2.4" fill="#f3c14a"/>
-  <text x="18" y="68" font-size="27" font-weight="800" fill="#ffffff">Building</text>
-  <text x="18" y="100" font-size="27" font-weight="800" fill="#f3c14a">Digital</text>
-  <text x="18" y="132" font-size="27" font-weight="800" fill="#f3c14a">Futures</text>
-  <text x="20" y="155" font-size="14.5" font-weight="700" fill="#ffffff">Since <tspan fill="#f3c14a">2021</tspan></text>
-  <rect x="20" y="163" width="30" height="2.4" fill="#f3c14a"/>
-  <text x="20" y="184" font-size="10.3" fill="#cfcac0">
-    <tspan x="20" dy="0">Helping institutions</tspan>
-    <tspan x="20" dy="13">manage and showcase</tspan>
-    <tspan x="20" dy="13">student portfolios —</tspan>
-    <tspan x="20" dy="13">simply and efficiently.</tspan>
-  </text>
-
-</svg>
-</div>
-
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
-const milestones = [
-  { cx:265, cy:55,  side:'R', title:"Start of NestickTech",
-    desc:"Nestick Tech was founded with a vision to provide innovative digital solutions for educational institutions." },
-  { cx:250, cy:178, side:'L', tx:142, title:"Good Client Base Established",
-    desc:"Successfully built a strong client base across Pakistan, earning trust through quality service and support." },
-  { cx:305, cy:298, side:'R', title:"Global Expansion",
-    desc:"Expanded operations internationally, serving clients worldwide with customized digital solutions." },
-  { cx:205, cy:393, side:'L', title:"Launch of 1st Product — Neezamiya",
-    desc:"Launched our flagship product 'Neezamiya' - a comprehensive educational management system." },
-  { cx:265, cy:508, side:'R', title:"Launch of PBM",
-    desc:"Introduced Portfolio Business Manager (PBM) – revolutionizing portfolio handling for institutions." },
-  { cx:215, cy:600, side:'L', title:"Ready to Conquer This Year",
-    desc:"Setting our sights on new heights with AI-powered solutions and global market leadership." }
+const { useState, useEffect, useRef, useCallback } = React;
+
+const NUM_SEGS = 5, BOTTOM_GAP = 2;
+const SEG_SPAN = 360 / NUM_SEGS - BOTTOM_GAP, START_OFFSET = 270;
+
+const SEG_META = [
+  { id:"01", label:["MULTI","PORTAL"], title:"MULTI-PORTAL ARCHITECTURE", description:"Build and manage multiple portals from a single codebase with shared components. Scale seamlessly across brands, regions, and user types without duplicating your infrastructure." },
+  { id:"02", label:["CENTRALIZ"], title:"CENTRALIZED MANAGEMENT", description:"Control all your portals, users, and configurations from one unified dashboard. Streamline operations and reduce overhead with a single source of truth for your entire platform." },
+  { id:"03", label:["ACCESS","CONTROL"], title:"ACCESS CONTROL", description:"Define granular roles and permissions for every user across all portals. Protect sensitive data with enterprise-grade authentication and fine-grained authorization policies." },
+  { id:"04", label:["LIVE","SYNC"], title:"LIVE SYNC", description:"Real-time data synchronization across all portals and devices. Changes propagate instantly so every user always sees the most current information without manual refresh." },
+  { id:"05", label:["PORTFOLIO"], title:"PORTFOLIO", description:"Showcase and manage your complete portfolio of projects within one cohesive platform. Present clients with a polished, branded experience that highlights your best work." },
 ];
 
-const TITLE_SIZE = 12, DESC_SIZE = 9.4, TITLE_LH = 14.5, DESC_LH = 12.6, GAP = 8;
-const RIGHT_MAXW = 122, RIGHT_X = 320, LEFT_X = 20;
+const CX=340, CY=340, GOLD="#FFD700";
+const FILL="#0f1e38", FILL_HOVER="#1a3060", INNER_FILL="#07101e";
+const OUTER_R=320, STRIP_OUTER=320, STRIP_INNER=294;
+const SEG_OUTER=278, SEG_INNER=130, INNER_CIRCLE_R=116;
+const LABEL_R=206, NUM_R=(STRIP_OUTER+STRIP_INNER)/2;
+const FLY_SIZE=300;
 
-function wrapLines(ctx, text, maxWidth, font) {
-  ctx.font = font;
-  const words = text.split(' ');
-  const lines = [];
-  let cur = '';
-  for (const w of words) {
-    const test = cur ? cur + ' ' + w : w;
-    if (ctx.measureText(test).width <= maxWidth || !cur) {
-      cur = test;
-    } else {
-      lines.push(cur);
-      cur = w;
-    }
-  }
-  if (cur) lines.push(cur);
-  return lines;
+const toRad = d => d*Math.PI/180;
+const polar = (r,deg,cx=CX,cy=CY) => ({ x: cx+r*Math.cos(toRad(deg)), y: cy+r*Math.sin(toRad(deg)) });
+
+function arcPath(r,s,e,cx=CX,cy=CY){
+  let end=e; if(end<s) end+=360;
+  const lg=end-s>180?1:0, a=polar(r,s,cx,cy), b=polar(r,e,cx,cy);
+  return `M ${a.x} ${a.y} A ${r} ${r} 0 ${lg} 1 ${b.x} ${b.y}`;
+}
+function donutSeg(oR,iR,s,e,cx=CX,cy=CY){
+  let end=e; if(end<s) end+=360;
+  const lg=end-s>180?1:0;
+  const os=polar(oR,s,cx,cy),oe=polar(oR,e,cx,cy),ie=polar(iR,e,cx,cy),is_=polar(iR,s,cx,cy);
+  return `M ${os.x} ${os.y} A ${oR} ${oR} 0 ${lg} 1 ${oe.x} ${oe.y} L ${ie.x} ${ie.y} A ${iR} ${iR} 0 ${lg} 0 ${is_.x} ${is_.y} Z`;
 }
 
-function buildBlocks() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const blocksG = document.getElementById('blocks');
-  blocksG.innerHTML = '';
+// easeInOutCubic — smoother than quad, physical feel
+function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
 
-  milestones.forEach(m => {
-    const isRight = m.side === 'R';
-    const x = isRight ? RIGHT_X : LEFT_X;
-    const maxW = isRight ? RIGHT_MAXW : (m.cx - 22 - LEFT_X - 14);
+function computeVB(s,e,oR=278,iR=130,cx=340,cy=340,pad=14){
+  const toR=d=>d*Math.PI/180; let end=e; if(end<s) end+=360;
+  const pts=[];
+  for(let d=s;d<=end;d+=2){ const a=toR(d); pts.push([cx+oR*Math.cos(a),cy+oR*Math.sin(a)],[cx+iR*Math.cos(a),cy+iR*Math.sin(a)]); }
+  for(let d=s;d<=end;d+=2){ const a=toR(d); pts.push([cx+320*Math.cos(a),cy+320*Math.sin(a)],[cx+294*Math.cos(a),cy+294*Math.sin(a)]); }
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const minX=Math.min(...xs)-pad,minY=Math.min(...ys)-pad,maxX=Math.max(...xs)+pad,maxY=Math.max(...ys)+pad;
+  return `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX-minX).toFixed(0)} ${(maxY-minY).toFixed(0)}`;
+}
 
-    const titleLines = wrapLines(ctx, m.title, maxW, `700 ${TITLE_SIZE}px Poppins`);
-    const descLines  = wrapLines(ctx, m.desc,  maxW, `400 ${DESC_SIZE}px Poppins`);
-
-    const totalH = titleLines.length * TITLE_LH + GAP + descLines.length * DESC_LH;
-    const blockTop = m.cy - totalH / 2;
-
-    const g = document.createElementNS(svgNS, 'g');
-
-    const dotX = isRight ? x - 8 : x + maxW + 8;
-    const dotY = blockTop + TITLE_LH * 0.4;
-    const circleEdgeX = isRight ? m.cx + 22 : m.cx - 22;
-    const midX = isRight ? circleEdgeX + (dotX - circleEdgeX) * 0.45 : circleEdgeX - (circleEdgeX - dotX) * 0.45;
-
-    const line = document.createElementNS(svgNS, 'path');
-    line.setAttribute('d', `M${circleEdgeX},${m.cy} L${midX},${m.cy} L${dotX},${dotY}`);
-    line.setAttribute('fill', 'none');
-    line.setAttribute('stroke', '#caa24a');
-    line.setAttribute('stroke-width', '1.3');
-    line.setAttribute('opacity', '0.9');
-    g.appendChild(line);
-
-    const dot = document.createElementNS(svgNS, 'circle');
-    dot.setAttribute('cx', dotX); dot.setAttribute('cy', dotY); dot.setAttribute('r', 2.5);
-    dot.setAttribute('fill', '#f3c14a');
-    g.appendChild(dot);
-
-    const titleEl = document.createElementNS(svgNS, 'text');
-    titleEl.setAttribute('x', x);
-    titleEl.setAttribute('y', blockTop + TITLE_LH * 0.78);
-    titleEl.setAttribute('font-size', TITLE_SIZE);
-    titleEl.setAttribute('font-weight', '700');
-    titleEl.setAttribute('fill', '#f3c14a');
-    titleLines.forEach((line2, i) => {
-      const tspan = document.createElementNS(svgNS, 'tspan');
-      tspan.setAttribute('x', x);
-      tspan.setAttribute('dy', i === 0 ? 0 : TITLE_LH);
-      tspan.textContent = line2;
-      titleEl.appendChild(tspan);
-    });
-    g.appendChild(titleEl);
-
-    const descTop = blockTop + titleLines.length * TITLE_LH + GAP;
-    const descEl = document.createElementNS(svgNS, 'text');
-    descEl.setAttribute('x', x);
-    descEl.setAttribute('y', descTop + DESC_LH * 0.78);
-    descEl.setAttribute('font-size', DESC_SIZE);
-    descEl.setAttribute('fill', '#c9c4ba');
-    descLines.forEach((line2, i) => {
-      const tspan = document.createElementNS(svgNS, 'tspan');
-      tspan.setAttribute('x', x);
-      tspan.setAttribute('dy', i === 0 ? 0 : DESC_LH);
-      tspan.textContent = line2;
-      descEl.appendChild(tspan);
-    });
-    g.appendChild(descEl);
-
-    blocksG.appendChild(g);
+function calcSegments(){
+  return Array.from({length:NUM_SEGS},(_,i)=>{
+    const segAngle=360/NUM_SEGS, centerDeg=(START_OFFSET+i*segAngle)%360;
+    const half=SEG_SPAN/2, startDeg=(centerDeg-half+360)%360;
+    const endDeg=((centerDeg+half)%360-BOTTOM_GAP+360)%360;
+    return {...SEG_META[i], startDeg, endDeg, centerDeg, index:i, vb:computeVB(startDeg,endDeg)};
   });
 }
+const SEGMENTS=calcSegments();
 
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(buildBlocks).catch(buildBlocks);
-  buildBlocks();
-} else {
-  buildBlocks();
+function useTypewriter(text,speed=16,delay=400){
+  const [displayed,setDisplayed]=useState(""), [done,setDone]=useState(false);
+  const t=useRef(null);
+  useEffect(()=>{
+    setDisplayed(""); setDone(false); let i=0;
+    t.current=setTimeout(()=>{
+      const tick=()=>{ i++; setDisplayed(text.slice(0,i)); if(i<text.length) t.current=setTimeout(tick,speed); else setDone(true); };
+      tick();
+    },delay);
+    return ()=>clearTimeout(t.current);
+  },[text]);
+  return {displayed,done};
 }
+
+function SegPaths({seg,fill,innerFill,color,sw=2}){
+  const np=polar(NUM_R,seg.centerDeg), lp=polar(LABEL_R,seg.centerDeg);
+  return React.createElement(React.Fragment,null,
+    React.createElement('path',{d:arcPath(OUTER_R,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
+    React.createElement('path',{d:donutSeg(STRIP_OUTER,STRIP_INNER,seg.startDeg,seg.endDeg),fill:innerFill,stroke:color,strokeWidth:sw}),
+    React.createElement('path',{d:arcPath(STRIP_INNER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
+    React.createElement('path',{d:donutSeg(SEG_OUTER,SEG_INNER,seg.startDeg,seg.endDeg),fill,stroke:color,strokeWidth:sw}),
+    React.createElement('path',{d:arcPath(SEG_OUTER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
+    React.createElement('path',{d:arcPath(SEG_INNER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
+    React.createElement('text',{x:np.x,y:np.y,textAnchor:"middle",dominantBaseline:"central",fill:color,fontFamily:"Arial,sans-serif",fontSize:"13",fontWeight:"700",letterSpacing:"1.5"},seg.id),
+    ...seg.label.map((line,i)=>React.createElement('text',{key:i,x:lp.x,y:lp.y+(i-(seg.label.length-1)/2)*21,textAnchor:"middle",dominantBaseline:"central",fill:color,fontFamily:"Arial,sans-serif",fontSize:"14",fontWeight:"700",letterSpacing:"2.5"},line))
+  );
+}
+
+function InfoPanel({seg,visible}){
+  const {displayed,done}=useTypewriter(seg.description);
+  return React.createElement('div',{style:{opacity:visible?1:0,transition:"opacity 0.5s ease",maxWidth:320}},
+    React.createElement('div',{style:{display:"flex",alignItems:"flex-start",gap:10,marginBottom:16}},
+      React.createElement('span',{style:{flexShrink:0,marginTop:5,width:10,height:10,borderRadius:"50%",backgroundColor:GOLD}}),
+      React.createElement('p',{style:{color:GOLD,fontFamily:"Arial,sans-serif",fontSize:15,fontWeight:700,letterSpacing:1,lineHeight:1.45,margin:0}},seg.title)
+    ),
+    React.createElement('div',{style:{display:"flex",alignItems:"flex-start",gap:10}},
+      React.createElement('span',{style:{flexShrink:0,marginTop:7,width:7,height:7,borderRadius:"50%",backgroundColor:GOLD,opacity:0.5}}),
+      React.createElement('p',{style:{color:"#D1D5DB",fontFamily:"Arial,sans-serif",fontSize:13.5,lineHeight:1.78,margin:0,minHeight:80}},
+        displayed,
+        !done&&React.createElement('span',{style:{display:"inline-block",width:2,height:13,backgroundColor:GOLD,marginLeft:2,verticalAlign:"middle",animation:"tw-blink 0.75s step-end infinite"}})
+      )
+    )
+  );
+}
+
+function App(){
+  const [activeSeg,setActiveSeg]=useState(null);
+  const [showInfo,setShowInfo]=useState(false);
+  const [animating,setAnimating]=useState(false);
+  const [hoveredId,setHoveredId]=useState(null);
+  const [wheelReady,setWheelReady]=useState(false);
+  // fly state: { left, top, scale }
+  const [fly,setFly]=useState(null);
+
+  const wheelRef=useRef(null), containerRef=useRef(null), rafRef=useRef(null), startRef=useRef(null);
+  // store start/end positions for both journeys
+  const journeyRef=useRef(null);
+
+  useEffect(()=>{ const t=setTimeout(()=>setWheelReady(true),120); return ()=>clearTimeout(t); },[]);
+
+  // Get the segment's center position in container-local coords
+  // and compute the "natural" scale it should appear at when sitting in the wheel
+  function getSlotInfo(seg){
+    const wEl=wheelRef.current, cEl=containerRef.current;
+    if(!wEl||!cEl) return null;
+    const wRect=wEl.getBoundingClientRect(), cRect=cEl.getBoundingClientRect();
+    const svgScale=wRect.width/680;
+    const midR=(SEG_OUTER+SEG_INNER)/2;
+    const rad=toRad(seg.centerDeg);
+    // segment center in container coords
+    const slotCx=(wRect.left-cRect.left)+(CX+midR*Math.cos(rad))*svgScale;
+    const slotCy=(wRect.top-cRect.top)+(CY+midR*Math.sin(rad))*svgScale;
+    // how big the segment visually is in the wheel vs FLY_SIZE
+    const segVisualWidth=(SEG_OUTER-SEG_INNER)*svgScale;
+    const slotScale=segVisualWidth/FLY_SIZE*1.9; // tweak factor for visual match
+    return { slotCx, slotCy, slotScale, cRect };
+  }
+
+  const handleClick=useCallback((seg)=>{
+    if(animating||activeSeg) return;
+    const info=getSlotInfo(seg);
+    if(!info) return;
+    const {slotCx,slotCy,slotScale,cRect}=info;
+
+    // flying div top-left when centred over slot
+    const startLeft=slotCx-FLY_SIZE/2;
+    const startTop=slotCy-FLY_SIZE/2;
+    // landing position: left side, vertically centred
+    const endLeft=cRect.width*0.03;
+    const endTop=cRect.height*0.5-FLY_SIZE/2;
+
+    journeyRef.current={startLeft,startTop,startScale:slotScale,endLeft,endTop};
+
+    setFly({left:startLeft,top:startTop,scale:slotScale,seg});
+    setActiveSeg(seg);
+    setAnimating(true);
+    setShowInfo(false);
+
+    const DUR=1400; startRef.current=null;
+    const go=ts=>{
+      if(startRef.current===null) startRef.current=ts;
+      const raw=Math.min((ts-startRef.current)/DUR,1);
+      const t=ease(raw);
+      const left=startLeft+(endLeft-startLeft)*t;
+      const top=startTop+(endTop-startTop)*t - 36*Math.sin(raw*Math.PI);
+      // scale: from slotScale → 1 (grows as it flies out)
+      const scale=slotScale+(1-slotScale)*t;
+      setFly(prev=>({...prev,left,top,scale}));
+      if(raw<1){ rafRef.current=requestAnimationFrame(go); }
+      else{
+        setFly(prev=>({...prev,left:endLeft,top:endTop,scale:1}));
+        setAnimating(false);
+        setTimeout(()=>setShowInfo(true),150);
+      }
+    };
+    rafRef.current=requestAnimationFrame(go);
+  },[animating,activeSeg]);
+
+  const handleClose=useCallback(()=>{
+    if(animating||!activeSeg) return;
+    setShowInfo(false);
+    const j=journeyRef.current;
+    if(!j){ setActiveSeg(null); setFly(null); return; }
+    const {startLeft,startTop,startScale,endLeft,endTop}=j;
+
+    if(rafRef.current) cancelAnimationFrame(rafRef.current);
+    setAnimating(true);
+    startRef.current=null;
+
+    const DUR=1400;
+    // We animate LEFT+TOP (position) AND SCALE simultaneously
+    // scale goes 1 → slotScale so it "shrinks into" the slot naturally
+    const go=ts=>{
+      if(startRef.current===null) startRef.current=ts;
+      const raw=Math.min((ts-startRef.current)/DUR,1);
+      const t=ease(raw);
+      const left=endLeft+(startLeft-endLeft)*t;
+      const top=endTop+(startTop-endTop)*t;
+      // KEY: scale shrinks smoothly from 1 back to slotScale
+      const scale=1+(startScale-1)*t;
+      setFly(prev=>({...prev,left,top,scale}));
+      if(raw<1){ rafRef.current=requestAnimationFrame(go); }
+      else{
+        // snap complete: hide flying div, reveal wheel segment
+        setAnimating(false);
+        setActiveSeg(null);
+        setFly(null);
+      }
+    };
+    rafRef.current=requestAnimationFrame(go);
+  },[animating,activeSeg]);
+
+  useEffect(()=>{ const f=e=>{ if(e.key==="Escape") handleClose(); }; window.addEventListener("keydown",f); return ()=>window.removeEventListener("keydown",f); },[handleClose]);
+
+  return React.createElement('section',{
+    ref:containerRef,
+    style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+      width:"100%",minHeight:"100vh",padding:"60px 16px",
+      backgroundColor:"#0B0F19",boxSizing:"border-box",position:"relative",overflow:"hidden"}
+  },
+    React.createElement('style',null,`@keyframes tw-blink{0%,100%{opacity:1}50%{opacity:0}}`),
+
+    // Header
+    React.createElement('div',{style:{textAlign:"center",marginBottom:40}},
+      React.createElement('h2',{style:{fontFamily:"'Poppins',Arial,sans-serif",fontSize:"clamp(22px,3.5vw,34px)",fontWeight:700,letterSpacing:"-0.3px",margin:0}},
+        React.createElement('span',{style:{color:"#FFFFFF"}},"Comprehensive")," ",
+        React.createElement('span',{style:{color:GOLD}},"System Features")
+      ),
+      React.createElement('p',{style:{marginTop:8,fontSize:13,color:"#9CA3AF",letterSpacing:1}},"Explore our powerful platform capabilities"),
+      React.createElement('div',{style:{margin:"12px auto 0",height:2,width:160,backgroundColor:GOLD,opacity:0.6}})
+    ),
+
+    // Wheel
+    React.createElement('div',{
+      ref:wheelRef,
+      style:{width:"100%",maxWidth:520,position:"relative",
+        opacity:wheelReady?1:0,
+        transform:wheelReady?"translateY(0) scale(1)":"translateY(28px) scale(0.97)",
+        transition:wheelReady?"opacity 1.1s ease,transform 1.5s ease":"none"}
+    },
+      React.createElement('svg',{width:"100%",viewBox:"0 0 680 680",xmlns:"http://www.w3.org/2000/svg"},
+        ...SEGMENTS.map(seg=>{
+          const isActive=activeSeg&&activeSeg.id===seg.id;
+          const isHov=hoveredId===seg.id&&!activeSeg;
+          return React.createElement('g',{
+            key:seg.id,
+            onClick:()=>!activeSeg&&!animating&&handleClick(seg),
+            onMouseEnter:()=>!activeSeg&&setHoveredId(seg.id),
+            onMouseLeave:()=>setHoveredId(null),
+            style:{
+              cursor:activeSeg?"default":"pointer",
+              opacity:isActive?0.12:1,
+              transition:"opacity 0.25s ease",
+              transform:isHov&&!activeSeg?"scale(1.015)":"scale(1)",
+              transformOrigin:`${CX}px ${CY}px`,
+              transitionProperty:"opacity,transform",
+              transitionDuration:"0.25s,0.15s",
+              pointerEvents:activeSeg?"none":"auto",
+            }
+          },
+            React.createElement(SegPaths,{seg,fill:isHov?FILL_HOVER:FILL,innerFill:INNER_FILL,color:GOLD,sw:isHov?2.2:2})
+          );
+        }),
+        React.createElement('circle',{cx:CX,cy:CY,r:INNER_CIRCLE_R,fill:INNER_FILL,stroke:GOLD,strokeWidth:"2"}),
+        React.createElement('text',{x:CX,y:CY,textAnchor:"middle",dominantBaseline:"central",fill:GOLD,fontFamily:"Arial,sans-serif",fontSize:"22",fontWeight:"700",letterSpacing:"3"},"Neezamiya")
+      )
+    ),
+
+    // Dim overlay — z:10, does NOT cover flying segment (z:20)
+    activeSeg&&React.createElement('div',{
+      onClick:handleClose,
+      style:{position:"absolute",inset:0,zIndex:10,backgroundColor:"rgba(0,0,0,0.6)",
+        transition:"background-color 0.4s ease",pointerEvents:animating?"none":"auto"}
+    }),
+
+    // Info panel — z:30
+    activeSeg&&React.createElement('div',{
+      onClick:e=>e.stopPropagation(),
+      style:{position:"absolute",right:"8%",top:"50%",transform:"translateY(-50%)",
+        width:320,maxWidth:"28vw",zIndex:30,pointerEvents:animating?"none":"auto"}
+    },
+      React.createElement(InfoPanel,{seg:activeSeg,visible:showInfo})
+    ),
+
+    // Close button — z:40
+    activeSeg&&React.createElement('button',{
+      onClick:e=>{e.stopPropagation();handleClose();},
+      style:{position:"absolute",top:20,right:28,background:"transparent",border:"none",
+        cursor:"pointer",color:GOLD,fontSize:38,lineHeight:1,zIndex:40,
+        opacity:showInfo&&!animating?1:0,transition:"opacity 0.4s ease",
+        pointerEvents:showInfo&&!animating?"auto":"none"}
+    },"×"),
+
+    // Flying segment — z:20, above overlay, below info panel
+    // transformOrigin at FLY_SIZE/2 so scale is centred
+    fly&&React.createElement('div',{
+      style:{
+        position:"absolute",
+        left:fly.left, top:fly.top,
+        width:FLY_SIZE, height:FLY_SIZE,
+        zIndex:20,
+        transform:`scale(${fly.scale})`,
+        transformOrigin:`${FLY_SIZE/2}px ${FLY_SIZE/2}px`,
+        pointerEvents:"none",
+        willChange:"transform,left,top",
+      }
+    },
+      React.createElement('svg',{width:FLY_SIZE,height:FLY_SIZE,viewBox:fly.seg.vb,xmlns:"http://www.w3.org/2000/svg"},
+        React.createElement(SegPaths,{seg:fly.seg,fill:FILL_HOVER,innerFill:INNER_FILL,color:GOLD,sw:2.5})
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
 </html>
