@@ -7,11 +7,36 @@ const SEG_SPAN = 360 / NUM_SEGS - BOTTOM_GAP;
 const START_OFFSET = 270;
 
 const SEG_META = [
-  { id: "01", label: ["MULTI", "PORTAL"],   title: "MULTI-PORTAL ARCHITECTURE", description: "Build and manage multiple portals from a single codebase with shared components. Scale seamlessly across brands, regions, and user types without duplicating your infrastructure." },
-  { id: "02", label: ["CENTRALIZ"],         title: "CENTRALIZED MANAGEMENT",     description: "Control all your portals, users, and configurations from one unified dashboard. Streamline operations and reduce overhead with a single source of truth for your entire platform." },
-  { id: "03", label: ["ACCESS", "CONTROL"], title: "ACCESS CONTROL",             description: "Define granular roles and permissions for every user across all portals. Protect sensitive data with enterprise-grade authentication and fine-grained authorization policies." },
-  { id: "04", label: ["LIVE", "SYNC"],      title: "LIVE SYNC",                  description: "Real-time data synchronization across all portals and devices. Changes propagate instantly so every user always sees the most current information without manual refresh." },
-  { id: "05", label: ["PORTFOLIO"],         title: "PORTFOLIO",                  description: "Showcase and manage your complete portfolio of projects within one cohesive platform. Present clients with a polished, branded experience that highlights your best work." },
+  { 
+    id: "01", 
+    label: ["MULTI", "PORTAL"],   
+    title: "MULTI-PORTAL ARCHITECTURE", 
+    description: "Build and manage multiple portals from a single codebase with shared components and reusable UI elements. Scale seamlessly across different brands, regions, and user types without duplicating your infrastructure or maintaining separate codebases. Our architecture supports independent deployments while maintaining consistency and reducing maintenance overhead across your entire ecosystem." 
+  },
+  { 
+    id: "02", 
+    label: ["CENTRALIZ"],         
+    title: "CENTRALIZED MANAGEMENT",     
+    description: "Control all your portals, users, and system configurations from one unified and intuitive dashboard. Streamline your daily operations and significantly reduce administrative overhead with a single source of truth for your entire platform. Access real-time analytics, user activity logs, and system performance metrics all in one centralized location for better decision making." 
+  },
+  { 
+    id: "03", 
+    label: ["ACCESS", "CONTROL"], 
+    title: "ACCESS CONTROL",             
+    description: "Define granular roles and permissions for every user across all portals with precision and flexibility. Protect your sensitive business data with enterprise-grade authentication protocols and fine-grained authorization policies that adapt to your organizational structure. Implement multi-factor authentication, single sign-on, and custom permission sets tailored to your specific security requirements." 
+  },
+  { 
+    id: "04", 
+    label: ["LIVE", "SYNC"],      
+    title: "LIVE SYNC",                  
+    description: "Experience real-time data synchronization across all portals, devices, and user sessions. Changes propagate instantly throughout the system so every user always sees the most current information without manual refresh or page reload. Our WebSocket-powered sync engine ensures data consistency and provides a seamless collaborative experience for teams working across different locations and time zones." 
+  },
+  { 
+    id: "05", 
+    label: ["PORTFOLIO"],         
+    title: "PORTFOLIO",                  
+    description: "Showcase and manage your complete portfolio of projects within one cohesive and branded platform. Present your clients with a polished, professional experience that highlights your best work and demonstrates your capabilities. Organize projects by category, track progress metrics, and share success stories with customizable portfolio views that reflect your unique brand identity." 
+  },
 ];
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -155,7 +180,7 @@ function calcSegments(): Segment[] {
 const SEGMENTS = calcSegments();
 
 // ─── Typewriter Hook ──────────────────────────────────────────────────────────
-function useTypewriter(text: string, speed = 16, delay = 400) {
+function useTypewriter(text: string, speed = 20, delay = 300) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
   const t = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -206,8 +231,6 @@ function SegPaths({
 }
 
 // ─── Info Panel ───────────────────────────────────────────────────────────────
-// ENHANCED: Larger text and description when segment is expanded
-// FIXED: Added margin-top to prevent navbar overlap
 function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; theme: string }) {
   const { displayed, done } = useTypewriter(seg.description);
   const titleColor = theme === "dark" ? GOLD : BLUE;
@@ -220,10 +243,10 @@ function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; th
       transition: "opacity 0.5s ease", 
       maxWidth: 480,
       position: "relative",
-      marginTop: 40, // Added margin-top to prevent navbar overlap
+      marginTop: 40,
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
-        <span style={{ flexShrink: 0, marginTop: 6, width: 12, height: 12, borderRadius: "50%", backgroundColor: dotColor }} />
+        
         <p style={{ 
           color: titleColor, 
           fontFamily: "Arial,sans-serif", 
@@ -237,7 +260,7 @@ function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; th
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, position: "relative" }}>
-        <span style={{ flexShrink: 0, marginTop: 8, width: 8, height: 8, borderRadius: "50%", backgroundColor: dotColor, opacity: 0.5 }} />
+       
         <p style={{ 
           color: descColor, 
           fontFamily: "Arial,sans-serif", 
@@ -343,12 +366,11 @@ export default function FeaturesSection() {
     const { w: destW, h: destH } = fitSize(vbW, vbH, DEST_MAX);
 
     // Landing: left edge at 10% of the container, vertically centred.
-    // FIXED: Added margin adjustment for segments that are at the bottom
     const endCx = cRect.width * 0.10 + destW / 2;
-    // For CENTRALIZ (index 1) and PORTFOLIO (index 4), adjust vertical position
-    // to account for navbar overlap
+    // For CENTRALIZ (index 1), ACCESS CONTROL (index 2), and PORTFOLIO (index 4)
+    // adjust vertical position to account for navbar overlap
     let endCy = cRect.height * 0.5;
-    if (seg.index === 1 || seg.index === 4) {
+    if (seg.index === 1 || seg.index === 2 || seg.index === 4) {
       endCy = cRect.height * 0.5 + 60; // Shift down by 60px
     }
 
@@ -518,13 +540,13 @@ export default function FeaturesSection() {
           </svg>
         </div>
 
-        {/* Dim overlay */}
+        {/* Dim overlay - EVEN DARKER overlay for maximum background hiding */}
         {activeSeg && (
           <div
             onClick={handleClose}
             style={{
               position: "absolute", inset: 0, zIndex: 10,
-              backgroundColor: "rgba(0,0,0,0.6)",
+              backgroundColor: "rgba(0,0,0,0.92)", // Changed from 0.85 to 0.92 for even darker overlay
               opacity: overlayVisible ? 1 : 0,
               transition: "opacity 0.45s ease",
               pointerEvents: animating ? "none" : "auto",
