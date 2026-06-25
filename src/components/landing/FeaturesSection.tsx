@@ -24,7 +24,29 @@ const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#6B7280";
 const OUTER_R = 320, STRIP_OUTER = 320, STRIP_INNER = 294;
 const SEG_OUTER = 278, SEG_INNER = 130, INNER_CIRCLE_R = 116;
 const LABEL_R = 206, NUM_R = (STRIP_OUTER + STRIP_INNER) / 2;
-const FLY_SIZE = 300;
+
+// Max width/height the flown-out segment is allowed to grow to once it lands
+// next to the description panel. The segment's own aspect ratio is preserved,
+// so it never gets stretched or squashed.
+const DEST_MAX = 450;
+
+// How much the segment arcs upward mid-flight, on the way OUT only — a
+// deliberate little "lift off". On the way back in there is NO arc at all
+// (see ARC_HEIGHT_IN = 0 below): a plain straight glide that comes to a
+// complete stop, with nothing left to "settle" once it arrives — the
+// calmest possible landing.
+const ARC_HEIGHT_OUT = 28;
+const ARC_HEIGHT_IN  = 0;
+
+// Durations. Closing is slower and more unhurried than opening.
+const OPEN_DUR  = 1400;
+const CLOSE_DUR = 1700;
+
+// How long the flying piece and the real wheel segment cross-fade into one
+// another once the closing motion has finished travelling. This is what
+// removes the handoff "jatka" — instead of an instant swap, the two co-exist
+// briefly, one fading out as the other fades in.
+const HANDOFF_MS = 420;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Segment {
@@ -37,6 +59,19 @@ interface Segment {
   centerDeg: number;
   index: number;
   vb: string;
+}
+
+interface FlyState {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  seg: Segment;
+}
+
+interface Journey {
+  slotCx: number; slotCy: number; slotW: number; slotH: number;
+  endCx: number;  endCy: number;  destW: number;  destH: number;
 }
 
 // ─── SVG Helpers ─────────────────────────────────────────────────────────────
@@ -62,8 +97,15 @@ function donutSeg(oR: number, iR: number, s: number, e: number, cx = CX, cy = CY
 }
 
 // ─── Easing ──────────────────────────────────────────────────────────────────
-function ease(t: number) {
+// Used for the OUT journey — speeds up then settles, like a deliberate launch.
+function easeInOut(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+// Used for the IN (closing) journey — decelerates the whole way, never
+// speeding back up, so the last moment is the slowest. This is what makes
+// the landing read as "gently placed down" rather than "stopped".
+function easeOutQuart(t: number) {
+  return 1 - Math.pow(1 - t, 4);
 }
 
 // ─── ViewBox Calculator ───────────────────────────────────────────────────────
@@ -83,6 +125,20 @@ function computeVB(s: number, e: number, oR = 278, iR = 130, cx = 340, cy = 340,
   const minX = Math.min(...xs) - pad, minY = Math.min(...ys) - pad;
   const maxX = Math.max(...xs) + pad, maxY = Math.max(...ys) + pad;
   return `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}`;
+}
+
+// Pulls the numeric width/height back out of a "minX minY w h" viewBox string.
+function vbSize(vb: string) {
+  const parts = vb.split(" ").map(Number);
+  return { w: parts[2], h: parts[3] };
+}
+
+// Scales (w,h) down (or up) so its largest side equals `max`, preserving
+// aspect ratio — this is what lets every segment land at a consistent,
+// undistorted size next to the description panel.
+function fitSize(w: number, h: number, max: number) {
+  const scale = Math.min(max / w, max / h);
+  return { w: w * scale, h: h * scale };
 }
 
 // ─── Segments ────────────────────────────────────────────────────────────────
@@ -150,59 +206,52 @@ function SegPaths({
 }
 
 // ─── Info Panel ───────────────────────────────────────────────────────────────
-function InfoPanel({ seg, visible, theme, onClose }: { seg: Segment; visible: boolean; theme: string; onClose: () => void }) {
+// ENHANCED: Larger text and description when segment is expanded
+// FIXED: Added margin-top to prevent navbar overlap
+function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; theme: string }) {
   const { displayed, done } = useTypewriter(seg.description);
   const titleColor = theme === "dark" ? GOLD : BLUE;
   const descColor  = theme === "dark" ? "#D1D5DB" : LIGHT_DESC;
   const dotColor   = theme === "dark" ? GOLD : BLUE;
 
   return (
-    <div style={{ opacity: visible ? 1 : 0, transition: "opacity 0.5s ease", maxWidth: 340, position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 16 }}>
-        <span style={{ flexShrink: 0, marginTop: 5, width: 10, height: 10, borderRadius: "50%", backgroundColor: dotColor }} />
-        <p style={{ color: titleColor, fontFamily: "Arial,sans-serif", fontSize: 15, fontWeight: 700, letterSpacing: 1, lineHeight: 1.45, margin: 0 }}>
+    <div style={{ 
+      opacity: visible ? 1 : 0, 
+      transition: "opacity 0.5s ease", 
+      maxWidth: 480,
+      position: "relative",
+      marginTop: 40, // Added margin-top to prevent navbar overlap
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
+        <span style={{ flexShrink: 0, marginTop: 6, width: 12, height: 12, borderRadius: "50%", backgroundColor: dotColor }} />
+        <p style={{ 
+          color: titleColor, 
+          fontFamily: "Arial,sans-serif", 
+          fontSize: 22,
+          fontWeight: 700, 
+          letterSpacing: 1.2, 
+          lineHeight: 1.5, 
+          margin: 0 
+        }}>
           {seg.title}
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 10, position: "relative" }}>
-        <span style={{ flexShrink: 0, marginTop: 7, width: 7, height: 7, borderRadius: "50%", backgroundColor: dotColor, opacity: 0.5 }} />
-        <p style={{ color: descColor, fontFamily: "Arial,sans-serif", fontSize: 13.5, lineHeight: 1.78, margin: 0, minHeight: 80, width: "100%" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, position: "relative" }}>
+        <span style={{ flexShrink: 0, marginTop: 8, width: 8, height: 8, borderRadius: "50%", backgroundColor: dotColor, opacity: 0.5 }} />
+        <p style={{ 
+          color: descColor, 
+          fontFamily: "Arial,sans-serif", 
+          fontSize: 17,
+          lineHeight: 1.9,
+          margin: 0, 
+          minHeight: 120,
+          width: "100%" 
+        }}>
           {displayed}
           {!done && (
-            <span style={{ display: "inline-block", width: 2, height: 13, backgroundColor: dotColor, marginLeft: 2, verticalAlign: "middle", animation: "tw-blink 0.75s step-end infinite" }} />
+            <span style={{ display: "inline-block", width: 2.5, height: 17, backgroundColor: dotColor, marginLeft: 3, verticalAlign: "middle", animation: "tw-blink 0.75s step-end infinite" }} />
           )}
         </p>
-        {/* Cross icon - always visible, bigger size */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onClose(); }}
-          aria-label="Close"
-          style={{
-            position: "absolute",
-            right: -40,
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: titleColor,
-            fontSize: 42,
-            lineHeight: 1,
-            padding: "8px 12px",
-            opacity: 0.7,
-            transition: "opacity 0.2s ease, transform 0.2s ease",
-            zIndex: 1000,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = "1";
-            e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = "0.7";
-            e.currentTarget.style.transform = "translateY(-50%) scale(1)";
-          }}
-        >
-          ×
-        </button>
       </div>
     </div>
   );
@@ -210,21 +259,24 @@ function InfoPanel({ seg, visible, theme, onClose }: { seg: Segment; visible: bo
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 export default function FeaturesSection() {
-  const [activeSeg, setActiveSeg]   = useState<Segment | null>(null);
-  const [showInfo, setShowInfo]     = useState(false);
-  const [animating, setAnimating]   = useState(false);
-  const [hoveredId, setHoveredId]   = useState<string | null>(null);
-  const [wheelReady, setWheelReady] = useState(false);
-  const [theme, setTheme]           = useState("dark");
+  const [activeSeg, setActiveSeg]       = useState<Segment | null>(null);
+  const [showInfo, setShowInfo]         = useState(false);
+  const [animating, setAnimating]       = useState(false);
+  const [hoveredId, setHoveredId]       = useState<string | null>(null);
+  const [wheelReady, setWheelReady]     = useState(false);
+  const [theme, setTheme]               = useState("dark");
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
-  // fly: only position changes — scale is ALWAYS 1
-  const [fly, setFly] = useState<{ left: number; top: number; seg: Segment } | null>(null);
+  const [fly, setFly]               = useState<FlyState | null>(null);
+  const [flyVisible, setFlyVisible] = useState(true);
 
   const wheelRef     = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rafRef       = useRef<number | null>(null);
   const startRef     = useRef<number | null>(null);
-  const journeyRef   = useRef<{ slotLeft: number; slotTop: number; endLeft: number; endTop: number } | null>(null);
+  const journeyRef   = useRef<Journey | null>(null);
+  const handoffRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Theme detection ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -241,11 +293,13 @@ export default function FeaturesSection() {
     return () => clearTimeout(t);
   }, []);
 
-  // ── Scroll lock (runs when detail is open) ──────────────────────────────────
+  // ── Scroll lock ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!activeSeg) return;
 
     const scrollY = window.scrollY;
+    setScrollPosition(scrollY);
+    
     document.body.style.position = "fixed";
     document.body.style.top      = `-${scrollY}px`;
     document.body.style.left     = "0";
@@ -262,7 +316,7 @@ export default function FeaturesSection() {
     };
   }, [activeSeg]);
 
-  // ── Slot position helper ────────────────────────────────────────────────────
+  // ── Slot info helper ────────────────────────────────────────────────────────
   function getSlotInfo(seg: Segment) {
     const wEl = wheelRef.current, cEl = containerRef.current;
     if (!wEl || !cEl) return null;
@@ -272,43 +326,61 @@ export default function FeaturesSection() {
     const rad  = toRad(seg.centerDeg);
     const slotCx = (wRect.left - cRect.left) + (CX + midR * Math.cos(rad)) * svgScale;
     const slotCy = (wRect.top  - cRect.top)  + (CY + midR * Math.sin(rad)) * svgScale;
-    // top-left of FLY_SIZE div centred over the slot
-    const slotLeft = slotCx - FLY_SIZE / 2;
-    const slotTop  = slotCy - FLY_SIZE / 2;
-    return { slotLeft, slotTop, cRect };
+    const { w: vbW, h: vbH } = vbSize(seg.vb);
+    const slotW = vbW * svgScale;
+    const slotH = vbH * svgScale;
+    return { slotCx, slotCy, slotW, slotH, cRect };
   }
 
-  // ── Click: segment flies out to left (10% from left edge) ──────────────────
+  // ── Click: segment flies out to left ──────────────────────────────────────
   const handleClick = useCallback((seg: Segment) => {
     if (animating || activeSeg) return;
     const info = getSlotInfo(seg);
     if (!info) return;
-    const { slotLeft, slotTop, cRect } = info;
+    const { slotCx, slotCy, slotW, slotH, cRect } = info;
 
-    // Landing: 10% from left, vertically centred
-    const endLeft = cRect.width * 0.10;
-    const endTop  = cRect.height * 0.5 - FLY_SIZE / 2;
+    const { w: vbW, h: vbH } = vbSize(seg.vb);
+    const { w: destW, h: destH } = fitSize(vbW, vbH, DEST_MAX);
 
-    journeyRef.current = { slotLeft, slotTop, endLeft, endTop };
+    // Landing: left edge at 10% of the container, vertically centred.
+    // FIXED: Added margin adjustment for segments that are at the bottom
+    const endCx = cRect.width * 0.10 + destW / 2;
+    // For CENTRALIZ (index 1) and PORTFOLIO (index 4), adjust vertical position
+    // to account for navbar overlap
+    let endCy = cRect.height * 0.5;
+    if (seg.index === 1 || seg.index === 4) {
+      endCy = cRect.height * 0.5 + 60; // Shift down by 60px
+    }
 
-    setFly({ left: slotLeft, top: slotTop, seg });
+    journeyRef.current = { slotCx, slotCy, slotW, slotH, endCx, endCy, destW, destH };
+
+    if (handoffRef.current) { clearTimeout(handoffRef.current); handoffRef.current = null; }
+    setFlyVisible(true);
+    setFly({ left: slotCx - slotW / 2, top: slotCy - slotH / 2, width: slotW, height: slotH, seg });
     setActiveSeg(seg);
     setAnimating(true);
     setShowInfo(false);
+    setOverlayVisible(false);
 
-    const DUR = 1400; startRef.current = null;
+    requestAnimationFrame(() => requestAnimationFrame(() => setOverlayVisible(true)));
+
+    startRef.current = null;
     const go = (ts: number) => {
       if (startRef.current === null) startRef.current = ts;
-      const raw = Math.min((ts - startRef.current) / DUR, 1);
-      const t   = ease(raw);
-      const left = slotLeft + (endLeft - slotLeft) * t;
-      const top  = slotTop  + (endTop  - slotTop)  * t - 36 * Math.sin(raw * Math.PI);
-      // scale stays 1 the entire time
-      setFly(prev => prev ? { ...prev, left, top } : prev);
+      const raw = Math.min((ts - startRef.current) / OPEN_DUR, 1);
+      const t   = easeInOut(raw);
+
+      const cx = slotCx + (endCx - slotCx) * t;
+      const cy = slotCy + (endCy - slotCy) * t - ARC_HEIGHT_OUT * Math.sin(raw * Math.PI) ** 2;
+      const w  = slotW  + (destW  - slotW)  * t;
+      const h  = slotH  + (destH  - slotH)  * t;
+
+      setFly({ left: cx - w / 2, top: cy - h / 2, width: w, height: h, seg });
+
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(go);
       } else {
-        setFly(prev => prev ? { ...prev, left: endLeft, top: endTop } : prev);
+        setFly({ left: endCx - destW / 2, top: endCy - destH / 2, width: destW, height: destH, seg });
         setAnimating(false);
         setTimeout(() => setShowInfo(true), 150);
       }
@@ -316,38 +388,53 @@ export default function FeaturesSection() {
     rafRef.current = requestAnimationFrame(go);
   }, [animating, activeSeg]);
 
-  // ── Close: segment returns to slot, full size, no shrink ───────────────────
+  // ── Close: segment glides back ─────────────────────────────────────────────
   const handleClose = useCallback(() => {
     if (animating || !activeSeg) return;
     setShowInfo(false);
+    setOverlayVisible(false);
+    
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.overflow = "";
+    window.scrollTo(0, scrollPosition);
+    
     const j = journeyRef.current;
     if (!j) { setActiveSeg(null); setFly(null); return; }
-    const { slotLeft, slotTop, endLeft, endTop } = j;
+    const { slotCx, slotCy, slotW, slotH, endCx, endCy, destW, destH } = j;
 
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setAnimating(true);
     startRef.current = null;
 
-    const DUR = 1400;
     const go = (ts: number) => {
       if (startRef.current === null) startRef.current = ts;
-      const raw = Math.min((ts - startRef.current) / DUR, 1);
-      const t   = ease(raw);
-      // Only position animates — scale stays 1, no shrink
-      const left = endLeft + (slotLeft - endLeft) * t;
-      const top  = endTop  + (slotTop  - endTop)  * t;
-      setFly(prev => prev ? { ...prev, left, top } : prev);
+      const raw = Math.min((ts - startRef.current) / CLOSE_DUR, 1);
+      const t   = easeOutQuart(raw);
+
+      const cx = endCx + (slotCx - endCx) * t;
+      const cy = endCy + (slotCy - endCy) * t - ARC_HEIGHT_IN * Math.sin(raw * Math.PI);
+      const w  = destW + (slotW - destW) * t;
+      const h  = destH + (slotH - destH) * t;
+
+      setFly(prev => prev ? { ...prev, left: cx - w / 2, top: cy - h / 2, width: w, height: h } : prev);
+
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(go);
       } else {
-        // Segment has reached the slot — remove flying div, wheel segment fades in
         setAnimating(false);
         setActiveSeg(null);
-        setFly(null);
+        setFlyVisible(false);
+        handoffRef.current = setTimeout(() => {
+          setFly(null);
+          handoffRef.current = null;
+        }, HANDOFF_MS);
       }
     };
     rafRef.current = requestAnimationFrame(go);
-  }, [animating, activeSeg]);
+  }, [animating, activeSeg, scrollPosition]);
 
   // ── ESC key ─────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -413,9 +500,8 @@ export default function FeaturesSection() {
                   onMouseLeave={() => setHoveredId(null)}
                   style={{
                     cursor: activeSeg ? "default" : "pointer",
-                    // Ghost when active — fades back in when segment returns
                     opacity: isActive ? 0.12 : 1,
-                    transition: "opacity 0.25s ease, transform 0.15s ease",
+                    transition: `opacity ${HANDOFF_MS}ms ease, transform 0.15s ease`,
                     transform: isHov && !activeSeg ? "scale(1.015)" : "scale(1)",
                     transformOrigin: `${CX}px ${CY}px`,
                     pointerEvents: activeSeg ? "none" : "auto",
@@ -432,54 +518,56 @@ export default function FeaturesSection() {
           </svg>
         </div>
 
-        {/* Dim overlay — z:10, does NOT cover flying segment */}
+        {/* Dim overlay */}
         {activeSeg && (
           <div
             onClick={handleClose}
             style={{
               position: "absolute", inset: 0, zIndex: 10,
               backgroundColor: "rgba(0,0,0,0.6)",
-              transition: "background-color 0.4s ease",
+              opacity: overlayVisible ? 1 : 0,
+              transition: "opacity 0.45s ease",
               pointerEvents: animating ? "none" : "auto",
             }}
           />
         )}
 
-        {/* Info panel — 10% from right, z:30 */}
+        {/* Info panel */}
         {activeSeg && (
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               position: "absolute",
-              right: "10%",          // ← 10% gap from right
+              right: "10%",
               top: "50%",
               transform: "translateY(-50%)",
-              width: 320,
-              maxWidth: "28vw",
+              width: 480,
+              maxWidth: "36vw",
               zIndex: 30,
               pointerEvents: animating ? "none" : "auto",
             }}
           >
-            <InfoPanel seg={activeSeg} visible={showInfo} theme={theme} onClose={handleClose} />
+            <InfoPanel seg={activeSeg} visible={showInfo} theme={theme} />
           </div>
         )}
 
-        {/* Flying segment — scale ALWAYS 1, only left/top animates — z:20 */}
+        {/* Flying segment */}
         {fly && (
           <div
             style={{
               position: "absolute",
               left: fly.left,
               top: fly.top,
-              width: FLY_SIZE,
-              height: FLY_SIZE,
-              zIndex: 20,               // above overlay (10), below info panel (30)
+              width: fly.width,
+              height: fly.height,
+              opacity: flyVisible ? 1 : 0,
+              transition: `opacity ${HANDOFF_MS}ms ease`,
+              zIndex: 20,
               pointerEvents: "none",
-              willChange: "left, top",
-              // 10% gap from left edge is handled via endLeft = cRect.width * 0.10 in handleClick
+              willChange: "left, top, width, height, opacity",
             }}
           >
-            <svg width={FLY_SIZE} height={FLY_SIZE} viewBox={fly.seg.vb} xmlns="http://www.w3.org/2000/svg">
+            <svg width={fly.width} height={fly.height} viewBox={fly.seg.vb} xmlns="http://www.w3.org/2000/svg">
               <SegPaths seg={fly.seg} fill={segFillHov} innerFill={innerFill} color={textColor} sw={2.5} />
             </svg>
           </div>

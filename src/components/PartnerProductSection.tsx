@@ -11,6 +11,7 @@ export default function SocialProofBar() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [countersStarted, setCountersStarted] = useState(false);
   const [hoveredBox, setHoveredBox] = useState<number | null>(null);
+  const [hoverProgress, setHoverProgress] = useState<number>(0);
 
   useEffect(() => {
     const checkTheme = () => setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
@@ -25,6 +26,24 @@ export default function SocialProofBar() {
       setCountersStarted(true);
     }
   }, [isInView, countersStarted]);
+
+  // Smooth hover animation with better easing
+  useEffect(() => {
+    let animationFrame: number;
+    const target = hoveredBox !== null ? 1 : 0;
+    
+    const animate = () => {
+      setHoverProgress(prev => {
+        const diff = target - prev;
+        if (Math.abs(diff) < 0.001) return target;
+        return prev + diff * 0.08;
+      });
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    return () => cancelAnimationFrame(animationFrame);
+  }, [hoveredBox]);
 
   // Main drawing function
   const drawCanvas = () => {
@@ -201,20 +220,13 @@ export default function SocialProofBar() {
     }
 
     function gDot(x: number, y: number, r: number = 4) {
-      context.save();
-      context.shadowColor = theme === 'dark' ? '#00ffff' : '#3B82F6';
-      context.shadowBlur = 18;
-      context.fillStyle = theme === 'dark' ? '#ddf8ff' : '#3B82F6';
-      context.beginPath();
-      context.arc(x, y, r, 0, Math.PI * 2);
-      context.fill();
-      context.restore();
+      // Function kept but not used - all dots removed
     }
 
     // ── ICONS ──
-    function iHandshake(cx: number, cy: number, scale: number = 1) {
+    function iHandshake(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 54;
+      const y0 = cy + 54 + offsetY;
       context.save();
       context.translate(cx, cy);
       context.scale(scale, scale);
@@ -238,7 +250,7 @@ export default function SocialProofBar() {
       context.restore();
     }
 
-    function iDocs(cx: number, cy: number, scale: number = 1) {
+    function iDocs(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
       context.save();
       context.translate(cx, cy);
@@ -250,7 +262,7 @@ export default function SocialProofBar() {
       context.shadowColor = color;
       context.shadowBlur = 5;
       const bx = cx - 12,
-        by = cy + 30;
+        by = cy + 30 + offsetY;
       context.strokeRect(bx + 7, by + 5, 18, 20);
       const fillColor = theme === 'dark' ? '#0b1d38' : '#F0F4FF';
       context.fillStyle = fillColor;
@@ -265,9 +277,9 @@ export default function SocialProofBar() {
       context.restore();
     }
 
-    function iPeople(cx: number, cy: number, scale: number = 1) {
+    function iPeople(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 30;
+      const y0 = cy + 30 + offsetY;
       context.save();
       context.translate(cx, cy);
       context.scale(scale, scale);
@@ -335,12 +347,13 @@ export default function SocialProofBar() {
       Ri: number,
       label: string,
       val: string,
-      icon: (cx: number, cy: number, scale: number) => void,
+      icon: (cx: number, cy: number, scale: number, offsetY?: number) => void,
       labelOffY: number,
       valOffY: number,
       labelSize: number = 15,
       valSize: number = 40,
-      boxIndex: number | null = null
+      boxIndex: number | null = null,
+      iconOffsetY: number = 0
     ) {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
@@ -349,36 +362,42 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       
-      // Check if this box is hovered
       const isHovered = hoveredBox === boxIndex;
-      const scale = isHovered ? 1.08 : 1;
+      const easedProgress = isHovered ? 
+        1 - Math.pow(1 - hoverProgress, 3) : 
+        hoverProgress * hoverProgress * 0.3;
       
-      // Center the scaled box at same position
-      const scaledR = R * scale;
-      const scaledRi = Ri * scale;
+      const smoothScale = isHovered ? 
+        1 + (0.08 * easedProgress) : 
+        1 + (0.02 * easedProgress);
+      
+      const glowIntensity = isHovered ? 
+        16 + (24 * easedProgress) : 
+        16 + (10 * easedProgress);
+      
+      const scaledR = R * smoothScale;
+      const scaledRi = Ri * smoothScale;
       
       const op = hexPts(cx, cy, scaledR);
       const ip = hexPts(cx, cy, scaledRi);
       
-      // Outer ring with glow
-      polyRounded(op, fillColor, strokeColor, 1.5, shadowColor, isHovered ? 40 : 24, 14);
-      // Inner ring
+      polyRounded(op, fillColor, strokeColor, 1.5, shadowColor, glowIntensity, 14);
       polyRounded(ip, null, innerStroke, 3.5, null, 0, 10);
       
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `${labelSize}px Arial,sans-serif`;
-      context.fillText(label, cx, cy + (labelOffY || 0) * scale);
+      context.font = `${labelSize * smoothScale}px Arial,sans-serif`;
+      context.fillText(label, cx, cy + (labelOffY || 0) * smoothScale);
       context.fillStyle = valColor;
-      context.font = `bold ${valSize}px Arial,sans-serif`;
+      context.font = `bold ${valSize * smoothScale}px Arial,sans-serif`;
       context.shadowColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
       context.shadowBlur = 3;
-      context.fillText(val, cx, cy + (valOffY || 0) * scale);
+      context.fillText(val, cx, cy + (valOffY || 0) * smoothScale);
       context.restore();
       
-      // Draw icon with scale
-      icon(cx, cy, scale);
+      // Draw icon with offset
+      icon(cx, cy, smoothScale, iconOffsetY);
     }
 
     // ══════════════════════════════════
@@ -395,10 +414,28 @@ export default function SocialProofBar() {
       TWri = 128;
     const twP = octPts(TW.cx, TW.cy, TWr);
     const twPi = octPts(TW.cx, TW.cy, TWri);
-    const twLM = mid(twP[4], twP[5]);
+    
+    const twLMOriginal = mid(twP[4], twP[5]);
+    const twLM: [number, number] = [
+      twLMOriginal[0],
+      twLMOriginal[1] + 35
+    ];
+    
     const twTR = twP[7];
     const twBL = twP[3];
     const twRight = twP[0];
+    
+    const twUpperEdge = mid(twP[6], twP[7]);
+    
+    const twActiveUsersPoint: [number, number] = [
+      twUpperEdge[0] + 20,
+      twUpperEdge[1] + 48
+    ];
+    
+    const twTemplatesPoint: [number, number] = [
+      twUpperEdge[0] - 20,
+      twUpperEdge[1] + 185
+    ];
 
     // CLIENTS - Box 0
     const CL = { cx: 100 + offsetX, cy: 226 };
@@ -409,17 +446,23 @@ export default function SocialProofBar() {
     const TP = { cx: 240 + offsetX, cy: 340 };
     const tpP = hexPts(TP.cx, TP.cy, R);
     const tpPi = hexPts(TP.cx, TP.cy, Ri);
-    const tpTR = tpP[5];
+    const tpTopLeft = tpP[5];
+    const tpTopRight = tpP[0];
+    const tpTopOffset = mid(tpTopLeft, tpTopRight);
+    const tpStartPoint: [number, number] = [
+      tpTopOffset[0],
+      tpTopOffset[1] + 40
+    ];
 
     // ACTIVE USERS - Box 2
-    const AU = { cx: 730 + offsetX, cy: 140 };
+    const AU = { cx: 780 + offsetX, cy: 140 };
     const auP = hexPts(AU.cx, AU.cy, R);
     const auPi = hexPts(AU.cx, AU.cy, Ri);
     const auLeft = auP[3];
     const auRight = auP[0];
 
     // SUCCESS RATE - Box 3
-    const SR = { cx: 880 + offsetX, cy: 235 };
+    const SR = { cx: 920 + offsetX, cy: 260 };
     const srP = hexPts(SR.cx, SR.cy, R);
     const srPi = hexPts(SR.cx, SR.cy, Ri);
     const srLeft = srP[3];
@@ -433,54 +476,40 @@ export default function SocialProofBar() {
       const cx = twLM[0], cy = twLM[1];
       
       gCurve(x1, y1, x2, y2, cx - 30, y1 + 10, cx + 30, y2 - 10);
-      
-      function bz(t: number) {
-        const mt = 1 - t;
-        const cp1x = cx - 30, cp1y = y1 + 10;
-        const cp2x = cx + 30, cp2y = y2 - 10;
-        return [
-          mt * mt * mt * x1 + 3 * mt * mt * t * cp1x + 3 * mt * t * t * cp2x + t * t * t * x2,
-          mt * mt * mt * y1 + 3 * mt * mt * t * cp1y + 3 * mt * t * t * cp2y + t * t * t * y2,
-        ];
-      }
-      [0.2, 0.4, 0.6, 0.8].forEach((t) => { const p = bz(t); gDot(p[0], p[1], 3); });
     }
 
     // LINE 2: Templates → TW
     {
-      const x1 = tpTR[0], y1 = tpTR[1], x2 = twBL[0], y2 = twBL[1];
-      gCurve(x1, y1, x2, y2, x1 + 30, y1 - 20, x2 - 20, y2 + 20);
-      function bz(t: number) {
-        const mt = 1 - t;
-        return [
-          mt * mt * mt * x1 + 3 * mt * mt * t * (x1 + 30) + 3 * mt * t * t * (x2 - 20) + t * t * t * x2,
-          mt * mt * mt * y1 + 3 * mt * mt * t * (y1 - 20) + 3 * mt * t * t * (y2 + 20) + t * t * t * y2,
-        ];
-      }
-      [0.25, 0.5, 0.75].forEach((t) => { const p = bz(t); gDot(p[0], p[1], 3); });
+      const x1 = tpStartPoint[0], y1 = tpStartPoint[1];
+      const x2 = twTemplatesPoint[0], y2 = twTemplatesPoint[1];
+      gCurve(x1, y1, x2, y2, x1 + 40, y1 - 10, x2 - 30, y2 + 15);
     }
 
     // LINE 3: TW → Active Users
     {
-      const x1 = twTR[0], y1 = twTR[1], x2 = auLeft[0], y2 = auLeft[1];
-      gCurve(x1, y1, x2, y2, x1 + 55, y1 - 35, x2 - 55, y2 - 15);
-      function bz(t: number) {
-        const mt = 1 - t;
-        return [
-          mt * mt * mt * x1 + 3 * mt * mt * t * (x1 + 55) + 3 * mt * t * t * (x2 - 55) + t * t * t * x2,
-          mt * mt * mt * y1 + 3 * mt * mt * t * (y1 - 35) + 3 * mt * t * t * (y2 - 15) + t * t * t * y2,
-        ];
-      }
-      [0.25, 0.5, 0.75].forEach((t) => { const p = bz(t); gDot(p[0], p[1], 3); });
+      const x1 = twActiveUsersPoint[0], y1 = twActiveUsersPoint[1];
+      const x2 = auLeft[0], y2 = auLeft[1];
+      gCurve(x1, y1, x2, y2, x1 + 50, y1 - 20, x2 - 60, y2 - 10);
     }
 
     // ── DRAW BOXES ──
 
-    // 1. CLIENTS (Box 0)
-    drawHexRounded(CL.cx, CL.cy, R, Ri, "Clients", countersStarted ? "500+" : "0", iHandshake, -36, 12, 14, 36, 0);
+    // 1. CLIENTS (Box 0) 
+    // Label: 1rem (16px) bottom push → labelOffY: -36 + 16 = -20
+    // Number: 0.5rem (8px) bottom push → valOffY: 12 + 8 = 20
+    // Icon: 0.5rem (8px) up push → iconOffsetY: -8 - 8 = -16
+    drawHexRounded(
+      CL.cx, CL.cy, R, Ri, 
+      "Clients", countersStarted ? "500+" : "0", 
+      iHandshake, -30, 20, 14, 36, 0, -16
+    );
 
-    // 2. TEMPLATES (Box 1)
+    // 2. TEMPLATES (Box 1) 
+    // Label: 1rem (16px) top push → labelOffY: -22 - 16 = -38
+    // Number: no change → valOffY: 20 - 6 = 14 (adjusted from original)
+    // Icon: no change → iconOffsetY: -6
     {
+
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
@@ -488,27 +517,38 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 1;
-      const scale = isHovered ? 1.08 : 1;
-      const scaledR = R * scale;
-      const scaledRi = Ri * scale;
+      const easedProgress = isHovered ? 
+        1 - Math.pow(1 - hoverProgress, 3) : 
+        hoverProgress * hoverProgress * 0.3;
+      const smoothScale = isHovered ? 
+        1 + (0.08 * easedProgress) : 
+        1 + (0.02 * easedProgress);
+      const glowIntensity = isHovered ? 
+        16 + (24 * easedProgress) : 
+        16 + (10 * easedProgress);
+      const scaledR = R * smoothScale;
+      const scaledRi = Ri * smoothScale;
       
       const tpP_rounded = hexPts(TP.cx, TP.cy, scaledR);
       const tpPi_rounded = hexPts(TP.cx, TP.cy, scaledRi);
-      polyRounded(tpP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', isHovered ? 40 : 22, 14);
+      polyRounded(tpP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
       polyRounded(tpPi_rounded, null, innerStroke, 3.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = "14px Arial,sans-serif";
-      context.fillText("Templates", TP.cx, TP.cy - 22 * scale);
+      context.font = `${14 * smoothScale}px Arial,sans-serif`;
+      // Label pushed 1rem (16px) top: -22 - 16 = -38
+      context.fillText("Templates", TP.cx, TP.cy - 30 * smoothScale);
       context.fillStyle = valColor;
-      context.font = `bold ${34 * scale}px Arial,sans-serif`;
-      context.fillText(countersStarted ? "30+" : "0", TP.cx, TP.cy + 20 * scale);
+      context.font = `bold ${34 * smoothScale}px Arial,sans-serif`;
+      // Number position adjusted: 14 (was 20 - 6)
+      context.fillText(countersStarted ? "30+" : "0", TP.cx, (TP.cy + 14 * smoothScale));
       context.restore();
-      iDocs(TP.cx, TP.cy, scale);
+      // Icon up by -6px
+      iDocs(TP.cx, TP.cy, smoothScale, -6);
     }
 
-    // CENTER OCTAGON (No hover effect)
+    // CENTER OCTAGON
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
@@ -531,6 +571,9 @@ export default function SocialProofBar() {
     }
 
     // 3. ACTIVE USERS (Box 2)
+    // Label: 1rem (16px) bottom push → labelOffY: -46 + 16 = -30 (then +8 for previous adjustment = -22)
+    // Number: no change → valOffY: 4 + 8 = 12
+    // Icon: 0.5rem (8px) bottom push → iconOffsetY: 8 + 8 = 16
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
@@ -539,27 +582,38 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 2;
-      const scale = isHovered ? 1.08 : 1;
-      const scaledR = R * scale;
-      const scaledRi = Ri * scale;
+      const easedProgress = isHovered ? 
+        1 - Math.pow(1 - hoverProgress, 3) : 
+        hoverProgress * hoverProgress * 0.3;
+      const smoothScale = isHovered ? 
+        1 + (0.08 * easedProgress) : 
+        1 + (0.02 * easedProgress);
+      const glowIntensity = isHovered ? 
+        16 + (24 * easedProgress) : 
+        16 + (10 * easedProgress);
+      const scaledR = R * smoothScale;
+      const scaledRi = Ri * smoothScale;
       
       const auP_rounded = hexPts(AU.cx, AU.cy, scaledR);
       const auPi_rounded = hexPts(AU.cx, AU.cy, scaledRi);
-      polyRounded(auP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', isHovered ? 40 : 24, 14);
+      polyRounded(auP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
       polyRounded(auPi_rounded, null, innerStroke, 3.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `${13 * scale}px Arial,sans-serif`;
-      context.fillText("Active Users", AU.cx, AU.cy - 46 * scale);
+      context.font = `${13 * smoothScale}px Arial,sans-serif`;
+      // Label pushed 1rem (16px) bottom: -46 + 16 = -30, then +8 = -22
+      context.fillText("Active Users", AU.cx, (AU.cy - 30 * smoothScale));
       context.fillStyle = valColor;
-      context.font = `bold ${32 * scale}px Arial,sans-serif`;
-      context.fillText(countersStarted ? "20.0K+" : "0", AU.cx, AU.cy + 4 * scale);
+      context.font = `bold ${32 * smoothScale}px Arial,sans-serif`;
+      // Number: 4 + 8 = 12
+      context.fillText(countersStarted ? "20.0K+" : "0", AU.cx, (AU.cy + 12 * smoothScale));
       context.restore();
-      iPeople(AU.cx, AU.cy - 12, scale);
+      // Icon pushed 0.5rem (8px) bottom: 8 + 8 = 16
+      iPeople(AU.cx, AU.cy - 12, smoothScale, 16);
     }
 
-    // 4. SUCCESS RATE (Box 3)
+    // 4. SUCCESS RATE (Box 3) - No changes
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
@@ -568,36 +622,39 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 3;
-      const scale = isHovered ? 1.08 : 1;
-      const scaledR = R * scale;
-      const scaledRi = Ri * scale;
+      const easedProgress = isHovered ? 
+        1 - Math.pow(1 - hoverProgress, 3) : 
+        hoverProgress * hoverProgress * 0.3;
+      const smoothScale = isHovered ? 
+        1 + (0.08 * easedProgress) : 
+        1 + (0.02 * easedProgress);
+      const glowIntensity = isHovered ? 
+        16 + (24 * easedProgress) : 
+        16 + (10 * easedProgress);
+      const scaledR = R * smoothScale;
+      const scaledRi = Ri * smoothScale;
       
       const srP_rounded = hexPts(SR.cx, SR.cy, scaledR);
       const srPi_rounded = hexPts(SR.cx, SR.cy, scaledRi);
-      polyRounded(srP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', isHovered ? 40 : 24, 14);
+      polyRounded(srP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
       polyRounded(srPi_rounded, null, innerStroke, 3.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `${14 * scale}px Arial,sans-serif`;
-      context.fillText("Success Rate", SR.cx, SR.cy - 28 * scale);
+      context.font = `${14 * smoothScale}px Arial,sans-serif`;
+      context.fillText("Success Rate", SR.cx, SR.cy - 28 * smoothScale);
       context.fillStyle = valColor;
-      context.font = `bold ${36 * scale}px Arial,sans-serif`;
-      context.fillText(countersStarted ? "99%" : "0%", SR.cx, SR.cy + 18 * scale);
+      context.font = `bold ${36 * smoothScale}px Arial,sans-serif`;
+      context.fillText(countersStarted ? "99%" : "0%", SR.cx, SR.cy + 18 * smoothScale);
       context.restore();
-      iArrow(SR.cx, SR.cy, scale);
+      iArrow(SR.cx, SR.cy, smoothScale);
     }
-
-    // Connection endpoint dots
-    [clRight, tpTR, twBL, twTR, auLeft, srLeft].forEach((p) =>
-      gDot(p[0], p[1], 5.5)
-    );
   };
 
   // Redraw when hover changes
   useEffect(() => {
     drawCanvas();
-  }, [theme, isInView, countersStarted, hoveredBox]);
+  }, [theme, isInView, countersStarted, hoverProgress]);
 
   // Mouse event handlers
   useEffect(() => {
@@ -612,7 +669,6 @@ export default function SocialProofBar() {
       const mouseX = (e.clientX - rect.left) * scaleX;
       const mouseY = (e.clientY - rect.top) * scaleY;
       
-      // Box positions
       const offsetX = 95;
       const boxes = [
         { cx: 100 + offsetX, cy: 226, R: 88, index: 0 },
@@ -652,7 +708,6 @@ export default function SocialProofBar() {
 
   return (
     <>
-      {/* Desktop Version */}
       <motion.div
         ref={sectionRef}
         className="relative w-full overflow-hidden hidden md:block"
@@ -674,7 +729,6 @@ export default function SocialProofBar() {
         />
       </motion.div>
 
-      {/* Mobile Version */}
       <div className="block md:hidden">
         <SocialProofBarMobile />
       </div>
