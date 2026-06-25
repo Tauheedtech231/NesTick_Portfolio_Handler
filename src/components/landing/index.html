@@ -1,330 +1,333 @@
 <!DOCTYPE html>
-<html>
-<head>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0B0F19; font-family: Arial, sans-serif; }
-  @keyframes tw-blink { 0%,100%{opacity:1} 50%{opacity:0} }
-</style>
-</head>
+<html><head><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#000;}</style></head>
 <body>
-<div id="root"></div>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<canvas id="c"></canvas>
 <script>
-const { useState, useEffect, useRef, useCallback } = React;
+const cv=document.getElementById('c');
+const ctx=cv.getContext('2d');
+const W=1200,H=500;
+cv.width=W;cv.height=H;
+cv.style.width='100%';
+cv.style.borderRadius='12px';
 
-const NUM_SEGS = 5, BOTTOM_GAP = 2;
-const SEG_SPAN = 360 / NUM_SEGS - BOTTOM_GAP, START_OFFSET = 270;
+// ── BACKGROUND ──
+(function(){
+  const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,700);
+  g.addColorStop(0,'#102448');
+  g.addColorStop(0.5,'#091a32');
+  g.addColorStop(1,'#040c1a');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+})();
 
-const SEG_META = [
-  { id:"01", label:["MULTI","PORTAL"], title:"MULTI-PORTAL ARCHITECTURE", description:"Build and manage multiple portals from a single codebase with shared components. Scale seamlessly across brands, regions, and user types without duplicating your infrastructure." },
-  { id:"02", label:["CENTRALIZ"], title:"CENTRALIZED MANAGEMENT", description:"Control all your portals, users, and configurations from one unified dashboard. Streamline operations and reduce overhead with a single source of truth for your entire platform." },
-  { id:"03", label:["ACCESS","CONTROL"], title:"ACCESS CONTROL", description:"Define granular roles and permissions for every user across all portals. Protect sensitive data with enterprise-grade authentication and fine-grained authorization policies." },
-  { id:"04", label:["LIVE","SYNC"], title:"LIVE SYNC", description:"Real-time data synchronization across all portals and devices. Changes propagate instantly so every user always sees the most current information without manual refresh." },
-  { id:"05", label:["PORTFOLIO"], title:"PORTFOLIO", description:"Showcase and manage your complete portfolio of projects within one cohesive platform. Present clients with a polished, branded experience that highlights your best work." },
-];
+// ── MAP DOTS ──
+(function(){
+  ctx.fillStyle='rgba(45,110,158,0.2)';
+  function d(x,y){ctx.beginPath();ctx.arc(x,y,2.2,0,Math.PI*2);ctx.fill();}
+  // top-left cluster
+  const tl=[[22,38],[48,38],[74,38],[100,38],[126,38],[152,38],[178,38],
+             [22,64],[48,64],[74,64],[100,64],[126,64],[152,64],
+             [22,90],[48,90],[74,90],[100,90],[126,90],
+             [22,116],[48,116],[74,116],[100,116],
+             [22,142],[48,142],[74,142]];
+  tl.forEach(p=>d(p[0],p[1]));
+  // top-right cluster
+  for(let r=0;r<6;r++)for(let c=0;c<16;c++)
+    if((r+c)%2===0||r<3) d(660+c*30,34+r*28);
+  // bottom-right cluster
+  for(let r=0;r<5;r++)for(let c=0;c<16;c++)
+    if((r+c)%2===0) d(670+c*28,340+r*28);
+  // bottom-left
+  [[22,348],[48,348],[22,374],[48,374],[74,374],[22,400]].forEach(p=>d(p[0],p[1]));
+})();
 
-const CX=340, CY=340, GOLD="#FFD700";
-const FILL="#0f1e38", FILL_HOVER="#1a3060", INNER_FILL="#07101e";
-const OUTER_R=320, STRIP_OUTER=320, STRIP_INNER=294;
-const SEG_OUTER=278, SEG_INNER=130, INNER_CIRCLE_R=116;
-const LABEL_R=206, NUM_R=(STRIP_OUTER+STRIP_INNER)/2;
-const FLY_SIZE=300;
-
-const toRad = d => d*Math.PI/180;
-const polar = (r,deg,cx=CX,cy=CY) => ({ x: cx+r*Math.cos(toRad(deg)), y: cy+r*Math.sin(toRad(deg)) });
-
-function arcPath(r,s,e,cx=CX,cy=CY){
-  let end=e; if(end<s) end+=360;
-  const lg=end-s>180?1:0, a=polar(r,s,cx,cy), b=polar(r,e,cx,cy);
-  return `M ${a.x} ${a.y} A ${r} ${r} 0 ${lg} 1 ${b.x} ${b.y}`;
+// ── HELPERS ──
+function hexPts(cx,cy,r){
+  // flat-top hex: 0°=right,60°=BR,120°=BL,180°=L,240°=TL,300°=TR
+  const p=[];
+  for(let i=0;i<6;i++){const a=i*Math.PI/3;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
+  return p;
 }
-function donutSeg(oR,iR,s,e,cx=CX,cy=CY){
-  let end=e; if(end<s) end+=360;
-  const lg=end-s>180?1:0;
-  const os=polar(oR,s,cx,cy),oe=polar(oR,e,cx,cy),ie=polar(iR,e,cx,cy),is_=polar(iR,s,cx,cy);
-  return `M ${os.x} ${os.y} A ${oR} ${oR} 0 ${lg} 1 ${oe.x} ${oe.y} L ${ie.x} ${ie.y} A ${iR} ${iR} 0 ${lg} 0 ${is_.x} ${is_.y} Z`;
+function octPts(cx,cy,r){
+  // offset -22.5° so left/right are flat edges
+  const p=[];
+  for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/8;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
+  return p;
+  // [0]≈-22.5  [1]≈22.5   [2]≈67.5   [3]≈112.5
+  // [4]≈157.5  [5]≈202.5  [6]≈247.5  [7]≈292.5
+  // LEFT flat  = mid([4],[5])
+  // RIGHT flat = mid([0],[1])
+  // TopRight corner = [7]
+  // BotLeft  corner = [3]
 }
+function mid(a,b){return[(a[0]+b[0])/2,(a[1]+b[1])/2];}
 
-// easeInOutCubic — smoother than quad, physical feel
-function ease(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
-
-function computeVB(s,e,oR=278,iR=130,cx=340,cy=340,pad=14){
-  const toR=d=>d*Math.PI/180; let end=e; if(end<s) end+=360;
-  const pts=[];
-  for(let d=s;d<=end;d+=2){ const a=toR(d); pts.push([cx+oR*Math.cos(a),cy+oR*Math.sin(a)],[cx+iR*Math.cos(a),cy+iR*Math.sin(a)]); }
-  for(let d=s;d<=end;d+=2){ const a=toR(d); pts.push([cx+320*Math.cos(a),cy+320*Math.sin(a)],[cx+294*Math.cos(a),cy+294*Math.sin(a)]); }
-  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
-  const minX=Math.min(...xs)-pad,minY=Math.min(...ys)-pad,maxX=Math.max(...xs)+pad,maxY=Math.max(...ys)+pad;
-  return `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX-minX).toFixed(0)} ${(maxY-minY).toFixed(0)}`;
-}
-
-function calcSegments(){
-  return Array.from({length:NUM_SEGS},(_,i)=>{
-    const segAngle=360/NUM_SEGS, centerDeg=(START_OFFSET+i*segAngle)%360;
-    const half=SEG_SPAN/2, startDeg=(centerDeg-half+360)%360;
-    const endDeg=((centerDeg+half)%360-BOTTOM_GAP+360)%360;
-    return {...SEG_META[i], startDeg, endDeg, centerDeg, index:i, vb:computeVB(startDeg,endDeg)};
-  });
-}
-const SEGMENTS=calcSegments();
-
-function useTypewriter(text,speed=16,delay=400){
-  const [displayed,setDisplayed]=useState(""), [done,setDone]=useState(false);
-  const t=useRef(null);
-  useEffect(()=>{
-    setDisplayed(""); setDone(false); let i=0;
-    t.current=setTimeout(()=>{
-      const tick=()=>{ i++; setDisplayed(text.slice(0,i)); if(i<text.length) t.current=setTimeout(tick,speed); else setDone(true); };
-      tick();
-    },delay);
-    return ()=>clearTimeout(t.current);
-  },[text]);
-  return {displayed,done};
+function poly(pts,fill,sc,sw,gc,gb){
+  ctx.save();
+  if(gc){ctx.shadowColor=gc;ctx.shadowBlur=gb||22;}
+  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(sc){ctx.strokeStyle=sc;ctx.lineWidth=sw;ctx.stroke();}
+  ctx.restore();
 }
 
-function SegPaths({seg,fill,innerFill,color,sw=2}){
-  const np=polar(NUM_R,seg.centerDeg), lp=polar(LABEL_R,seg.centerDeg);
-  return React.createElement(React.Fragment,null,
-    React.createElement('path',{d:arcPath(OUTER_R,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
-    React.createElement('path',{d:donutSeg(STRIP_OUTER,STRIP_INNER,seg.startDeg,seg.endDeg),fill:innerFill,stroke:color,strokeWidth:sw}),
-    React.createElement('path',{d:arcPath(STRIP_INNER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
-    React.createElement('path',{d:donutSeg(SEG_OUTER,SEG_INNER,seg.startDeg,seg.endDeg),fill,stroke:color,strokeWidth:sw}),
-    React.createElement('path',{d:arcPath(SEG_OUTER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
-    React.createElement('path',{d:arcPath(SEG_INNER,seg.startDeg,seg.endDeg),fill:"none",stroke:color,strokeWidth:sw}),
-    React.createElement('text',{x:np.x,y:np.y,textAnchor:"middle",dominantBaseline:"central",fill:color,fontFamily:"Arial,sans-serif",fontSize:"13",fontWeight:"700",letterSpacing:"1.5"},seg.id),
-    ...seg.label.map((line,i)=>React.createElement('text',{key:i,x:lp.x,y:lp.y+(i-(seg.label.length-1)/2)*21,textAnchor:"middle",dominantBaseline:"central",fill:color,fontFamily:"Arial,sans-serif",fontSize:"14",fontWeight:"700",letterSpacing:"2.5"},line))
-  );
-}
-
-function InfoPanel({seg,visible}){
-  const {displayed,done}=useTypewriter(seg.description);
-  return React.createElement('div',{style:{opacity:visible?1:0,transition:"opacity 0.5s ease",maxWidth:320}},
-    React.createElement('div',{style:{display:"flex",alignItems:"flex-start",gap:10,marginBottom:16}},
-      React.createElement('span',{style:{flexShrink:0,marginTop:5,width:10,height:10,borderRadius:"50%",backgroundColor:GOLD}}),
-      React.createElement('p',{style:{color:GOLD,fontFamily:"Arial,sans-serif",fontSize:15,fontWeight:700,letterSpacing:1,lineHeight:1.45,margin:0}},seg.title)
-    ),
-    React.createElement('div',{style:{display:"flex",alignItems:"flex-start",gap:10}},
-      React.createElement('span',{style:{flexShrink:0,marginTop:7,width:7,height:7,borderRadius:"50%",backgroundColor:GOLD,opacity:0.5}}),
-      React.createElement('p',{style:{color:"#D1D5DB",fontFamily:"Arial,sans-serif",fontSize:13.5,lineHeight:1.78,margin:0,minHeight:80}},
-        displayed,
-        !done&&React.createElement('span',{style:{display:"inline-block",width:2,height:13,backgroundColor:GOLD,marginLeft:2,verticalAlign:"middle",animation:"tw-blink 0.75s step-end infinite"}})
-      )
-    )
-  );
-}
-
-function App(){
-  const [activeSeg,setActiveSeg]=useState(null);
-  const [showInfo,setShowInfo]=useState(false);
-  const [animating,setAnimating]=useState(false);
-  const [hoveredId,setHoveredId]=useState(null);
-  const [wheelReady,setWheelReady]=useState(false);
-  // fly state: { left, top, scale }
-  const [fly,setFly]=useState(null);
-
-  const wheelRef=useRef(null), containerRef=useRef(null), rafRef=useRef(null), startRef=useRef(null);
-  // store start/end positions for both journeys
-  const journeyRef=useRef(null);
-
-  useEffect(()=>{ const t=setTimeout(()=>setWheelReady(true),120); return ()=>clearTimeout(t); },[]);
-
-  // Get the segment's center position in container-local coords
-  // and compute the "natural" scale it should appear at when sitting in the wheel
-  function getSlotInfo(seg){
-    const wEl=wheelRef.current, cEl=containerRef.current;
-    if(!wEl||!cEl) return null;
-    const wRect=wEl.getBoundingClientRect(), cRect=cEl.getBoundingClientRect();
-    const svgScale=wRect.width/680;
-    const midR=(SEG_OUTER+SEG_INNER)/2;
-    const rad=toRad(seg.centerDeg);
-    // segment center in container coords
-    const slotCx=(wRect.left-cRect.left)+(CX+midR*Math.cos(rad))*svgScale;
-    const slotCy=(wRect.top-cRect.top)+(CY+midR*Math.sin(rad))*svgScale;
-    // how big the segment visually is in the wheel vs FLY_SIZE
-    const segVisualWidth=(SEG_OUTER-SEG_INNER)*svgScale;
-    const slotScale=segVisualWidth/FLY_SIZE*1.9; // tweak factor for visual match
-    return { slotCx, slotCy, slotScale, cRect };
+// ── GLOW CURVE LINE with fade at ends ──
+function gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y){
+  // Use bezier for S-curve
+  const steps=80;
+  // Draw as segmented path with varying alpha for fade
+  for(let pass=0;pass<3;pass++){
+    const width=[9,3.5,1.6][pass];
+    ctx.save();
+    ctx.shadowColor='#00ddff';
+    ctx.shadowBlur=[16,8,4][pass];
+    ctx.lineCap='round';
+    for(let i=0;i<steps;i++){
+      const t0=i/steps, t1=(i+1)/steps;
+      const tm=(t0+t1)/2;
+      // fade: 0 at ends, 1 in middle
+      const fade=Math.sin(tm*Math.PI);
+      const alpha=[0.07,0.3,1.0][pass]*fade;
+      const colors=['rgba(0,210,255,','rgba(0,230,255,','rgba(200,248,255,'];
+      ctx.strokeStyle=colors[pass]+alpha+')';
+      ctx.lineWidth=width;
+      // cubic bezier point
+      function bp(t){
+        const mt=1-t;
+        return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,
+               mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
+      const p0=bp(t0),p1=bp(t1);
+      ctx.beginPath();ctx.moveTo(p0[0],p0[1]);ctx.lineTo(p1[0],p1[1]);ctx.stroke();
+    }
+    ctx.restore();
   }
-
-  const handleClick=useCallback((seg)=>{
-    if(animating||activeSeg) return;
-    const info=getSlotInfo(seg);
-    if(!info) return;
-    const {slotCx,slotCy,slotScale,cRect}=info;
-
-    // flying div top-left when centred over slot
-    const startLeft=slotCx-FLY_SIZE/2;
-    const startTop=slotCy-FLY_SIZE/2;
-    // landing position: left side, vertically centred
-    const endLeft=cRect.width*0.03;
-    const endTop=cRect.height*0.5-FLY_SIZE/2;
-
-    journeyRef.current={startLeft,startTop,startScale:slotScale,endLeft,endTop};
-
-    setFly({left:startLeft,top:startTop,scale:slotScale,seg});
-    setActiveSeg(seg);
-    setAnimating(true);
-    setShowInfo(false);
-
-    const DUR=1400; startRef.current=null;
-    const go=ts=>{
-      if(startRef.current===null) startRef.current=ts;
-      const raw=Math.min((ts-startRef.current)/DUR,1);
-      const t=ease(raw);
-      const left=startLeft+(endLeft-startLeft)*t;
-      const top=startTop+(endTop-startTop)*t - 36*Math.sin(raw*Math.PI);
-      // scale: from slotScale → 1 (grows as it flies out)
-      const scale=slotScale+(1-slotScale)*t;
-      setFly(prev=>({...prev,left,top,scale}));
-      if(raw<1){ rafRef.current=requestAnimationFrame(go); }
-      else{
-        setFly(prev=>({...prev,left:endLeft,top:endTop,scale:1}));
-        setAnimating(false);
-        setTimeout(()=>setShowInfo(true),150);
-      }
-    };
-    rafRef.current=requestAnimationFrame(go);
-  },[animating,activeSeg]);
-
-  const handleClose=useCallback(()=>{
-    if(animating||!activeSeg) return;
-    setShowInfo(false);
-    const j=journeyRef.current;
-    if(!j){ setActiveSeg(null); setFly(null); return; }
-    const {startLeft,startTop,startScale,endLeft,endTop}=j;
-
-    if(rafRef.current) cancelAnimationFrame(rafRef.current);
-    setAnimating(true);
-    startRef.current=null;
-
-    const DUR=1400;
-    // We animate LEFT+TOP (position) AND SCALE simultaneously
-    // scale goes 1 → slotScale so it "shrinks into" the slot naturally
-    const go=ts=>{
-      if(startRef.current===null) startRef.current=ts;
-      const raw=Math.min((ts-startRef.current)/DUR,1);
-      const t=ease(raw);
-      const left=endLeft+(startLeft-endLeft)*t;
-      const top=endTop+(startTop-endTop)*t;
-      // KEY: scale shrinks smoothly from 1 back to slotScale
-      const scale=1+(startScale-1)*t;
-      setFly(prev=>({...prev,left,top,scale}));
-      if(raw<1){ rafRef.current=requestAnimationFrame(go); }
-      else{
-        // snap complete: hide flying div, reveal wheel segment
-        setAnimating(false);
-        setActiveSeg(null);
-        setFly(null);
-      }
-    };
-    rafRef.current=requestAnimationFrame(go);
-  },[animating,activeSeg]);
-
-  useEffect(()=>{ const f=e=>{ if(e.key==="Escape") handleClose(); }; window.addEventListener("keydown",f); return ()=>window.removeEventListener("keydown",f); },[handleClose]);
-
-  return React.createElement('section',{
-    ref:containerRef,
-    style:{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
-      width:"100%",minHeight:"100vh",padding:"60px 16px",
-      backgroundColor:"#0B0F19",boxSizing:"border-box",position:"relative",overflow:"hidden"}
-  },
-    React.createElement('style',null,`@keyframes tw-blink{0%,100%{opacity:1}50%{opacity:0}}`),
-
-    // Header
-    React.createElement('div',{style:{textAlign:"center",marginBottom:40}},
-      React.createElement('h2',{style:{fontFamily:"'Poppins',Arial,sans-serif",fontSize:"clamp(22px,3.5vw,34px)",fontWeight:700,letterSpacing:"-0.3px",margin:0}},
-        React.createElement('span',{style:{color:"#FFFFFF"}},"Comprehensive")," ",
-        React.createElement('span',{style:{color:GOLD}},"System Features")
-      ),
-      React.createElement('p',{style:{marginTop:8,fontSize:13,color:"#9CA3AF",letterSpacing:1}},"Explore our powerful platform capabilities"),
-      React.createElement('div',{style:{margin:"12px auto 0",height:2,width:160,backgroundColor:GOLD,opacity:0.6}})
-    ),
-
-    // Wheel
-    React.createElement('div',{
-      ref:wheelRef,
-      style:{width:"100%",maxWidth:520,position:"relative",
-        opacity:wheelReady?1:0,
-        transform:wheelReady?"translateY(0) scale(1)":"translateY(28px) scale(0.97)",
-        transition:wheelReady?"opacity 1.1s ease,transform 1.5s ease":"none"}
-    },
-      React.createElement('svg',{width:"100%",viewBox:"0 0 680 680",xmlns:"http://www.w3.org/2000/svg"},
-        ...SEGMENTS.map(seg=>{
-          const isActive=activeSeg&&activeSeg.id===seg.id;
-          const isHov=hoveredId===seg.id&&!activeSeg;
-          return React.createElement('g',{
-            key:seg.id,
-            onClick:()=>!activeSeg&&!animating&&handleClick(seg),
-            onMouseEnter:()=>!activeSeg&&setHoveredId(seg.id),
-            onMouseLeave:()=>setHoveredId(null),
-            style:{
-              cursor:activeSeg?"default":"pointer",
-              opacity:isActive?0.12:1,
-              transition:"opacity 0.25s ease",
-              transform:isHov&&!activeSeg?"scale(1.015)":"scale(1)",
-              transformOrigin:`${CX}px ${CY}px`,
-              transitionProperty:"opacity,transform",
-              transitionDuration:"0.25s,0.15s",
-              pointerEvents:activeSeg?"none":"auto",
-            }
-          },
-            React.createElement(SegPaths,{seg,fill:isHov?FILL_HOVER:FILL,innerFill:INNER_FILL,color:GOLD,sw:isHov?2.2:2})
-          );
-        }),
-        React.createElement('circle',{cx:CX,cy:CY,r:INNER_CIRCLE_R,fill:INNER_FILL,stroke:GOLD,strokeWidth:"2"}),
-        React.createElement('text',{x:CX,y:CY,textAnchor:"middle",dominantBaseline:"central",fill:GOLD,fontFamily:"Arial,sans-serif",fontSize:"22",fontWeight:"700",letterSpacing:"3"},"Neezamiya")
-      )
-    ),
-
-    // Dim overlay — z:10, does NOT cover flying segment (z:20)
-    activeSeg&&React.createElement('div',{
-      onClick:handleClose,
-      style:{position:"absolute",inset:0,zIndex:10,backgroundColor:"rgba(0,0,0,0.6)",
-        transition:"background-color 0.4s ease",pointerEvents:animating?"none":"auto"}
-    }),
-
-    // Info panel — z:30
-    activeSeg&&React.createElement('div',{
-      onClick:e=>e.stopPropagation(),
-      style:{position:"absolute",right:"8%",top:"50%",transform:"translateY(-50%)",
-        width:320,maxWidth:"28vw",zIndex:30,pointerEvents:animating?"none":"auto"}
-    },
-      React.createElement(InfoPanel,{seg:activeSeg,visible:showInfo})
-    ),
-
-    // Close button — z:40
-    activeSeg&&React.createElement('button',{
-      onClick:e=>{e.stopPropagation();handleClose();},
-      style:{position:"absolute",top:20,right:28,background:"transparent",border:"none",
-        cursor:"pointer",color:GOLD,fontSize:38,lineHeight:1,zIndex:40,
-        opacity:showInfo&&!animating?1:0,transition:"opacity 0.4s ease",
-        pointerEvents:showInfo&&!animating?"auto":"none"}
-    },"×"),
-
-    // Flying segment — z:20, above overlay, below info panel
-    // transformOrigin at FLY_SIZE/2 so scale is centred
-    fly&&React.createElement('div',{
-      style:{
-        position:"absolute",
-        left:fly.left, top:fly.top,
-        width:FLY_SIZE, height:FLY_SIZE,
-        zIndex:20,
-        transform:`scale(${fly.scale})`,
-        transformOrigin:`${FLY_SIZE/2}px ${FLY_SIZE/2}px`,
-        pointerEvents:"none",
-        willChange:"transform,left,top",
-      }
-    },
-      React.createElement('svg',{width:FLY_SIZE,height:FLY_SIZE,viewBox:fly.seg.vb,xmlns:"http://www.w3.org/2000/svg"},
-        React.createElement(SegPaths,{seg:fly.seg,fill:FILL_HOVER,innerFill:INNER_FILL,color:GOLD,sw:2.5})
-      )
-    )
-  );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+function gDot(x,y,r=4){
+  ctx.save();ctx.shadowColor='#00ffff';ctx.shadowBlur=18;
+  ctx.fillStyle='#ddf8ff';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+// ── ICONS ──
+function iHandshake(cx,cy){
+  const y0=cy+54;
+  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=8;
+  ctx.beginPath();ctx.moveTo(cx-28,y0+7);ctx.lineTo(cx-14,y0-1);ctx.quadraticCurveTo(cx,y0-13,cx+14,y0-1);ctx.lineTo(cx+28,y0+7);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-14,y0-1);ctx.quadraticCurveTo(cx,y0+13,cx+14,y0-1);ctx.stroke();
+  ctx.restore();
+}
+function iDocs(cx,cy){
+  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=1.9;ctx.lineCap='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=7;
+  const bx=cx-15,by=cy+30;
+  ctx.strokeRect(bx+9,by+7,23,26);
+  ctx.fillStyle='#0b1d38';ctx.fillRect(bx,by,23,26);ctx.strokeRect(bx,by,23,26);
+  [7,13,19].forEach(dy=>{ctx.beginPath();ctx.moveTo(bx+4,by+dy);ctx.lineTo(bx+19,by+dy);ctx.stroke();});
+  ctx.restore();
+}
+function iPeople(cx,cy){
+  const y0=cy+30;
+  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=1.9;ctx.lineCap='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=7;
+  ctx.beginPath();ctx.arc(cx-20,y0,7,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,y0-2,8,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx+20,y0,7,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-30,y0+24);ctx.quadraticCurveTo(cx-20,y0+13,cx-10,y0+18);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-12,y0+24);ctx.quadraticCurveTo(cx,y0+13,cx+12,y0+24);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+10,y0+18);ctx.quadraticCurveTo(cx+20,y0+13,cx+30,y0+24);ctx.stroke();
+  ctx.restore();
+}
+function iArrow(cx,cy){
+  const y0=cy+46;
+  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=9;
+  ctx.beginPath();ctx.moveTo(cx-24,y0+10);ctx.lineTo(cx-7,y0-6);ctx.lineTo(cx+5,y0+5);ctx.lineTo(cx+24,y0-18);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+13,y0-18);ctx.lineTo(cx+24,y0-18);ctx.lineTo(cx+24,y0-7);ctx.stroke();
+  ctx.restore();
+}
+
+function drawHex(cx,cy,R,Ri,label,val,icon,labelOffY,valOffY){
+  const op=hexPts(cx,cy,R),ip=hexPts(cx,cy,Ri);
+  poly(op,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
+  poly(ip,null,'rgba(26,90,150,0.58)',1.4);
+  ctx.save();ctx.textAlign='center';
+  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';
+  ctx.fillText(label,cx,cy+(labelOffY||0));
+  ctx.fillStyle='#fff';ctx.font='bold 40px Arial,sans-serif';
+  ctx.shadowColor='rgba(255,255,255,0.1)';ctx.shadowBlur=3;
+  ctx.fillText(val,cx,cy+(valOffY||0));
+  ctx.restore();
+  icon(cx,cy);
+}
+
+// ══════════════════════════════════
+//  LAYOUT — NO OVERLAP, proper gaps
+// ══════════════════════════════════
+// Equal hex radius for 4 side boxes: R=88, inner Ri=73
+// Gap between boxes: ~20-30px minimum
+
+const R=88, Ri=73;
+
+// CENTER OCTAGON
+const TW={cx:510,cy:238};const TWr=148,TWri=128;
+const twP=octPts(TW.cx,TW.cy,TWr);
+const twPi=octPts(TW.cx,TW.cy,TWri);
+
+// TW edges (octagon, offset -22.5°):
+// LEFT flat mid  = mid of pts[4](157.5°) and pts[5](202.5°)
+const twLM=mid(twP[4],twP[5]);   // left flat mid
+// RIGHT flat mid = mid of pts[0](-22.5°) and pts[1](22.5°)
+const twRM=mid(twP[0],twP[1]);   // right flat mid
+// TopRight corner = pts[7] (292.5° = -67.5°)
+const twTR=twP[7];
+// BotLeft  corner = pts[3] (112.5°)
+const twBL=twP[3];
+
+// CLIENTS — left of TW, gap ~28px from TW left edge
+// TW leftmost x = TW.cx - TWr = 510-148 = 362
+// Clients right edge x = CL.cx + R
+// Gap = 362 - (CL.cx + R) = 28  →  CL.cx = 362-28-R = 362-28-88 = 246
+// But line goes from Clients right (pt[0]) to twLM
+// twLM.y ≈ TW.cy = 238, so Clients.cy ≈ 238 for horizontal line
+const CL={cx:242,cy:226};
+const clP=hexPts(CL.cx,CL.cy,R),clPi=hexPts(CL.cx,CL.cy,Ri);
+const clRight=clP[0]; // rightmost (0°)
+
+// TEMPLATES — below-right of Clients, gap from TW bottom-left
+// twBL ≈ (510+148*cos(112.5°), 238+148*sin(112.5°))
+// cos112.5≈-0.383, sin112.5≈0.924 → twBL≈(453,374)  
+// wait, octPts offset=-22.5: i=3 → angle=3*45-22.5=112.5°
+// twBL = (510+148*cos(112.5°), 238+148*sin(112.5°))
+//       = (510-56.7, 238+136.8) = (453.3, 374.8)
+// Templates top-right corner (hexPts[5]=300°):
+// TP.cy + R*sin(300°) = TP.cy - R*0.866
+// TP.cx + R*cos(300°) = TP.cx + R*0.5
+// Connect tpTR to twBL with diagonal curve
+// No overlap: TP hex must not touch TW
+// TP center: x=340, y=356
+const TP={cx:336,cy:360};
+const tpP=hexPts(TP.cx,TP.cy,R),tpPi=hexPts(TP.cx,TP.cy,Ri);
+const tpTR=tpP[5]; // TopRight corner (300°)
+
+// ACTIVE USERS — right of TW, upper
+// twTR = (510+148*cos(-67.5°), 238+148*sin(-67.5°))
+// cos(-67.5)≈0.383, sin(-67.5)≈-0.924 → (566.7, 101.2)
+// AU left edge (hex pt[3]=180°): AU.cx - R
+// Line from twTR up-right to AU left
+// AU.cy should be above TW center, around 185
+const AU={cx:760,cy:188};
+const auP=hexPts(AU.cx,AU.cy,R),auPi=hexPts(AU.cx,AU.cy,Ri);
+const auLeft=auP[3];  // leftmost (180°)
+const auRight=auP[0]; // rightmost (0°)
+
+// SUCCESS RATE — right of Active Users, slight down
+// AU right edge: AU.cx+R = 760+88=848, gap ~20px
+// SR left edge: SR.cx-R; SR.cx = 848+20+R = 848+20+88=956
+// SR.cy: connects from AU right (auRight.y≈188) to SR left
+const SR={cx:968,cy:265};
+const srP=hexPts(SR.cx,SR.cy,R),srPi=hexPts(SR.cx,SR.cy,Ri);
+const srLeft=srP[3];
+
+// ══════════════════════════════════
+//  CONNECTIONS
+// ══════════════════════════════════
+
+// LINE 1: Clients RIGHT (clRight) → TW LEFT-MID (twLM)
+// Gentle S-curve: mostly horizontal, slight dip then rise
+{
+  const x1=clRight[0],y1=clRight[1],x2=twLM[0],y2=twLM[1];
+  const mx=(x1+x2)/2;
+  // S-curve control points
+  const cp1x=mx-20,cp1y=y1+6;
+  const cp2x=mx+20,cp2y=y2-6;
+  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
+  // dots evenly spaced
+  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
+  [0.2,0.4,0.6,0.8].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
+}
+
+// LINE 2: Templates TOP-RIGHT (tpTR) → TW BOTTOM-LEFT (twBL)
+// Diagonal curve going up-right
+{
+  const x1=tpTR[0],y1=tpTR[1],x2=twBL[0],y2=twBL[1];
+  const cp1x=x1+30,cp1y=y1-20;
+  const cp2x=x2-20,cp2y=y2+20;
+  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
+  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
+  [0.25,0.5,0.75].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
+}
+
+// LINE 3: TW TOP-RIGHT (twTR) → Active Users LEFT (auLeft)
+// Curve going upper-right
+{
+  const x1=twTR[0],y1=twTR[1],x2=auLeft[0],y2=auLeft[1];
+  const cp1x=x1+55,cp1y=y1-35;
+  const cp2x=x2-55,cp2y=y2-15;
+  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
+  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
+  [0.25,0.5,0.75].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
+}
+
+// LINE 4: Active Users RIGHT (auRight) → Success Rate LEFT (srLeft)
+// Short mostly-horizontal curve with slight drop
+{
+  const x1=auRight[0],y1=auRight[1],x2=srLeft[0],y2=srLeft[1];
+  const mx=(x1+x2)/2;
+  const cp1x=mx-15,cp1y=y1+10;
+  const cp2x=mx+15,cp2y=y2-10;
+  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
+  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
+  [0.3,0.6].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
+}
+
+// ── DRAW BOXES (on top of lines) ──
+
+// CLIENTS
+drawHex(CL.cx,CL.cy,R,Ri,'Clients','500+',iHandshake,-36,12);
+
+// TEMPLATES
+{
+  poly(tpP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',22);
+  poly(tpPi,null,'rgba(26,90,150,0.58)',1.4);
+  ctx.save();ctx.textAlign='center';
+  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Templates',TP.cx,TP.cy-22);
+  ctx.fillStyle='#fff';ctx.font='bold 36px Arial,sans-serif';ctx.fillText('30+',TP.cx,TP.cy+20);
+  ctx.restore();
+  iDocs(TP.cx,TP.cy);
+}
+
+// CENTER OCTAGON
+poly(twP,'#0e2448','#28a8ec',3.2,'#24b8fc',40);
+poly(twPi,null,'rgba(30,120,180,0.7)',1.9);
+ctx.save();ctx.textAlign='center';ctx.fillStyle='#fff';
+ctx.font='bold 37px Arial,sans-serif';
+ctx.shadowColor='rgba(160,220,255,0.2)';ctx.shadowBlur=6;
+ctx.fillText('TRUSTED',TW.cx,TW.cy-4);
+ctx.fillText('WORLDWIDE',TW.cx,TW.cy+42);
+ctx.restore();
+
+// ACTIVE USERS
+{
+  poly(auP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
+  poly(auPi,null,'rgba(26,90,150,0.58)',1.4);
+  ctx.save();ctx.textAlign='center';
+  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Active Users',AU.cx,AU.cy-46);
+  ctx.fillStyle='#fff';ctx.font='bold 38px Arial,sans-serif';ctx.fillText('20.0K+',AU.cx,AU.cy+4);
+  ctx.restore();
+  iPeople(AU.cx,AU.cy-12);
+}
+
+// SUCCESS RATE
+{
+  poly(srP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
+  poly(srPi,null,'rgba(26,90,150,0.58)',1.4);
+  ctx.save();ctx.textAlign='center';
+  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Success Rate',SR.cx,SR.cy-28);
+  ctx.fillStyle='#fff';ctx.font='bold 40px Arial,sans-serif';ctx.fillText('99%',SR.cx,SR.cy+18);
+  ctx.restore();
+  iArrow(SR.cx,SR.cy);
+}
+
+// Connection endpoint dots (on very top)
+[clRight,twLM,tpTR,twBL,twTR,auLeft,auRight,srLeft].forEach(p=>gDot(p[0],p[1],5.5));
 </script>
-</body>
-</html>
+</body></html>
