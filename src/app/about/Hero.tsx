@@ -1,22 +1,34 @@
 'use client';
 
 import { motion, useInView, Variants } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
-interface HeroProps {
-  theme: 'light' | 'dark';
-  getAccentColor: () => string;
-}
-
-export function Hero({ theme, getAccentColor }: HeroProps) {
+export function Hero() {
   const heroRef = useRef(null);
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
+  
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  const fadeInLeftVariants:Variants = {
+  // ── Theme detection ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    const check = () =>
+      setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.documentElement, { attributes: true });
+    return () => obs.disconnect();
+  }, []);
+
+  // ── Get accent color based on theme ─────────────────────────────────────────
+  const getAccentColor = () => {
+    return theme === 'dark' ? '#E8CA5E' : '#2563EB';
+  };
+
+  const fadeInLeftVariants: Variants = {
     hidden: { x: -50, opacity: 0 },
-    visible: { 
-      x: 0, 
+    visible: {
+      x: 0,
       opacity: 1,
       transition: {
         type: "spring",
@@ -27,10 +39,10 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
     }
   };
 
-  const fromBottomVariants:Variants = {
+  const fromBottomVariants: Variants = {
     hidden: { y: 50, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: {
         type: "spring",
@@ -42,10 +54,13 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
     }
   };
 
+  const isDark = theme === 'dark';
+  const accentColor = getAccentColor();
+
   return (
     <section ref={heroRef} className="relative overflow-hidden flex items-center justify-center min-h-[50vh]">
       <div className="absolute inset-0 z-0">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop')`,
@@ -55,7 +70,7 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80" />
       </div>
-      
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial="hidden"
@@ -63,18 +78,21 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
           variants={fadeInLeftVariants}
           className="mb-5"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full mb-4 mx-auto w-fit"
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 mt-[2rem] rounded-full mb-4 mx-auto w-fit"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
+              backgroundColor: isDark ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 160, 255, 0.08)',
               border: 'none',
             }}
           >
-            <Sparkles className="w-3.5 h-3.5"
-              style={{ color: getAccentColor() }}
+            <Sparkles
+              className="w-3.5 h-3.5"
+              style={{ color: accentColor }}
             />
-            <span className="text-xs font-medium tracking-wide"
-              style={{ 
-                color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+            <span
+              className="text-xs font-medium tracking-wide"
+              style={{
+                color: isDark ? '#D1D5DB' : '#4B5563',
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
@@ -85,8 +103,9 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 leading-tight max-w-3xl mx-auto font-serif tracking-tight">
             <span className="block" style={{ fontFamily: "'Poppins', sans-serif" }}>
               Building{' '}
-              <span className="inline-block"
-                style={{ color: getAccentColor() }}
+              <span
+                className="inline-block"
+                style={{ color: accentColor }}
               >
                 Digital Futures
               </span>
@@ -100,8 +119,8 @@ export function Hero({ theme, getAccentColor }: HeroProps) {
           animate={heroInView ? "visible" : "hidden"}
           variants={fromBottomVariants}
           className="text-base md:text-lg max-w-2xl mx-auto font-light tracking-wide"
-          style={{ 
-            color: theme === 'dark' ? '#D1D5DB' : '#E5E7EB',
+          style={{
+            color: isDark ? '#D1D5DB' : '#E5E7EB',
             fontFamily: "'Calibri Light', sans-serif",
           }}
         >

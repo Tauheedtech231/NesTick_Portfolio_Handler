@@ -260,7 +260,7 @@ function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; th
         </p>
       </div>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, position: "relative" }}>
-       
+      
         <p style={{ 
           color: descColor, 
           fontFamily: "Arial,sans-serif", 

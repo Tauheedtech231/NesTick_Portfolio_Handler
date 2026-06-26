@@ -1,333 +1,554 @@
 <!DOCTYPE html>
-<html><head><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#000;}</style></head>
-<body>
-<canvas id="c"></canvas>
-<script>
-const cv=document.getElementById('c');
-const ctx=cv.getContext('2d');
-const W=1200,H=500;
-cv.width=W;cv.height=H;
-cv.style.width='100%';
-cv.style.borderRadius='12px';
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Digital Futures</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-// ── BACKGROUND ──
-(function(){
-  const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,700);
-  g.addColorStop(0,'#102448');
-  g.addColorStop(0.5,'#091a32');
-  g.addColorStop(1,'#040c1a');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-})();
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-// ── MAP DOTS ──
-(function(){
-  ctx.fillStyle='rgba(45,110,158,0.2)';
-  function d(x,y){ctx.beginPath();ctx.arc(x,y,2.2,0,Math.PI*2);ctx.fill();}
-  // top-left cluster
-  const tl=[[22,38],[48,38],[74,38],[100,38],[126,38],[152,38],[178,38],
-             [22,64],[48,64],[74,64],[100,64],[126,64],[152,64],
-             [22,90],[48,90],[74,90],[100,90],[126,90],
-             [22,116],[48,116],[74,116],[100,116],
-             [22,142],[48,142],[74,142]];
-  tl.forEach(p=>d(p[0],p[1]));
-  // top-right cluster
-  for(let r=0;r<6;r++)for(let c=0;c<16;c++)
-    if((r+c)%2===0||r<3) d(660+c*30,34+r*28);
-  // bottom-right cluster
-  for(let r=0;r<5;r++)for(let c=0;c<16;c++)
-    if((r+c)%2===0) d(670+c*28,340+r*28);
-  // bottom-left
-  [[22,348],[48,348],[22,374],[48,374],[74,374],[22,400]].forEach(p=>d(p[0],p[1]));
-})();
-
-// ── HELPERS ──
-function hexPts(cx,cy,r){
-  // flat-top hex: 0°=right,60°=BR,120°=BL,180°=L,240°=TL,300°=TR
-  const p=[];
-  for(let i=0;i<6;i++){const a=i*Math.PI/3;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
-  return p;
-}
-function octPts(cx,cy,r){
-  // offset -22.5° so left/right are flat edges
-  const p=[];
-  for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/8;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
-  return p;
-  // [0]≈-22.5  [1]≈22.5   [2]≈67.5   [3]≈112.5
-  // [4]≈157.5  [5]≈202.5  [6]≈247.5  [7]≈292.5
-  // LEFT flat  = mid([4],[5])
-  // RIGHT flat = mid([0],[1])
-  // TopRight corner = [7]
-  // BotLeft  corner = [3]
-}
-function mid(a,b){return[(a[0]+b[0])/2,(a[1]+b[1])/2];}
-
-function poly(pts,fill,sc,sw,gc,gb){
-  ctx.save();
-  if(gc){ctx.shadowColor=gc;ctx.shadowBlur=gb||22;}
-  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-  ctx.closePath();
-  if(fill){ctx.fillStyle=fill;ctx.fill();}
-  if(sc){ctx.strokeStyle=sc;ctx.lineWidth=sw;ctx.stroke();}
-  ctx.restore();
-}
-
-// ── GLOW CURVE LINE with fade at ends ──
-function gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y){
-  // Use bezier for S-curve
-  const steps=80;
-  // Draw as segmented path with varying alpha for fade
-  for(let pass=0;pass<3;pass++){
-    const width=[9,3.5,1.6][pass];
-    ctx.save();
-    ctx.shadowColor='#00ddff';
-    ctx.shadowBlur=[16,8,4][pass];
-    ctx.lineCap='round';
-    for(let i=0;i<steps;i++){
-      const t0=i/steps, t1=(i+1)/steps;
-      const tm=(t0+t1)/2;
-      // fade: 0 at ends, 1 in middle
-      const fade=Math.sin(tm*Math.PI);
-      const alpha=[0.07,0.3,1.0][pass]*fade;
-      const colors=['rgba(0,210,255,','rgba(0,230,255,','rgba(200,248,255,'];
-      ctx.strokeStyle=colors[pass]+alpha+')';
-      ctx.lineWidth=width;
-      // cubic bezier point
-      function bp(t){
-        const mt=1-t;
-        return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,
-               mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
-      const p0=bp(t0),p1=bp(t1);
-      ctx.beginPath();ctx.moveTo(p0[0],p0[1]);ctx.lineTo(p1[0],p1[1]);ctx.stroke();
-    }
-    ctx.restore();
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
   }
-}
 
-function gDot(x,y,r=4){
-  ctx.save();ctx.shadowColor='#00ffff';ctx.shadowBlur=18;
-  ctx.fillStyle='#ddf8ff';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-}
+  .hero {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 60% 50%, #0d1a3a 0%, #050810 60%, #000 100%);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 0 6%;
+  }
 
-// ── ICONS ──
-function iHandshake(cx,cy){
-  const y0=cy+54;
-  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=8;
-  ctx.beginPath();ctx.moveTo(cx-28,y0+7);ctx.lineTo(cx-14,y0-1);ctx.quadraticCurveTo(cx,y0-13,cx+14,y0-1);ctx.lineTo(cx+28,y0+7);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-14,y0-1);ctx.quadraticCurveTo(cx,y0+13,cx+14,y0-1);ctx.stroke();
-  ctx.restore();
-}
-function iDocs(cx,cy){
-  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=1.9;ctx.lineCap='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=7;
-  const bx=cx-15,by=cy+30;
-  ctx.strokeRect(bx+9,by+7,23,26);
-  ctx.fillStyle='#0b1d38';ctx.fillRect(bx,by,23,26);ctx.strokeRect(bx,by,23,26);
-  [7,13,19].forEach(dy=>{ctx.beginPath();ctx.moveTo(bx+4,by+dy);ctx.lineTo(bx+19,by+dy);ctx.stroke();});
-  ctx.restore();
-}
-function iPeople(cx,cy){
-  const y0=cy+30;
-  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=1.9;ctx.lineCap='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=7;
-  ctx.beginPath();ctx.arc(cx-20,y0,7,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();ctx.arc(cx,y0-2,8,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();ctx.arc(cx+20,y0,7,0,Math.PI*2);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-30,y0+24);ctx.quadraticCurveTo(cx-20,y0+13,cx-10,y0+18);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-12,y0+24);ctx.quadraticCurveTo(cx,y0+13,cx+12,y0+24);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx+10,y0+18);ctx.quadraticCurveTo(cx+20,y0+13,cx+30,y0+24);ctx.stroke();
-  ctx.restore();
-}
-function iArrow(cx,cy){
-  const y0=cy+46;
-  ctx.save();ctx.strokeStyle='#5bc9fb';ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowColor='#5bc9fb';ctx.shadowBlur=9;
-  ctx.beginPath();ctx.moveTo(cx-24,y0+10);ctx.lineTo(cx-7,y0-6);ctx.lineTo(cx+5,y0+5);ctx.lineTo(cx+24,y0-18);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx+13,y0-18);ctx.lineTo(cx+24,y0-18);ctx.lineTo(cx+24,y0-7);ctx.stroke();
-  ctx.restore();
-}
+  /* Starfield */
+  .stars {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 25%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 65%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 45%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 80%, rgba(100,160,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 55%, rgba(100,160,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 80% 35%, rgba(100,160,255,0.6) 0%, transparent 100%);
+    pointer-events: none;
+  }
 
-function drawHex(cx,cy,R,Ri,label,val,icon,labelOffY,valOffY){
-  const op=hexPts(cx,cy,R),ip=hexPts(cx,cy,Ri);
-  poly(op,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
-  poly(ip,null,'rgba(26,90,150,0.58)',1.4);
-  ctx.save();ctx.textAlign='center';
-  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';
-  ctx.fillText(label,cx,cy+(labelOffY||0));
-  ctx.fillStyle='#fff';ctx.font='bold 40px Arial,sans-serif';
-  ctx.shadowColor='rgba(255,255,255,0.1)';ctx.shadowBlur=3;
-  ctx.fillText(val,cx,cy+(valOffY||0));
-  ctx.restore();
-  icon(cx,cy);
-}
+  /* Left content */
+  .left {
+    flex: 0 0 42%;
+    position: relative;
+    z-index: 2;
+  }
 
-// ══════════════════════════════════
-//  LAYOUT — NO OVERLAP, proper gaps
-// ══════════════════════════════════
-// Equal hex radius for 4 side boxes: R=88, inner Ri=73
-// Gap between boxes: ~20-30px minimum
+  .about-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
 
-const R=88, Ri=73;
+  .about-label::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 2px;
+  }
 
-// CENTER OCTAGON
-const TW={cx:510,cy:238};const TWr=148,TWri=128;
-const twP=octPts(TW.cx,TW.cy,TWr);
-const twPi=octPts(TW.cx,TW.cy,TWri);
+  .headline {
+    font-size: clamp(42px, 5.5vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
 
-// TW edges (octagon, offset -22.5°):
-// LEFT flat mid  = mid of pts[4](157.5°) and pts[5](202.5°)
-const twLM=mid(twP[4],twP[5]);   // left flat mid
-// RIGHT flat mid = mid of pts[0](-22.5°) and pts[1](22.5°)
-const twRM=mid(twP[0],twP[1]);   // right flat mid
-// TopRight corner = pts[7] (292.5° = -67.5°)
-const twTR=twP[7];
-// BotLeft  corner = pts[3] (112.5°)
-const twBL=twP[3];
+  .headline .white { color: #fff; }
+  .headline .gold { color: #f5a623; }
+  .headline .blue { color: #4da6ff; }
 
-// CLIENTS — left of TW, gap ~28px from TW left edge
-// TW leftmost x = TW.cx - TWr = 510-148 = 362
-// Clients right edge x = CL.cx + R
-// Gap = 362 - (CL.cx + R) = 28  →  CL.cx = 362-28-R = 362-28-88 = 246
-// But line goes from Clients right (pt[0]) to twLM
-// twLM.y ≈ TW.cy = 238, so Clients.cy ≈ 238 for horizontal line
-const CL={cx:242,cy:226};
-const clP=hexPts(CL.cx,CL.cy,R),clPi=hexPts(CL.cx,CL.cy,Ri);
-const clRight=clP[0]; // rightmost (0°)
+  .since {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.45);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 18px 0 28px;
+  }
 
-// TEMPLATES — below-right of Clients, gap from TW bottom-left
-// twBL ≈ (510+148*cos(112.5°), 238+148*sin(112.5°))
-// cos112.5≈-0.383, sin112.5≈0.924 → twBL≈(453,374)  
-// wait, octPts offset=-22.5: i=3 → angle=3*45-22.5=112.5°
-// twBL = (510+148*cos(112.5°), 238+148*sin(112.5°))
-//       = (510-56.7, 238+136.8) = (453.3, 374.8)
-// Templates top-right corner (hexPts[5]=300°):
-// TP.cy + R*sin(300°) = TP.cy - R*0.866
-// TP.cx + R*cos(300°) = TP.cx + R*0.5
-// Connect tpTR to twBL with diagonal curve
-// No overlap: TP hex must not touch TW
-// TP center: x=340, y=356
-const TP={cx:336,cy:360};
-const tpP=hexPts(TP.cx,TP.cy,R),tpPi=hexPts(TP.cx,TP.cy,Ri);
-const tpTR=tpP[5]; // TopRight corner (300°)
+  .since::before,
+  .since::after {
+    content: '';
+    flex: 1;
+    max-width: 40px;
+    height: 1px;
+    background: rgba(255,255,255,0.3);
+  }
 
-// ACTIVE USERS — right of TW, upper
-// twTR = (510+148*cos(-67.5°), 238+148*sin(-67.5°))
-// cos(-67.5)≈0.383, sin(-67.5)≈-0.924 → (566.7, 101.2)
-// AU left edge (hex pt[3]=180°): AU.cx - R
-// Line from twTR up-right to AU left
-// AU.cy should be above TW center, around 185
-const AU={cx:760,cy:188};
-const auP=hexPts(AU.cx,AU.cy,R),auPi=hexPts(AU.cx,AU.cy,Ri);
-const auLeft=auP[3];  // leftmost (180°)
-const auRight=auP[0]; // rightmost (0°)
+  .since span { white-space: nowrap; }
 
-// SUCCESS RATE — right of Active Users, slight down
-// AU right edge: AU.cx+R = 760+88=848, gap ~20px
-// SR left edge: SR.cx-R; SR.cx = 848+20+R = 848+20+88=956
-// SR.cy: connects from AU right (auRight.y≈188) to SR left
-const SR={cx:968,cy:265};
-const srP=hexPts(SR.cx,SR.cy,R),srPi=hexPts(SR.cx,SR.cy,Ri);
-const srLeft=srP[3];
+  .description {
+    color: rgba(255,255,255,0.6);
+    font-size: 14.5px;
+    line-height: 1.7;
+    max-width: 380px;
+    margin-bottom: 44px;
+  }
 
-// ══════════════════════════════════
-//  CONNECTIONS
-// ══════════════════════════════════
+  .description .highlight {
+    color: #f5a623;
+    font-weight: 600;
+    font-style: italic;
+  }
 
-// LINE 1: Clients RIGHT (clRight) → TW LEFT-MID (twLM)
-// Gentle S-curve: mostly horizontal, slight dip then rise
-{
-  const x1=clRight[0],y1=clRight[1],x2=twLM[0],y2=twLM[1];
-  const mx=(x1+x2)/2;
-  // S-curve control points
-  const cp1x=mx-20,cp1y=y1+6;
-  const cp2x=mx+20,cp2y=y2-6;
-  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
-  // dots evenly spaced
-  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
-  [0.2,0.4,0.6,0.8].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
-}
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 36px;
+    margin-bottom: 44px;
+  }
 
-// LINE 2: Templates TOP-RIGHT (tpTR) → TW BOTTOM-LEFT (twBL)
-// Diagonal curve going up-right
-{
-  const x1=tpTR[0],y1=tpTR[1],x2=twBL[0],y2=twBL[1];
-  const cp1x=x1+30,cp1y=y1-20;
-  const cp2x=x2-20,cp2y=y2+20;
-  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
-  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
-  [0.25,0.5,0.75].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
-}
+  .stat-item { display: flex; flex-direction: column; }
 
-// LINE 3: TW TOP-RIGHT (twTR) → Active Users LEFT (auLeft)
-// Curve going upper-right
-{
-  const x1=twTR[0],y1=twTR[1],x2=auLeft[0],y2=auLeft[1];
-  const cp1x=x1+55,cp1y=y1-35;
-  const cp2x=x2-55,cp2y=y2-15;
-  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
-  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
-  [0.25,0.5,0.75].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
-}
+  .stat-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
 
-// LINE 4: Active Users RIGHT (auRight) → Success Rate LEFT (srLeft)
-// Short mostly-horizontal curve with slight drop
-{
-  const x1=auRight[0],y1=auRight[1],x2=srLeft[0],y2=srLeft[1];
-  const mx=(x1+x2)/2;
-  const cp1x=mx-15,cp1y=y1+10;
-  const cp2x=mx+15,cp2y=y2-10;
-  gCurve(x1,y1,x2,y2,cp1x,cp1y,cp2x,cp2y);
-  function bz(t){const mt=1-t;return[mt*mt*mt*x1+3*mt*mt*t*cp1x+3*mt*t*t*cp2x+t*t*t*x2,mt*mt*mt*y1+3*mt*mt*t*cp1y+3*mt*t*t*cp2y+t*t*t*y2];}
-  [0.3,0.6].forEach(t=>{const p=bz(t);gDot(p[0],p[1],3);});
-}
+  .stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #f5a623;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
 
-// ── DRAW BOXES (on top of lines) ──
+  .stat-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.4;
+  }
 
-// CLIENTS
-drawHex(CL.cx,CL.cy,R,Ri,'Clients','500+',iHandshake,-36,12);
+  /* CTA Button */
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
 
-// TEMPLATES
-{
-  poly(tpP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',22);
-  poly(tpPi,null,'rgba(26,90,150,0.58)',1.4);
-  ctx.save();ctx.textAlign='center';
-  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Templates',TP.cx,TP.cy-22);
-  ctx.fillStyle='#fff';ctx.font='bold 36px Arial,sans-serif';ctx.fillText('30+',TP.cx,TP.cy+20);
-  ctx.restore();
-  iDocs(TP.cx,TP.cy);
-}
+  .cta-text {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
 
-// CENTER OCTAGON
-poly(twP,'#0e2448','#28a8ec',3.2,'#24b8fc',40);
-poly(twPi,null,'rgba(30,120,180,0.7)',1.9);
-ctx.save();ctx.textAlign='center';ctx.fillStyle='#fff';
-ctx.font='bold 37px Arial,sans-serif';
-ctx.shadowColor='rgba(160,220,255,0.2)';ctx.shadowBlur=6;
-ctx.fillText('TRUSTED',TW.cx,TW.cy-4);
-ctx.fillText('WORLDWIDE',TW.cx,TW.cy+42);
-ctx.restore();
+  .cta-arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
 
-// ACTIVE USERS
-{
-  poly(auP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
-  poly(auPi,null,'rgba(26,90,150,0.58)',1.4);
-  ctx.save();ctx.textAlign='center';
-  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Active Users',AU.cx,AU.cy-46);
-  ctx.fillStyle='#fff';ctx.font='bold 38px Arial,sans-serif';ctx.fillText('20.0K+',AU.cx,AU.cy+4);
-  ctx.restore();
-  iPeople(AU.cx,AU.cy-12);
-}
+  .cta-btn:hover .cta-arrow {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(3px);
+  }
 
-// SUCCESS RATE
-{
-  poly(srP,'#0c1e3b','#1e84cb',2.8,'#1a95dc',24);
-  poly(srPi,null,'rgba(26,90,150,0.58)',1.4);
-  ctx.save();ctx.textAlign='center';
-  ctx.fillStyle='#88c1e0';ctx.font='15px Arial,sans-serif';ctx.fillText('Success Rate',SR.cx,SR.cy-28);
-  ctx.fillStyle='#fff';ctx.font='bold 40px Arial,sans-serif';ctx.fillText('99%',SR.cx,SR.cy+18);
-  ctx.restore();
-  iArrow(SR.cx,SR.cy);
-}
+  .cta-arrow svg { width: 14px; height: 14px; color: #fff; }
 
-// Connection endpoint dots (on very top)
-[clRight,twLM,tpTR,twBL,twTR,auLeft,auRight,srLeft].forEach(p=>gDot(p[0],p[1],5.5));
-</script>
-</body></html>
+  /* Right - orbital diagram */
+  .right {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    z-index: 1;
+  }
+
+  .orbital-container {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  /* Orbital rings */
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.07);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ring-1 { width: 160px; height: 160px; border-color: rgba(255,200,80,0.3); }
+  .ring-2 { width: 270px; height: 270px; border-style: dashed; border-color: rgba(255,255,255,0.1); }
+  .ring-3 { width: 390px; height: 390px; border-color: rgba(255,255,255,0.07); }
+  .ring-4 { width: 490px; height: 490px; border-color: rgba(255,255,255,0.04); }
+
+  /* Core planet */
+  .core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #4da6ff 0%, #1a3a7a 40%, #0a1535 70%, #050a1a 100%);
+    box-shadow:
+      0 0 40px rgba(77,166,255,0.4),
+      0 0 80px rgba(77,166,255,0.15),
+      inset 0 0 30px rgba(0,0,50,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  /* N logo */
+  .n-logo {
+    font-size: 42px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #4da6ff, #f5a623, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-style: italic;
+  }
+
+  /* Golden glow arc on left side of core */
+  .core::before {
+    content: '';
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-left-color: #f5a623;
+    border-bottom-color: rgba(245,166,35,0.3);
+    transform: rotate(-30deg);
+    box-shadow: -4px 4px 20px rgba(245,166,35,0.6);
+  }
+
+  /* Orbital feature nodes */
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 6;
+  }
+
+  .node-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(10,20,50,0.9);
+    border: 1px solid rgba(77,166,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(77,166,255,0.2);
+  }
+
+  .node-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: #4da6ff;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .node-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* Top - Smart Portfolios */
+  .node-top {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Left - Secure & Reliable */
+  .node-left {
+    top: 50%;
+    left: 30px;
+    transform: translateY(-50%);
+  }
+
+  /* Right - Data Driven Insights */
+  .node-right {
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+  }
+
+  /* Bottom - Global Presence */
+  .node-bottom {
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Dot accents on rings */
+  .dot {
+    position: absolute;
+    border-radius: 50%;
+    background: #f5a623;
+    box-shadow: 0 0 8px rgba(245,166,35,0.8);
+  }
+
+  .dot-1 { width: 6px; height: 6px; top: 50%; left: -3px; margin-top: -3px; }
+  .dot-blue {
+    width: 5px;
+    height: 5px;
+    background: #4da6ff;
+    box-shadow: 0 0 8px rgba(77,166,255,0.8);
+    border-radius: 50%;
+    position: absolute;
+  }
+
+  /* Large curved arc line on left side (the big swooping curve) */
+  .arc-svg {
+    position: absolute;
+    top: 50%;
+    left: -3%;
+    transform: translateY(-50%);
+    width: 55%;
+    height: 110%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Bottom gradient fade */
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    pointer-events: none;
+  }
+
+  /* Floating blue dots scattered */
+  .float-dot {
+    position: absolute;
+    border-radius: 50%;
+    background: #4da6ff;
+    box-shadow: 0 0 6px rgba(77,166,255,0.9);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <!-- Stars background -->
+  <div class="stars"></div>
+
+  <!-- Floating dots -->
+  <div class="float-dot" style="width:4px;height:4px;top:18%;left:48%;opacity:0.8;"></div>
+  <div class="float-dot" style="width:3px;height:3px;top:32%;left:52%;opacity:0.6;"></div>
+  <div class="float-dot" style="width:4px;height:4px;top:72%;left:44%;opacity:0.7;"></div>
+  <div class="float-dot" style="width:3px;height:3px;top:55%;left:57%;opacity:0.5;"></div>
+  <div class="float-dot" style="width:5px;height:5px;top:80%;left:60%;opacity:0.6;background:#f5a623;box-shadow:0 0 8px rgba(245,166,35,0.9);"></div>
+
+  <!-- Left Content -->
+  <div class="left">
+    <div class="about-label">About Us</div>
+
+    <div class="headline">
+      <div class="white">Building</div>
+      <div>
+        <span class="gold">Digital </span><span class="blue">Futures</span>
+      </div>
+    </div>
+
+    <div class="since">
+      <span>Since 2021</span>
+    </div>
+
+    <p class="description">
+      We empower institutions to manage and showcase student portfolios —
+      <span class="highlight">simply, securely and efficiently.</span>
+    </p>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-item">
+        <!-- Institution icon -->
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(245,166,35,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M8 10v11M12 10v11M16 10v11M20 10v11"/>
+        </svg>
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Institutions<br>Trust Us</div>
+      </div>
+
+      <div class="stat-item">
+        <!-- People icon -->
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(245,166,35,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <div class="stat-number">1M+</div>
+        <div class="stat-label">Students<br>Impacted</div>
+      </div>
+
+      <div class="stat-item">
+        <!-- Globe icon -->
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(162,100,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <div class="stat-number" style="color:#a264ff;">20+</div>
+        <div class="stat-label">Countries<br>Reached</div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="cta-btn">
+      <span class="cta-text">Explore Our Solutions</span>
+      <div class="cta-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </div>
+    </button>
+  </div>
+
+  <!-- Right - Orbital Diagram -->
+  <div class="right">
+
+    <!-- Big swooping arc SVG in background -->
+    <svg class="arc-svg" viewBox="0 0 300 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 280 0 Q 0 300 280 600" stroke="rgba(77,100,255,0.15)" stroke-width="1.5" fill="none"/>
+      <path d="M 260 0 Q -30 300 260 600" stroke="rgba(100,80,255,0.08)" stroke-width="1" fill="none"/>
+    </svg>
+
+    <div class="orbital-container">
+      <!-- Rings -->
+      <div class="ring ring-4">
+        <div class="dot-blue" style="top:15%;left:72%;width:4px;height:4px;"></div>
+        <div class="dot-blue" style="top:82%;left:20%;width:3px;height:3px;"></div>
+      </div>
+      <div class="ring ring-3">
+        <div class="dot-blue" style="top:5%;left:55%;width:4px;height:4px;"></div>
+      </div>
+      <div class="ring ring-2">
+        <div class="dot dot-1"></div>
+      </div>
+      <div class="ring ring-1"></div>
+
+      <!-- Core -->
+      <div class="core">
+        <span class="n-logo">N</span>
+      </div>
+
+      <!-- Top node: Smart Portfolios -->
+      <div class="node node-top">
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="node-label">Smart<br>Portfolios</div>
+      </div>
+
+      <!-- Left node: Secure & Reliable -->
+      <div class="node node-left">
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="node-label">Secure &<br>Reliable</div>
+      </div>
+
+      <!-- Right node: Data Driven Insights -->
+      <div class="node node-right">
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+            <polyline points="3 7 7 3 11 7 15 3 19 7"/>
+          </svg>
+        </div>
+        <div class="node-label">Data Driven<br>Insights</div>
+      </div>
+
+      <!-- Bottom node: Global Presence -->
+      <div class="node node-bottom">
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        </div>
+        <div class="node-label">Global<br>Presence</div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>
