@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useEffect, useRef, useState, useCallback, memo } from "react";
-import { LogOut, LayoutDashboard, Menu, X, Sun, Moon, Code2, UserCircle, Shield, Sparkles, GraduationCap } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { LogOut, LayoutDashboard, Menu, X, Sun, Moon, UserCircle, Shield, Sparkles, GraduationCap, ChevronDown, Code2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -36,46 +35,20 @@ function useTheme() {
   return { theme, toggleTheme, mounted };
 }
 
-// Simple nav item with slide animation
-const NavItem = memo(({ item, isActive, onClick, theme, index, isVisible }: { 
-  item: { name: string; path: string }; 
-  isActive: boolean; 
-  onClick: () => void;
-  theme: 'light' | 'dark';
-  index: number;
-  isVisible: boolean;
-}) => (
-  <button
-    onClick={onClick}
-    className={`relative px-4 py-2 transition-all duration-700 ease-out will-change-transform cursor-pointer ${
-      isActive 
-        ? (theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#0066FF]')
-        : (theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-[#1F4381]')
-    }`}
-    style={{
-      opacity: isVisible ? 1 : 0,
-      transform: isVisible ? 'translateY(0)' : 'translateY(-80px)',
-      transitionDelay: `${index * 100}ms`,
-      fontFamily: "'Poppins', sans-serif",
-    }}
-  >
-    <span className="font-medium text-sm uppercase tracking-wide">
-      {item.name}
-    </span>
-    <span className={`absolute left-0 bottom-0 h-0.5 rounded-full transition-all duration-200 ${
-      isActive ? 'w-full' : 'w-0 group-hover:w-full'
-    }`}
-    style={{
-      backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-    }} />
-  </button>
-));
-
-NavItem.displayName = 'NavItem';
-
 // Login Dropdown Component
-const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'; onSelect: (route: string) => void; isVisible: boolean }) => {
+const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect: (route: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const roles = [
     { id: 'admin', name: 'Admin', icon: Shield, route: '/auth/login', color: '#F59E0B' },
@@ -85,69 +58,68 @@ const LoginDropdown = ({ theme, onSelect, isVisible }: { theme: 'light' | 'dark'
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-700 ease-out will-change-transform cursor-pointer"
         style={{
-          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-          color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-          opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-60px) scale(0.8)',
-          transitionDelay: '500ms',
+          background: theme === 'dark' ? '#f5b800' : '#1a56db',
+          color: theme === 'dark' ? '#0d1a35' : '#ffffff',
           fontFamily: "'Poppins', sans-serif",
+          padding: '8px 16px',
+          borderRadius: '28px',
+          fontSize: '13px',
+          fontWeight: '600',
+          border: 'none',
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
         }}
+        className="flex items-center gap-2"
       >
         <UserCircle className="w-4 h-4" />
-        Login
+        <span className="hidden sm:inline">Login</span>
+        <span className="sm:hidden">Login</span>
       </button>
 
       {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
+        <div className="absolute right-0 mt-2 w-56 sm:w-64 rounded-xl shadow-2xl border overflow-hidden z-[9999]"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
+          }}
+        >
+          <div className="px-4 py-3 border-b"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.1)',
             }}
           >
-            <div className="px-4 py-3 border-b"
-              style={{
-                borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
-              }}
-            >
-              <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                Login as
-              </p>
-              <p className="text-xs text-gray-500" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
-                Choose your role to continue
-              </p>
-            </div>
-            
-            <div className="p-2">
-              {roles.map((role) => {
-                const Icon = role.icon;
-                return (
-                  <button
-                    key={role.id}
-                    onClick={() => {
-                      onSelect(role.route);
-                      setIsOpen(false);
-                    }}
-                    className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 hover:shadow-md cursor-pointer group"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    <Icon className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" style={{ color: role.color }} />
-                    <span>{role.name}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              Login as
+            </p>
+            <p className="text-xs text-gray-500" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              Choose your role
+            </p>
           </div>
-        </>
+          
+          <div className="p-2">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              return (
+                <button
+                  key={role.id}
+                  onClick={() => {
+                    onSelect(role.route);
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm rounded-lg font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: role.color }} />
+                  <span>{role.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -162,32 +134,30 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<'admin' | 'designer' | 'developer' | 'principal' | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Simple scroll handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Trigger animation on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Check user authentication from all storage locations
   useEffect(() => {
     const checkUserAuthentication = () => {
       try {
-        // Check for Principal (localStorage)
         const authCollege = localStorage.getItem('auth_college');
         if (authCollege) {
           const collegeData = JSON.parse(authCollege);
@@ -202,7 +172,6 @@ export default function Navbar() {
           }
         }
         
-        // Check for Admin (localStorage)
         const loginUser = localStorage.getItem('login_user');
         if (loginUser) {
           const adminUser = JSON.parse(loginUser);
@@ -211,7 +180,6 @@ export default function Navbar() {
           return;
         }
         
-        // Check for Designer (sessionStorage)
         const designerAuth = sessionStorage.getItem('designer_auth');
         if (designerAuth) {
           const designerData = JSON.parse(designerAuth);
@@ -222,7 +190,6 @@ export default function Navbar() {
           }
         }
         
-        // Check for Developer (sessionStorage)
         const developerAuth = sessionStorage.getItem('developer_auth');
         if (developerAuth) {
           const developerData = JSON.parse(developerAuth);
@@ -233,7 +200,6 @@ export default function Navbar() {
           }
         }
         
-        // No user found
         setUser(null);
         setUserRole(null);
       } catch (error) {
@@ -245,12 +211,10 @@ export default function Navbar() {
 
     checkUserAuthentication();
 
-    // Listen for storage changes
     const handleStorageChange = () => {
       checkUserAuthentication();
     };
 
-    // Custom event for sessionStorage changes
     const handleSessionStorageChange = () => {
       checkUserAuthentication();
     };
@@ -264,7 +228,6 @@ export default function Navbar() {
     };
   }, []);
 
-  // Simple mobile menu toggle
   useEffect(() => {
     if (!mobileMenuRef.current) return;
     
@@ -291,7 +254,6 @@ export default function Navbar() {
   }, [isMobileMenuOpen]);
 
   const handleLogout = useCallback(() => {
-    // Clear based on role
     if (userRole === 'admin') {
       localStorage.removeItem('login_user');
     } else if (userRole === 'designer') {
@@ -305,8 +267,6 @@ export default function Navbar() {
     setUser(null);
     setUserRole(null);
     setIsDropdownOpen(false);
-    
-    // Redirect to home
     router.push('/');
   }, [userRole, router]);
 
@@ -334,14 +294,11 @@ export default function Navbar() {
   }, [router]);
 
   const handleRoleSelect = useCallback((route: string) => {
-    // Check if user is already logged in for Principal Portal
     if (route === '/College_Portfolio_Handler/login') {
       const authCollege = localStorage.getItem('auth_college');
       if (authCollege) {
-        // User is logged in, go to dashboard
         router.push('/College_Portfolio_Handler');
       } else {
-        // User not logged in, go to login
         router.push('/College_Portfolio_Handler/login');
       }
     } else {
@@ -349,7 +306,6 @@ export default function Navbar() {
     }
   }, [router]);
 
-  const getUserEmail = () => user?.email || '';
   const getUserName = () => user?.name || user?.email || '';
   const getUserInitial = () => {
     const name = getUserName();
@@ -365,14 +321,13 @@ export default function Navbar() {
     { name: 'About', path: '/about' },
   ];
 
-  // Don't render until mounted
   if (!mounted) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1F4381]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: '#132248' }}>
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between" style={{ height: '80px' }}>
             <div className="flex items-center space-x-3">
-              <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl bg-gray-700" />
+              <div className="w-12 h-12 rounded-xl bg-gray-700" />
             </div>
           </div>
         </div>
@@ -381,241 +336,232 @@ export default function Navbar() {
   }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'shadow-md' : ''
-    }`}
-    style={{
-      backgroundColor: theme === 'dark' 
-        ? '#1F4381'
-        : '#FFFFFF',
-      borderBottom: theme === 'dark' ? '1px solid rgba(232, 202, 94, 0.2)' : '1px solid rgba(0, 0, 0, 0.08)',
-      fontFamily: "'Poppins', sans-serif",
-    }}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-50 flex justify-center px-2 sm:px-4`}
+      style={{
+        paddingTop: '10px',
+        paddingBottom: '10px',
+        background: 'transparent',
+      }}
+    >
+      <div 
+        className="w-full max-w-[1300px] h-[70px] sm:h-[80px] rounded-[16px] sm:rounded-[20px] flex items-center relative overflow-visible"
+        style={{
+          background: theme === 'dark' ? '#132248' : '#ffffff',
+          boxShadow: isScrolled ? '0 6px 40px rgba(0,0,0,0.5)' : '0 6px 40px rgba(0,0,0,0.5)',
+          fontFamily: "'Poppins', sans-serif",
+        }}
+      >
+        {/* ① LOGO BLOCK - No Background Color */}
+        <div 
+          className="h-full rounded-l-[16px] sm:rounded-l-[20px] flex items-center gap-2 sm:gap-3 flex-shrink-0"
+          style={{
+            background: 'transparent',
+            padding: '0 10px 0 10px',
+          }}
+        >
+          {/* Logo Image - No Background */}
           <div 
+            className="w-[40px] h-[40px] sm:w-[52px] sm:h-[52px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:scale-105 transition-transform duration-200"
             onClick={handleLogoClick}
-            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer hover:opacity-80 transition-opacity group"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === 'Space') {
-                handleLogoClick(e as unknown as React.MouseEvent);
-              }
-            }}
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-60px) scale(0.8)',
-              transition: 'all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              transitionDelay: '100ms',
-            }}
           >
-            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl group-hover:scale-105 transition-transform duration-300 shadow-md cursor-pointer"
-              style={{
-                boxShadow: theme === 'dark' ? '0 0 15px rgba(232, 202, 94, 0.2)' : '0 0 15px rgba(0, 100, 255, 0.15)',
-              }}
-            >
-              <Image
-                src="/logo.jpg"
-                alt="Logo"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            {/* Company name */}
-            <span className="hidden sm:inline-block text-xl md:text-2xl font-bold font-serif tracking-tight cursor-pointer"
-              style={{
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              Portfolio Handler
-            </span>
+            <Image
+              src="/logo.jpg"
+              alt="Logo"
+              width={46}
+              height={46}
+              className="rounded-lg sm:w-[46px] sm:h-[46px] object-cover"
+            />
           </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item, index) => (
-              <NavItem
-                key={item.name}
-                item={item}
-                isActive={pathname === item.path}
-                onClick={() => handleNavigation(item.path)}
-                theme={theme}
-                index={index}
-                isVisible={isVisible}
-              />
-            ))}
-          </div>
-
-          {/* Right Side Buttons */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
-              style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
-                borderWidth: '1px',
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
-                transitionDelay: '400ms',
-              }}
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-[#E8CA5E]" />
-              ) : (
-                <Moon className="w-4 h-4 text-[#0066FF]" />
-              )}
-            </button>
-
-            {/* Desktop Login Button - Show when user is NOT logged in */}
-            {!user && (
-              <div className="hidden lg:block">
-                <LoginDropdown theme={theme} onSelect={handleRoleSelect} isVisible={isVisible} />
-              </div>
-            )}
-
-            {/* User Dropdown - Desktop only when user is logged in */}
-            {user && (
-              <div className="relative hidden lg:block">
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
-                  style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-                    borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
-                    borderWidth: '1px',
-                    opacity: isVisible ? 1 : 0,
-                    transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
-                    transitionDelay: '500ms',
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{
-                      backgroundColor: userRole === 'admin' ? '#F59E0B' : 
-                                     (userRole === 'developer' ? '#8B5CF6' : 
-                                     (userRole === 'principal' ? '#10B981' : '#0066FF')),
-                    }}
-                  >
-                    <span className="text-white font-bold text-sm">
-                      {getUserInitial()}
-                    </span>
-                  </div>
-                  <span className="hidden xl:block text-sm font-medium max-w-[150px] truncate"
-                    style={{ color: theme === 'dark' ? '#D1D5DB' : '#4B5563' }}
-                  >
-                    {getUserName()}
-                  </span>
-                </button>
-
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setIsDropdownOpen(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
-                      }}
-                    >
-                      <div className="px-4 py-3 border-b"
-                        style={{
-                          borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.1)',
-                        }}
-                      >
-                        <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          Signed in as
-                        </p>
-                        <p className="text-sm text-gray-600 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          {getUserName()}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1 capitalize" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
-                          {userRole}
-                        </p>
-                      </div>
-                      
-                      <div className="p-2">
-                        {/* Dashboard Link - Based on role */}
-                        <button
-                          onClick={() => {
-                            handleDashboardRedirect();
-                            setIsDropdownOpen(false);
-                          }}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-gray-700 hover:bg-gray-100 hover:scale-105 cursor-pointer"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          <span>
-                            {userRole === 'admin' ? 'Admin Dashboard' : 
-                             userRole === 'developer' ? 'Developer Dashboard' : 
-                             userRole === 'principal' ? 'Principal Dashboard' : 
-                             'Designer Dashboard'}
-                          </span>
-                        </button>
-                        
-                        <hr className="my-2 border-gray-100" />
-                        
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-medium text-red-600 hover:bg-red-50 hover:scale-105 cursor-pointer"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Logout</span>
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl transition-all duration-700 ease-out will-change-transform cursor-pointer"
-              style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 100, 255, 0.2)',
-                borderWidth: '1px',
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(-50px) scale(0.8)',
-                transitionDelay: '600ms',
-              }}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }} />
-              ) : (
-                <Menu className="w-5 h-5" style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }} />
-              )}
-            </button>
+          <div className="flex flex-col leading-[1.2] cursor-pointer" onClick={handleLogoClick}>
+            <span className="text-[11px] sm:text-[15px] font-semibold" style={{ color: theme === 'dark' ? '#d8e6ff' : '#1a56db' }}>Portfolio</span>
+            <span className="text-[12px] sm:text-[16px] font-bold" style={{ color: '#f5b800' }}>Handler</span>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* ② S-CURVE DIVIDER - Now Hidden */}
+        <div className="hidden"></div>
+
+        {/* ③ NAV LINKS */}
+        <div className="hidden md:flex flex-1 h-full items-center gap-0 pl-1 overflow-x-auto">
+          {navItems.map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <button
+                key={item.name}
+                onClick={() => handleNavigation(item.path)}
+                className="relative h-full flex items-center whitespace-nowrap text-[11px] lg:text-[13px] font-medium tracking-[0.6px] px-2 lg:px-5 cursor-pointer"
+                style={{
+                  color: isActive ? '#f5b800' : (theme === 'dark' ? '#9ab0d4' : '#4a5a7a'),
+                  fontWeight: isActive ? '600' : '500',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {item.name}
+                {isActive && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-md"
+                    style={{ background: '#f5b800' }} />
+                )}
+              </button>
+            );
+          })}
+          <style>{`
+            .nav-links-container button + button::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 1px;
+              height: 20px;
+              background: ${theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'};
+            }
+          `}</style>
+        </div>
+
+        {/* ④ RIGHT CONTROLS */}
+        <div className="flex items-center gap-1 sm:gap-3 pr-2 sm:pr-4 flex-shrink-0 ml-auto">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-[34px] h-[34px] sm:w-[42px] sm:h-[42px] rounded-full border-2 flex items-center justify-center cursor-pointer"
+            style={{
+              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
+              background: 'transparent',
+              color: theme === 'dark' ? '#f5c842' : '#1a56db',
+            }}
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+            ) : (
+              <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+            )}
+          </button>
+
+          {/* Login / User Pill */}
+          {!user ? (
+            <LoginDropdown theme={theme} onSelect={handleRoleSelect} />
+          ) : (
+            <div className="relative" ref={dropdownRef}>
+              <div
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center gap-1 sm:gap-2 cursor-pointer"
+                style={{
+                  background: theme === 'dark' ? '#f5b800' : '#1a56db',
+                  borderRadius: '28px',
+                  padding: '4px 10px 4px 4px',
+                }}
+              >
+                <div 
+                  className="w-[28px] h-[28px] sm:w-[34px] sm:h-[34px] rounded-full flex items-center justify-center text-[10px] sm:text-sm font-bold flex-shrink-0"
+                  style={{
+                    background: theme === 'dark' ? '#132248' : '#ffffff',
+                    border: '2px solid rgba(255,255,255,0.4)',
+                    color: theme === 'dark' ? '#f5b800' : '#1a56db',
+                  }}
+                >
+                  {getUserInitial()}
+                </div>
+                <span 
+                  className="text-[10px] sm:text-[12.5px] font-semibold max-w-[80px] sm:max-w-[130px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ color: '#ffffff' }}
+                >
+                  {getUserName()}
+                </span>
+                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ${isDropdownOpen ? 'rotate-180' : ''}`} style={{ color: '#ffffff' }} />
+              </div>
+
+              {/* User Dropdown */}
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 sm:w-64 rounded-xl shadow-2xl border overflow-hidden z-[9999]"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
+                  }}
+                >
+                  <div className="px-4 py-3 border-b"
+                    style={{
+                      borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.1)',
+                    }}
+                  >
+                    <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      Signed in as
+                    </p>
+                    <p className="text-sm text-gray-600 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {getUserName()}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1 capitalize" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {userRole}
+                    </p>
+                  </div>
+                  
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        handleDashboardRedirect();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      <span>
+                        {userRole === 'admin' ? 'Admin Dashboard' : 
+                         userRole === 'developer' ? 'Developer Dashboard' : 
+                         userRole === 'principal' ? 'Principal Dashboard' : 
+                         'Designer Dashboard'}
+                      </span>
+                    </button>
+                    
+                    <hr className="my-2 border-gray-100" />
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm rounded-lg font-medium text-red-600 hover:bg-red-50 cursor-pointer"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden w-[34px] h-[34px] sm:w-[42px] sm:h-[42px] rounded-full border-2 flex items-center justify-center cursor-pointer"
+            style={{
+              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
+              background: 'transparent',
+              color: theme === 'dark' ? '#f5c842' : '#1a56db',
+            }}
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            ) : (
+              <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
+            )}
+          </button>
+        </div>
+
+        {/* ⑤ MOBILE MENU */}
         <div 
           ref={mobileMenuRef} 
-          className="lg:hidden mt-3 overflow-hidden transition-all duration-200"
+          className="md:hidden absolute top-[75px] sm:top-[90px] left-2 right-2 sm:left-4 sm:right-4 overflow-hidden"
           style={{ 
             display: 'none',
+            opacity: 0,
             transform: 'translateY(-10px)',
-            opacity: 0
+            transition: 'opacity 150ms ease, transform 150ms ease',
           }}
         >
-          <div className="rounded-xl shadow-lg border overflow-hidden"
+          <div className="rounded-xl shadow-2xl border overflow-hidden"
             style={{
               backgroundColor: '#FFFFFF',
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(0, 100, 255, 0.2)',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
             }}
           >
             <div className="px-4 py-4 space-y-2">
@@ -625,9 +571,9 @@ export default function Navbar() {
                   <button
                     key={item.name}
                     onClick={() => handleNavigation(item.path)}
-                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg transition-all duration-200 cursor-pointer ${
+                    className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg cursor-pointer ${
                       isActive 
-                        ? 'bg-[#0066FF]/10 text-[#0066FF]'
+                        ? 'text-[#f5b800] bg-[#f5b800]/10'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     style={{ fontFamily: "'Poppins', sans-serif" }}
@@ -641,26 +587,20 @@ export default function Navbar() {
             {/* Mobile Menu - Login/User Section */}
             {user ? (
               <div className="border-t border-gray-100 px-4 py-4 space-y-2">
-                {/* Dashboard Button */}
                 <button
                   onClick={() => {
                     handleDashboardRedirect();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
-                    backgroundColor: userRole === 'admin' ? '#F59E0B' : 
-                                   (userRole === 'developer' ? '#8B5CF6' : 
-                                   (userRole === 'principal' ? '#10B981' : '#0066FF')),
-                    color: '#FFFFFF',
+                    background: '#f5b800',
+                    color: '#0d1a35',
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  {userRole === 'admin' ? 'Admin Dashboard' : 
-                   userRole === 'developer' ? 'Developer Dashboard' : 
-                   userRole === 'principal' ? 'Principal Dashboard' : 
-                   'Designer Dashboard'}
+                  Dashboard
                 </button>
                 
                 <button
@@ -668,7 +608,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
                     backgroundColor: '#DC2626',
                     color: '#FFFFFF',
@@ -681,13 +621,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="border-t border-gray-100 px-4 py-4 space-y-2">
-                {/* Mobile Login Options */}
                 <button
                   onClick={() => {
                     router.push('/auth/login');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
                     backgroundColor: '#F59E0B',
                     color: '#FFFFFF',
@@ -703,7 +642,7 @@ export default function Navbar() {
                     router.push('/designer/login?type=developer');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
                     backgroundColor: '#8B5CF6',
                     color: '#FFFFFF',
@@ -719,7 +658,7 @@ export default function Navbar() {
                     router.push('/designer/login');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
                     backgroundColor: '#0066FF',
                     color: '#FFFFFF',
@@ -730,7 +669,6 @@ export default function Navbar() {
                   Login as Designer
                 </button>
 
-                {/* Mobile Principal Portal */}
                 <button
                   onClick={() => {
                     const authCollege = localStorage.getItem('auth_college');
@@ -741,7 +679,7 @@ export default function Navbar() {
                     }
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-300 font-semibold hover:scale-105 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
                     backgroundColor: '#10B981',
                     color: '#FFFFFF',

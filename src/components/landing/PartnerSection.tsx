@@ -22,7 +22,7 @@ import {
   Plus,
   Trash2,
   Upload,
-  Link,
+
   X,
   DollarSign,
   Network,
@@ -358,9 +358,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
 
   const getInputStyle = () => ({
     width: '100%',
-    padding: '0.5rem 0.75rem',
+    padding: '0.6rem 0.85rem',
     borderRadius: '0.5rem',
-    fontSize: '0.75rem',
+    fontSize: '0.8rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
@@ -1000,7 +1000,9 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                   {formData.links.map((link, index) => (
                     <div key={index} className="flex gap-2 mb-2">
                       <div className="relative flex-1">
-                        <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5" style={{ color: getTextMuted() }} />
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        
+                        </div>
                         <input
                           type="url"
                           value={link}
@@ -1016,7 +1018,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                         <button
                           type="button"
                           onClick={() => removeLinkField(index)}
-                          className="p-2 rounded-lg hover:bg-red-500/20 transition-colors"
+                          className="p-2 rounded-lg hover:bg-red-500/20 transition-colors flex-shrink-0"
                         >
                           <Trash2 className="w-4 h-4 text-red-400" />
                         </button>
@@ -1156,30 +1158,31 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 md:py-3 px-4 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{
-                    backgroundColor: getButtonBg(),
-                    color: getButtonText(),
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      Submit Partnership Request
-                      <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
+  type="submit"
+  disabled={isSubmitting}
+  className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto"
+  style={{
+    backgroundColor: getButtonBg(),
+    color: getButtonText(),
+    fontFamily: "'Poppins', sans-serif",
+    boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+  }}
+>
+  {isSubmitting ? (
+    <>
+      <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Registering...
+    </>
+  ) : (
+    <>
+      Register as Designer
+      <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+    </>
+  )}
+</button>
               </form>
             )}
 
@@ -1392,30 +1395,31 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 md:py-3 px-4 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{
-                    backgroundColor: getButtonBg(),
-                    color: getButtonText(),
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Registering...
-                    </>
-                  ) : (
-                    <>
-                      Register as Designer
-                      <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
+  type="submit"
+  disabled={isSubmitting}
+  className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto"
+  style={{
+    backgroundColor: getButtonBg(),
+    color: getButtonText(),
+    fontFamily: "'Poppins', sans-serif",
+    boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+  }}
+>
+  {isSubmitting ? (
+    <>
+      <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Registering...
+    </>
+  ) : (
+    <>
+      Register as Designer
+      <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+    </>
+  )}
+</button>
               </form>
             )}
 
@@ -1710,30 +1714,31 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
                 </div>
 
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 md:py-3 px-4 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{
-                    backgroundColor: '#3B82F6',
-                    color: '#FFFFFF',
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      Register as Developer
-                      <Send className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
+  type="submit"
+  disabled={isSubmitting}
+  className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto"
+  style={{
+    backgroundColor: '#3B82F6',
+    color: '#FFFFFF',
+    fontFamily: "'Poppins', sans-serif",
+    boxShadow: '0 4px 14px rgba(59, 130, 246, 0.3)',
+  }}
+>
+  {isSubmitting ? (
+    <>
+      <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Submitting...
+    </>
+  ) : (
+    <>
+      Register as Developer
+      <Send className="w-3.5 h-3.5" />
+    </>
+  )}
+</button>
               </form>
             )}
 
@@ -1781,7 +1786,7 @@ export function PartnerSection({ onPartnerSubmit, onDesignerSubmit, onDeveloperS
             </p>
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="px-5 py-2 md:px-6 md:py-2 rounded-lg font-semibold text-xs md:text-sm hover:scale-105 transition-transform"
+              className="px-5 py-2 md:px-6 md:py-2 rounded-lg font-semibold text-xs md:text-sm hover:scale-[1.02] active:scale-95 transition-transform"
               style={{
                 backgroundColor: getButtonBg(),
                 color: getButtonText(),

@@ -76,6 +76,7 @@ const PATH_D =
   'M222,85 C228,100 200,150 215,210 C228,252 272,278 258,322 C244,360 168,375 182,418 C196,455 245,480 232,522 C220,558 172,575 190,630';
 
 const GOLD = '#E8CA5E';
+const BLUE = '#0066FF';
 
 export default function JourneySection() {
   const svgWrapRef = useRef<HTMLDivElement>(null);
@@ -114,10 +115,8 @@ export default function JourneySection() {
       const rect = wrap.getBoundingClientRect();
       const vh = window.innerHeight;
       
-      // FIXED: Better scroll timing - start when section enters viewport
-      // and end when section leaves viewport
-      const startPx = vh * 0.4; // Start earlier (when section is 40% from top)
-      const endPx = -rect.height * 0.6; // End when section is 60% scrolled past
+      const startPx = vh * 0.4;
+      const endPx = -rect.height * 0.6;
       
       const p = Math.max(0, Math.min(1, (startPx - rect.top) / (startPx - endPx)));
       setProgress(p);
@@ -180,11 +179,28 @@ export default function JourneySection() {
   const bgColor = isDark ? '#0B0F19' : '#F5F5F5';
   const badgeBg = isDark ? 'rgba(31,67,129,0.2)' : 'rgba(0,102,255,0.08)';
   const circleFill = isDark ? '#1c1712' : '#f0ece6';
+  
+  // Theme-based road colors
+  const roadColors = isDark ? {
+    glow: '#7a4e10',
+    mid: '#ffb238',
+    base: '#3a2a0a',
+    gradient: ['#a9690f', '#f3b13b', '#ffe08a', '#caa24a'],
+    edge: '#7a4400',
+    dash: '#fff8e6',
+  } : {
+    glow: '#0044aa',
+    mid: '#0066FF',
+    base: '#c5d5e8',
+    gradient: ['#0066FF', '#3385FF', '#66A3FF', '#0044aa'],
+    edge: '#003399',
+    dash: '#e8f0ff',
+  };
 
   return (
     <section
       className="py-4 md:py-6 overflow-hidden w-full"
-      style={{ backgroundColor: bgColor, fontFamily: "'Poppins', sans-serif" }}
+      style={{ backgroundColor: bgColor, fontFamily: "'Poppins', sans-serif", transition: 'background-color 0.6s ease' }}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {/* ── Header ─────────────────────────────────────────────────────────── */}
@@ -199,7 +215,7 @@ export default function JourneySection() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2 mx-auto w-fit"
             style={{ backgroundColor: badgeBg }}
           >
-            <Rocket className="w-3.5 h-3.5" style={{ color: GOLD }} />
+            <Rocket className="w-3.5 h-3.5" style={{ color: isDark ? GOLD : BLUE }} />
             <span className="text-xs font-medium tracking-wide" style={{ color: textMuted }}>
               Our Journey
             </span>
@@ -210,7 +226,7 @@ export default function JourneySection() {
             style={{ color: textPrimary }}
           >
             The Story of{' '}
-            <span style={{ color: GOLD }}>Growth &amp; Innovation</span>
+            <span style={{ color: isDark ? GOLD : BLUE }}>Growth &amp; Innovation</span>
           </h2>
 
           <p
@@ -233,10 +249,10 @@ export default function JourneySection() {
               <defs>
                 {/* Road gradient */}
                 <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#a9690f" />
-                  <stop offset="35%"  stopColor="#f3b13b" />
-                  <stop offset="70%"  stopColor="#ffe08a" />
-                  <stop offset="100%" stopColor="#caa24a" />
+                  <stop offset="0%"   stopColor={roadColors.gradient[0]} />
+                  <stop offset="35%"  stopColor={roadColors.gradient[1]} />
+                  <stop offset="70%"  stopColor={roadColors.gradient[2]} />
+                  <stop offset="100%" stopColor={roadColors.gradient[3]} />
                 </linearGradient>
 
                 {/* Dot fill */}
@@ -256,44 +272,44 @@ export default function JourneySection() {
 
               {/* ── Road layers ─────────────────────────────────────────────── */}
 
-              {/* 1. Outer glow - made thinner */}
+              {/* 1. Outer glow */}
               <path
                 id="road-glow"
                 d={PATH_D}
                 fill="none"
-                stroke="#7a4e10"
+                stroke={roadColors.glow}
                 strokeWidth={8}
                 strokeLinecap="round"
-                opacity={0.22}
+                opacity={isDark ? 0.22 : 0.15}
                 filter="url(#glowLg)"
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 2. Mid glow - made thinner */}
+              {/* 2. Mid glow */}
               <path
                 id="road-mid"
                 d={PATH_D}
                 fill="none"
-                stroke="#ffb238"
+                stroke={roadColors.mid}
                 strokeWidth={4}
                 strokeLinecap="round"
-                opacity={0.4}
+                opacity={isDark ? 0.4 : 0.3}
                 filter="url(#softGlow)"
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 3. Asphalt base - made thinner */}
+              {/* 3. Asphalt base */}
               <path
                 d={PATH_D}
                 fill="none"
-                stroke="#3a2a0a"
+                stroke={roadColors.base}
                 strokeWidth={12}
                 strokeLinecap="round"
               />
 
-              {/* 4. Road surface - made thinner */}
+              {/* 4. Road surface */}
               <path
                 id="road-main"
                 d={PATH_D}
@@ -305,44 +321,44 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 5. Left edge line - adjusted offset */}
+              {/* 5. Left edge line */}
               <path
                 id="road-edge-l"
                 d={PATH_D}
                 fill="none"
-                stroke="#7a4400"
+                stroke={roadColors.edge}
                 strokeWidth={1.5}
                 strokeLinecap="round"
-                opacity={0.7}
+                opacity={isDark ? 0.7 : 0.5}
                 transform="translate(-3.5,0)"
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 6. Right edge line - adjusted offset */}
+              {/* 6. Right edge line */}
               <path
                 id="road-edge-r"
                 d={PATH_D}
                 fill="none"
-                stroke="#7a4400"
+                stroke={roadColors.edge}
                 strokeWidth={1.5}
                 strokeLinecap="round"
-                opacity={0.7}
+                opacity={isDark ? 0.7 : 0.5}
                 transform="translate(3.5,0)"
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 7. Center dashed white line - unchanged */}
+              {/* 7. Center dashed white line */}
               <path
                 id="road-dashes"
                 d={PATH_D}
                 fill="none"
-                stroke="#fff8e6"
+                stroke={roadColors.dash}
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeDasharray="12 8"
-                opacity={0.85}
+                opacity={isDark ? 0.85 : 0.6}
               />
 
               {/* ── Milestones ──────────────────────────────────────────────── */}
@@ -353,6 +369,7 @@ export default function JourneySection() {
                 const textX = isRight ? m.dotX + 30 : m.dotX - 30;
                 const textAnchor = isRight ? 'start' : 'end';
                 const textYOffset = -13;
+                const accentColor = isDark ? GOLD : BLUE;
 
                 return (
                   <g key={m.id}>
@@ -362,7 +379,7 @@ export default function JourneySection() {
                       cx={m.dotX}
                       cy={m.cy}
                       r={20}
-                      fill={GOLD}
+                      fill={accentColor}
                       filter="url(#softGlow)"
                       style={{
                         opacity: isVisible ? 0.5 : 0,
@@ -377,7 +394,7 @@ export default function JourneySection() {
                       cy={m.cy}
                       r={16}
                       fill="url(#circleFill)"
-                      stroke={GOLD}
+                      stroke={accentColor}
                       strokeWidth={2.2}
                       style={{
                         opacity: isVisible ? 1 : 0,
@@ -417,7 +434,7 @@ export default function JourneySection() {
                         y={m.cy + textYOffset}
                         fontSize={11}
                         fontWeight={700}
-                        fill={GOLD}
+                        fill={accentColor}
                         textAnchor={textAnchor}
                         fontFamily="Poppins, sans-serif"
                       >
@@ -428,10 +445,11 @@ export default function JourneySection() {
                           key={i}
                           x={textX}
                           y={m.cy + textYOffset + 13 + i * 11}
-                          fontSize={8}
+                          fontSize={6}
                           fill={textMuted}
                           textAnchor={textAnchor}
                           fontFamily="Poppins, sans-serif"
+                          letterSpacing="0.2"
                         >
                           {line}
                         </text>

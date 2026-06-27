@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Building2, Palette, Code2, LucideIcon } from 'lucide-react';
+import { Building2, Palette, Code2, LucideIcon, CheckCircle } from 'lucide-react';
 
 interface BenefitItem {
   icon: LucideIcon;
@@ -28,12 +28,11 @@ export function PartnerWhyChoose({
   isInView, 
   categoryContent 
 }: PartnerWhyChooseProps) {
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F5F5F5';
   const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
   const getAccentColor = () => theme === 'dark' ? '#E8CA5E' : '#00A0FF';
   const getButtonText = () => theme === 'dark' ? '#1F4381' : '#FFFFFF';
+  const getIconBg = () => theme === 'dark' ? 'rgba(232, 202, 94, 0.12)' : 'rgba(0, 160, 255, 0.08)';
 
   const getIcon = () => {
     if (activeForm === 'partner') return Building2;
@@ -48,22 +47,22 @@ export function PartnerWhyChoose({
       initial={{ opacity: 0, x: -50 }}
       animate={isInView ? { opacity: 1, x: 0 } : {}}
       transition={{ delay: 0.3, duration: 0.6 }}
-      className="rounded-xl md:rounded-2xl p-5 md:p-8"
+      className="rounded-xl md:rounded-2xl p-5 md:p-6 lg:p-8"
       style={{
         backgroundColor: 'transparent',
         border: 'none',
         fontFamily: "'Poppins', sans-serif",
       }}
     >
-      <div className="flex items-center gap-3 mb-4 md:mb-6">
+      <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6">
         <div
-          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ backgroundColor: getAccentColor() }}
         >
           <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color: getButtonText() }} />
         </div>
         <h3
-          className="text-lg md:text-xl font-bold font-serif tracking-tight"
+          className="text-lg md:text-xl lg:text-2xl font-bold font-serif tracking-tight"
           style={{ 
             color: getTextColor(),
             fontFamily: "'Poppins', sans-serif",
@@ -73,58 +72,85 @@ export function PartnerWhyChoose({
         </h3>
       </div>
 
-      <div className="space-y-4 md:space-y-6">
+      <div className="space-y-4 md:space-y-5">
         <p
-          className="text-sm md:text-base leading-relaxed font-light tracking-wide"
+          className="text-xs md:text-sm lg:text-base leading-relaxed"
           style={{ 
             color: getTextSecondary(),
-            fontFamily: "'Calibri Light', sans-serif",
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 400,
+            letterSpacing: '0.01em',
           }}
         >
           {categoryContent.description}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Benefits as simple list with check icons */}
+        <div className="space-y-2 md:space-y-2.5">
           {categoryContent.benefits.map((benefit, idx) => {
-            const BenefitIcon = benefit.icon;
             return (
-              <div
+              <motion.div
                 key={idx}
-                className="flex items-center gap-2 p-2 rounded-lg"
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.4 + (idx * 0.08), duration: 0.4 }}
+                className="flex items-start gap-2.5 md:gap-3 group cursor-pointer"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(31, 67, 129, 0.1)' : 'rgba(0, 160, 255, 0.04)',
+                  padding: '6px 10px',
+                  borderRadius: '6px',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = getIconBg();
+                  e.currentTarget.style.transform = 'translateX(3px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.transform = 'translateX(0px)';
                 }}
               >
-                <BenefitIcon
-                  className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0"
-                  style={{ color: benefit.color }}
-                />
+                {/* Check Icon */}
+                <div
+                  className="flex-shrink-0 mt-0.5"
+                  style={{ color: getAccentColor() }}
+                >
+                  <CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                </div>
+                
+                {/* Benefit Text */}
                 <span
-                  className="text-[10px] md:text-xs font-medium"
+                  className="text-xs md:text-sm lg:text-base font-medium"
                   style={{ 
                     color: getTextSecondary(),
                     fontFamily: "'Poppins', sans-serif",
+                    fontWeight: 400,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1.5,
                   }}
                 >
                   {benefit.text}
                 </span>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
         <div
-          className="p-4 md:p-5 rounded-r-xl"
+          className="p-4 md:p-5 rounded-xl"
           style={{
-            backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.06)' : 'rgba(0, 160, 255, 0.03)',
+            backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.08)' : 'rgba(0, 160, 255, 0.04)',
             borderLeft: `3px solid ${getAccentColor()}`,
+            borderTopRightRadius: '10px',
+            borderBottomRightRadius: '10px',
           }}
         >
           <p
-            className="text-[11px] md:text-sm italic leading-relaxed font-light"
+            className="text-xs md:text-sm lg:text-base italic leading-relaxed"
             style={{ 
               color: getTextSecondary(),
-              fontFamily: "'Calibri Light', sans-serif",
+              fontFamily: "'Georgia', 'Times New Roman', serif",
+              fontWeight: 400,
+              letterSpacing: '0.01em',
             }}
           >
             "{categoryContent.quote}"
