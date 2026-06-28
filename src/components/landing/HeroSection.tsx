@@ -293,26 +293,47 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               presence across the universe of learning.
             </p>
 
-            {/* Two CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Two CTA Buttons - Full Rounded with Glow */}
+            <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+              
+              {/* ── LEARN MORE BUTTON ── */}
+              {/* Black BG + Yellow Border Glow */}
               <button
                 onClick={handleLearn}
-                className={`group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 ${
-                  theme === 'dark'
-                    ? 'bg-[#E8CA5E] text-[#1F4381] hover:bg-[#E8CA5E]/90'
-                    : 'bg-[#00A0FF] text-white hover:bg-[#00A0FF]/90'
-                }`}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                style={{ 
+                  fontFamily: "'Poppins', sans-serif",
+                  background: '#0a0a0a',
+                  color: '#E8CA5E',
+                  border: '2px solid #E8CA5E',
+                }}
               >
+                {/* Yellow Glow Effect */}
+                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-[-4px] rounded-full border-2 border-[#E8CA5E]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               
+              {/* ── YOUR DESIGN BUTTON ── */}
+              {/* Transparent + Blue Border Glow */}
               <button
                 onClick={handleDesignClick}
-                className="group inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 hover:border-white"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                style={{ 
+                  fontFamily: "'Poppins', sans-serif",
+                  background: 'transparent',
+                  color: '#ffffff',
+                  border: '2px solid #00A0FF',
+                }}
               >
+                {/* Blue Glow Effect */}
+                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-[-4px] rounded-full border-2 border-[#00A0FF]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                
                 <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 <span>Your Design</span>
               </button>

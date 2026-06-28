@@ -159,7 +159,16 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
   const C = 240;
 
   return (
-    <div style={{ position: "relative", width: 480, height: 480 }}>
+    <div style={{ 
+      position: "relative", 
+      width: 480, 
+      height: 480, 
+      maxWidth: "100%", 
+      maxHeight: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
 
       {[
         { size: 480, border: `1px solid ${theme === 'dark' ? 'rgba(77,166,255,0.05)' : 'rgba(0,102,255,0.05)'}`, shadow: "none" },
@@ -513,6 +522,110 @@ export function HeroSection() {
         .hero-divider  { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.28s both; }
         .hero-p        { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.36s both; }
         .hero-btn-wrap { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.44s both; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+          .hero-container {
+            flex-direction: column !important;
+            padding: 40px 5% !important;
+            gap: 30px !important;
+            min-height: auto !important;
+            padding-top: 100px !important;
+          }
+          .hero-left {
+            flex: 1 1 auto !important;
+            width: 100% !important;
+            text-align: center !important;
+          }
+          .hero-left p {
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .hero-left .hero-eyebrow {
+            justify-content: center !important;
+          }
+          .hero-left .hero-divider {
+            justify-content: center !important;
+          }
+          .hero-left .hero-btn-wrap {
+            display: flex !important;
+            justify-content: center !important;
+          }
+          .hero-right {
+            flex: 1 1 auto !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 480px !important;
+            margin-right: 0 !important;
+            justify-content: center !important;
+            padding-top: 0 !important;
+          }
+          .hero-right > div {
+            transform: scale(0.75) !important;
+            transform-origin: center !important;
+            margin-top: 0 !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .hero-right {
+            min-height: 420px !important;
+          }
+          .hero-right > div {
+            transform: scale(0.65) !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero-container {
+            padding: 30px 4% !important;
+            padding-top: 80px !important;
+            gap: 20px !important;
+          }
+          .hero-right {
+            min-height: 380px !important;
+          }
+          .hero-right > div {
+            transform: scale(0.6) !important;
+          }
+          .hero-h1-l1, .hero-h1-l2 span {
+            font-size: clamp(28px, 8vw, 36px) !important;
+          }
+          .hero-p {
+            font-size: 12px !important;
+          }
+          .hero-btn-wrap button {
+            padding: 8px 14px 8px 18px !important;
+            gap: 10px !important;
+          }
+          .hero-btn-wrap button span {
+            font-size: 12px !important;
+          }
+          .hero-btn-wrap button div {
+            width: 28px !important;
+            height: 28px !important;
+          }
+          .hero-btn-wrap button div svg {
+            width: 11px !important;
+            height: 11px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-right {
+            min-height: 320px !important;
+          }
+          .hero-right > div {
+            transform: scale(0.5) !important;
+          }
+          .hero-h1-l1, .hero-h1-l2 span {
+            font-size: clamp(22px, 7vw, 28px) !important;
+          }
+          .hero-eyebrow span {
+            font-size: 9px !important;
+          }
+        }
       `}</style>
 
       <section style={{
@@ -526,9 +639,13 @@ export function HeroSection() {
         overflow: "hidden",
         fontFamily: "'Inter',sans-serif",
         transition: "background 0.6s ease, margin-top 0.3s ease",
-      }}>
+      }}
+      className="hero-container"
+      >
+
         <Stars theme={theme} />
 
+        {/* LEFT */}
         <div className="hero-left" style={{ flex: "0 0 42%", position: "relative", zIndex: 2 }}>
 
           <div className="hero-eyebrow" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
@@ -563,6 +680,7 @@ export function HeroSection() {
             </span>
           </p>
 
+          {/* ─── BUTTON WITH GLOW ─── */}
           <div className="hero-btn-wrap">
             <button
               onMouseEnter={() => setBtnHovered(true)}
@@ -573,16 +691,42 @@ export function HeroSection() {
                 alignItems: "center",
                 gap: 14,
                 background: btnHovered ? btnBg : "transparent",
-                border: `1px solid ${btnHovered ? btnBorder : btnBorderDefault}`,
+                border: `1px solid ${btnHovered ? (theme === 'dark' ? '#f5a623' : '#0066FF') : btnBorderDefault}`,
                 borderRadius: 50,
                 cursor: "pointer",
                 padding: "10px 20px 10px 24px",
                 transition: "background 0.25s, border-color 0.25s, transform 0.2s",
                 transform: btnHovered ? "translateX(4px)" : "translateX(0)",
+                position: "relative",
               }}
             >
+              {/* Glow Effect - Yellow in Dark, Blue in Light */}
+              <span className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 -z-10"
+                style={{ 
+                  opacity: btnHovered ? 1 : 0,
+                  background: theme === 'dark' 
+                    ? 'rgba(245,166,35,0.20)' 
+                    : 'rgba(0,102,255,0.15)',
+                  filter: 'blur(20px)',
+                }} />
+              <span className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 -z-10"
+                style={{ 
+                  opacity: btnHovered ? 1 : 0,
+                  background: theme === 'dark' 
+                    ? 'rgba(245,166,35,0.10)' 
+                    : 'rgba(0,102,255,0.08)',
+                  filter: 'blur(30px)',
+                }} />
+              <span className="absolute inset-[-4px] rounded-full border-2 opacity-0 transition-opacity duration-500 blur-sm"
+                style={{ 
+                  opacity: btnHovered ? 1 : 0,
+                  borderColor: theme === 'dark' 
+                    ? 'rgba(245,166,35,0.30)' 
+                    : 'rgba(0,102,255,0.25)',
+                }} />
+
               <span style={{
-                color: btnHovered ? primaryColor : btnTextColor,
+                color: btnHovered ? (theme === 'dark' ? '#f5a623' : '#0066FF') : btnTextColor,
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: "inherit",
@@ -595,8 +739,8 @@ export function HeroSection() {
                 width: 32,
                 height: 32,
                 borderRadius: "50%",
-                background: btnHovered ? btnBg : btnIconBg,
-                border: `1px solid ${btnHovered ? btnBorder : btnIconBorder}`,
+                background: btnHovered ? (theme === 'dark' ? 'rgba(245,166,35,0.15)' : 'rgba(0,102,255,0.10)') : btnIconBg,
+                border: `1px solid ${btnHovered ? (theme === 'dark' ? '#f5a623' : '#0066FF') : btnIconBorder}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -605,7 +749,7 @@ export function HeroSection() {
                 flexShrink: 0,
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                  stroke={btnHovered ? primaryColor : (theme === 'dark' ? "white" : "#1F2937")}
+                  stroke={btnHovered ? (theme === 'dark' ? '#f5a623' : '#0066FF') : (theme === 'dark' ? "white" : "#1F2937")}
                   strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   style={{ transition: "stroke 0.25s" }}>
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -616,7 +760,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* RIGHT - Orbit with 2rem right push */}
+        {/* RIGHT - Orbit */}
         <div className="hero-right" style={{
           flex: 1,
           position: "relative",
@@ -625,7 +769,7 @@ export function HeroSection() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          marginRight: "-6rem",  // 👈 2rem right ki taraf push kiya
+          marginRight: "-4rem",
           transition: "margin-right 0.3s ease",
         }}>
           <OrbitalDiagram theme={theme} />

@@ -110,7 +110,6 @@ const IconCircle: React.FC<{
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
-      {/* Outer ring glow on hover */}
       <motion.div
         style={{
           position: "absolute",
@@ -131,7 +130,6 @@ const IconCircle: React.FC<{
         }}
       />
       
-      {/* Inner icon with rotation on hover */}
       <motion.div
         animate={{
           rotate: isHovered ? 10 : 0,
@@ -145,7 +143,6 @@ const IconCircle: React.FC<{
         {children}
       </motion.div>
       
-      {/* Glowing dot with pulse on hover */}
       <motion.div
         style={{
           position: "absolute",
@@ -196,6 +193,7 @@ const MissionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' 
         flexDirection: "column",
         alignItems: "flex-start",
         padding: "0 20px",
+        width: "100%",
       }}
     >
       <div
@@ -205,6 +203,7 @@ const MissionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' 
           gap: "16px",
           marginBottom: "18px",
           width: "100%",
+          flexWrap: "wrap",
         }}
       >
         <IconCircle dotColor={data.accentColor} theme={theme}>
@@ -260,6 +259,7 @@ const MissionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' 
           fontWeight: 400,
           maxWidth: "480px",
           transition: "color 0.3s ease",
+          width: "100%",
         }}
       >
         {data.body}
@@ -289,7 +289,7 @@ const VisionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' |
       }}
       style={{ 
         padding: "0 20px",
-        marginLeft: "3rem", 
+        width: "100%",
       }}
     >
       <div
@@ -298,6 +298,7 @@ const VisionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' |
           alignItems: "center",
           gap: "16px",
           marginBottom: "18px",
+          flexWrap: "wrap",
         }}
       >
         <IconCircle dotColor={data.accentColor} theme={theme}>
@@ -353,6 +354,7 @@ const VisionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' |
           fontWeight: 400,
           maxWidth: "480px",
           transition: "color 0.3s ease",
+          width: "100%",
         }}
       >
         {data.body}
@@ -414,7 +416,6 @@ export function PurposeSection() {
   const bgColor = theme === 'dark' ? "#0B0F19" : "#f0f4f9";
   const textColor = theme === 'dark' ? '#fff' : '#1F2937';
   const mutedColor = theme === 'dark' ? '#8899bb' : '#6B7280';
-  const dividerColor = theme === 'dark' ? '#2a4080' : '#c5cfe0';
   const centerDotColor = theme === 'dark' ? '#5b9bff' : '#0066FF';
   const centerLineColor = theme === 'dark' 
     ? "linear-gradient(to bottom, transparent 0%, #2a4080 20%, #3a6ac0 50%, #2a4080 80%, transparent 100%)"
@@ -439,7 +440,7 @@ export function PurposeSection() {
       style={{
         background: bgColor,
         minHeight: "450px",
-        padding: "40px 48px 50px",
+        padding: "40px 20px 50px",
         fontFamily: "'Inter', sans-serif",
         position: "relative",
         overflow: "hidden",
@@ -483,7 +484,7 @@ export function PurposeSection() {
         style={{ textAlign: "center", marginBottom: "12px", lineHeight: 1.15 }}
       >
         <h1 style={{ 
-          fontSize: "30px", 
+          fontSize: "clamp(24px, 4vw, 30px)", 
           fontWeight: 800, 
           color: textColor, 
           display: "block", 
@@ -512,7 +513,7 @@ export function PurposeSection() {
         <div style={{ width: "26px", height: "2.5px", background: "#5b9bff", borderRadius: "2px" }} />
       </motion.div>
 
-      {/* Mission & Vision with Center Line */}
+      {/* Mission & Vision - Responsive Grid */}
       <div
         style={{
           display: "grid",
@@ -522,6 +523,7 @@ export function PurposeSection() {
           margin: "0 auto",
           alignItems: "start",
         }}
+        className="purpose-grid"
       >
         <MissionCard data={missionData} isInView={isInView} theme={theme} />
 
@@ -535,6 +537,7 @@ export function PurposeSection() {
             margin: "0 auto",
             transition: "background 0.6s ease",
           }}
+          className="center-line"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
@@ -556,11 +559,66 @@ export function PurposeSection() {
               boxShadow: `0 0 20px 5px ${centerDotColor}60`,
               transition: "background 0.3s ease, box-shadow 0.3s ease",
             }}
+            className="center-dot"
           />
         </div>
 
         <VisionCard data={visionData} isInView={isInView} theme={theme} />
       </div>
+
+      {/* ─── RESPONSIVE STYLES ─── */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .purpose-grid {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+          }
+          .center-line {
+            display: none !important;
+          }
+          .center-dot {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .purpose-grid {
+            gap: 30px !important;
+          }
+          .purpose-grid > div {
+            padding: 0 10px !important;
+          }
+          .purpose-grid > div > div:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          .purpose-grid > div > div:first-child h3 {
+            font-size: 18px !important;
+          }
+          .purpose-grid > div p {
+            font-size: 13px !important;
+          }
+          .purpose-grid > div .dot-grid {
+            margin-top: 20px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          section {
+            padding: 30px 12px 40px !important;
+          }
+          .purpose-grid > div {
+            padding: 0 6px !important;
+          }
+          .purpose-grid > div > div:first-child h3 {
+            font-size: 16px !important;
+          }
+          .purpose-grid > div p {
+            font-size: 12px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
