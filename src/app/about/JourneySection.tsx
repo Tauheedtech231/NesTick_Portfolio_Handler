@@ -48,7 +48,7 @@ const milestones: Milestone[] = [
     dotX: 182,
     year: "'24",
     title: 'Launch — Neezamiya',
-    desc: ['Flagship educational management', 'system launched.'],
+    desc: ['Educational management', 'system launched.'],
     side: 'left',
   },
   {
@@ -197,6 +197,25 @@ export default function JourneySection() {
     dash: '#e8f0ff',
   };
 
+  // ── Check if mobile ──────────────────────────────────────────────────────────
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Mobile-specific sizing - Increased font sizes by 3px
+  const dotRadius = isMobile ? 14 : 16;
+  const outerRadius = isMobile ? 18 : 20;
+  const yearFontSize = isMobile ? 11 : 10;
+  const titleFontSize = isMobile ? 13 : 11;
+  const descFontSize = isMobile ? 11 : 6;
+  const textXOffset = isMobile ? 30 : 30;
+  const textYOffset = isMobile ? -10 : -13;
+  const lineHeight = isMobile ? 16 : 11;
+
   return (
     <section
       className="py-4 md:py-6 overflow-hidden w-full"
@@ -239,12 +258,13 @@ export default function JourneySection() {
 
         {/* ── SVG Timeline ───────────────────────────────────────────────────── */}
         <div ref={svgWrapRef} className="w-full flex justify-center -mt-2">
-          <div className="w-full">
+          <div className="w-full max-w-full">
             <svg
               viewBox="0 0 480 680"
               xmlns="http://www.w3.org/2000/svg"
               className="w-full h-auto"
               preserveAspectRatio="xMidYMid meet"
+              style={{ width: '100%', maxWidth: '100%' }}
             >
               <defs>
                 {/* Road gradient */}
@@ -278,7 +298,7 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.glow}
-                strokeWidth={8}
+                strokeWidth={isMobile ? 8 : 8}
                 strokeLinecap="round"
                 opacity={isDark ? 0.22 : 0.15}
                 filter="url(#glowLg)"
@@ -292,7 +312,7 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.mid}
-                strokeWidth={4}
+                strokeWidth={isMobile ? 4 : 4}
                 strokeLinecap="round"
                 opacity={isDark ? 0.4 : 0.3}
                 filter="url(#softGlow)"
@@ -305,7 +325,7 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.base}
-                strokeWidth={12}
+                strokeWidth={isMobile ? 14 : 12}
                 strokeLinecap="round"
               />
 
@@ -315,7 +335,7 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke="url(#roadGrad)"
-                strokeWidth={8}
+                strokeWidth={isMobile ? 8 : 8}
                 strokeLinecap="round"
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
@@ -327,10 +347,10 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.edge}
-                strokeWidth={1.5}
+                strokeWidth={isMobile ? 1.5 : 1.5}
                 strokeLinecap="round"
                 opacity={isDark ? 0.7 : 0.5}
-                transform="translate(-3.5,0)"
+                transform={`translate(${isMobile ? -3.5 : -3.5},0)`}
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
@@ -341,10 +361,10 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.edge}
-                strokeWidth={1.5}
+                strokeWidth={isMobile ? 1.5 : 1.5}
                 strokeLinecap="round"
                 opacity={isDark ? 0.7 : 0.5}
-                transform="translate(3.5,0)"
+                transform={`translate(${isMobile ? 3.5 : 3.5},0)`}
                 strokeDasharray={totalLength || 1}
                 strokeDashoffset={totalLength || 1}
               />
@@ -355,9 +375,9 @@ export default function JourneySection() {
                 d={PATH_D}
                 fill="none"
                 stroke={roadColors.dash}
-                strokeWidth={2}
+                strokeWidth={isMobile ? 2 : 2}
                 strokeLinecap="round"
-                strokeDasharray="12 8"
+                strokeDasharray={isMobile ? "10 8" : "12 8"}
                 opacity={isDark ? 0.85 : 0.6}
               />
 
@@ -365,10 +385,9 @@ export default function JourneySection() {
               {milestones.map((m) => {
                 const isVisible = visibleMilestones.has(m.id);
                 const isRight = m.side === 'right';
-                const xOffset = isRight ? 40 : -40;
-                const textX = isRight ? m.dotX + 30 : m.dotX - 30;
+                const xOffset = isRight ? (isMobile ? 35 : 40) : (isMobile ? -35 : -40);
+                const textX = isRight ? m.dotX + (isMobile ? 28 : 30) : m.dotX - (isMobile ? 28 : 30);
                 const textAnchor = isRight ? 'start' : 'end';
-                const textYOffset = -13;
                 const accentColor = isDark ? GOLD : BLUE;
 
                 return (
@@ -378,7 +397,7 @@ export default function JourneySection() {
                       id={`dot-outer-${m.id}`}
                       cx={m.dotX}
                       cy={m.cy}
-                      r={20}
+                      r={outerRadius}
                       fill={accentColor}
                       filter="url(#softGlow)"
                       style={{
@@ -392,10 +411,10 @@ export default function JourneySection() {
                       id={`dot-inner-${m.id}`}
                       cx={m.dotX}
                       cy={m.cy}
-                      r={16}
+                      r={dotRadius}
                       fill="url(#circleFill)"
                       stroke={accentColor}
-                      strokeWidth={2.2}
+                      strokeWidth={isMobile ? 2.5 : 2.2}
                       style={{
                         opacity: isVisible ? 1 : 0,
                         transition: 'opacity 0.4s ease 0.05s',
@@ -405,9 +424,9 @@ export default function JourneySection() {
                     {/* Year label */}
                     <text
                       x={m.dotX}
-                      y={m.cy + 4}
+                      y={m.cy + (isMobile ? 4 : 4)}
                       textAnchor="middle"
-                      fontSize={10}
+                      fontSize={yearFontSize}
                       fontWeight={700}
                       fill={isDark ? '#FFFFFF' : '#1F2937'}
                       fontFamily="Poppins, sans-serif"
@@ -432,7 +451,7 @@ export default function JourneySection() {
                       <text
                         x={textX}
                         y={m.cy + textYOffset}
-                        fontSize={11}
+                        fontSize={titleFontSize}
                         fontWeight={700}
                         fill={accentColor}
                         textAnchor={textAnchor}
@@ -444,12 +463,13 @@ export default function JourneySection() {
                         <text
                           key={i}
                           x={textX}
-                          y={m.cy + textYOffset + 13 + i * 11}
-                          fontSize={6}
+                          y={m.cy + textYOffset + (isMobile ? 18 : 13) + i * lineHeight}
+                          fontSize={descFontSize}
                           fill={textMuted}
                           textAnchor={textAnchor}
                           fontFamily="Poppins, sans-serif"
                           letterSpacing="0.2"
+                          fontWeight={isMobile ? 600 : 400}
                         >
                           {line}
                         </text>

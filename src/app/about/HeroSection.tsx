@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { MobileHeroSection } from './MobileHeroSection';
 
 // ─── Stars ───
 function Stars({ theme }: { theme: 'light' | 'dark' }) {
@@ -248,10 +249,10 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
           position: "absolute",
           top: "50%",
           left: "50%",
-          width: 116,
-          height: 116,
-          marginTop: -58,
-          marginLeft: -58,
+          width: 140,
+          height: 140,
+          marginTop: -70,
+          marginLeft: -70,
           borderRadius: "50%",
           background: isHovered
             ? "radial-gradient(circle at 38% 35%, #f5c842 0%, #d4880f 35%, #8a5a0a 70%, #4a2d04 100%)"
@@ -268,8 +269,8 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
             ? "box-shadow 0.2s, transform 0s"
             : "box-shadow 0.6s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.6s ease",
           boxShadow: isHovered
-            ? "0 0 0 2px rgba(245,166,35,0.45), 0 0 36px rgba(245,166,35,0.55), 0 0 70px rgba(245,166,35,0.25)"
-            : `0 0 0 1px ${borderColor}`,
+            ? `0 0 0 2px ${primaryColor}, 0 0 36px ${primaryColor}88, 0 0 70px ${primaryColor}44`
+            : `0 0 0 1px ${borderColor}, 0 0 20px ${primaryColor}33`,
           userSelect: "none",
           willChange: "transform",
         }}
@@ -277,14 +278,14 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         <svg style={{ position: "absolute", inset: 0, borderRadius: "50%" }} viewBox="0 0 116 116" fill="none">
           <path
             d="M 20 44 A 58 58 0 0 1 58 6"
-            stroke="#f5a623"
+            stroke={isHovered ? "#f5a623" : primaryColor}
             strokeWidth="3"
             strokeLinecap="round"
             style={{ transition: "stroke 0.6s ease" }}
           />
           <path
             d="M 20 44 A 58 58 0 0 0 58 110"
-            stroke={isHovered ? "rgba(245,166,35,0.6)" : "rgba(245,166,35,0.2)"}
+            stroke={isHovered ? "rgba(245,166,35,0.6)" : `${primaryColor}33`}
             strokeWidth="2"
             strokeLinecap="round"
             style={{ transition: "stroke 0.6s ease" }}
@@ -292,13 +293,10 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         </svg>
 
         <span style={{
-          fontSize: 36,
+          fontSize: 40,
           fontWeight: 900,
           fontStyle: "italic",
-          background: "linear-gradient(135deg,#4da6ff,#f5a623,#fff)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
+          color: '#FFFFFF',
           position: "relative",
           zIndex: 1,
           transform: `rotate(${-nAngle}rad)`,
@@ -309,8 +307,10 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
             : "transform 0.6s cubic-bezier(0.34,1.56,0.64,1)",
           pointerEvents: "none",
           willChange: "transform",
+          letterSpacing: "3px",
+          textShadow: `0 0 30px ${primaryColor}66, 0 0 60px ${primaryColor}33`,
         }}>
-          N
+          PSM
         </span>
       </div>
 
@@ -523,6 +523,20 @@ export function HeroSection() {
         .hero-p        { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.36s both; }
         .hero-btn-wrap { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.44s both; }
 
+        /* ── DESKTOP HIDE ON MOBILE ── */
+        @media (max-width: 768px) {
+          .desktop-hero {
+            display: none !important;
+          }
+        }
+
+        /* ── MOBILE HIDE ON DESKTOP ── */
+        @media (min-width: 769px) {
+          .mobile-hero {
+            display: none !important;
+          }
+        }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
           .hero-container {
@@ -611,43 +625,28 @@ export function HeroSection() {
             height: 11px !important;
           }
         }
-
-        @media (max-width: 480px) {
-          .hero-right {
-            min-height: 320px !important;
-          }
-          .hero-right > div {
-            transform: scale(0.5) !important;
-          }
-          .hero-h1-l1, .hero-h1-l2 span {
-            font-size: clamp(22px, 7vw, 28px) !important;
-          }
-          .hero-eyebrow span {
-            font-size: 9px !important;
-          }
-        }
       `}</style>
 
-      <section style={{
-        minHeight: "100vh",
-        background: bgGradient,
-        display: "flex",
-        alignItems: "center",
-        padding: "0 6%",
-        marginTop: "-1rem",
-        position: "relative",
-        overflow: "hidden",
-        fontFamily: "'Inter',sans-serif",
-        transition: "background 0.6s ease, margin-top 0.3s ease",
-      }}
-      className="hero-container"
+      {/* ─── DESKTOP HERO ─── */}
+      <section 
+        className="desktop-hero hero-container"
+        style={{
+          minHeight: "100vh",
+          background: bgGradient,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 6%",
+          marginTop: "-1rem",
+          position: "relative",
+          overflow: "hidden",
+          fontFamily: "'Inter',sans-serif",
+          transition: "background 0.6s ease, margin-top 0.3s ease",
+        }}
       >
-
         <Stars theme={theme} />
 
         {/* LEFT */}
         <div className="hero-left" style={{ flex: "0 0 42%", position: "relative", zIndex: 2 }}>
-
           <div className="hero-eyebrow" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
             <div style={{ width: 3, height: 16, borderRadius: 2, background: dividerColor }} />
             <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: "3px", textTransform: "uppercase", color: textMutedLight }}>
@@ -680,7 +679,6 @@ export function HeroSection() {
             </span>
           </p>
 
-          {/* ─── BUTTON WITH GLOW ─── */}
           <div className="hero-btn-wrap">
             <button
               onMouseEnter={() => setBtnHovered(true)}
@@ -700,7 +698,6 @@ export function HeroSection() {
                 position: "relative",
               }}
             >
-              {/* Glow Effect - Yellow in Dark, Blue in Light */}
               <span className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 -z-10"
                 style={{ 
                   opacity: btnHovered ? 1 : 0,
@@ -775,6 +772,11 @@ export function HeroSection() {
           <OrbitalDiagram theme={theme} />
         </div>
       </section>
+
+      {/* ─── MOBILE HERO ─── */}
+      <div className="mobile-hero">
+        <MobileHeroSection />
+      </div>
     </>
   );
 }

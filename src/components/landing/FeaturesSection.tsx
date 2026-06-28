@@ -231,26 +231,30 @@ function SegPaths({
 }
 
 // ─── Info Panel ───────────────────────────────────────────────────────────────
-function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; theme: string }) {
+function InfoPanel({ seg, visible, theme, isMobile }: { seg: Segment; visible: boolean; theme: string; isMobile: boolean }) {
   const { displayed, done } = useTypewriter(seg.description);
   const titleColor = theme === "dark" ? GOLD : BLUE;
   const descColor  = theme === "dark" ? "#D1D5DB" : LIGHT_DESC;
   const dotColor   = theme === "dark" ? GOLD : BLUE;
 
+  const titleFontSize = isMobile ? 16 : 22;
+  const descFontSize = isMobile ? 13 : 17;
+  const minHeight = isMobile ? 80 : 120;
+
   return (
     <div style={{ 
       opacity: visible ? 1 : 0, 
       transition: "opacity 0.5s ease", 
-      maxWidth: 480,
+      maxWidth: isMobile ? "90vw" : 480,
       position: "relative",
-      marginTop: 40,
+      marginTop: isMobile ? 0 : 40,
+      padding: isMobile ? "0 10px" : 0,
     }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
-        
+      <div style={{ display: "flex", alignItems: "flex-start", gap: isMobile ? 10 : 14, marginBottom: isMobile ? 8 : 20 }}>
         <p style={{ 
           color: titleColor, 
           fontFamily: "Arial,sans-serif", 
-          fontSize: 22,
+          fontSize: titleFontSize,
           fontWeight: 700, 
           letterSpacing: 1.2, 
           lineHeight: 1.5, 
@@ -259,20 +263,19 @@ function InfoPanel({ seg, visible, theme }: { seg: Segment; visible: boolean; th
           {seg.title}
         </p>
       </div>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, position: "relative" }}>
-      
+      <div style={{ display: "flex", alignItems: "flex-start", gap: isMobile ? 10 : 14, position: "relative" }}>
         <p style={{ 
           color: descColor, 
           fontFamily: "Arial,sans-serif", 
-          fontSize: 17,
-          lineHeight: 1.9,
+          fontSize: descFontSize,
+          lineHeight: isMobile ? 1.6 : 1.9,
           margin: 0, 
-          minHeight: 120,
+          minHeight: minHeight,
           width: "100%" 
         }}>
           {displayed}
           {!done && (
-            <span style={{ display: "inline-block", width: 2.5, height: 17, backgroundColor: dotColor, marginLeft: 3, verticalAlign: "middle", animation: "tw-blink 0.75s step-end infinite" }} />
+            <span style={{ display: "inline-block", width: 2.5, height: isMobile ? 14 : 17, backgroundColor: dotColor, marginLeft: 3, verticalAlign: "middle", animation: "tw-blink 0.75s step-end infinite" }} />
           )}
         </p>
       </div>
@@ -290,6 +293,7 @@ export default function FeaturesSection() {
   const [theme, setTheme]               = useState("dark");
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [fly, setFly]               = useState<FlyState | null>(null);
   const [flyVisible, setFlyVisible] = useState(true);
@@ -300,6 +304,14 @@ export default function FeaturesSection() {
   const startRef     = useRef<number | null>(null);
   const journeyRef   = useRef<Journey | null>(null);
   const handoffRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Check mobile ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // ── Theme detection ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -355,7 +367,7 @@ export default function FeaturesSection() {
     return { slotCx, slotCy, slotW, slotH, cRect };
   }
 
-  // ── Click: segment flies out to left ──────────────────────────────────────
+  // ── Click: segment flies out ──────────────────────────────────────────────
   const handleClick = useCallback((seg: Segment) => {
     if (animating || activeSeg) return;
     const info = getSlotInfo(seg);
@@ -363,15 +375,23 @@ export default function FeaturesSection() {
     const { slotCx, slotCy, slotW, slotH, cRect } = info;
 
     const { w: vbW, h: vbH } = vbSize(seg.vb);
-    const { w: destW, h: destH } = fitSize(vbW, vbH, DEST_MAX);
+    
+    // Mobile: larger destination size for better visibility
+    const maxDest = isMobile ? 280 : DEST_MAX;
+    const { w: destW, h: destH } = fitSize(vbW, vbH, maxDest);
 
-    // Landing: left edge at 10% of the container, vertically centred.
-    const endCx = cRect.width * 0.10 + destW / 2;
-    // For CENTRALIZ (index 1), ACCESS CONTROL (index 2), and PORTFOLIO (index 4)
-    // adjust vertical position to account for navbar overlap
-    let endCy = cRect.height * 0.5;
-    if (seg.index === 1 || seg.index === 2 || seg.index === 4) {
-      endCy = cRect.height * 0.5 + 60; // Shift down by 60px
+    // Landing position - mobile vs desktop
+    let endCx, endCy;
+    if (isMobile) {
+      // Mobile: center horizontally, positioned higher
+      endCx = cRect.width * 0.5;
+      endCy = cRect.height * 0.22 + destH / 2;
+    } else {
+      endCx = cRect.width * 0.10 + destW / 2;
+      endCy = cRect.height * 0.5;
+      if (seg.index === 1 || seg.index === 2 || seg.index === 4) {
+        endCy = cRect.height * 0.5 + 60;
+      }
     }
 
     journeyRef.current = { slotCx, slotCy, slotW, slotH, endCx, endCy, destW, destH };
@@ -408,7 +428,7 @@ export default function FeaturesSection() {
       }
     };
     rafRef.current = requestAnimationFrame(go);
-  }, [animating, activeSeg]);
+  }, [animating, activeSeg, isMobile]);
 
   // ── Close: segment glides back ─────────────────────────────────────────────
   const handleClose = useCallback(() => {
@@ -476,6 +496,8 @@ export default function FeaturesSection() {
   const heading2    = isDark ? GOLD       : BLUE;
   const subColor    = isDark ? "#9CA3AF"  : "#6B7280";
 
+  const wheelMaxWidth = isMobile ? 320 : 520;
+
   return (
     <>
       <style>{`@keyframes tw-blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
@@ -484,27 +506,28 @@ export default function FeaturesSection() {
         ref={containerRef}
         style={{
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          width: "100%", minHeight: "100vh", padding: "60px 16px",
+          width: "100%", minHeight: isMobile ? "auto" : "100vh", 
+          padding: isMobile ? "30px 12px 40px" : "60px 16px",
           backgroundColor: bgColor, boxSizing: "border-box", position: "relative", overflow: "hidden",
         }}
       >
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h2 style={{ fontFamily: "'Poppins',Arial,sans-serif", fontSize: "clamp(22px,3.5vw,34px)", fontWeight: 700, letterSpacing: "-0.3px", margin: 0 }}>
+        <div style={{ textAlign: "center", marginBottom: isMobile ? 16 : 40 }}>
+          <h2 style={{ fontFamily: "'Poppins',Arial,sans-serif", fontSize: isMobile ? "clamp(18px,5vw,24px)" : "clamp(22px,3.5vw,34px)", fontWeight: 700, letterSpacing: "-0.3px", margin: 0 }}>
             <span style={{ color: heading1 }}>Comprehensive</span>{" "}
             <span style={{ color: heading2 }}>System Features</span>
           </h2>
-          <p style={{ marginTop: 8, fontSize: 13, color: subColor, fontFamily: "Arial,sans-serif", letterSpacing: 1 }}>
+          <p style={{ marginTop: isMobile ? 2 : 8, fontSize: isMobile ? 10 : 13, color: subColor, fontFamily: "Arial,sans-serif", letterSpacing: 1 }}>
             Explore our powerful platform capabilities
           </p>
-          <div style={{ margin: "12px auto 0", height: 2, width: 160, backgroundColor: heading2, opacity: 0.6 }} />
+          <div style={{ margin: "6px auto 0", height: 2, width: isMobile ? 80 : 160, backgroundColor: heading2, opacity: 0.6 }} />
         </div>
 
         {/* Wheel */}
         <div
           ref={wheelRef}
           style={{
-            width: "100%", maxWidth: 520, position: "relative",
+            width: "100%", maxWidth: wheelMaxWidth, position: "relative",
             opacity: wheelReady ? 1 : 0,
             transform: wheelReady ? "translateY(0) scale(1)" : "translateY(28px) scale(0.97)",
             transition: wheelReady ? "opacity 1.1s ease, transform 1.5s ease" : "none",
@@ -534,19 +557,19 @@ export default function FeaturesSection() {
               );
             })}
             <circle cx={CX} cy={CY} r={INNER_CIRCLE_R} fill={innerFill} stroke={textColor} strokeWidth="2" />
-            <text x={CX} y={CY} textAnchor="middle" dominantBaseline="central" fill={textColor} fontFamily="Arial,sans-serif" fontSize="22" fontWeight="700" letterSpacing="3">
+            <text x={CX} y={CY} textAnchor="middle" dominantBaseline="central" fill={textColor} fontFamily="Arial,sans-serif" fontSize={isMobile ? "14" : "22"} fontWeight="700" letterSpacing="3">
               Neezamiya
             </text>
           </svg>
         </div>
 
-        {/* Dim overlay - EVEN DARKER overlay for maximum background hiding */}
+        {/* Dim overlay */}
         {activeSeg && (
           <div
             onClick={handleClose}
             style={{
               position: "absolute", inset: 0, zIndex: 10,
-              backgroundColor: "rgba(0,0,0,0.92)", // Changed from 0.85 to 0.92 for even darker overlay
+              backgroundColor: "rgba(0,0,0,0.92)",
               opacity: overlayVisible ? 1 : 0,
               transition: "opacity 0.45s ease",
               pointerEvents: animating ? "none" : "auto",
@@ -559,17 +582,21 @@ export default function FeaturesSection() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              position: "absolute",
-              right: "10%",
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 480,
-              maxWidth: "36vw",
+              position: isMobile ? "relative" : "absolute",
+              right: isMobile ? "auto" : "10%",
+              top: isMobile ? "auto" : "50%",
+              transform: isMobile ? "none" : "translateY(-50%)",
+              width: isMobile ? "100%" : 480,
+              maxWidth: isMobile ? "100%" : "36vw",
               zIndex: 30,
               pointerEvents: animating ? "none" : "auto",
+              marginTop: isMobile ? 0 : 0,
+              padding: isMobile ? "0 10px" : 0,
+              display: "flex",
+              justifyContent: "center",
             }}
           >
-            <InfoPanel seg={activeSeg} visible={showInfo} theme={theme} />
+            <InfoPanel seg={activeSeg} visible={showInfo} theme={theme} isMobile={isMobile} />
           </div>
         )}
 

@@ -1,762 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Portfolio Handler Footer</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-
-body {
-  font-family:'Inter',sans-serif;
-  background:#060a1e;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-}
-
-footer {
-  background: #0c1033;
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px 18px 0 0;
-  border: 1px solid rgba(255,255,255,0.06);
-  margin: 0 6px;
-}
-
-/* ── LEFT PURPLE GLOW ── */
-.bg-glow-left {
-  position:absolute;
-  bottom:-80px; left:-80px;
-  width:420px; height:380px;
-  background: radial-gradient(ellipse at 25% 65%, rgba(72,35,180,0.55) 0%, rgba(50,20,130,0.25) 45%, transparent 72%);
-  pointer-events:none; z-index:0;
-}
-
-/* ── CURVED LINES SVG ── */
-.bg-lines {
-  position:absolute;
-  bottom:0; left:0;
-  width:400px; height:280px;
-  pointer-events:none; z-index:0;
-}
-
-/* ── DOT GRID BOTTOM-LEFT ── */
-.dot-grid-bl {
-  position:absolute;
-  bottom:72px; left:195px;
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:12px;
-  z-index:0; pointer-events:none;
-}
-.dot-grid-bl span {
-  width:4px;height:4px;border-radius:50%;
-  background:rgba(255,255,255,0.16);display:block;
-}
-
-/* ── DOT GRID TOP-RIGHT ── */
-.dot-grid-tr {
-  position:absolute;
-  top:16px; right:16px;
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:9px;
-  z-index:0; pointer-events:none;
-}
-.dot-grid-tr span {
-  width:3px;height:3px;border-radius:50%;
-  background:rgba(255,255,255,0.14);display:block;
-}
-
-/* ── PEN CANVAS ── */
-#penCanvas {
-  position:absolute;
-  bottom:0; right:20px;
-  width:260px; height:260px;
-  z-index:1; pointer-events:none;
-}
-/* ink trail overlay */
-#inkCanvas {
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  z-index:1; pointer-events:none;
-}
-
-/* ════════════════════════
-   MAIN GRID
-════════════════════════ */
-.footer-main {
-  position:relative; z-index:2;
-  display:grid;
-  grid-template-columns: 1.1fr 1px 1fr 1px 1fr;
-  padding: 48px 50px 36px;
-}
-
-.col-sep {
-  background:rgba(255,255,255,0.08);
-  margin: 0 42px;
-}
-
-/* ── COL 1 ── */
-.brand-row {
-  display:flex; align-items:center; gap:16px;
-  margin-bottom:6px;
-}
-.logo-wrap {
-  width:70px; height:70px; border-radius:50%;
-  background:#fff;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  border:2px solid rgba(160,140,255,0.35);
-  overflow:hidden;
-}
-.logo-wrap svg { width:46px; height:46px; }
-
-.brand-name {
-  font-size:26px; font-weight:800; color:#fff; line-height:1.1;
-}
-
-.brand-line {
-  height:2.5px; width:115px;
-  background:linear-gradient(to right,#7c3aed,#06b6d4,#f59e0b);
-  border-radius:2px; margin:8px 0 24px;
-}
-
-.brand-desc {
-  font-size:14px; line-height:1.78;
-  color:rgba(255,255,255,0.48);
-  max-width:310px; margin-bottom:28px;
-}
-
-.trust-badge {
-  display:flex; align-items:center; gap:13px;
-  border:1px solid rgba(100,70,220,0.38);
-  border-radius:10px; padding:13px 18px;
-  background:rgba(70,40,180,0.1);
-  max-width:305px;
-}
-.trust-ico {
-  width:43px;height:43px;border-radius:50%;
-  background:rgba(80,50,200,0.32);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.trust-ico svg{width:22px;height:22px;}
-.trust-title { font-size:14.5px;font-weight:700;color:#fff; }
-.trust-sub   { font-size:12px;color:rgba(255,255,255,0.42);margin-top:2px; }
-
-/* accent dots between cols */
-.acc-dot {
-  position:absolute;z-index:3;
-  width:8px;height:8px;border-radius:50%;
-}
-
-/* ── COL 2 & 3 HEADER ── */
-.col-head {
-  display:flex;align-items:center;gap:13px;
-  margin-bottom:7px;
-}
-.head-ico {
-  width:46px;height:46px;border-radius:50%;
-  background:rgba(90,55,210,0.38);
-  display:flex;align-items:center;justify-content:center;
-}
-.head-ico svg{width:22px;height:22px;}
-.col-title { font-size:21px;font-weight:700;color:#fff; }
-
-.col-line {
-  height:2.5px; width:88px;
-  background:linear-gradient(to right,#7c3aed,#f59e0b);
-  border-radius:2px; margin-bottom:22px;
-}
-
-/* nav links */
-.nav-list { list-style:none;display:flex;flex-direction:column;gap:17px;margin-bottom:26px; }
-.nav-list li a {
-  display:flex;align-items:center;gap:15px;
-  text-decoration:none; font-size:15.5px;
-  color:rgba(255,255,255,0.65);
-  transition:color .2s;
-}
-.nav-list li a:hover{color:#fff;}
-.nav-list li a svg{width:20px;height:20px;flex-shrink:0;}
-
-/* quote */
-.quote-card {
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.09);
-  border-radius:12px; padding:18px 20px 16px;
-}
-.q-ico-wrap {
-  width:34px;height:34px;border-radius:8px;
-  background:rgba(90,55,210,0.5);
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:13px;
-}
-.q-ico-wrap svg{width:16px;height:16px;}
-.q-text { font-size:14.5px;color:rgba(255,255,255,0.7);line-height:1.65;margin-bottom:13px; }
-.q-bar  { height:2.5px;width:48px;background:linear-gradient(to right,#7c3aed,#06b6d4);border-radius:2px; }
-
-/* contact */
-.contact-list { display:flex;flex-direction:column;gap:17px;margin-bottom:30px; }
-.c-row { display:flex;align-items:center;gap:14px; }
-.c-ico {
-  width:41px;height:41px;border-radius:50%;
-  background:rgba(80,50,200,0.35);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.c-ico svg{width:18px;height:18px;}
-.c-val { font-size:14px;color:rgba(255,255,255,0.68); }
-
-.follow-title { font-size:17px;font-weight:700;color:#fff;margin-bottom:7px; }
-.follow-line {
-  height:2.5px;width:62px;
-  background:linear-gradient(to right,#7c3aed,#f59e0b);
-  border-radius:2px;margin-bottom:16px;
-}
-.soc-row { display:flex;gap:13px; }
-.soc-btn {
-  width:50px;height:50px;border-radius:50%;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
-  display:flex;align-items:center;justify-content:center;
-  text-decoration:none; cursor:pointer;
-  transition:background .2s;
-}
-.soc-btn:hover{background:rgba(255,255,255,0.13);}
-.soc-btn svg{width:22px;height:22px;}
-
-/* ── BOTTOM BAR ── */
-.footer-btm {
-  position:relative;z-index:2;
-  border-top:1px solid rgba(255,255,255,0.07);
-  padding:14px 50px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.btm-left {
-  display:flex;align-items:center;gap:9px;
-  color:rgba(255,255,255,0.38);font-size:13px;
-}
-.btm-left svg{width:16px;height:16px;color:rgba(240,180,40,0.7);}
-.btm-right {
-  font-size:13px;color:rgba(255,255,255,0.38);
-  display:flex;align-items:center;gap:5px;
-}
-.btm-right .hrt{color:#f43f5e;}
-.btm-right .brd{color:#a855f7;font-weight:600;}
-</style>
-</head>
-<body>
-<footer>
-
-  <!-- BG decorations -->
-  <div class="bg-glow-left"></div>
-
-  <!-- Curved glowing lines -->
-  <svg class="bg-lines" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- outer large arc -->
-    <path d="M -20 280 Q 60 200 130 170 Q 210 135 270 155 Q 320 170 370 140"
-          stroke="rgba(80,55,200,0.3)" stroke-width="1.2" fill="none"/>
-    <!-- mid arc -->
-    <path d="M -20 250 Q 50 180 110 155 Q 185 125 245 140 Q 295 155 345 125"
-          stroke="rgba(90,65,210,0.22)" stroke-width="1" fill="none"/>
-    <!-- inner arc -->
-    <path d="M -20 220 Q 40 160 95 140 Q 165 112 218 128"
-          stroke="rgba(100,75,220,0.18)" stroke-width="0.8" fill="none"/>
-    <!-- glowing dot on outer arc ~midpoint -->
-    <circle cx="155" cy="164" r="5" fill="#f59e0b" opacity="0.85"/>
-    <circle cx="155" cy="164" r="10" fill="rgba(245,158,11,0.2)"/>
-    <!-- small dot inner arc -->
-    <circle cx="90"  cy="195" r="3" fill="rgba(120,90,240,0.55)"/>
-    <circle cx="230" cy="145" r="3" fill="rgba(120,90,240,0.4)"/>
-  </svg>
-
-  <!-- Dot grid bottom-left -->
-  <div class="dot-grid-bl">
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
-
-  <!-- Dot grid top-right -->
-  <div class="dot-grid-tr">
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
-
-  <!-- Ink trail overlay canvas -->
-  <canvas id="inkCanvas"></canvas>
-  <!-- Pen canvas -->
-  <canvas id="penCanvas"></canvas>
-
-  <!-- accent dots -->
-  <div class="acc-dot" style="left:calc(50px + 30%);top:52%;background:#f59e0b;"></div>
-  <div class="acc-dot" style="left:calc(50px + 63%);top:44%;background:#6d28d9;"></div>
-
-  <!-- MAIN -->
-  <div class="footer-main">
-
-    <!-- COL 1 -->
-    <div>
-      <div class="brand-row">
-        <div class="logo-wrap">
-          <svg viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="29" fill="#111060"/>
-            <!-- open book -->
-            <path d="M13 39 Q30 31 47 39 L47 19 Q30 11 13 19 Z" fill="#2d24a0" opacity="0.85"/>
-            <line x1="30" y1="11" x2="30" y2="39" stroke="#7ec8f5" stroke-width="1.6"/>
-            <!-- wheat -->
-            <path d="M27 21 Q23 14 28 11 Q26 16 30 14 Q28 10 33 11 Q37 15 32 21" fill="#f0c040"/>
-            <line x1="30" y1="14" x2="30" y2="21" stroke="#f0c040" stroke-width="1.3"/>
-            <text x="30" y="52" font-size="5.2" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Inter" font-weight="700" letter-spacing="0.5">NEZAMIYA</text>
-          </svg>
-        </div>
-        <div class="brand-name">Portfolio Handler</div>
-      </div>
-      <div class="brand-line"></div>
-      <p class="brand-desc">Empowering educational institutions with modern portfolio management solutions. Create, manage, and showcase student portfolios effortlessly.</p>
-
-      <div class="trust-badge">
-        <div class="trust-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <polyline points="9,12 11,14 15,10" stroke="#a78bfa" stroke-width="2"/>
-          </svg>
-        </div>
-        <div>
-          <div class="trust-title">Trusted by 500+ Institutions</div>
-          <div class="trust-sub">Delivering excellence, every day.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-sep"></div>
-
-    <!-- COL 2 -->
-    <div>
-      <div class="col-head">
-        <div class="head-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-          </svg>
-        </div>
-        <div class="col-title">Quick Links</div>
-      </div>
-      <div class="col-line"></div>
-
-      <ul class="nav-list">
-        <li><a href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.8">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>
-          </svg>Home
-        </a></li>
-        <li><a href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.8">
-            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-          </svg>Vision
-        </a></li>
-        <li><a href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.8">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
-          </svg>Templates
-        </a></li>
-        <li><a href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.8">
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          </svg>About
-        </a></li>
-      </ul>
-
-      <div class="quote-card">
-        <div class="q-ico-wrap">
-          <svg viewBox="0 0 24 24" fill="#c4b5fd">
-            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-          </svg>
-        </div>
-        <p class="q-text">Building the future of education, one portfolio at a time.</p>
-        <div class="q-bar"></div>
-      </div>
-    </div>
-
-    <div class="col-sep"></div>
-
-    <!-- COL 3 -->
-    <div>
-      <div class="col-head">
-        <div class="head-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
-          </svg>
-        </div>
-        <div class="col-title">Get in Touch</div>
-      </div>
-      <div class="col-line"></div>
-
-      <div class="contact-list">
-        <div class="c-row">
-          <div class="c-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-          </div>
-          <span class="c-val">nezamiya@gmail.com</span>
-        </div>
-        <div class="c-row">
-          <div class="c-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 .01h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-            </svg>
-          </div>
-          <span class="c-val">03237594869</span>
-        </div>
-        <div class="c-row">
-          <div class="c-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
-            </svg>
-          </div>
-          <span class="c-val">https://nesticktech.com/</span>
-        </div>
-      </div>
-
-      <div class="follow-title">Follow Us</div>
-      <div class="follow-line"></div>
-      <div class="soc-row">
-        <a href="#" class="soc-btn">
-          <svg viewBox="0 0 24 24" fill="#5b8ef0"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-        </a>
-        <a href="#" class="soc-btn">
-          <svg viewBox="0 0 24 24" fill="#5b8ef0">
-            <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/>
-            <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
-          </svg>
-        </a>
-        <a href="#" class="soc-btn">
-          <svg viewBox="0 0 24 24" fill="none">
-            <defs>
-              <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#f09433"/>
-                <stop offset="50%" stop-color="#dc2743"/>
-                <stop offset="100%" stop-color="#bc1888"/>
-              </linearGradient>
-            </defs>
-            <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig)"/>
-            <circle cx="12" cy="12" r="4.5" fill="none" stroke="#fff" stroke-width="1.8"/>
-            <circle cx="17.5" cy="6.5" r="1.3" fill="#fff"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- BOTTOM BAR -->
-  <div class="footer-btm">
-    <div class="btm-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-      © 2026 Portfolio Handler. All rights reserved.
-    </div>
-    <div class="btm-right">
-      Made with <span class="hrt">♥</span> by <span class="brd">Nestick Tech</span>
-    </div>
-  </div>
-
-</footer>
-
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>PSM - Building Digital Futures</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
-/* ════════════════════════════════════════
-   PEN ILLUSTRATION + ANIMATED INK TRAIL
-   Logic: pen nib → curves through footer
-   → connects to "Follow Us" social icons
-════════════════════════════════════════ */
-
-// ── DRAW PEN (static) ──
-(function drawPen(){
-  const c   = document.getElementById('penCanvas');
-  const ctx = c.getContext('2d');
-  const W = 260, H = 260;
-  c.width = W; c.height = H;
-  ctx.clearRect(0,0,W,H);
-
-  ctx.save();
-  ctx.translate(W*0.75, H*0.02);
-  ctx.rotate(Math.PI*0.42);
-
-  const pL=158, pW=16;
-
-  // cap
-  const capG=ctx.createLinearGradient(-pW/2,0,pW/2,0);
-  capG.addColorStop(0,'rgba(50,35,160,0.92)');
-  capG.addColorStop(.5,'rgba(85,62,205,0.97)');
-  capG.addColorStop(1,'rgba(40,25,140,0.88)');
-  ctx.beginPath(); ctx.roundRect(-pW/2,-10,pW,30,5);
-  ctx.fillStyle=capG; ctx.fill();
-
-  // body
-  const bG=ctx.createLinearGradient(-pW/2,0,pW/2,0);
-  bG.addColorStop(0,'rgba(42,28,152,0.93)');
-  bG.addColorStop(.35,'rgba(74,54,194,0.97)');
-  bG.addColorStop(.65,'rgba(92,72,212,0.97)');
-  bG.addColorStop(1,'rgba(33,18,128,0.90)');
-  ctx.fillStyle=bG;
-  ctx.fillRect(-pW/2,20,pW,pL-20);
-
-  // shine
-  ctx.fillStyle='rgba(255,255,255,0.10)';
-  ctx.fillRect(-pW/2+2,22,4,pL-28);
-
-  // ring separator
-  ctx.fillStyle='rgba(180,160,255,0.25)';
-  ctx.fillRect(-pW/2,pL-38,pW,3);
-
-  // grip
-  ctx.fillStyle='rgba(28,16,108,0.97)';
-  ctx.fillRect(-pW/2,pL-27,pW,20);
-  for(let i=0;i<4;i++){ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(-pW/2,pL-26+i*5,pW,2);}
-
-  // nib
-  ctx.fillStyle='rgba(108,92,218,0.88)';
-  ctx.beginPath();
-  ctx.moveTo(-pW/2+1,pL-7);ctx.lineTo(pW/2-1,pL-7);
-  ctx.lineTo(3,pL+30);ctx.lineTo(-3,pL+30);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='rgba(185,175,255,0.5)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(0,pL-4);ctx.lineTo(0,pL+26);ctx.stroke();
-
-  // metallic tip
-  ctx.fillStyle='rgba(225,218,255,0.97)';
-  ctx.beginPath();ctx.moveTo(-3,pL+26);ctx.lineTo(3,pL+26);ctx.lineTo(0,pL+35);ctx.closePath();ctx.fill();
-  // tip glow
-  const tipG=ctx.createRadialGradient(0,pL+35,0,0,pL+35,8);
-  tipG.addColorStop(0,'rgba(180,160,255,0.4)');
-  tipG.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=tipG;ctx.beginPath();ctx.arc(0,pL+35,8,0,Math.PI*2);ctx.fill();
-
-  // clip
-  ctx.strokeStyle='rgba(148,128,255,0.68)';ctx.lineWidth=3;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(pW/2+1,4);ctx.lineTo(pW/2+1,pL-32);ctx.stroke();
-  ctx.fillStyle='rgba(148,128,255,0.68)';ctx.beginPath();ctx.arc(pW/2+1,4,5,0,Math.PI*2);ctx.fill();
-
-  ctx.restore();
-
-  // sparkle dots around pen
-  [[W*.10,H*.26,2.0,'rgba(120,95,240,0.5)'],[W*.03,H*.42,1.4,'rgba(100,75,220,0.38)'],
-   [W*.18,H*.50,1.6,'rgba(130,105,245,0.48)'],[W*.06,H*.60,1.1,'rgba(110,85,230,0.35)'],
-   [W*.26,H*.36,1.3,'rgba(140,115,250,0.44)'],[W*.14,H*.12,1.5,'rgba(120,95,240,0.38)'],
-   [W*.04,H*.18,0.9,'rgba(100,75,220,0.28)']
-  ].forEach(([x,y,r,col])=>{ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();});
-})();
-
-
-/* ── ANIMATED INK TRAIL ── */
-(function inkTrail(){
-  const footer  = document.querySelector('footer');
-  const inkC    = document.getElementById('inkCanvas');
-  const ctx     = inkC.getContext('2d');
-
-  function resize(){
-    inkC.width  = footer.offsetWidth;
-    inkC.height = footer.offsetHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // The ink trail path:
-  // Starts at pen nib position (right side, bottom area)
-  // curves LEFT across footer → ends at "Follow Us" social icons (col3, bottom)
-  // Then a second branch curves up to "Get in Touch" heading
-  // This creates a visual story: pen wrote all the contact info
-
-  // We animate by drawing progressively more of the path each frame
-  let progress = 0;       // 0→1 draw phase
-  let fadeAlpha = 0;      // for glow pulse
-  const SPEED = 0.004;
-
-  // Control points — relative to footer size
-  // Main path: nib (right-bottom) → social icons area
-  function getPath(W, H){
-    // pen nib tip is roughly at: right=30px from right, bottom=80px from bottom
-    // social icons are in col3 bottom: ~75% from left, ~72% from top
-    const nibX   = W - 55;
-    const nibY   = H - 50;
-    const socX   = W * 0.74;
-    const socY   = H * 0.75;
-    // "Get in Touch" heading: ~66% left, ~18% top
-    const touchX = W * 0.67;
-    const touchY = H * 0.14;
-
-    return {
-      // main arc: nib → social icons
-      main: [
-        {x: nibX,       y: nibY},
-        {cx1: nibX-80,  cy1: nibY-20,  cx2: socX+60, cy2: socY+30,  x: socX, y: socY}
-      ],
-      // branch: from midpoint up to "Get in Touch" heading
-      branch: [
-        {x: W*0.82,     y: H*0.52},
-        {cx1: W*0.80,   cy1: H*0.30,   cx2: touchX+30, cy2: touchY+20, x: touchX, y: touchY}
-      ],
-      // tiny tail: from social to email row
-      tail: [
-        {x: socX,       y: socY},
-        {cx1: socX-10,  cy1: socY-40,  cx2: socX-15,  cy2: H*0.38,   x: W*0.67, y: H*0.33}
-      ]
-    };
-  }
-
-  // Helper: get point at t along a cubic bezier
-  function bezierPoint(p0, p1, t){
-    const mt = 1-t;
-    return {
-      x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.cx1 + 3*mt*t*t*p1.cx2 + t*t*t*p1.x,
-      y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.cy1 + 3*mt*t*t*p1.cy2 + t*t*t*p1.y
-    };
-  }
-
-  // Draw a partial bezier path up to progress t
-  function drawPartialBezier(ctx, start, curve, t, color, width, glow){
-    const steps = Math.floor(t * 60);
-    if(steps < 1) return;
-    ctx.beginPath();
-    ctx.moveTo(start.x, start.y);
-    for(let i=1; i<=steps; i++){
-      const pt = bezierPoint(start, curve, i/60);
-      ctx.lineTo(pt.x, pt.y);
-    }
-    if(glow){
-      ctx.shadowColor = color;
-      ctx.shadowBlur  = 10;
-    }
-    ctx.strokeStyle = color;
-    ctx.lineWidth   = width;
-    ctx.lineCap     = 'round';
-    ctx.lineJoin    = 'round';
-    ctx.stroke();
-    ctx.shadowBlur  = 0;
-
-    // Return endpoint
-    return bezierPoint(start, curve, t);
-  }
-
-  // Draw a glowing dot at nib tip position
-  function drawNibDot(ctx, x, y, alpha){
-    const g = ctx.createRadialGradient(x,y,0,x,y,14);
-    g.addColorStop(0,  `rgba(200,180,255,${alpha*0.9})`);
-    g.addColorStop(0.4,`rgba(130,100,240,${alpha*0.5})`);
-    g.addColorStop(1,  'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.fill();
-  }
-
-  // Draw small circle at endpoint (like a period / connection node)
-  function drawNode(ctx, x, y, color, alpha){
-    ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2);
-    ctx.fillStyle = color.replace('1)', `${alpha})`);
-    ctx.fill();
-    const g=ctx.createRadialGradient(x,y,2,x,y,12);
-    g.addColorStop(0,color.replace('1)',`${alpha*0.6})`));
-    g.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=g; ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();
-  }
-
-  function animate(){
-    const W = inkC.width, H = inkC.height;
-    ctx.clearRect(0,0,W,H);
-
-    const paths = getPath(W, H);
-    const nibX  = W - 55;
-    const nibY  = H - 50;
-
-    fadeAlpha = 0.55 + 0.35*Math.sin(Date.now()*0.002);
-
-    // ── Phase 1: draw main arc (0→0.5) ──
-    const mainT  = Math.min(progress / 0.5, 1);
-    // ── Phase 2: draw branch (0.4→0.75) ──
-    const branchT= Math.max(0, Math.min((progress-0.4)/0.35, 1));
-    // ── Phase 3: draw tail (0.65→1) ──
-    const tailT  = Math.max(0, Math.min((progress-0.65)/0.35, 1));
-
-    // Main trail — glowing purple-to-cyan gradient feel
-    if(mainT > 0){
-      const ep = drawPartialBezier(
-        ctx,
-        paths.main[0], paths.main[1],
-        mainT,
-        'rgba(110,80,230,0.55)', 1.8, true
-      );
-      // glow duplicate
-      drawPartialBezier(ctx, paths.main[0], paths.main[1], mainT,
-        'rgba(140,110,255,0.20)', 4, false);
-
-      // moving nib glow dot at current endpoint
-      if(ep && mainT < 1){
-        drawNibDot(ctx, ep.x, ep.y, fadeAlpha);
-      }
-      // endpoint node when done
-      if(mainT >= 1){
-        drawNode(ctx, paths.main[1].x, paths.main[1].y, 'rgba(130,100,255,1)', fadeAlpha);
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'deep-navy': '#020b1c',
+            'brand-blue': '#4a9eff',
+            'brand-yellow': '#ffb400',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
       }
     }
-
-    // Branch trail — lighter purple/indigo
-    if(branchT > 0){
-      const bp = drawPartialBezier(
-        ctx,
-        paths.branch[0], paths.branch[1],
-        branchT,
-        'rgba(90,65,210,0.45)', 1.4, true
-      );
-      drawPartialBezier(ctx, paths.branch[0], paths.branch[1], branchT,
-        'rgba(120,95,240,0.15)', 3.5, false);
-      if(bp && branchT < 1) drawNibDot(ctx, bp.x, bp.y, fadeAlpha*0.7);
-      if(branchT >= 1){
-        drawNode(ctx, paths.branch[1].x, paths.branch[1].y, 'rgba(160,130,255,1)', fadeAlpha*0.8);
-        // small label shimmer at "Get in Touch"
-        ctx.font = '500 11px Inter';
-        ctx.fillStyle = `rgba(180,160,255,${fadeAlpha*0.45})`;
-        ctx.fillText('✦ written by pen', paths.branch[1].x - 50, paths.branch[1].y - 14);
-      }
+  </script>
+<!-- Custom styles for specific effects that Tailwind might need help with -->
+<style data-purpose="animations">
+    @keyframes rotate-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-
-    // Tail trail
-    if(tailT > 0){
-      const tp = drawPartialBezier(
-        ctx,
-        paths.tail[0], paths.tail[1],
-        tailT,
-        'rgba(80,55,195,0.38)', 1.2, true
-      );
-      if(tp && tailT < 1) drawNibDot(ctx, tp.x, tp.y, fadeAlpha*0.55);
-      if(tailT >= 1){
-        drawNode(ctx, paths.tail[1].x, paths.tail[1].y, 'rgba(140,115,255,1)', fadeAlpha*0.7);
-      }
+    .animate-orbit {
+      animation: rotate-slow 20s linear infinite;
     }
-
-    // nib glow at pen start (always)
-    drawNibDot(ctx, nibX, nibY, fadeAlpha * 0.6);
-
-    // advance progress, then loop
-    progress += SPEED;
-    if(progress > 1.4){
-      // pause then restart
-      progress = -0.5;
+    .glow-blue {
+      box-shadow: 0 0 40px rgba(74, 158, 255, 0.2);
     }
+    .glow-yellow-dot {
+      box-shadow: 0 0 10px rgba(255, 180, 0, 0.8);
+    }
+  </style>
+</head>
+<body class="bg-deep-navy text-white min-h-screen font-sans">
+<!-- BEGIN: MainHeader -->
+<header class="p-6 flex justify-between items-center fixed top-0 w-full z-50">
+<div class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center bg-black/40 backdrop-blur-md" data-purpose="nav-logo">
+<span class="text-white font-bold text-lg">N</span>
+</div>
+<!-- Placeholder for potential mobile menu toggle -->
+<div class="hidden"></div>
+</header>
+<!-- END: MainHeader -->
+<main class="pt-24 pb-12 px-6 flex flex-col items-center">
+<!-- BEGIN: HeroTextSection -->
+<section class="w-full max-w-md mb-12" data-purpose="hero-content">
+<div class="flex items-center gap-2 mb-6">
+<span class="w-1 h-4 bg-gray-500 rounded-full"></span>
+<span class="text-xs uppercase tracking-widest text-gray-400 font-semibold">About Us</span>
+</div>
+<h1 class="text-5xl md:text-6xl font-black leading-tight mb-4 px-2">
+        Building<br>
+<span class="text-brand-yellow">Digital</span><br>
+<span class="text-brand-blue">Futures</span>
+</h1>
+<div class="flex items-center gap-4 mb-8">
+<div class="h-[1px] w-12 bg-gray-600"></div>
+<span class="text-[10px] tracking-[0.3em] text-gray-400 font-bold">SINCE 2021</span>
+<div class="h-[1px] w-12 bg-gray-600"></div>
+</div>
+<p class="text-gray-400 text-base leading-relaxed max-w-[300px]">
+        We empower institutions to manage and showcase College portfolios — 
+        <span class="text-brand-yellow italic font-bold">simply, securely and efficiently.</span>
+</p>
+<div class="mt-10">
+<button class="group flex items-center gap-4 px-6 py-4 rounded-full border border-gray-700 bg-black/20 hover:bg-white/5 transition-all duration-300">
+<span class="text-sm font-bold tracking-wide">Explore Our Solutions</span>
+<div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center group-hover:bg-brand-blue transition-colors">
+<svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</button>
+</div>
+</section>
+<!-- END: HeroTextSection -->
+<!-- BEGIN: OrbitalUI -->
+<section class="relative w-full aspect-square max-w-[400px] flex items-center justify-center mt-8" data-purpose="orbital-visual">
+<!-- Outer Orbit Rings -->
+<div class="absolute w-full h-full border border-blue-900/30 rounded-full"></div>
+<div class="absolute w-[80%] h-[80%] border border-blue-900/20 rounded-full"></div>
+<div class="absolute w-[60%] h-[60%] border border-dashed border-blue-500/10 rounded-full"></div>
+<!-- Central PSM Logo Sphere -->
+<div class="relative z-10 w-32 h-32 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-black glow-blue border border-blue-500/30">
+<div class="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow to-brand-blue">
+          PSM
+        </div>
+<!-- Inner glow effect -->
+<div class="absolute inset-2 rounded-full border border-blue-400/20"></div>
+</div>
+<!-- Animated Rotating Container for Orbiting Elements -->
+<div class="absolute w-full h-full animate-orbit">
+<!-- Feature 1: Secure & Reliable -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-10 h-10 rounded-lg border border-blue-500/50 bg-black/80 flex items-center justify-center mb-2">
+<svg class="h-5 w-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="text-[8px] font-bold tracking-[0.2em] text-center uppercase text-gray-300">Secure &amp;<br>Reliable</span>
+</div>
+<!-- Feature 2: Data Driven Insights -->
+<div class="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-10 h-10 rounded-lg border border-blue-500/50 bg-black/80 flex items-center justify-center mb-2">
+<svg class="h-5 w-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="text-[8px] font-bold tracking-[0.2em] text-center uppercase text-gray-300">Data Driven<br>Insights</span>
+</div>
+<!-- Feature 3: Global Presence -->
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex flex-col items-center">
+<div class="w-10 h-10 rounded-lg border border-blue-500/50 bg-black/80 flex items-center justify-center mb-2">
+<svg class="h-5 w-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="text-[8px] font-bold tracking-[0.2em] text-center uppercase text-gray-300">Global<br>Presence</span>
+</div>
+<!-- Feature 4: Smart Portfolios -->
+<div class="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-10 h-10 rounded-lg border border-blue-500/50 bg-black/80 flex items-center justify-center mb-2">
+<svg class="h-5 w-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="text-[8px] font-bold tracking-[0.2em] text-center uppercase text-gray-300">Smart<br>Portfolios</span>
+</div>
+<!-- Moving Yellow Dot -->
+<div class="absolute top-[40%] left-[10%] w-2 h-2 bg-brand-yellow rounded-full glow-yellow-dot"></div>
+</div>
+<!-- Static Decorative Stars/Dots -->
+<div class="absolute top-10 right-10 w-1 h-1 bg-blue-400 rounded-full"></div>
+<div class="absolute bottom-20 left-20 w-1 h-1 bg-blue-300 rounded-full opacity-50"></div>
+<div class="absolute top-1/4 left-5 w-0.5 h-0.5 bg-white rounded-full opacity-30"></div>
+</section>
+<!-- END: OrbitalUI -->
+</main>
+<!-- BEGIN: FooterDecoration -->
+<footer class="fixed bottom-0 left-0 w-full p-4 pointer-events-none opacity-20">
+<div class="flex justify-center space-x-1">
+<div class="w-1 h-1 bg-blue-500 rounded-full"></div>
+<div class="w-1 h-1 bg-blue-500 rounded-full"></div>
+<div class="w-1 h-1 bg-blue-500 rounded-full"></div>
+</div>
+</footer>
+<!-- END: FooterDecoration -->
 
-    requestAnimationFrame(animate);
-  }
 
-  animate();
-})();
-</script>
-</body>
-</html>
+</body></html>

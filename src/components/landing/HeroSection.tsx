@@ -242,30 +242,48 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
           <div className="flex flex-col items-center justify-center text-center">
             
-            {/* Badge */}
-            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border shadow-md mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 ${
-              theme === 'dark'
-                ? 'bg-[#1F4381] border-[#E8CA5E]'
-                : 'bg-white border-[#00A0FF]'
-            }`}>
-              <div className="flex gap-1">
-                <Compass className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
+            {/* ─── Premium Badge ─── */}
+            <div 
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border shadow-lg mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 relative overflow-hidden"
+              style={{
+                background: theme === 'dark' 
+                  ? 'linear-gradient(135deg, #1F4381, #0B0F19)' 
+                  : 'linear-gradient(135deg, #ffffff, #e8edf5)',
+                border: '1px solid rgba(232, 202, 94, 0.3)',
+                boxShadow: '0 0 30px rgba(232, 202, 94, 0.15), 0 0 60px rgba(0, 160, 255, 0.08)'
+              }}
+            >
+              {/* Shine Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" 
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)',
+                  transform: 'skewX(-20deg)'
+                }}
+              />
+              
+              <div className="flex gap-1.5">
+                <Compass className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
                   theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
                 }`} />
-                <Globe2 className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors duration-500 ${
+                <Globe2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
                   theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
                 }`} />
               </div>
-              <span className={`text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500 ${
-                theme === 'dark' ? 'text-white' : 'text-[#00A0FF]'
-              }`}
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              <span 
+                className="text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
+                  textShadow: theme === 'dark' 
+                    ? '0 0 20px rgba(232, 202, 94, 0.3)' 
+                    : '0 0 20px rgba(0, 160, 255, 0.2)'
+                }}
               >
                 🌟 Trusted by 500+ Educational Institutions
               </span>
             </div>
 
-            {/* Headings */}
+            {/* Headings with Glow */}
             <div className="mb-5 sm:mb-7">
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
                 <span className="block text-white font-serif tracking-tight drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -274,10 +292,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </h1>
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
                 <span className="block">
-                  <span className="text-[#E8CA5E] font-serif drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <span 
+                    className="font-serif drop-shadow-lg" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: '#E8CA5E',
+                      textShadow: '0 0 30px rgba(232, 202, 94, 0.4), 0 0 60px rgba(232, 202, 94, 0.2), 0 0 90px rgba(232, 202, 94, 0.1)'
+                    }}
+                  >
                     Galaxy of
                   </span>{' '}
-                  <span className="text-[#00E0FF] font-serif drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <span 
+                    className="font-serif drop-shadow-lg" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: '#00E0FF',
+                      textShadow: '0 0 30px rgba(0, 224, 255, 0.4), 0 0 60px rgba(0, 224, 255, 0.2), 0 0 90px rgba(0, 224, 255, 0.1)'
+                    }}
+                  >
                     College Portfolios
                   </span>
                 </span>
@@ -293,46 +325,68 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               presence across the universe of learning.
             </p>
 
-            {/* Two CTA Buttons - Full Rounded with Glow */}
+            {/* ─── Premium CTA Buttons ─── */}
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
               
               {/* ── LEARN MORE BUTTON ── */}
-              {/* Black BG + Yellow Border Glow */}
               <button
                 onClick={handleLearn}
-                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
                   background: '#0a0a0a',
                   color: '#E8CA5E',
                   border: '2px solid #E8CA5E',
+                  borderRadius: '50px',
+                  boxShadow: '0 0 30px rgba(232, 202, 94, 0.15), 0 0 60px rgba(232, 202, 94, 0.08), inset 0 0 30px rgba(232, 202, 94, 0.05)'
                 }}
               >
-                {/* Yellow Glow Effect */}
-                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-[-4px] rounded-full border-2 border-[#E8CA5E]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                {/* Premium Shine Effect */}
+                <span className="absolute inset-0 rounded-full overflow-hidden">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" 
+                    style={{ transform: 'skewX(-20deg)' }}
+                  />
+                </span>
+                
+                {/* Glow Effects */}
+                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-[-4px] rounded-full border-2 border-[#E8CA5E]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                
+                {/* Static Glow (always visible) */}
+                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/10 blur-xl opacity-50 -z-10" />
                 
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               
               {/* ── YOUR DESIGN BUTTON ── */}
-              {/* Transparent + Blue Border Glow */}
               <button
                 onClick={handleDesignClick}
-                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
                   background: 'transparent',
                   color: '#ffffff',
                   border: '2px solid #00A0FF',
+                  borderRadius: '50px',
+                  boxShadow: '0 0 30px rgba(0, 160, 255, 0.15), 0 0 60px rgba(0, 160, 255, 0.08), inset 0 0 30px rgba(0, 160, 255, 0.05)'
                 }}
               >
-                {/* Blue Glow Effect */}
-                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-[-4px] rounded-full border-2 border-[#00A0FF]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                {/* Premium Shine Effect */}
+                <span className="absolute inset-0 rounded-full overflow-hidden">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" 
+                    style={{ transform: 'skewX(-20deg)' }}
+                  />
+                </span>
+                
+                {/* Glow Effects */}
+                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                <span className="absolute inset-[-4px] rounded-full border-2 border-[#00A0FF]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+                
+                {/* Static Glow (always visible) */}
+                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/10 blur-xl opacity-40 -z-10" />
                 
                 <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                 <span>Your Design</span>
@@ -354,6 +408,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         </div>
 
         <style jsx>{`
+          @keyframes shimmer {
+            0% { transform: translateX(-100%) skewX(-20deg); }
+            100% { transform: translateX(200%) skewX(-20deg); }
+          }
+          @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+          }
           .will-change-transform {
             will-change: transform;
           }

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { 
   Home, Eye, Layout, User, 
   Mail, Phone, Globe, Shield, 
-  Quote, Compass
+  Quote, Compass, MessageCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -74,7 +74,7 @@ export default function Footer() {
         <div className="col-brand">
           <div className="flex items-center gap-3 mb-1">
             <div 
-              className="w-[52px] h-[52px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+              className="w-[52px] h-[52px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
               style={{
                 background: '#fff',
                 border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,
@@ -89,7 +89,7 @@ export default function Footer() {
               />
             </div>
             <div>
-              <div className="text-[22px] font-bold transition-colors duration-300"
+              <div className="text-[22px] font-bold transition-colors duration-300 cursor-pointer"
                 style={{ 
                   color: isDark ? '#ffffff' : '#1a1a2e',
                   fontFamily: "'Inter', sans-serif",
@@ -120,7 +120,7 @@ export default function Footer() {
 
           {/* ── QUOTE UNDER DESCRIPTION ── */}
           <div 
-            className="mt-4 flex items-start gap-2.5 max-w-[280px]"
+            className="mt-4 flex items-start gap-2.5 max-w-[280px] cursor-pointer"
             style={{
               padding: '10px 14px',
               borderRadius: '8px',
@@ -145,14 +145,14 @@ export default function Footer() {
         <div className="col-links md:px-6">
           <div className="flex items-center gap-3 mb-1.5">
             <div 
-              className="w-[38px] h-[38px] rounded-full flex items-center justify-center"
+              className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
                 background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
               }}
             >
               <Compass className="w-[18px] h-[18px] text-[#a78bfa]" />
             </div>
-            <div className="text-[18px] font-bold transition-colors duration-300"
+            <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
                 color: isDark ? '#ffffff' : '#1a1a2e',
                 fontFamily: "'Inter', sans-serif",
@@ -176,7 +176,7 @@ export default function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.path}
-                    className="flex items-center gap-3 text-[14px] transition-colors duration-200 hover:text-[#f0c040]"
+                    className="flex items-center gap-3 text-[14px] transition-colors duration-200 hover:text-[#f0c040] cursor-pointer"
                     style={{
                       color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',
                       fontFamily: "'Inter', sans-serif",
@@ -200,14 +200,14 @@ export default function Footer() {
         <div className="col-contact md:px-4">
           <div className="flex items-center gap-3 mb-1.5">
             <div 
-              className="w-[38px] h-[38px] rounded-full flex items-center justify-center"
+              className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
                 background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
               }}
             >
-              <Mail className="w-[18px] h-[18px] text-[#a78bfa]" />
+              <MessageCircle className="w-[18px] h-[18px] text-[#a78bfa]" />
             </div>
-            <div className="text-[18px] font-bold transition-colors duration-300"
+            <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
                 color: isDark ? '#ffffff' : '#1a1a2e',
                 fontFamily: "'Inter', sans-serif",
@@ -225,7 +225,7 @@ export default function Footer() {
           />
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer">
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
@@ -241,7 +241,7 @@ export default function Footer() {
               </span>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer">
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
@@ -257,7 +257,7 @@ export default function Footer() {
               </span>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer">
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
@@ -284,7 +284,7 @@ export default function Footer() {
           borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
         }}
       >
-        <div className="flex items-center gap-2 text-[12px] transition-colors duration-300" style={{ 
+        <div className="flex items-center gap-2 text-[12px] transition-colors duration-300 cursor-pointer" style={{ 
           color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'
         }}>
           <Shield className="w-3.5 h-3.5" style={{ 
@@ -292,10 +292,10 @@ export default function Footer() {
           }} />
           © {currentYear} Portfolio Handler. All rights reserved.
         </div>
-        <div className="text-[12px] flex items-center gap-1 transition-colors duration-300" style={{ 
+        <div className="text-[12px] flex items-center gap-1 transition-colors duration-300 cursor-pointer" style={{ 
           color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'
         }}>
-          Made with <span className="text-[#f43f5e]">♥</span> by{' '}
+          Made by{' '}
           <span className="font-semibold text-[#a855f7]">Nestick Tech</span>
         </div>
       </div>

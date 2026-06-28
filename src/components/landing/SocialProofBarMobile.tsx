@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 
 /**
  * SocialProofBarMobile
- * Mobile responsive hexagon stat cluster — "Trusted Worldwide"
+ * Mobile responsive hexagon stat cluster with rounded corners (same as desktop) — "Trusted Worldwide"
  * Built with Next.js + TypeScript + Tailwind CSS
  */
 
@@ -120,7 +120,7 @@ const Counter = ({
   );
 };
 
-// Individual Hexagon Component
+// Individual Hexagon Component - Same rounded corners as desktop
 const HexStat = ({ label, value, icon, theme = 'dark', delay = 0, onClick }: HexStatProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
@@ -128,19 +128,21 @@ const HexStat = ({ label, value, icon, theme = 'dark', delay = 0, onClick }: Hex
   const getColors = () => {
     if (theme === 'dark') {
       return {
-        stroke: '#3fd0ff',
-        innerStroke: '#1c5670',
-        fill: '#07111f',
-        labelColor: '#E5E7EB',
+        stroke: '#3B82F6',
+        innerStroke: 'rgba(96,165,250,0.9)',
+        fill: '#0F172A',
+        labelColor: '#93C5FD',
         valueColor: '#FFFFFF',
+        shadow: '#3B82F6'
       };
     } else {
       return {
-        stroke: '#0066FF',
-        innerStroke: '#60A5FA',
-        fill: '#F8FAFC',
+        stroke: '#3B82F6',
+        innerStroke: 'rgba(59,130,246,0.8)',
+        fill: '#FFFFFF',
         labelColor: '#4B5563',
         valueColor: '#1F2937',
+        shadow: '#3B82F6'
       };
     }
   };
@@ -187,25 +189,41 @@ const HexStat = ({ label, value, icon, theme = 'dark', delay = 0, onClick }: Hex
         viewBox="0 0 140 158"
         className="absolute inset-0 h-full w-full"
       >
+        {/* Outer hexagon - rounded corners like desktop */}
         <polygon
           points="70,2 137,41.5 137,116.5 70,156 3,116.5 3,41.5"
           fill={colors.fill}
           stroke={colors.stroke}
-          strokeWidth="2"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
+        {/* Inner hexagon - rounded corners like desktop */}
         <polygon
           points="70,12 128,47.5 128,110.5 70,146 12,110.5 12,47.5"
           fill="none"
           stroke={colors.innerStroke}
-          strokeWidth="1"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {/* Glow shadow - rounded corners like desktop */}
+        <polygon
+          points="70,2 137,41.5 137,116.5 70,156 3,116.5 3,41.5"
+          fill="none"
+          stroke={colors.shadow}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          opacity="0.15"
+          style={{ filter: 'blur(12px)' }}
         />
       </svg>
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none">
-        <span className="text-[10px] font-normal" style={{ 
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none p-2">
+        <span className="text-[11px] font-normal tracking-wide" style={{ 
           color: colors.labelColor,
           fontFamily: "'Poppins', sans-serif",
-          letterSpacing: '0.3px',
         }}>
           {label}
         </span>
@@ -223,7 +241,7 @@ const HexStat = ({ label, value, icon, theme = 'dark', delay = 0, onClick }: Hex
   );
 };
 
-// Center Hexagon
+// Center Octagon Component - Same rounded corners as desktop
 const CenterHex = ({ theme = 'dark', onClick }: { theme?: 'light' | 'dark'; onClick?: () => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2, margin: "-50px" });
@@ -231,17 +249,19 @@ const CenterHex = ({ theme = 'dark', onClick }: { theme?: 'light' | 'dark'; onCl
   const getColors = () => {
     if (theme === 'dark') {
       return {
-        stroke: '#3fd0ff',
-        innerStroke: '#1c5670',
-        fill: '#07111f',
+        stroke: '#3B82F6',
+        innerStroke: 'rgba(96,165,250,0.9)',
+        fill: '#0F172A',
         textColor: '#FFFFFF',
+        shadow: '#3B82F6'
       };
     } else {
       return {
-        stroke: '#0066FF',
-        innerStroke: '#60A5FA',
-        fill: '#F8FAFC',
+        stroke: '#3B82F6',
+        innerStroke: 'rgba(59,130,246,0.8)',
+        fill: '#FFFFFF',
         textColor: '#1F2937',
+        shadow: '#3B82F6'
       };
     }
   };
@@ -277,21 +297,38 @@ const CenterHex = ({ theme = 'dark', onClick }: { theme?: 'light' | 'dark'; onCl
         viewBox="0 0 170 195"
         className="absolute inset-0 h-full w-full"
       >
+        {/* Outer octagon - rounded corners like desktop */}
         <polygon
           points="85,3 167,51.75 167,143.25 85,192 3,143.25 3,51.75"
           fill={colors.fill}
           stroke={colors.stroke}
-          strokeWidth="2.5"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
+        {/* Inner octagon - rounded corners like desktop */}
         <polygon
           points="85,14 158,58.5 158,136.5 85,182 12,136.5 12,58.5"
           fill="none"
           stroke={colors.innerStroke}
-          strokeWidth="1"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {/* Glow shadow - rounded corners like desktop */}
+        <polygon
+          points="85,3 167,51.75 167,143.25 85,192 3,143.25 3,51.75"
+          fill="none"
+          stroke={colors.shadow}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          opacity="0.15"
+          style={{ filter: 'blur(16px)' }}
         />
       </svg>
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none p-4">
         <span className="text-[18px] font-extrabold leading-tight tracking-wider" style={{ 
           color: colors.textColor,
           fontFamily: "'Poppins', sans-serif",
@@ -307,7 +344,7 @@ const CenterHex = ({ theme = 'dark', onClick }: { theme?: 'light' | 'dark'; onCl
 
 // World Map Dots Component (Background)
 const WorldMapDots = ({ theme = 'dark' }: { theme?: 'light' | 'dark' }) => {
-  const dotColor = theme === 'dark' ? '#16456b' : '#93C5FD';
+  const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.1)';
   const W = 400, H = 600;
   const mask = [
     "01111100011111111100",
@@ -337,7 +374,7 @@ const WorldMapDots = ({ theme = 'dark' }: { theme?: 'light' | 'dark' }) => {
         dots.push({ 
           x, 
           y, 
-          r: 1.2, 
+          r: 2.2, 
           o: 0.4 + rand() * 0.5 
         });
       }
@@ -347,7 +384,7 @@ const WorldMapDots = ({ theme = 'dark' }: { theme?: 'light' | 'dark' }) => {
   return (
     <svg
       viewBox="0 0 400 600"
-      className="absolute inset-0 w-full h-full opacity-30 pointer-events-none"
+      className="absolute inset-0 w-full h-full pointer-events-none"
       preserveAspectRatio="xMidYMid slice"
     >
       {dots.map((d, i) => (
@@ -393,7 +430,6 @@ export default function SocialProofBarMobile() {
   // Handle click events
   const handleHexClick = (label: string) => {
     console.log(`Clicked on ${label}`);
-    // Add your custom logic here
   };
 
   // Stats data
@@ -404,10 +440,9 @@ export default function SocialProofBarMobile() {
     { label: 'Success Rate', value: '99%', iconType: 'success', delay: 1.05 },
   ];
 
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFC';
-  const iconColor = theme === 'dark' ? '#ffffff' : '#1F2937';
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+  const iconColor = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
 
-  // Mobile layout: 2 rows with 2 items each, center in middle
   const topRow = stats.slice(0, 2);
   const bottomRow = stats.slice(2, 4);
 
@@ -425,13 +460,12 @@ export default function SocialProofBarMobile() {
         padding: '20px 0',
       }}
     >
-      {/* Background World Map Dots - No lines */}
       <WorldMapDots theme={theme} />
       
       <div className="relative w-full max-w-[420px] flex flex-col items-center gap-0 z-[2]">
-        {/* Top Row - Slide from left */}
+        {/* Top Row */}
         <div className="flex justify-center items-center gap-2 mb-[-18px]">
-          {topRow.map((stat, index) => (
+          {topRow.map((stat) => (
             <HexStat
               key={stat.label}
               label={stat.label}
@@ -444,15 +478,15 @@ export default function SocialProofBarMobile() {
           ))}
         </div>
 
-        {/* Center Hex - Scale up from center */}
+        {/* Center Hex */}
         <CenterHex 
           theme={theme}
           onClick={() => handleHexClick('Trusted Worldwide')}
         />
 
-        {/* Bottom Row - Slide from right */}
+        {/* Bottom Row */}
         <div className="flex justify-center items-center gap-2 mt-[-18px]">
-          {bottomRow.map((stat, index) => (
+          {bottomRow.map((stat) => (
             <HexStat
               key={stat.label}
               label={stat.label}
