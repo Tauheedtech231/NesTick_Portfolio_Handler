@@ -62,8 +62,8 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          background: theme === 'dark' ? '#f5b800' : '#1a56db',
-          color: theme === 'dark' ? '#0d1a35' : '#ffffff',
+          background: theme === 'dark' ? '#E8CA5E' : '#0066FF', // ← UPDATED: Gold color
+          color: theme === 'dark' ? '#1F4381' : '#FFFFFF', // ← UPDATED: Dark text on gold
           fontFamily: "'Poppins', sans-serif",
           padding: '8px 16px',
           borderRadius: '28px',
@@ -375,7 +375,9 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col leading-[1.2] cursor-pointer" onClick={handleLogoClick}>
             <span className="text-[11px] sm:text-[15px] font-semibold" style={{ color: theme === 'dark' ? '#d8e6ff' : '#1a56db' }}>Portfolio</span>
-            <span className="text-[12px] sm:text-[16px] font-bold" style={{ color: '#f5b800' }}>Handler</span>
+            <span className="text-[12px] sm:text-[16px] font-bold" style={{ color: '#E8CA5E' }}> {/* ← UPDATED: Gold color */ }
+              Handler
+            </span>
           </div>
         </div>
 
@@ -392,7 +394,7 @@ export default function Navbar() {
                 onClick={() => handleNavigation(item.path)}
                 className="relative h-full flex items-center whitespace-nowrap text-[11px] lg:text-[13px] font-medium tracking-[0.6px] px-2 lg:px-5 cursor-pointer"
                 style={{
-                  color: isActive ? '#f5b800' : (theme === 'dark' ? '#9ab0d4' : '#4a5a7a'),
+                  color: isActive ? '#E8CA5E' : (theme === 'dark' ? '#9ab0d4' : '#4a5a7a'), // ← UPDATED: Gold for active
                   fontWeight: isActive ? '600' : '500',
                   fontFamily: "'Poppins', sans-serif",
                 }}
@@ -400,7 +402,7 @@ export default function Navbar() {
                 {item.name}
                 {isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-md"
-                    style={{ background: '#f5b800' }} />
+                    style={{ background: '#E8CA5E' }} /> 
                 )}
               </button>
             );
@@ -428,7 +430,7 @@ export default function Navbar() {
             style={{
               borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
               background: 'transparent',
-              color: theme === 'dark' ? '#f5c842' : '#1a56db',
+              color: theme === 'dark' ? '#E8CA5E' : '#0066FF', // ← UPDATED: Gold sun icon
             }}
           >
             {theme === 'dark' ? (
@@ -447,7 +449,7 @@ export default function Navbar() {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-1 sm:gap-2 cursor-pointer"
                 style={{
-                  background: theme === 'dark' ? '#f5b800' : '#1a56db',
+                  background: theme === 'dark' ? '#E8CA5E' : '#0066FF', // ← UPDATED: Gold background
                   borderRadius: '28px',
                   padding: '4px 10px 4px 4px',
                 }}
@@ -457,18 +459,18 @@ export default function Navbar() {
                   style={{
                     background: theme === 'dark' ? '#132248' : '#ffffff',
                     border: '2px solid rgba(255,255,255,0.4)',
-                    color: theme === 'dark' ? '#f5b800' : '#1a56db',
+                    color: theme === 'dark' ? '#E8CA5E' : '#0066FF', // ← UPDATED: Gold text
                   }}
                 >
                   {getUserInitial()}
                 </div>
                 <span 
                   className="text-[10px] sm:text-[12.5px] font-semibold max-w-[80px] sm:max-w-[130px] overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ color: '#ffffff' }}
+                  style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} // ← UPDATED: Dark text on gold
                 >
                   {getUserName()}
                 </span>
-                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ${isDropdownOpen ? 'rotate-180' : ''}`} style={{ color: '#ffffff' }} />
+                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ${isDropdownOpen ? 'rotate-180' : ''}`} style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} /> {/* ← UPDATED: Dark text on gold */}
               </div>
 
               {/* User Dropdown */}
@@ -536,7 +538,7 @@ export default function Navbar() {
             style={{
               borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
               background: 'transparent',
-              color: theme === 'dark' ? '#f5c842' : '#1a56db',
+              color: theme === 'dark' ? '#E8CA5E' : '#0066FF', // ← UPDATED: Gold icon
             }}
           >
             {isMobileMenuOpen ? (
@@ -573,7 +575,7 @@ export default function Navbar() {
                     onClick={() => handleNavigation(item.path)}
                     className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg cursor-pointer ${
                       isActive 
-                        ? 'text-[#f5b800] bg-[#f5b800]/10'
+                        ? 'text-[#E8CA5E] bg-[#E8CA5E]/10' // ← UPDATED: Gold text + bg
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     style={{ fontFamily: "'Poppins', sans-serif" }}
@@ -594,8 +596,8 @@ export default function Navbar() {
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
-                    background: '#f5b800',
-                    color: '#0d1a35',
+                    background: '#E8CA5E', // ← UPDATED: Gold background
+                    color: '#1F4381', // ← UPDATED: Dark text
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >

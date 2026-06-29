@@ -74,7 +74,7 @@ const IconCircle: React.FC<{
 
   const borderColor = theme === 'dark' ? "#1e3366" : "#c5cfe0";
   const bgColor = theme === 'dark' ? "rgba(12, 22, 58, 0.8)" : "rgba(240, 244, 255, 0.8)";
-  const glowColor = theme === 'dark' ? "rgba(91,155,255,0.15)" : "rgba(0,102,255,0.12)";
+  const glowColor = theme === 'dark' ? "rgba(232,202,94,0.15)" : "rgba(232,202,94,0.12)"; // ← UPDATED: Gold
 
   return (
     <motion.div
@@ -394,15 +394,17 @@ export function PurposeSection() {
     return () => observer.disconnect();
   }, []);
 
+  // ─── UPDATED: Gold color for Mission ───
   const missionData: CardData = {
     label: "Our Mission",
     title: "Empowering\nEducation",
     body: "To empower educational institutions with cutting-edge portfolio management technology that simplifies administration, enhances student visibility, and creates lasting digital legacies for academic achievements.",
-    accentColor: "#f5a623",
-    labelColor: "#f5a623",
-    icon: <TargetIcon color="#d4901a" />,
+    accentColor: "#E8CA5E", // ← UPDATED: Gold
+    labelColor: "#E8CA5E", // ← UPDATED: Gold
+    icon: <TargetIcon color="#c49b2a" />, // ← UPDATED: Darker Gold
   };
 
+  // Vision stays Blue
   const visionData: CardData = {
     label: "Our Vision",
     title: "Shaping\nthe Future",
@@ -416,10 +418,10 @@ export function PurposeSection() {
   const bgColor = theme === 'dark' ? "#0B0F19" : "#f0f4f9";
   const textColor = theme === 'dark' ? '#fff' : '#1F2937';
   const mutedColor = theme === 'dark' ? '#8899bb' : '#6B7280';
-  const centerDotColor = theme === 'dark' ? '#5b9bff' : '#0066FF';
+  const centerDotColor = theme === 'dark' ? '#E8CA5E' : '#E8CA5E'; // ← UPDATED: Gold
   const centerLineColor = theme === 'dark' 
-    ? "linear-gradient(to bottom, transparent 0%, #2a4080 20%, #3a6ac0 50%, #2a4080 80%, transparent 100%)"
-    : "linear-gradient(to bottom, transparent 0%, #c5cfe0 20%, #0066FF 50%, #c5cfe0 80%, transparent 100%)";
+    ? "linear-gradient(to bottom, transparent 0%, #2a4080 20%, #E8CA5E 50%, #2a4080 80%, transparent 100%)" // ← UPDATED: Gold
+    : "linear-gradient(to bottom, transparent 0%, #c5cfe0 20%, #E8CA5E 50%, #c5cfe0 80%, transparent 100%)"; // ← UPDATED: Gold
 
   // Header animation
   const headerVariants:Variants = {
@@ -491,7 +493,7 @@ export function PurposeSection() {
           margin: 0,
           transition: "color 0.3s ease",
         }}>
-          Purpose & <span style={{ color: "#f5a623" }}>Impact</span>
+          Purpose & <span style={{ color: "#E8CA5E" }}>Impact</span> {/* ← UPDATED: Gold */}
         </h1>
       </motion.div>
 
@@ -508,7 +510,7 @@ export function PurposeSection() {
           marginBottom: "36px",
         }}
       >
-        <div style={{ width: "26px", height: "2.5px", background: "#f5a623", borderRadius: "2px" }} />
+        <div style={{ width: "26px", height: "2.5px", background: "#E8CA5E", borderRadius: "2px" }} /> {/* ← UPDATED: Gold */}
         <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: theme === 'dark' ? "#e8e8e8" : "#1F2937", transition: "background 0.3s ease" }} />
         <div style={{ width: "26px", height: "2.5px", background: "#5b9bff", borderRadius: "2px" }} />
       </motion.div>
@@ -527,7 +529,7 @@ export function PurposeSection() {
       >
         <MissionCard data={missionData} isInView={isInView} theme={theme} />
 
-        {/* Center Line with Glowing Dot */}
+        {/* Center Line with Glowing Dot - GOLD */}
         <div
           style={{
             background: centerLineColor,

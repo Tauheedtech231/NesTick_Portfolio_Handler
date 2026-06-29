@@ -13,7 +13,8 @@ import {
   MessageSquare,
   Send,
   CheckCircle,
-  XCircle
+  XCircle,
+  ArrowRight
 } from 'lucide-react';
 
 interface ContactFormData {
@@ -57,44 +58,51 @@ export default function ContactSection() {
     return () => observer.disconnect();
   }, []);
 
-  // Theme colors - Same as Partner Section
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F5F5F5';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : 'rgba(0, 0, 0, 0.04)';
+  // Theme colors
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
   const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
-  const getAccentColor = () => '#60A5FA';
-  const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : 'rgba(245, 245, 245, 0.8)';
-  const getButtonBg = () => '#60A5FA';
-  const getButtonText = () => '#FFFFFF';
-  const getCurveColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(0, 0, 0, 0.1)';
+  const getAccentColor = () => '#E8CA5E';
+  const getAccentBg = () => theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(232, 202, 94, 0.08)';
+  const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : 'rgba(249, 250, 251, 0.9)';
+  const getButtonBg = () => theme === 'dark' ? '#E8CA5E' : '#0066FF';
+  const getButtonText = () => theme === 'dark' ? '#1F4381' : '#FFFFFF';
+  const getCurveColor = () => theme === 'dark' ? '#6B7280' : '#9CA3AF';
+  const getCenterLineColor = () => theme === 'dark' ? '#6B7280' : '#9CA3AF';
+  const getIconBg = () => theme === 'dark' ? '#1F2937' : '#374151';
+  const getIconBorder = () => '#E8CA5E';
+  const getIconColor = () => '#FFFFFF';
+  const getArrowCircleBg = () => '#E8CA5E';
+  const getArrowColor = () => '#FFFFFF';
 
   const getInputStyle = () => ({
     width: '100%',
-    padding: '0.7rem 1rem 0.7rem 2.5rem',
-    borderRadius: '0.5rem',
-    fontSize: '0.85rem',
+    padding: '0.8rem 1rem 0.8rem 2.8rem',
+    borderRadius: '0.75rem',
+    fontSize: '0.95rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
     outline: 'none',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s ease',
     fontFamily: "'Calibri Light', sans-serif",
   });
 
   const getTextareaStyle = () => ({
     width: '100%',
-    padding: '0.7rem 1rem 0.7rem 2.5rem',
-    borderRadius: '0.5rem',
-    fontSize: '0.85rem',
+    padding: '0.8rem 1rem 0.8rem 2.8rem',
+    borderRadius: '0.75rem',
+    fontSize: '0.95rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
     outline: 'none',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s ease',
     fontFamily: "'Calibri Light', sans-serif",
     resize: 'none' as const,
-    minHeight: '120px',
+    minHeight: '140px',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -134,17 +142,16 @@ export default function ContactSection() {
     }
   };
 
-  // Contact info items
   const contactItems = [
     {
       icon: MapPin,
       title: 'Office Address',
-      details: ['123 Business Avenue,', 'Main Boulevard, Lahore, Pakistan']
+      details: ['Johar Town,', 'Lahore, Pakistan']
     },
     {
       icon: Phone,
       title: 'Contact Info',
-      details: ['+92 322 4700200', 'info@mansolhab.com']
+      details: ['03237594869', 'neezamiya@gmail.com']
     },
     {
       icon: Clock,
@@ -156,7 +163,7 @@ export default function ContactSection() {
   return (
     <section 
       ref={sectionRef}
-      className="py-10 px-4 sm:px-6 relative overflow-hidden"
+      className="py-16 px-4 sm:px-6 relative overflow-hidden"
       style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
     >
       <div className="max-w-6xl mx-auto">
@@ -170,28 +177,58 @@ export default function ContactSection() {
             border: 'none',
           }}
         >
-          <div className="flex flex-col md:flex-row">
-            {/* Left Column - Contact Info */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 lg:p-10 relative z-10">
+          <div className="flex flex-col md:flex-row relative">
+            {/* ─── CENTER DIVIDER LINE WITH ARROW ─── */}
+            <div className="hidden md:flex absolute left-1/2 top-0 bottom-0 -translate-x-1/2 flex-col items-center z-20">
+              <div className="flex-1 w-[2px]"
+                style={{ 
+                  background: `linear-gradient(to bottom, transparent, ${getCenterLineColor()})`,
+                }}
+              />
+              
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 relative cursor-pointer group transition-all duration-300 hover:scale-110"
+                style={{
+                  backgroundColor: getArrowCircleBg(),
+                  border: `2px solid ${getAccentColor()}`,
+                  zIndex: 2,
+                  boxShadow: `0 0 30px rgba(232, 202, 94, 0.15)`,
+                }}
+              >
+                <ArrowRight 
+                  className="w-6 h-6 relative z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(232,202,94,0.8)] group-hover:scale-110"
+                  style={{ color: getArrowColor() }}
+                />
+              </div>
+              
+              <div className="flex-1 w-[2px]"
+                style={{ 
+                  background: `linear-gradient(to top, transparent, ${getCenterLineColor()})`,
+                }}
+              />
+            </div>
+
+            {/* Left Column - Contact Info - 50% width */}
+            <div className="w-full md:w-1/2 p-6 md:p-8 lg:p-10 relative z-10 pr-6 md:pr-10">
               <div className="mb-8 md:mb-10">
-                <h1 className="text-3xl md:text-4xl  font-bold font-serif leading-tight cursor-pointer"
+                <h1 className="text-2xl md:text-3xl font-bold font-serif leading-tight cursor-pointer"
                   style={{ 
                     color: getTextColor(),
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  Get in<br />
+                  Let's<br />
                   <span 
-                    className="relative inline-block"
-                    style={{ color: getAccentColor() }}
+                    className="inline-block"
+                    style={{ 
+                      color: getAccentColor(),
+                    }}
                   >
-                    Touch
-                 
+                    Connect
                   </span>
-                 
                 </h1>
                 <p 
-                  className="mt-4 max-w-xs leading-relaxed cursor-pointer text-sm"
+                  className="mt-4 max-w-xs leading-relaxed cursor-pointer text-base"
                   style={{ 
                     color: getTextMuted(),
                     fontFamily: "'Calibri Light', sans-serif",
@@ -201,121 +238,140 @@ export default function ContactSection() {
                 </p>
               </div>
 
-              {/* Contact Details */}
-              <div className="space-y-8 relative">
-                {/* Curved Timeline Line - Pure Black/Dark */}
+              {/* Contact Details - WITH CURVE SHAPE AND GAPS */}
+              <div className="space-y-10 relative">
+                
+                {/* Curved Timeline Line - GRAY */}
                 <svg 
-                  className="absolute left-[18px] top-6 bottom-6 w-8 h-[calc(100%-48px)]"
-                  style={{ color: getCurveColor() }}
+                  className="absolute left-[10px] top-6 bottom-6 w-8 h-[calc(100%-48px)]"
                   preserveAspectRatio="none" 
                   viewBox="0 0 40 100" 
                   fill="none"
                 >
                   <path 
                     d="M7 0 Q 45 50 7 100" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
+                    stroke={getCurveColor()} 
+                    strokeWidth="2.5" 
                     fill="none"
                   />
                 </svg>
                 
-                {/* Top Dot - Connected to curve top */}
-              {/* Top Dot - Slightly right push */}
-<div 
-  className="absolute w-2.5 h-2.5 rounded-full"
-  style={{ 
-    backgroundColor: getAccentColor(),
-    left: 'calc(14px + 0.2rem)',
-    top: '17px',
-  }}
-/>
-                
-                {/* Middle Dot - 0.5rem left push */}
+                {/* Top Dot - GOLD */}
                 <div 
-                  className="absolute left-[38px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full"
+                  className="absolute w-3 h-3 rounded-full"
                   style={{ 
                     backgroundColor: getAccentColor(),
-                    transform: 'translateY(-50%) translateX(-0.3rem)',
+                    left: 'calc(6px + 0.2rem)',
+                    top: '17px',
                   }}
                 />
                 
-                {/* Bottom Dot - 1.5rem bottom push + 1rem left push */}
-              <div 
-  className="absolute w-2.5 h-2.5 rounded-full"
-  style={{ 
-    backgroundColor: getAccentColor(),
-    left: 'calc(14px + .5rem)',    // ← 2rem RIGHT push
-    bottom: 'calc(-.5rem + 0px)',
-  }}
-/>
+                {/* Middle Dot - GOLD - 1rem RIGHT push */}
+                <div 
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{ 
+                    backgroundColor: getAccentColor(),
+                    left: 'calc(6px + 1.2rem)', // ← 1rem RIGHT push (0.2rem + 1rem)
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                />
+                
+                {/* Bottom Dot - GOLD - 1rem DOWN and 0.3rem RIGHT */}
+                <div 
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{ 
+                    backgroundColor: getAccentColor(),
+                    left: 'calc(6px + 0.2rem)', // ← 0.3rem RIGHT (0.2rem + 0.3rem)
+                    bottom: 'calc(-1.5rem + 0px)', // ← 1rem DOWN
+                  }}
+                />
 
-                {contactItems.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 pl-14 cursor-pointer">
-                    <div 
-                      className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        border: `1px solid ${getBorderColor()}`,
-                      }}
-                    >
-                      <item.icon 
-                        className="w-4 h-4" 
-                        style={{ color: getAccentColor() }}
-                      />
-                    </div>
-                    <div>
-                      <h3 
-                        className="font-semibold text-sm"
-                        style={{ 
-                          color: getTextColor(),
-                          fontFamily: "'Poppins', sans-serif",
+                {contactItems.map((item, index) => {
+                  let plValue = 'pl-14';
+                  
+                  if (index === 0) {
+                    plValue = 'pl-16';
+                  } else if (index === 1) {
+                    plValue = 'pl-20';
+                  } else if (index === 2) {
+                    plValue = 'pl-16';
+                  }
+                  
+                  return (
+                    <div key={index} className={`flex items-start gap-6 ${plValue} cursor-pointer`}>
+                      <div 
+                        className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105"
+                        style={{
+                          backgroundColor: getIconBg(),
+                          border: `2px solid ${getIconBorder()}`,
                         }}
                       >
-                        {item.title}
-                      </h3>
-                      {item.details.map((line, idx) => (
-                        <p 
-                          key={idx}
-                          className="text-xs leading-relaxed"
+                        <item.icon 
+                          className="w-5 h-5" 
+                          style={{ color: getIconColor() }}
+                        />
+                      </div>
+                      <div>
+                        <h3 
+                          className="font-semibold text-base"
                           style={{ 
-                            color: getTextMuted(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            color: getTextColor(),
+                            fontFamily: "'Poppins', sans-serif",
                           }}
                         >
-                          {line}
-                        </p>
-                      ))}
+                          {item.title}
+                        </h3>
+                        {item.details.map((line, idx) => (
+                          <p 
+                            key={idx}
+                            className="text-sm leading-relaxed"
+                            style={{ 
+                              color: getTextMuted(),
+                              fontFamily: "'Calibri Light', sans-serif",
+                            }}
+                          >
+                            {line}
+                          </p>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right Column - Form */}
+            {/* Right Column - Form - 50% width */}
             <div 
-              className="w-full md:w-1/2 p-6 md:p-8 lg:p-10 border-t md:border-t-0 md:border-l"
+              className="w-full md:w-1/2 p-6 md:p-8 lg:p-10 border-t md:border-t-0 pl-6 md:pl-10"
               style={{ borderColor: getBorderColor() }}
             >
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-8">
                 <h2 
-                  className="text-xl md:text-2xl font-bold font-serif cursor-pointer"
+                  className="text-2xl md:text-3xl font-bold font-serif text-center cursor-pointer"
                   style={{ 
                     color: getTextColor(),
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
                   Send us a{' '}
-                  <span style={{ color: getAccentColor() }}>Message</span>
+                  <span 
+                    className="inline-block"
+                    style={{ 
+                      color: getAccentColor(),
+                    }}
+                  >
+                    Message
+                  </span>
                 </h2>
-            
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name Field */}
                 <div className="relative group cursor-pointer">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <User 
-                      className="w-4 h-4 transition-colors"
+                      className="w-5 h-5 transition-colors"
                       style={{ color: getTextMuted() }}
                     />
                   </div>
@@ -326,7 +382,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     placeholder="Enter your name"
-                    className="w-full rounded-lg focus:outline-none transition-all cursor-text"
+                    className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = getAccentColor();
@@ -343,7 +399,7 @@ export default function ContactSection() {
                 <div className="relative group cursor-pointer">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <Mail 
-                      className="w-4 h-4 transition-colors"
+                      className="w-5 h-5 transition-colors"
                       style={{ color: getTextMuted() }}
                     />
                   </div>
@@ -354,7 +410,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     placeholder="Enter your email"
-                    className="w-full rounded-lg focus:outline-none transition-all cursor-text"
+                    className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = getAccentColor();
@@ -371,7 +427,7 @@ export default function ContactSection() {
                 <div className="relative group cursor-pointer">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <Tag 
-                      className="w-4 h-4 transition-colors"
+                      className="w-5 h-5 transition-colors"
                       style={{ color: getTextMuted() }}
                     />
                   </div>
@@ -382,7 +438,7 @@ export default function ContactSection() {
                     onChange={handleChange}
                     required
                     placeholder="What is this about?"
-                    className="w-full rounded-lg focus:outline-none transition-all cursor-text"
+                    className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = getAccentColor();
@@ -399,7 +455,7 @@ export default function ContactSection() {
                 <div className="relative group cursor-pointer">
                   <div className="absolute left-3 top-3 pointer-events-none">
                     <MessageSquare 
-                      className="w-4 h-4 transition-colors"
+                      className="w-5 h-5 transition-colors"
                       style={{ color: getTextMuted() }}
                     />
                   </div>
@@ -411,7 +467,7 @@ export default function ContactSection() {
                     placeholder="Write your message here"
                     rows={4}
                     maxLength={MAX_CHARS}
-                    className="w-full rounded-lg focus:outline-none transition-all resize-none cursor-text"
+                    className="w-full rounded-xl focus:outline-none transition-all resize-none cursor-text"
                     style={getTextareaStyle()}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = getAccentColor();
@@ -424,37 +480,37 @@ export default function ContactSection() {
                   />
                 </div>
 
-             {/* Bottom Row */}
-<div className="flex items-center justify-end pt-1">
-  <span 
-    className="text-[10px] font-medium mr-3"
-    style={{ 
-      color: getTextMuted(),
-      fontFamily: "'Calibri Light', sans-serif",
-    }}
-  >
-    {charCount} / {MAX_CHARS}
-  </span>
-  <button
-    type="submit"
-    disabled={isSubmitting}
-    className="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center transition-all duration-300 disabled:opacity-50 cursor-pointer hover:scale-105 active:scale-95"
-    style={{
-      backgroundColor: getButtonBg(),
-      color: getButtonText(),
-      fontFamily: "'Poppins', sans-serif",
-    }}
-  >
-    {isSubmitting ? (
-      <svg className="animate-spin w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-      </svg>
-    ) : (
-      <Send className="w-5 h-5 md:w-6 md:h-6" />
-    )}
-  </button>
-</div>
+                {/* Bottom Row */}
+                <div className="flex items-center justify-end pt-1">
+                  <span 
+                    className="text-xs font-medium mr-3"
+                    style={{ 
+                      color: getTextMuted(),
+                      fontFamily: "'Calibri Light', sans-serif",
+                    }}
+                  >
+                    {charCount} / {MAX_CHARS}
+                  </span>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-50 cursor-pointer hover:scale-105 active:scale-95"
+                    style={{
+                      backgroundColor: getButtonBg(),
+                      color: getButtonText(),
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    {isSubmitting ? (
+                      <svg className="animate-spin w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : (
+                      <Send className="w-6 h-6 md:w-7 md:h-7" />
+                    )}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

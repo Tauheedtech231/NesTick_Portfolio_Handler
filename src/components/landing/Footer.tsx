@@ -46,25 +46,26 @@ export default function Footer() {
 
   const isDark = theme === 'dark';
 
+  // ─── REFERENCE GOLD COLOR ONLY ────────────────────────────────────────────
+  const gold = '#E8CA5E';  // ← CHANGED: Only this
+
   return (
     <footer
       className="relative overflow-hidden transition-colors duration-300"
       style={{
-        background: isDark ? '#0d1235' : '#f8f9fa',
-        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-        fontFamily: "'Inter', sans-serif",
+        background: isDark ? '#0d1235' : '#f8f9fa',  // ← SAME AS BEFORE
+        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,  // ← SAME
+        fontFamily: "'Inter', sans-serif",  // ← SAME
       }}
     >
-      {/* ─── DECORATIVE RINGS ONLY ─── */}
-      
-      {/* Decorative Rings - Bottom Left */}
+      {/* ─── DECORATIVE RINGS - Only gold updated ─── */}
       <svg 
         className="absolute bottom-[-60px] left-[-60px] w-[200px] h-[200px] pointer-events-none z-0"
         viewBox="0 0 260 260"
       >
-        <circle cx="0" cy="260" r="90" fill="none" stroke={isDark ? "rgba(212,169,75,0.18)" : "rgba(212,169,75,0.12)"} strokeWidth="1"/>
-        <circle cx="0" cy="260" r="130" fill="none" stroke={isDark ? "rgba(212,169,75,0.18)" : "rgba(212,169,75,0.12)"} strokeWidth="1"/>
-        <circle cx="0" cy="260" r="170" fill="none" stroke={isDark ? "rgba(212,169,75,0.18)" : "rgba(212,169,75,0.12)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="90" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="130" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="170" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
       </svg>
 
       {/* ─── MAIN FOOTER ─── */}
@@ -77,7 +78,7 @@ export default function Footer() {
               className="w-[52px] h-[52px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
               style={{
                 background: '#fff',
-                border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,
+                border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,  // ← SAME
               }}
             >
               <Image
@@ -91,7 +92,7 @@ export default function Footer() {
             <div>
               <div className="text-[22px] font-bold transition-colors duration-300 cursor-pointer"
                 style={{ 
-                  color: isDark ? '#ffffff' : '#1a1a2e',
+                  color: isDark ? '#ffffff' : '#1a1a2e',  // ← SAME
                   fontFamily: "'Inter', sans-serif",
                   lineHeight: '1.1',
                 }}
@@ -104,14 +105,14 @@ export default function Footer() {
           <div 
             className="h-[2px] w-[90px] rounded-[2px] mt-1 mb-3"
             style={{
-              background: 'linear-gradient(to right, #f0c040, #a855f7)',
+              background: `linear-gradient(to right, ${gold}, ${gold})`,  // ← UPDATED: gold
             }}
           />
 
           <p 
             className="text-[13px] leading-[1.65] max-w-[280px] transition-colors duration-300"
             style={{ 
-              color: isDark ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)',
+              color: isDark ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)',  // ← SAME
               fontFamily: "'Inter', sans-serif",
             }}
           >
@@ -124,15 +125,15 @@ export default function Footer() {
             style={{
               padding: '10px 14px',
               borderRadius: '8px',
-              background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',  // ← SAME
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,  // ← SAME
             }}
           >
-            <Quote className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: isDark ? '#a78bfa' : '#7c3aed' }} />
+            <Quote className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: isDark ? gold : gold }} />  {/* ← UPDATED: gold */}
             <p 
               className="text-[12px] leading-[1.6] italic transition-colors duration-300"
               style={{ 
-                color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)',
+                color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)',  // ← SAME
                 fontFamily: "'Inter', sans-serif",
               }}
             >
@@ -147,14 +148,14 @@ export default function Footer() {
             <div 
               className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
-                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',  // ← SAME
               }}
             >
-              <Compass className="w-[18px] h-[18px] text-[#a78bfa]" />
+              <Compass className="w-[18px] h-[18px]" style={{ color: gold }} />  {/* ← UPDATED: gold */}
             </div>
             <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
-                color: isDark ? '#ffffff' : '#1a1a2e',
+                color: isDark ? '#ffffff' : '#1a1a2e',  // ← SAME
                 fontFamily: "'Inter', sans-serif",
               }}
             >
@@ -165,7 +166,7 @@ export default function Footer() {
           <div 
             className="h-[2px] w-[70px] rounded-[2px] mb-4"
             style={{
-              background: 'linear-gradient(to right, #f0c040, #a855f7)',
+              background: `linear-gradient(to right, ${gold}, ${gold})`,  // ← UPDATED: gold
             }}
           />
 
@@ -176,16 +177,16 @@ export default function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.path}
-                    className="flex items-center gap-3 text-[14px] transition-colors duration-200 hover:text-[#f0c040] cursor-pointer"
+                    className="flex items-center gap-3 text-[14px] transition-colors duration-200 hover:text-[#E8CA5E] cursor-pointer"  // ← UPDATED: gold hover
                     style={{
-                      color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',
+                      color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',  // ← SAME
                       fontFamily: "'Inter', sans-serif",
                       textDecoration: 'none',
                     }}
                   >
                     <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-[15px] h-[15px]" style={{ 
-                        color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'
+                        color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'  // ← SAME
                       }} />
                     </span>
                     {item.name}
@@ -202,14 +203,14 @@ export default function Footer() {
             <div 
               className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
-                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',  // ← SAME
               }}
             >
-              <MessageCircle className="w-[18px] h-[18px] text-[#a78bfa]" />
+              <MessageCircle className="w-[18px] h-[18px]" style={{ color: gold }} />  {/* ← UPDATED: gold */}
             </div>
             <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
-                color: isDark ? '#ffffff' : '#1a1a2e',
+                color: isDark ? '#ffffff' : '#1a1a2e',  // ← SAME
                 fontFamily: "'Inter', sans-serif",
               }}
             >
@@ -220,7 +221,7 @@ export default function Footer() {
           <div 
             className="h-[2px] w-[70px] rounded-[2px] mb-4"
             style={{
-              background: 'linear-gradient(to right, #f0c040, #a855f7)',
+              background: `linear-gradient(to right, ${gold}, ${gold})`,  // ← UPDATED: gold
             }}
           />
 
@@ -229,13 +230,13 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',  // ← SAME
                 }}
               >
-                <Mail className="w-[15px] h-[15px] text-[#a78bfa]" />
+                <Mail className="w-[15px] h-[15px]" style={{ color: gold }} />  {/* ← UPDATED: gold */}
               </div>
               <span className="text-[13px] transition-colors duration-300" style={{ 
-                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)'
+                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',  // ← SAME
               }}>
                 neezamiya@gmail.com
               </span>
@@ -245,13 +246,13 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',  // ← SAME
                 }}
               >
-                <Phone className="w-[15px] h-[15px] text-[#a78bfa]" />
+                <Phone className="w-[15px] h-[15px]" style={{ color: gold }} />  {/* ← UPDATED: gold */}
               </div>
               <span className="text-[13px] transition-colors duration-300" style={{ 
-                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)'
+                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',  // ← SAME
               }}>
                 03237594869
               </span>
@@ -261,13 +262,13 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',  // ← SAME
                 }}
               >
-                <Globe className="w-[15px] h-[15px] text-[#a78bfa]" />
+                <Globe className="w-[15px] h-[15px]" style={{ color: gold }} />  {/* ← UPDATED: gold */}
               </div>
               <span className="text-[13px] transition-colors duration-300" style={{ 
-                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)'
+                color: isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.55)',  // ← SAME
               }}>
                 nesticktech.com
               </span>
@@ -281,22 +282,24 @@ export default function Footer() {
       <div 
         className="relative z-10 border-t px-6 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-1.5 transition-colors duration-300"
         style={{
-          borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+          borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',  // ← SAME
         }}
       >
         <div className="flex items-center gap-2 text-[12px] transition-colors duration-300 cursor-pointer" style={{ 
-          color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'
+          color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',  // ← SAME
         }}>
           <Shield className="w-3.5 h-3.5" style={{ 
-            color: isDark ? 'rgba(240,180,40,0.6)' : 'rgba(240,180,40,0.7)'
+            color: gold  // ← UPDATED: gold
           }} />
           © {currentYear} Portfolio Handler. All rights reserved.
         </div>
         <div className="text-[12px] flex items-center gap-1 transition-colors duration-300 cursor-pointer" style={{ 
-          color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)'
+          color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',  // ← SAME
         }}>
-          Made by{' '}
-          <span className="font-semibold text-[#a855f7]">Nestick Tech</span>
+          Powered by{' '}
+          <span className="font-semibold" style={{ color: gold }}>  {/* ← UPDATED: gold */}
+            Nestick Tech
+          </span>
         </div>
       </div>
 

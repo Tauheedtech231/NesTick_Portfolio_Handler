@@ -39,9 +39,10 @@ const SEG_META = [
   },
 ];
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Constants - UPDATED COLORS ONLY ────────────────────────────────────────
 const CX = 340, CY = 340;
-const GOLD = "#FFD700", BLUE = "#0066FF";
+const GOLD = "#E8CA5E";        // ← CHANGED: #FFD700 → #E8CA5E
+const BLUE = "#0066FF";        // ← KEPT SAME
 const FILL = "#0f1e38", FILL_HOVER = "#1a3060", INNER_FILL = "#07101e", BG = "#0B0F19";
 const LIGHT_BG = "#FFFFFF", LIGHT_FILL = "#f0f4ff", LIGHT_FILL_HOVER = "#dce6ff";
 const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#6B7280";
@@ -496,7 +497,7 @@ export default function FeaturesSection() {
     return () => window.removeEventListener("keydown", f);
   }, [handleClose]);
 
-  // ── Theme-aware colors ───────────────────────────────────────────────────────
+  // ── Theme-aware colors - UPDATED ONLY COLORS ──────────────────────────────
   const isDark      = theme === "dark";
   const bgColor     = isDark ? BG         : LIGHT_BG;
   const segFill     = isDark ? FILL       : LIGHT_FILL;
@@ -574,13 +575,13 @@ export default function FeaturesSection() {
           </svg>
         </div>
 
-        {/* Dim overlay */}
+        {/* Dim overlay - UPDATED COLOR */}
         {activeSeg && (
           <div
             onClick={handleClose}
             style={{
               position: "absolute", inset: 0, zIndex: 10,
-              backgroundColor: "rgba(0,0,0,0.92)",
+              backgroundColor: isDark ? "rgba(11, 15, 25, 0.92)" : "rgba(0, 0, 0, 0.85)",
               opacity: overlayVisible ? 1 : 0,
               transition: "opacity 0.45s ease",
               pointerEvents: animating ? "none" : "auto",

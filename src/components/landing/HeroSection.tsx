@@ -198,16 +198,19 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       <section
         id="home"
         ref={heroRef}
-        className="relative min-h-screen  flex items-center justify-center overflow-hidden w-full"
-        style={{ fontFamily: "'Poppins', sans-serif" }}
+        className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
+        style={{ 
+          fontFamily: "'Poppins', sans-serif",
+          backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+        }}
       >
-        {/* Video Background - Direct */}
+        {/* Video Background - with overlay matching template colors */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <div 
             ref={(el) => setParallaxRef(el)}
             className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out will-change-transform"
           >
-            <div className="absolute inset-0 w-full h-full bg-black">
+            <div className="absolute inset-0 w-full h-full">
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -225,87 +228,87 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 Your browser does not support the video tag.
               </video>
               
-              {/* Fallback gradient if video fails to load */}
+              {/* Fallback gradient - USING REFERENCE COLORS */}
               {!videoLoaded && (
                 <div 
-                  className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#1F4381] to-[#0B0F19]"
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    background: theme === 'dark' 
+                      ? 'linear-gradient(135deg, #0B0F19, #1F4381)'
+                      : 'linear-gradient(135deg, #FFFFFF, #e8edf5)'
+                  }}
                 />
               )}
             </div>
           </div>
         </div>
 
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 z-10 bg-black/40" />
+        {/* Overlay - USING REFERENCE COLORS */}
+        <div 
+          className="absolute inset-0 z-10"
+          style={{
+            background: theme === 'dark' 
+              ? 'rgba(11, 15, 25, 0.7)' 
+              : 'rgba(255, 255, 255, 0.85)'
+          }}
+        />
 
         {/* Main Content */}
         <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
           <div className="flex flex-col items-center justify-center text-center">
             
-            {/* ─── Premium Badge ─── */}
+            {/* ─── Premium Badge - USING REFERENCE COLORS ─── */}
             <div 
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2  sm:py-2.5 rounded-full border shadow-lg mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500 relative overflow-hidden"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500"
               style={{
-                background: theme === 'dark' 
-                  ? 'linear-gradient(135deg, #1F4381, #0B0F19)' 
-                  : 'linear-gradient(135deg, #ffffff, #e8edf5)',
-                border: '1px solid rgba(232, 202, 94, 0.3)',
-                boxShadow: '0 0 30px rgba(232, 202, 94, 0.15), 0 0 60px rgba(0, 160, 255, 0.08)'
+                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                border: 'none',
               }}
             >
-              {/* Shine Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" 
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)',
-                  transform: 'skewX(-20deg)'
-                }}
+              <Globe2 
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
               />
-              
-              <div className="flex gap-1.5 ">
-               
-                <Globe2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                  theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
-                }`} />
-              </div>
               <span 
-                className="text-[10px] sm:text-xs md:text-sm font-medium transition-all duration-500"
+                className="text-[10px] sm:text-xs md:text-sm font-medium"
                 style={{
                   fontFamily: "'Poppins', sans-serif",
-                  color: theme === 'dark' ? '#E8CA5E' : '#00A0FF',
-                  textShadow: theme === 'dark' 
-                    ? '0 0 20px rgba(232, 202, 94, 0.3)' 
-                    : '0 0 20px rgba(0, 160, 255, 0.2)'
+                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                 }}
               >
                 Trusted by 500+ Educational Institutions
               </span>
             </div>
 
-            {/* Headings with Glow */}
+            {/* ─── HEADINGS - ORIGINAL FONT SIZES KEEP ─── */}
             <div className="mb-5 sm:mb-7">
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
-                <span className="block text-white font-serif tracking-tight drop-shadow-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <span 
+                  className="block font-serif tracking-tight"
+                  style={{ 
+                    fontFamily: "'Poppins', sans-serif",
+                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  }}
+                >
                   Journey Through the
                 </span>
               </h1>
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
                 <span className="block">
                   <span 
-                    className="font-serif drop-shadow-lg" 
+                    className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: '#E8CA5E',
-                      textShadow: '0 0 30px rgba(232, 202, 94, 0.4), 0 0 60px rgba(232, 202, 94, 0.2), 0 0 90px rgba(232, 202, 94, 0.1)'
+                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                     }}
                   >
                     Galaxy of
                   </span>{' '}
                   <span 
-                    className="font-serif drop-shadow-lg" 
+                    className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: '#00E0FF',
-                      textShadow: '0 0 30px rgba(0, 224, 255, 0.4), 0 0 60px rgba(0, 224, 255, 0.2), 0 0 90px rgba(0, 224, 255, 0.1)'
+                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                     }}
                   >
                     College Portfolios
@@ -314,46 +317,34 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </h1>
             </div>
 
-            {/* Subheading */}
-            <p className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide text-white drop-shadow-md"
-            style={{ fontFamily: "'Calibri Light', sans-serif" }}
+            {/* ─── SUBHEADING - ORIGINAL FONT SIZE KEEP ─── */}
+            <p 
+              className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide"
+              style={{ 
+                fontFamily: "'Calibri Light', sans-serif",
+                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+              }}
             >
               Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
               A centralized constellation where institutions create, customize, and control their digital 
               presence across the universe of learning.
             </p>
 
-            {/* ─── Premium CTA Buttons ─── */}
+            {/* ─── CTA Buttons - USING REFERENCE COLORS ─── */}
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
               
               {/* ── LEARN MORE BUTTON ── */}
               <button
                 onClick={handleLearn}
-                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
-                  background: '#0a0a0a',
-                  color: '#E8CA5E',
-                  border: '2px solid #E8CA5E',
+                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
                   borderRadius: '50px',
-                  boxShadow: '0 0 30px rgba(232, 202, 94, 0.15), 0 0 60px rgba(232, 202, 94, 0.08), inset 0 0 30px rgba(232, 202, 94, 0.05)'
+                  border: 'none',
                 }}
               >
-                {/* Premium Shine Effect */}
-                <span className="absolute inset-0 rounded-full overflow-hidden">
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" 
-                    style={{ transform: 'skewX(-20deg)' }}
-                  />
-                </span>
-                
-                {/* Glow Effects */}
-                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-[-4px] rounded-full border-2 border-[#E8CA5E]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
-                
-                {/* Static Glow (always visible) */}
-                <span className="absolute inset-0 rounded-full bg-[#E8CA5E]/10 blur-xl opacity-50 -z-10" />
-                
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -361,46 +352,47 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               {/* ── YOUR DESIGN BUTTON ── */}
               <button
                 onClick={handleDesignClick}
-                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer overflow-visible"
+                className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
-                  background: 'transparent',
-                  color: '#ffffff',
-                  border: '2px solid #00A0FF',
+                  backgroundColor: 'transparent',
+                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
                   borderRadius: '50px',
-                  boxShadow: '0 0 30px rgba(0, 160, 255, 0.15), 0 0 60px rgba(0, 160, 255, 0.08), inset 0 0 30px rgba(0, 160, 255, 0.05)'
+                  border: '2px solid',
+                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
                 }}
               >
-                {/* Premium Shine Effect */}
-                <span className="absolute inset-0 rounded-full overflow-hidden">
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" 
-                    style={{ transform: 'skewX(-20deg)' }}
-                  />
-                </span>
-                
-                {/* Glow Effects */}
-                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                <span className="absolute inset-[-4px] rounded-full border-2 border-[#00A0FF]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
-                
-                {/* Static Glow (always visible) */}
-                <span className="absolute inset-0 rounded-full bg-[#00A0FF]/10 blur-xl opacity-40 -z-10" />
-                
-                <Palette className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                <Palette className="w-4 h-4" />
                 <span>Your Design</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Simple scroll hint */}
+        {/* Scroll hint - USING REFERENCE COLORS */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
           <div className="flex flex-col items-center gap-1 opacity-50">
-            <span className="text-[9px] uppercase tracking-wider text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <span 
+              className="text-[9px] uppercase tracking-wider"
+              style={{ 
+                fontFamily: "'Poppins', sans-serif",
+                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+              }}
+            >
               Scroll
             </span>
-            <div className="w-4 h-6 border border-white rounded-full flex justify-center">
-              <div className="w-0.5 h-1.5 bg-white rounded-full mt-1 animate-bounce" />
+            <div 
+              className="w-4 h-6 rounded-full flex justify-center"
+              style={{
+                border: `2px solid ${theme === 'dark' ? '#FFFFFF' : '#1F2937'}`,
+              }}
+            >
+              <div 
+                className="w-0.5 h-1.5 rounded-full mt-1 animate-bounce"
+                style={{
+                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                }}
+              />
             </div>
           </div>
         </div>
@@ -410,66 +402,96 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             0% { transform: translateX(-100%) skewX(-20deg); }
             100% { transform: translateX(200%) skewX(-20deg); }
           }
-          @keyframes pulse-glow {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-          }
           .will-change-transform {
             will-change: transform;
-          }
-          
-          /* Smooth font rendering */
-          * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-          }
-          
-          /* Elegant text selection */
-          ::selection {
-            background: linear-gradient(135deg, #E8CA5E40, #00E0FF40);
-            color: #E8CA5E;
           }
         `}</style>
       </section>
 
+      {/* ─── MODAL - USING REFERENCE COLORS ─── */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
+            className="fixed inset-0 z-[200] flex justify-center p-4 overflow-y-auto"
+            style={{
+              backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.9)' : 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(8px)',
+            }}
             onClick={closeModal}
-            style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative bg-[#0F172A] rounded-2xl w-full max-w-2xl my-8 shadow-2xl border border-blue-500/30 overflow-hidden"
+              className="relative rounded-2xl w-full max-w-2xl my-8 shadow-2xl overflow-hidden"
+              style={{
+                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
+                border: '1px solid',
+                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.15)',
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="px-6 py-5 border-b border-gray-800 flex items-center justify-between bg-[#0F172A] sticky top-0 z-10">
+              <div 
+                className="px-6 py-5 flex items-center justify-between sticky top-0 z-10"
+                style={{
+                  borderBottom: '1px solid',
+                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
+                }}
+              >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Palette className="w-5 h-5 text-white" />
+                  <div 
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{
+                      backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                    }}
+                  >
+                    <Palette 
+                      className="w-5 h-5"
+                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+                    />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <h2 
+                      className="text-xl font-bold"
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif",
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      }}
+                    >
                       Your Design
                     </h2>
-                    <p className="text-sm text-gray-400" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                    <p 
+                      className="text-sm"
+                      style={{ 
+                        fontFamily: "'Calibri Light', sans-serif",
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      }}
+                    >
                       Share your creative vision with us
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="p-2 rounded-full hover:bg-gray-800 transition-colors"
+                  className="p-2 rounded-full transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
-                  <X className="w-5 h-5 text-gray-400 hover:text-white" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -477,13 +499,33 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               <div className="max-h-[70vh] overflow-y-auto">
                 {submitSuccess ? (
                   <div className="p-12 text-center">
-                    <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
-                      <CheckCircle className="w-8 h-8 text-green-500" />
+                    <div 
+                      className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4"
+                      style={{
+                        backgroundColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.08)',
+                      }}
+                    >
+                      <CheckCircle 
+                        className="w-8 h-8"
+                        style={{ color: '#22C55E' }}
+                      />
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                    <h3 
+                      className="text-xl font-bold mb-2"
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif",
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      }}
+                    >
                       Request Submitted!
                     </h3>
-                    <p className="text-gray-400" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
+                    <p 
+                      className="text-sm"
+                      style={{ 
+                        fontFamily: "'Calibri Light', sans-serif",
+                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      }}
+                    >
                       Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
                     </p>
                   </div>
@@ -491,7 +533,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <label 
+                          className="block text-sm font-medium mb-1.5"
+                          style={{ 
+                            fontFamily: "'Poppins', sans-serif",
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          }}
+                        >
                           Full Name *
                         </label>
                         <input
@@ -499,11 +547,18 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                            formErrors.name ? 'border-red-500' : 'border-gray-700'
+                          className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
+                            formErrors.name 
+                              ? 'border-red-500' 
+                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                           }`}
+                          style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
+                            outline: 'none',
+                          }}
                           placeholder="Enter your full name"
-                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.name && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -513,7 +568,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <label 
+                          className="block text-sm font-medium mb-1.5"
+                          style={{ 
+                            fontFamily: "'Poppins', sans-serif",
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          }}
+                        >
                           Email Address *
                         </label>
                         <input
@@ -521,11 +582,18 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                            formErrors.email ? 'border-red-500' : 'border-gray-700'
+                          className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
+                            formErrors.email 
+                              ? 'border-red-500' 
+                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                           }`}
+                          style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
+                            outline: 'none',
+                          }}
                           placeholder="you@example.com"
-                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.email && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -537,7 +605,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <label 
+                          className="block text-sm font-medium mb-1.5"
+                          style={{ 
+                            fontFamily: "'Poppins', sans-serif",
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          }}
+                        >
                           Phone Number *
                         </label>
                         <input
@@ -545,11 +619,18 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                            formErrors.phone ? 'border-red-500' : 'border-gray-700'
+                          className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
+                            formErrors.phone 
+                              ? 'border-red-500' 
+                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                           }`}
+                          style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
+                            outline: 'none',
+                          }}
                           placeholder="+92 300 1234567"
-                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
                         />
                         {formErrors.phone && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -559,17 +640,30 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                        <label 
+                          className="block text-sm font-medium mb-1.5"
+                          style={{ 
+                            fontFamily: "'Poppins', sans-serif",
+                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          }}
+                        >
                           Design Type *
                         </label>
                         <select
                           name="designType"
                           value={formData.designType}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${
-                            formErrors.designType ? 'border-red-500' : 'border-gray-700'
+                          className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
+                            formErrors.designType 
+                              ? 'border-red-500' 
+                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                           }`}
-                          style={{ fontFamily: "'Calibri Light', sans-serif" }}
+                          style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            fontFamily: "'Calibri Light', sans-serif",
+                            outline: 'none',
+                          }}
                         >
                           <option value="">Select design type</option>
                           {designTypes.map(type => (
@@ -585,7 +679,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <label 
+                        className="block text-sm font-medium mb-1.5"
+                        style={{ 
+                          fontFamily: "'Poppins', sans-serif",
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        }}
+                      >
                         What inspires you? (Optional)
                       </label>
                       <input
@@ -593,14 +693,26 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         name="inspiration"
                         value={formData.inspiration}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                        style={{
+                          backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                          fontFamily: "'Calibri Light', sans-serif",
+                          outline: 'none',
+                        }}
                         placeholder="e.g., Modern minimalism, Nature, Technology, Art Deco..."
-                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <label 
+                        className="block text-sm font-medium mb-1.5"
+                        style={{ 
+                          fontFamily: "'Poppins', sans-serif",
+                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        }}
+                      >
                         Describe your design requirements *
                       </label>
                       <textarea
@@ -608,11 +720,18 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         value={formData.description}
                         onChange={handleInputChange}
                         rows={4}
-                        className={`w-full px-4 py-2.5 rounded-xl bg-[#0B0F19] border text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none ${
-                          formErrors.description ? 'border-red-500' : 'border-gray-700'
+                        className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all resize-none ${
+                          formErrors.description 
+                            ? 'border-red-500' 
+                            : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                         }`}
+                        style={{
+                          backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
+                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          fontFamily: "'Calibri Light', sans-serif",
+                          outline: 'none',
+                        }}
                         placeholder="Tell us about your vision, preferred colors, style, features you need, etc..."
-                        style={{ fontFamily: "'Calibri Light', sans-serif" }}
                       />
                       {formErrors.description && (
                         <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -624,12 +743,17 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      className="w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95"
+                      style={{
+                        fontFamily: "'Poppins', sans-serif",
+                        backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                        color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                        border: 'none',
+                      }}
                     >
                       {isSubmitting ? (
                         <>
-                          <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>

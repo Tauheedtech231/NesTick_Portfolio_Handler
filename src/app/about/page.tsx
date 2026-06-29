@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import React, { useRef, useState, useEffect } from 'react';
 import { 
   Sparkles, 
@@ -13,14 +13,14 @@ import {
   Send,
   CheckCircle,
   XCircle,
-  Users,
 } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { PartnerSection } from '@/components/landing/PartnerSection';
 import JourneySection from './JourneySection';
 import { HeroSection } from './HeroSection'; 
-import { PurposeSection } from './PurposeSection'; 
+import { PurposeSection } from './PurposeSection';
+import { TeamSlider } from './TeamMember';  // ← IMPORTED
 
 interface ContactFormData {
   name: string;
@@ -29,60 +29,19 @@ interface ContactFormData {
   message: string;
 }
 
-// Team data
-const teamMembers = [
-  {
-    id: 1,
-    name: 'Talha Zaheer',
-    role: 'CTO',
-    avatarColor: '#6366F1',
-    initials: 'TZ',
-  },
-  {
-    id: 2,
-    name: 'Abdullah Amin',
-    role: 'Founder',
-    avatarColor: '#8B5CF6',
-    initials: 'AA',
-  },
-  {
-    id: 3,
-    name: 'Nimra Ali',
-    role: 'Creative Lead',
-    avatarColor: '#EC4899',
-    initials: 'NA',
-  },
-  {
-    id: 4,
-    name: 'Muhammad Tauheed',
-    role: 'Senior Developer',
-    avatarColor: '#06B6D4',
-    initials: 'MT',
-  },
+// Contact info data
+const contactInfo = [
+  { icon: Phone, label: "Phone", value: "+92 319 3236529", href: "tel:+923193236529", description: "Available Mon-Fri, 9AM-6PM" },
+  { icon: Mail, label: "Email", value: "support@portfoliohandler.com", href: "mailto:support@portfoliohandler.com", description: "We reply within 24 hours" },
+  { icon: MapPin, label: "Office", value: "Daska, Pakistan", href: null, description: "Serving globally from Daska" },
+  { icon: Clock, label: "Business Hours", value: "Monday - Friday", href: null, description: "9:00 AM - 6:00 PM (PKT)" },
 ];
 
 export default function AboutPage() {
-  const heroRef = useRef(null);
-  const teamRef = useRef(null);
   const contactRef = useRef(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   
-  const [duplicatedTeam, setDuplicatedTeam] = useState<typeof teamMembers>([]);
-  
-  const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
-  const teamInView = useInView(teamRef, { once: true, amount: 0.2 });
   const contactInView = useInView(contactRef, { once: true, amount: 0.2 });
-
-  const { scrollYProgress } = useScroll({
-    target: teamRef,
-    offset: ["start end", "end start"]
-  });
-
-  const sliderX = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    [0, -200, -400, -600, -800]
-  );
 
   useEffect(() => {
     const checkTheme = () => {
@@ -104,11 +63,6 @@ export default function AboutPage() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const copies = [...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers, ...teamMembers];
-    setDuplicatedTeam(copies);
-  }, []);
-
   const [contactFormData, setContactFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -117,13 +71,6 @@ export default function AboutPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
-  const contactInfo = [
-    { icon: Phone, label: "Phone", value: "+92 319 3236529", href: "tel:+923193236529", description: "Available Mon-Fri, 9AM-6PM" },
-    { icon: Mail, label: "Email", value: "support@portfoliohandler.com", href: "mailto:support@portfoliohandler.com", description: "We reply within 24 hours" },
-    { icon: MapPin, label: "Office", value: "Daska, Pakistan", href: null, description: "Serving globally from Daska" },
-    { icon: Clock, label: "Business Hours", value: "Monday - Friday", href: null, description: "9:00 AM - 6:00 PM (PKT)" },
-  ];
 
   const handleContactInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -161,21 +108,14 @@ export default function AboutPage() {
   // ── Theme-based colors ──
   const isDark = theme === 'dark';
   const bgPrimary = isDark ? '#0B0F19' : '#F5F5F5';
-  const bgSecondary = isDark ? '#0B0F19' : '#F5F5F5';
   const textPrimary = isDark ? '#FFFFFF' : '#1F2937';
   const textSecondary = isDark ? '#9CA3AF' : '#6B7280';
-  const textMuted = isDark ? '#9CA3AF' : '#6B7280';
   const accentColor = isDark ? '#E8CA5E' : '#0066FF';
-  const accentLight = isDark ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 102, 255, 0.08)';
+  const accentLight = isDark ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)';
   const borderColor = isDark ? 'rgba(30, 41, 59, 0.3)' : 'rgba(0, 0, 0, 0.08)';
   const inputBg = isDark ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.8)';
   const inputText = isDark ? '#FFFFFF' : '#1F2937';
-  const placeholderColor = isDark ? '#6B7280' : '#9CA3AF';
-  const cardBg = isDark ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.8)';
-  const iconBg = isDark ? 'rgba(31, 67, 129, 0.2)' : 'rgba(0, 102, 255, 0.08)';
-  const teamNameColor = isDark ? '#E2E8F0' : '#1F2937';
-  const teamRoleBg = isDark ? '#1F4381' : '#E8CA5E';
-  const teamRoleColor = isDark ? '#FFFFFF' : '#1F2937';
+  const iconBg = isDark ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)';
   const buttonBg = isDark ? '#E8CA5E' : '#0066FF';
   const buttonText = isDark ? '#1F4381' : '#FFFFFF';
 
@@ -204,113 +144,8 @@ export default function AboutPage() {
           console.log('New partner application:', data);
         }} />
 
-        {/* ─── Team Slider ─── */}
-        <section ref={teamRef} className="py-12 md:py-16 overflow-hidden" style={{ 
-          background: bgSecondary,
-          transition: 'background-color 0.6s ease'
-        }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-10 md:mb-12"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
-                style={{
-                  backgroundColor: accentLight,
-                  border: 'none',
-                  transition: 'background-color 0.6s ease',
-                }}
-              >
-                <Users className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                <span className="text-xs font-medium tracking-wide" style={{ 
-                  color: textSecondary,
-                  fontFamily: "'Poppins', sans-serif",
-                  transition: 'color 0.6s ease'
-                }}>
-                  Our Team
-                </span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 font-serif tracking-tight" style={{ 
-                color: textPrimary,
-                fontFamily: "'Poppins', sans-serif",
-                transition: 'color 0.6s ease'
-              }}>
-                Meet Our{' '}
-                <span className="inline-block" style={{ color: accentColor }}>
-                  Leadership
-                </span>
-              </h2>
-              <p className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide" style={{ 
-                color: textSecondary,
-                fontFamily: "'Calibri Light', sans-serif",
-                transition: 'color 0.6s ease'
-              }}>
-                The passionate team driving innovation at Portfolio Handler
-              </p>
-            </motion.div>
-
-            <div className="relative w-full overflow-hidden">
-              <motion.div 
-                className="relative w-full"
-                style={{ x: sliderX }}
-              >
-                <div className="flex gap-6 md:gap-8 lg:gap-10 items-stretch py-4 w-max">
-                  {duplicatedTeam.map((member, index) => (
-                    <div
-                      key={`${member.id}-${index}`}
-                      className="flex-shrink-0 group w-[180px] md:w-[200px] lg:w-[220px]"
-                    >
-                      <div className="flex flex-col items-center transition-all duration-300">
-                        <div className="relative mb-3">
-                          <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#6366F1]/20 to-[#8B5CF6]/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500`} />
-                          <div 
-                            className={`relative w-20 h-18 hover:cursor-pointer md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-[#6366F1]/20 overflow-hidden`}
-                            style={{
-                              backgroundColor: member.avatarColor,
-                              borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                            }}
-                          >
-                            <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                              {member.initials}
-                            </span>
-                          </div>
-                          
-                          <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[8px] md:text-[9px] font-medium whitespace-nowrap transition-all duration-300 group-hover:scale-105`}
-                            style={{
-                              backgroundColor: teamRoleBg,
-                              color: teamRoleColor,
-                              opacity: 0.95,
-                              boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.1)',
-                              fontFamily: "'Poppins', sans-serif",
-                              transition: 'background-color 0.6s ease, color 0.6s ease',
-                            }}
-                          >
-                            {member.role}
-                          </div>
-                        </div>
-                        
-                        <span className={`text-sm md:text-base font-semibold tracking-wide group-hover:text-[#6366F1] transition-colors duration-300 text-center`}
-                          style={{
-                            color: teamNameColor,
-                            fontFamily: "'Poppins', sans-serif",
-                            transition: 'color 0.6s ease',
-                          }}
-                        >
-                          {member.name}
-                        </span>
-                        
-                        <div className="w-0 h-0.5 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] group-hover:w-12 transition-all duration-300 mt-1 rounded-full" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
+        {/* ─── TEAM SECTION - Independent Component ─── */}
+        <TeamSlider />
 
         {/* ─── Contact Section ─── */}
         <section ref={contactRef} className="py-12 md:py-16" style={{ 
@@ -360,6 +195,7 @@ export default function AboutPage() {
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left - Contact Info */}
               <motion.div
                 initial={{ x: -50, opacity: 0 }}
                 animate={contactInView ? { x: 0, opacity: 1 } : {}}
@@ -425,6 +261,7 @@ export default function AboutPage() {
                 </div>
               </motion.div>
 
+              {/* Right - Contact Form */}
               <motion.div
                 initial={{ x: 50, opacity: 0 }}
                 animate={contactInView ? { x: 0, opacity: 1 } : {}}
