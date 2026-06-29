@@ -198,7 +198,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       <section
         id="home"
         ref={heroRef}
-        className="relative min-h-screen mt-5 flex items-center justify-center overflow-hidden w-full"
+        className="relative min-h-screen  flex items-center justify-center overflow-hidden w-full"
         style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         {/* Video Background - Direct */}
@@ -244,7 +244,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             
             {/* ─── Premium Badge ─── */}
             <div 
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border shadow-lg mb-6 sm:mb-8 mt-8 sm:mt-12 transition-all duration-500 relative overflow-hidden"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2  sm:py-2.5 rounded-full border shadow-lg mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500 relative overflow-hidden"
               style={{
                 background: theme === 'dark' 
                   ? 'linear-gradient(135deg, #1F4381, #0B0F19)' 
@@ -261,7 +261,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 }}
               />
               
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 ">
                
                 <Globe2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
                   theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
@@ -277,7 +277,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     : '0 0 20px rgba(0, 160, 255, 0.2)'
                 }}
               >
-                 Trusted by 500+ Educational Institutions
+                Trusted by 500+ Educational Institutions
               </span>
             </div>
 
