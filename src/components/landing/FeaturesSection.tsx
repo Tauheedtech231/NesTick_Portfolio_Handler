@@ -49,28 +49,11 @@ const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#6B7280";
 const OUTER_R = 320, STRIP_OUTER = 320, STRIP_INNER = 294;
 const SEG_OUTER = 278, SEG_INNER = 130, INNER_CIRCLE_R = 116;
 const LABEL_R = 206, NUM_R = (STRIP_OUTER + STRIP_INNER) / 2;
-
-// Max width/height the flown-out segment is allowed to grow to once it lands
-// next to the description panel. The segment's own aspect ratio is preserved,
-// so it never gets stretched or squashed.
 const DEST_MAX = 450;
-
-// How much the segment arcs upward mid-flight, on the way OUT only — a
-// deliberate little "lift off". On the way back in there is NO arc at all
-// (see ARC_HEIGHT_IN = 0 below): a plain straight glide that comes to a
-// complete stop, with nothing left to "settle" once it arrives — the
-// calmest possible landing.
 const ARC_HEIGHT_OUT = 28;
 const ARC_HEIGHT_IN  = 0;
-
-// Durations. Closing is slower and more unhurried than opening.
 const OPEN_DUR  = 1400;
 const CLOSE_DUR = 1700;
-
-// How long the flying piece and the real wheel segment cross-fade into one
-// another once the closing motion has finished travelling. This is what
-// removes the handoff "jatka" — instead of an instant swap, the two co-exist
-// briefly, one fading out as the other fades in.
 const HANDOFF_MS = 420;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -122,13 +105,9 @@ function donutSeg(oR: number, iR: number, s: number, e: number, cx = CX, cy = CY
 }
 
 // ─── Easing ──────────────────────────────────────────────────────────────────
-// Used for the OUT journey — speeds up then settles, like a deliberate launch.
 function easeInOut(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
-// Used for the IN (closing) journey — decelerates the whole way, never
-// speeding back up, so the last moment is the slowest. This is what makes
-// the landing read as "gently placed down" rather than "stopped".
 function easeOutQuart(t: number) {
   return 1 - Math.pow(1 - t, 4);
 }
@@ -152,15 +131,11 @@ function computeVB(s: number, e: number, oR = 278, iR = 130, cx = 340, cy = 340,
   return `${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}`;
 }
 
-// Pulls the numeric width/height back out of a "minX minY w h" viewBox string.
 function vbSize(vb: string) {
   const parts = vb.split(" ").map(Number);
   return { w: parts[2], h: parts[3] };
 }
 
-// Scales (w,h) down (or up) so its largest side equals `max`, preserving
-// aspect ratio — this is what lets every segment land at a consistent,
-// undistorted size next to the description panel.
 function fitSize(w: number, h: number, max: number) {
   const scale = Math.min(max / w, max / h);
   return { w: w * scale, h: h * scale };
@@ -304,6 +279,7 @@ export default function FeaturesSection() {
   const startRef     = useRef<number | null>(null);
   const journeyRef   = useRef<Journey | null>(null);
   const handoffRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isOpeningRef = useRef(false);
 
   // ── Check mobile ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -367,23 +343,24 @@ export default function FeaturesSection() {
     return { slotCx, slotCy, slotW, slotH, cRect };
   }
 
-  // ── Click: segment flies out ──────────────────────────────────────────────
-  const handleClick = useCallback((seg: Segment) => {
-    if (animating || activeSeg) return;
+  // ── Actual open logic ──────────────────────────────────────────────────────
+  const openSegment = useCallback((seg: Segment) => {
+    if (isOpeningRef.current) return;
+    isOpeningRef.current = true;
+
     const info = getSlotInfo(seg);
-    if (!info) return;
+    if (!info) {
+      isOpeningRef.current = false;
+      return;
+    }
     const { slotCx, slotCy, slotW, slotH, cRect } = info;
 
     const { w: vbW, h: vbH } = vbSize(seg.vb);
-    
-    // Mobile: larger destination size for better visibility
     const maxDest = isMobile ? 280 : DEST_MAX;
     const { w: destW, h: destH } = fitSize(vbW, vbH, maxDest);
 
-    // Landing position - mobile vs desktop
     let endCx, endCy;
     if (isMobile) {
-      // Mobile: center horizontally, positioned higher
       endCx = cRect.width * 0.5;
       endCy = cRect.height * 0.22 + destH / 2;
     } else {
@@ -424,11 +401,44 @@ export default function FeaturesSection() {
       } else {
         setFly({ left: endCx - destW / 2, top: endCy - destH / 2, width: destW, height: destH, seg });
         setAnimating(false);
+        isOpeningRef.current = false;
         setTimeout(() => setShowInfo(true), 150);
       }
     };
     rafRef.current = requestAnimationFrame(go);
-  }, [animating, activeSeg, isMobile]);
+  }, [isMobile]);
+
+  // ── Click: scroll to wheel then open ──────────────────────────────────────
+  const handleClick = useCallback((seg: Segment) => {
+    if (animating || activeSeg || isOpeningRef.current) return;
+
+    // ✅ Check if wheel is visible
+    if (wheelRef.current) {
+      const rect = wheelRef.current.getBoundingClientRect();
+      const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      
+      // If wheel is not fully visible, scroll to it first
+      if (!isVisible) {
+        const scrollY = window.scrollY;
+        const targetY = rect.top + scrollY - 100; // 100px top margin
+        
+        window.scrollTo({
+          top: targetY,
+          behavior: 'smooth'
+        });
+        
+        // Wait for scroll to complete then open
+        setTimeout(() => {
+          openSegment(seg);
+        }, 600);
+        
+        return;
+      }
+    }
+
+    // Wheel is visible, open immediately
+    openSegment(seg);
+  }, [animating, activeSeg, openSegment]);
 
   // ── Close: segment glides back ─────────────────────────────────────────────
   const handleClose = useCallback(() => {
@@ -444,7 +454,7 @@ export default function FeaturesSection() {
     window.scrollTo(0, scrollPosition);
     
     const j = journeyRef.current;
-    if (!j) { setActiveSeg(null); setFly(null); return; }
+    if (!j) { setActiveSeg(null); setFly(null); isOpeningRef.current = false; return; }
     const { slotCx, slotCy, slotW, slotH, endCx, endCy, destW, destH } = j;
 
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -469,6 +479,7 @@ export default function FeaturesSection() {
         setAnimating(false);
         setActiveSeg(null);
         setFlyVisible(false);
+        isOpeningRef.current = false;
         handoffRef.current = setTimeout(() => {
           setFly(null);
           handoffRef.current = null;

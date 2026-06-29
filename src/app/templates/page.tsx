@@ -347,7 +347,7 @@ export default function TemplatesPage() {
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif" }}>
       <Navbar />
-      <main className="min-h-screen pt-16 lg:pt-20 overflow-x-hidden"
+      <main className="min-h-screen pt-16  overflow-x-hidden"
         style={{
           backgroundColor: theme === 'dark' ? '#0B0F19' : '#F5F5F5',
         }}

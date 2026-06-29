@@ -131,7 +131,7 @@ export default function TemplatesSection({
   return (
     <section
       id="templates"
-      className="py-12 md:py-16 px-4 sm:px-6 relative"
+      className="py-12  px-4 sm:px-6 relative"
       style={{
         backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
         fontFamily: "'Poppins', sans-serif",

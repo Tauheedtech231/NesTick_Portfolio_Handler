@@ -198,7 +198,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       <section
         id="home"
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
+        className="relative min-h-screen mt-5 flex items-center justify-center overflow-hidden w-full"
         style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         {/* Video Background - Direct */}
@@ -262,9 +262,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               />
               
               <div className="flex gap-1.5">
-                <Compass className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
-                  theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
-                }`} />
+               
                 <Globe2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors duration-500 ${
                   theme === 'dark' ? 'text-[#E8CA5E]' : 'text-[#00A0FF]'
                 }`} />
@@ -279,7 +277,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     : '0 0 20px rgba(0, 160, 255, 0.2)'
                 }}
               >
-                🌟 Trusted by 500+ Educational Institutions
+                 Trusted by 500+ Educational Institutions
               </span>
             </div>
 

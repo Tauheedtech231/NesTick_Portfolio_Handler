@@ -13,7 +13,6 @@ const pool = mysql.createPool({
 });
 
 // GET - Fetch partners
-// GET - Fetch partners
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -24,7 +23,9 @@ export async function GET(request: NextRequest) {
 
     let query = `SELECT id, partner_id, partner_type, other_domain, organization_name, contact_person, 
                         email, phone, country, message, links, proposal_filename, proposal_file, 
-                        cv_filename, cv_file, status, created_at FROM partners WHERE 1=1`;
+                        cv_filename, cv_file, status, created_at, experience, region, company_name,
+                        linkedin_url, agency_name, services, team_size, website_url, sales_target
+                        FROM partners WHERE 1=1`;
     const params: any[] = [];
 
     if (id) {
@@ -48,13 +49,12 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await pool.execute(query, params);
     
-    // Dynamically generate URLs for files
     const processedRows = (rows as any[]).map(row => ({
       ...row,
       proposal_url: row.proposal_file ? `/api/partners/file?id=${row.id}&type=proposal` : null,
       cv_url: row.cv_file ? `/api/partners/file?id=${row.id}&type=cv` : null,
-      proposal_file: undefined, // Remove file data from response
-      cv_file: undefined // Remove file data from response
+      proposal_file: undefined,
+      cv_file: undefined
     }));
     
     return NextResponse.json({ 
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new partner with direct database storage
+// POST - Create new partner (supports 3 types: business_dev, marketing_agency, sales)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -76,87 +76,206 @@ export async function POST(request: NextRequest) {
     const {
       id,
       partnerType,
+      // Common fields
+      name,
+      email,
+      phone,
+      message,
+      // Partner form fields
       otherDomain,
       organizationName,
       contactPerson,
-      email,
-      phone,
       country,
-      message,
       links,
       proposalFile,
       proposalFileName,
       cvFile,
-      cvFileName
+      cvFileName,
+      // Business Dev fields
+      company,
+      experience,
+      region,
+      linkedin,
+      // Marketing Agency fields
+      agencyName,
+      contactPerson: marketingContact,
+      website,
+      services,
+      teamSize,
+      // Sales fields
+      salesTarget,
     } = body;
 
-    // Validation
-    if (!organizationName || !contactPerson || !email) {
+    // Validation based on partner type
+    if (!partnerType) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Organization name, contact person and email are required' 
+        error: 'Partner type is required' 
       }, { status: 400 });
     }
 
-    // Check if email already exists
-    const [existing] = await pool.execute('SELECT id FROM partners WHERE email = ?', [email]);
-    if ((existing as any[]).length > 0) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Email already registered' 
-      }, { status: 409 });
+    let finalOrgName = '';
+    let finalContactPerson = '';
+    let finalMessage = message || '';
+    let finalExperience = null;
+    let finalRegion = null;
+    let finalCompanyName = null;
+    let finalLinkedinUrl = null;
+    let finalAgencyName = null;
+    let finalServices = null;
+    let finalTeamSize = null;
+    let finalWebsiteUrl = null;
+    let finalSalesTarget = null;
+
+    // Validate based on partner type
+    switch(partnerType) {
+      case 'business_dev':
+        if (!name || !email || !company || !experience || !region) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Name, email, company, experience and region are required for Business Developer' 
+          }, { status: 400 });
+        }
+        finalOrgName = company;
+        finalContactPerson = name;
+        finalCompanyName = company;
+        finalExperience = experience;
+        finalRegion = region;
+        finalLinkedinUrl = linkedin || null;
+        finalMessage = `Business Developer Application\n\nName: ${name}\nCompany: ${company}\nExperience: ${experience}\nRegion: ${region}\nLinkedIn: ${linkedin || 'N/A'}\n\nMessage: ${message || ''}`;
+        break;
+
+      case 'marketing_agency':
+        if (!agencyName || !marketingContact || !email || !phone || !services || !teamSize) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Agency name, contact person, email, phone, services and team size are required for Marketing Agency' 
+          }, { status: 400 });
+        }
+        finalOrgName = agencyName;
+        finalContactPerson = marketingContact;
+        finalAgencyName = agencyName;
+        finalServices = services;
+        finalTeamSize = teamSize;
+        finalWebsiteUrl = website || null;
+        finalMessage = `Marketing Agency Registration\n\nAgency: ${agencyName}\nContact: ${marketingContact}\nServices: ${services}\nTeam Size: ${teamSize}\nWebsite: ${website || 'N/A'}\n\nMessage: ${message || ''}`;
+        break;
+
+      case 'sales':
+        if (!name || !email || !company || !experience || !region || !salesTarget) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Name, email, company, experience, region and sales target are required for Sales Person' 
+          }, { status: 400 });
+        }
+        finalOrgName = company;
+        finalContactPerson = name;
+        finalCompanyName = company;
+        finalExperience = experience;
+        finalRegion = region;
+        finalSalesTarget = salesTarget;
+        finalMessage = `Sales Person Application\n\nName: ${name}\nCompany: ${company}\nExperience: ${experience}\nRegion: ${region}\nSales Target: $${salesTarget}+\n\nMessage: ${message || ''}`;
+        break;
+
+      default:
+        // Original partner form
+        if (!organizationName || !contactPerson || !email) {
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Organization name, contact person and email are required' 
+          }, { status: 400 });
+        }
+        finalOrgName = organizationName;
+        finalContactPerson = contactPerson;
     }
 
-    // Store files directly in database (LONGTEXT columns)
+    // ✅ FIX: Check if email exists with SAME partner_type only
+    const [existing] = await pool.execute(
+      'SELECT id, partner_type FROM partners WHERE email = ?', 
+      [email]
+    );
+
+    if ((existing as any[]).length > 0) {
+      const existingRecord = (existing as any[])[0];
+      // Only block if same email AND same partner_type
+      if (existingRecord.partner_type === partnerType) {
+        return NextResponse.json({ 
+          success: false, 
+          error: `Email already registered as ${partnerType}. Please use different email.` 
+        }, { status: 409 });
+      }
+      // Different partner_type - allow it (no error)
+      console.log(`✅ Email ${email} already exists as ${existingRecord.partner_type}, allowing as ${partnerType}`);
+    }
+
+    // Store files
     let proposalData = null;
     let cvData = null;
 
     if (proposalFile && proposalFileName) {
-      proposalData = proposalFile; // Already base64 string
+      proposalData = proposalFile;
     }
 
     if (cvFile && cvFileName) {
-      cvData = cvFile; // Already base64 string
+      cvData = cvFile;
     }
 
-    // Insert partner with files in database
+    // Prepare links JSON
+    let linksJSON = links || null;
+    if (partnerType === 'business_dev' && linkedin) {
+      linksJSON = JSON.stringify([linkedin]);
+    }
+
+    // Insert partner with all fields
     const [result] = await pool.execute(
       `INSERT INTO partners (
         partner_id, partner_type, other_domain, organization_name, contact_person, 
         email, phone, country, message, links, proposal_filename, proposal_file, 
-        cv_filename, cv_file, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+        cv_filename, cv_file, status, experience, region, company_name,
+        linkedin_url, agency_name, services, team_size, website_url, sales_target
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id || `PART-${Date.now()}`,
-        partnerType || null,
+        partnerType,
         otherDomain || null,
-        organizationName,
-        contactPerson,
+        finalOrgName,
+        finalContactPerson,
         email,
         phone || null,
         country || null,
-        message || null,
-        links ? JSON.stringify(links) : null,
+        finalMessage || null,
+        linksJSON,
         proposalFileName || null,
         proposalData,
         cvFileName || null,
-        cvData
+        cvData,
+        finalExperience,
+        finalRegion,
+        finalCompanyName,
+        finalLinkedinUrl,
+        finalAgencyName,
+        finalServices,
+        finalTeamSize,
+        finalWebsiteUrl,
+        finalSalesTarget
       ]
     );
 
     const insertId = (result as any).insertId;
 
-    // Get inserted record (without file data for response)
+    // Get inserted record
     const [newPartner] = await pool.execute(
       `SELECT id, partner_id, partner_type, other_domain, organization_name, contact_person, 
               email, phone, country, message, links, proposal_filename, cv_filename, 
-              status, created_at FROM partners WHERE id = ?`,
+              status, created_at, experience, region, company_name, linkedin_url,
+              agency_name, services, team_size, website_url, sales_target
+              FROM partners WHERE id = ?`,
       [insertId]
     );
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Partner application submitted successfully. Waiting for review.',
+      message: 'Application submitted successfully. Waiting for review.',
       data: (newPartner as any[])[0]
     }, { status: 201 });
 
@@ -164,7 +283,7 @@ export async function POST(request: NextRequest) {
     console.error('POST partner error:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to submit partner application' 
+      error: 'Failed to submit application' 
     }, { status: 500 });
   }
 }
@@ -174,7 +293,7 @@ export async function GET_FILE(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
-    const fileType = searchParams.get('type'); // 'proposal' or 'cv'
+    const fileType = searchParams.get('type');
 
     if (!id || !fileType) {
       return NextResponse.json({ error: 'ID and type are required' }, { status: 400 });
@@ -190,7 +309,6 @@ export async function GET_FILE(request: NextRequest) {
       if (data && data.proposal_file) {
         fileName = data.proposal_filename || 'proposal';
         const base64Data = data.proposal_file;
-        // Extract mime type from base64
         const mimeMatch = base64Data.match(/^data:([^;]+);/);
         const mimeType = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
         const base64Content = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;

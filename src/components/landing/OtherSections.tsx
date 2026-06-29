@@ -184,7 +184,7 @@ export default function OtherSections({
       <FeaturesSection />
 
       {/* Packages Section */}
-      <section className="py-12 md:py-16 lg:py-10 px-4 sm:px-6"
+      <section className="py-10 px-4 sm:px-6"
         style={{
           backgroundColor: getSectionBg(),
         }}
@@ -370,7 +370,7 @@ export default function OtherSections({
       <section
         id="about"
         ref={aboutRef}
-        className="py-12 md:py-16 lg:py-20 px-4 sm:px-6"
+        className="py-12 md:py-16 px-4 sm:px-6"
         style={{
           backgroundColor: getSectionBg(),
         }}

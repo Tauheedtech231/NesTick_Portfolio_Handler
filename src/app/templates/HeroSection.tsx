@@ -158,7 +158,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              ✨ Ready-to-Use Portfolio Templates
+               Ready-to-Use Portfolio Templates
             </span>
           </motion.div>
 
@@ -196,14 +196,15 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
             Fully customizable to match your institution's brand and requirements.
           </motion.p>
 
-          {/* Two CTA Buttons */}
+          {/* Two CTA Buttons - Full Rounded with Proper Gap */}
           <motion.div 
             variants={fromBottomVariants} 
-            className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-2"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-2"
           >
+            {/* Browse Templates Button - Full Rounded */}
             <button
               onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
-              className="group inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
               style={{
                 backgroundColor: colors.buttonBg,
                 color: colors.buttonText,
@@ -214,10 +215,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform cursor-pointer" />
             </button>
             
-            {/* Your Design Button */}
+            {/* Your Design Button - Full Rounded */}
             <motion.button
               onClick={onDesignClick}
-              className="group inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 cursor-pointer hover:scale-105 active:scale-95 relative"
+              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 cursor-pointer hover:scale-105 active:scale-95 relative"
               style={{
                 borderColor: colors.borderColor,
                 color: colors.borderColor,
@@ -244,7 +245,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               {/* Pulsing ring effect */}
               {isPulsing && (
                 <span 
-                  className="absolute -inset-1 rounded-xl animate-ping opacity-40"
+                  className="absolute -inset-1 rounded-full animate-ping opacity-40"
                   style={{
                     border: '2px solid',
                     borderColor: colors.borderColor,

@@ -18,20 +18,20 @@ interface ProductSection {
   imagePosition: 'left' | 'right';
 }
 
-// Real Products with realistic data
+// 9 Real Products with realistic data
 const PRODUCTS: ProductSection[] = [
   {
-    id: "psm",
-    title: "Portfolio Site Management System",
+    id: "portfolio-site",
+    title: "Portfolio Site Management",
     subtitle: "Web Presence",
-    description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website.",
+    description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website. Every school gets its own customized portal with no-code editing and real-time analytics.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
     features: [
-      "School/College Website Management",
-      "Real-time Content Updates",
+      "Custom Portfolio Website",
+      "No-Code Content Updates",
       "Digital Presence & Branding",
       "Event & News Management",
-      "Media Gallery Integration"
+      "Media Gallery & Analytics"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -39,94 +39,148 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'left'
   },
   {
-    id: "ptms",
-    title: "Parent Teacher Management System",
-    subtitle: "Communication Hub",
-    description: "Bridge the gap between parents and teachers with seamless communication tools. Track attendance, monitor student progress, and foster collaborative engagement for better educational outcomes.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8ct-6ljgpbedqVzynuMqUA-N4P9vSJI2efu6wQXuGRI5tr0BZsaHYIu-1t5xcNGgXzK9SRb-oLPjps7ujmA6mvTVypHZxbyiYOizYHscgjebW6pB1c-Dx7gZUb62aR5FEogFjAORYt5d-vs93KLq6Oces-uxfUp0btjgUH5gWhLceN_zI9qS3BZ3NSY5s4SQoO4quhsYt-y53Bn-6vomE9VxIw3KJOHIRPw0VNEKVL-nBcg7pHnKUl8FGsdsuqzZgaW6QffTBwW2i",
-    features: [
-      "Parent-Teacher Communication",
-      "Real-time Attendance Tracking",
-      "Student Progress Monitoring",
-      "Performance Reports",
-      "Meeting Scheduling"
-    ],
-    buttonText: "Learn More",
-    buttonVariant: 'outline',
-    accentColor: 'tertiary',
-    imagePosition: 'right'
-  },
-  {
-    id: "aas",
+    id: "admission-automation",
     title: "Admission Automation System",
     subtitle: "Enrollment Engine",
-    description: "Streamline the entire admission process from application to enrollment. Automate application management, track candidate progress, and maintain comprehensive student records with ease.",
+    description: "Streamline the entire admission process from application to enrollment. Parents can apply from home, upload documents, and track progress digitally. Institutes can manage student data seamlessly with automated record generation and cloud storage.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0v_By-ZD17MH3x8-8ebL9kXpvq1ucsRAUKYF02VcOLnxE2_Mkn2v_ZKKDuLz_3MJ4N2tGarmuHavVvC6E7br6gVrFeto4EioicbeNtViS60Vzg9e79ihuJORKC9Yw7ivnTQt3Oy87qWlgO6qrjIsYaSKqx_XOeeGtTbQYbW6BvZUiSiibPhvvg938pDhO9h2OqWgZiA6Jl9PD7amnw3BXR6vzuGhe_FWjrJuHQ-PJNG6RcMM8OFDDfPPlb_dgR4v687A_8EPcUpb5",
     features: [
-      "Online Admissions Management",
-      "Application Tracking System",
-      "Student Record Management",
-      "Document Verification",
-      "Automated Communication"
+      "Online Application Portal",
+      "Document Upload & Verification",
+      "Payment Gateway Integration",
+      "Auto Student Record Generation",
+      "Admin Tracking Dashboard"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
-    accentColor: 'secondary',
+    accentColor: 'primary',
+    imagePosition: 'right'
+  },
+  {
+    id: "parent-teacher",
+    title: "Parent Teacher Management System",
+    subtitle: "Communication Hub",
+    description: "Bridge the gap between parents and teachers with seamless communication tools. Track attendance, monitor student progress, and foster collaborative engagement. Features include WhatsApp integration, real-time alerts, and a dedicated mobile app for parents.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8ct-6ljgpbedqVzynuMqUA-N4P9vSJI2efu6wQXuGRI5tr0BZsaHYIu-1t5xcNGgXzK9SRb-oLPjps7ujmA6mvTVypHZxbyiYOizYHscgjebW6pB1c-Dx7gZUb62aR5FEogFjAORYt5d-vs93KLq6Oces-uxfUp0btjgUH5gWhLceN_zI9qS3BZ3NSY5s4SQoO4quhsYt-y53Bn-6vomE9VxIw3KJOHIRPw0VNEKVL-nBcg7pHnKUl8FGsdsuqzZgaW6QffTBwW2i",
+    features: [
+      "Real-time Communication",
+      "Attendance & Progress Alerts",
+      "Digital Report Cards",
+      "Online PTM Scheduling",
+      "WhatsApp & SMS Integration"
+    ],
+    buttonText: "Learn More",
+    buttonVariant: 'primary',
+    accentColor: 'primary',
     imagePosition: 'left'
   },
   {
     id: "lms",
     title: "Learning Management System",
     subtitle: "Digital Classroom",
-    description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform.",
+    description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform. Supports live classes, recorded lectures, and hybrid learning models.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDCw2tL4WpL8lFescTP3sJeJ2IgCWjPgVNOH6ghlxsiEIZrGGsZhwwTiEveJUbQIpPRVuMKvVKoelYJm2Jw4ERjlq2bYBAG8_bMWghIqdNLyUSKAGQ2j2r99CAO6q2VWraE5KBI-Ffz69jyH61tgHPFxajV2bmM7iOlwYtKwJxPkCFv6CPPTD3h-v5ecZoXct2qZYbulD63Tl7TVPL9-U-9Yh6bTWQpIws395-Qcs0P6_6-HFGwuA3kCJEmiDq3hhIm9kdqUg3bRKjg",
     features: [
-      "Online Classes & Lectures",
-      "Course Management System",
-      "Assignments & Quizzes",
-      "Automated Grading",
-      "Student Progress Analytics"
+      "Online Live Classes",
+      "Course & Subject Management",
+      "Assignments & Auto-Grading",
+      "Student Performance Analytics",
+      "Parent Progress Portal"
     ],
     buttonText: "Learn More",
-    buttonVariant: 'outline',
+    buttonVariant: 'primary',
     accentColor: 'primary',
     imagePosition: 'right'
+  },
+  {
+    id: "exam-generator",
+    title: "AI Exam Generator",
+    subtitle: "Intelligent Assessment",
+    description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels. Includes AI question generation, diagram support, question bank management, and instant PDF export.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCD95CfUWzepGxHgvl-vqBNZ4fIM8DtX6OIAxsm03exAi-qKzGFICBrwKiLGGwDlojGz8ntEeOX1dNc5UpkyMl9xIvC834cUfOUcCgFFWpBcbi3gIa1QWABWwVVqZD3GiP-0zRN8ejBUc0ba_m74NnHYtJIttbLr5qWtx85x66-5Yq-Q0AbpQyslbSnWVssuRm0_ck5k-v4ws9RXeTA3OVQGXe0wZkDDVZY5dT2u0pNy1osh2TiFeQlDmqzYC1bzshBV5BY77plzLap",
+    features: [
+      "AI Question Generation",
+      "Syllabus-Aligned Papers",
+      "Question Bank Management",
+      "PDF Export & Print",
+      "Analytics Dashboard"
+    ],
+    buttonText: "Learn More",
+    buttonVariant: 'primary',
+    accentColor: 'primary',
+    imagePosition: 'left'
   },
   {
     id: "lrm",
     title: "Learning Resource Management",
     subtitle: "Knowledge Hub",
-    description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content with students and faculty.",
+    description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content. Features AI-powered categorization, version control, and seamless LMS integration.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1NzzttGVTvPn_9eDP-JQt7blKhxBt3pP4800OJooC3M8YUCl_D82H5Wb-raXAHvysQfiDLsvKlB3A5xSs9B0Idi0oFQJZKHPMKgLmjNtBhMb6bTX8M7dJhwijiYvyUa4BYP-sGoRcRKzkJfRYJzzveXRYOu3-CikfxSlRvT8xU5_Z5diz6KrutY7y-nZVKl4ICm8vXH1GcoeQyQWWp_1e_iysVx4TJQtz_HN3Dw4lUKO4kMs13Y8y_sC9rE0r6IYIwxd9VceuS3yb",
     features: [
       "Digital Library Management",
-      "Content Storage & Sharing",
-      "Learning Material Organization",
-      "Resource Categorization",
-      "Faculty & Student Access"
+      "AI-Powered Content Tagging",
+      "Version Control System",
+      "LMS Integration",
+      "Multi-Format Support"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
-    accentColor: 'success',
+    accentColor: 'primary',
+    imagePosition: 'right'
+  },
+  {
+    id: "erp",
+    title: "ERP System",
+    subtitle: "Institution Management",
+    description: "End-to-end resource management for schools and colleges. Covers finance, HR, academics, library, and inventory operations. Custom role-based access for departments and real-time dashboards for transparency and efficiency.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0v_By-ZD17MH3x8-8ebL9kXpvq1ucsRAUKYF02VcOLnxE2_Mkn2v_ZKKDuLz_3MJ4N2tGarmuHavVvC6E7br6gVrFeto4EioicbeNtViS60Vzg9e79ihuJORKC9Yw7ivnTQt3Oy87qWlgO6qrjIsYaSKqx_XOeeGtTbQYbW6BvZUiSiibPhvvg938pDhO9h2OqWgZiA6Jl9PD7amnw3BXR6vzuGhe_FWjrJuHQ-PJNG6RcMM8OFDDfPPlb_dgR4v687A_8EPcUpb5",
+    features: [
+      "Finance & Accounting",
+      "HR & Staff Management",
+      "Academic Operations",
+      "Library & Inventory",
+      "Real-Time Dashboards"
+    ],
+    buttonText: "Learn More",
+    buttonVariant: 'primary',
+    accentColor: 'primary',
     imagePosition: 'left'
   },
   {
-    id: "ai-exam",
-    title: "AI Exam Generator",
-    subtitle: "Intelligent Assessment",
-    description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels and export to PDF format.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCD95CfUWzepGxHgvl-vqBNZ4fIM8DtX6OIAxsm03exAi-qKzGFICBrwKiLGGwDlojGz8ntEeOX1dNc5UpkyMl9xIvC834cUfOUcCgFFWpBcbi3gIa1QWABWwVVqZD3GiP-0zRN8ejBUc0ba_m74NnHYtJIttbLr5qWtx85x66-5Yq-Q0AbpQyslbSnWVssuRm0_ck5k-v4ws9RXeTA3OVQGXe0wZkDDVZY5dT2u0pNy1osh2TiFeQlDmqzYC1bzshBV5BY77plzLap",
+    id: "neezamiya-meet",
+    title: "Neezamiya Meet",
+    subtitle: "Virtual Classroom",
+    description: "A Google Meet-like platform specially crafted for educational systems. Conduct secure video classes, record sessions, share screens, and engage students with interactive whiteboards and breakout rooms designed for learning.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDCw2tL4WpL8lFescTP3sJeJ2IgCWjPgVNOH6ghlxsiEIZrGGsZhwwTiEveJUbQIpPRVuMKvVKoelYJm2Jw4ERjlq2bYBAG8_bMWghIqdNLyUSKAGQ2j2r99CAO6q2VWraE5KBI-Ffz69jyH61tgHPFxajV2bmM7iOlwYtKwJxPkCFv6CPPTD3h-v5ecZoXct2qZYbulD63Tl7TVPL9-U-9Yh6bTWQpIws395-Qcs0P6_6-HFGwuA3kCJEmiDq3hhIm9kdqUg3bRKjg",
     features: [
-      "AI-Based Paper Generation",
-      "Syllabus-Aligned Exams",
-      "PDF Paper Export",
-      "Multiple Difficulty Levels",
-      "Question Bank Management"
+      "Secure Video Conferencing",
+      "Screen & Whiteboard Sharing",
+      "Session Recording",
+      "Breakout Rooms",
+      "Student Engagement Tools"
     ],
     buttonText: "Learn More",
-    buttonVariant: 'outline',
-    accentColor: 'error',
+    buttonVariant: 'primary',
+    accentColor: 'primary',
     imagePosition: 'right'
+  },
+  {
+    id: "neezamiya-muthamar",
+    title: "Neezamiya Muthamar",
+    subtitle: "Virtual Seminar System",
+    description: "A powerful virtual seminar platform designed for educational institutions. Host webinars, conferences, and guest lectures with ease. Features include live streaming, audience Q&A, polling, and detailed attendance tracking for large-scale events.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
+    features: [
+      "Live Webinar Streaming",
+      "Interactive Q&A Sessions",
+      "Real-time Polling",
+      "Attendance Tracking",
+      "Recording & Playback"
+    ],
+    buttonText: "Learn More",
+    buttonVariant: 'primary',
+    accentColor: 'primary',
+    imagePosition: 'left'
   }
 ];
 
@@ -220,22 +274,22 @@ export default function ProductShowcase() {
 
   const getAccentColor = (color: string) => {
     const colors: Record<string, string> = {
-      primary: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-      tertiary: theme === 'dark' ? '#F59E0B' : '#D97706',
-      secondary: theme === 'dark' ? '#60A5FA' : '#3B82F6',
-      error: theme === 'dark' ? '#EF4444' : '#DC2626',
-      success: theme === 'dark' ? '#22C55E' : '#16A34A',
+      primary: '#60A5FA', // Sky blue for all products
+      tertiary: '#60A5FA',
+      secondary: '#60A5FA',
+      error: '#60A5FA',
+      success: '#60A5FA',
     };
     return colors[color] || colors.primary;
   };
 
   const getAccentLight = (color: string) => {
     const colors: Record<string, string> = {
-      primary: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
-      tertiary: theme === 'dark' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(217, 119, 6, 0.08)',
-      secondary: theme === 'dark' ? 'rgba(96, 165, 250, 0.15)' : 'rgba(59, 130, 246, 0.08)',
-      error: theme === 'dark' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(220, 38, 38, 0.08)',
-      success: theme === 'dark' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(22, 163, 74, 0.08)',
+      primary: 'rgba(96, 165, 250, 0.15)',
+      tertiary: 'rgba(96, 165, 250, 0.15)',
+      secondary: 'rgba(96, 165, 250, 0.15)',
+      error: 'rgba(96, 165, 250, 0.15)',
+      success: 'rgba(96, 165, 250, 0.15)',
     };
     return colors[color] || colors.primary;
   };
@@ -257,7 +311,7 @@ export default function ProductShowcase() {
   };
 
   const getAccent = () => {
-    return theme === 'dark' ? '#E8CA5E' : '#0066FF';
+    return '#60A5FA'; // Sky blue
   };
 
   const getInputBg = () => {
@@ -320,8 +374,8 @@ export default function ProductShowcase() {
                 style={{
                   transitionDelay: `${index * 100}ms`,
                 }}>
-                  {/* REDUCED GAP HERE - from gap-10 lg:gap-16 xl:gap-20 to gap-6 lg:gap-10 xl:gap-14 */}
-                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 xl:gap-14 items-start lg:items-stretch`}>
+                  {/* REDUCED GAP - from gap-10 to gap-4 */}
+                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-start lg:items-stretch`}>
                     {/* Image */}
                     <div className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'}`} style={isLeft ? { paddingLeft: '0.3rem' } : undefined}>
                       <div
@@ -349,9 +403,9 @@ export default function ProductShowcase() {
                       </div>
                     </div>
 
-                    {/* Content */}
+                    {/* Content - REDUCED GAP here too */}
                     <div 
-                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-4 md:space-y-5 pl-0 lg:pl-4 flex flex-col h-full`}
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col h-full`}
                       style={isLeft ? { paddingRight: '0.3rem' } : { paddingLeft: '0.3rem' }}
                     >
                       <div className="flex-1 flex flex-col justify-center">
@@ -385,7 +439,7 @@ export default function ProductShowcase() {
                           {product.description}
                         </p>
                         
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
                           {product.features.map((feature, idx) => (
                             <li
                               key={idx}
@@ -614,25 +668,31 @@ export default function ProductShowcase() {
                       Product of Interest
                     </label>
                     <select
-                      id="interest"
-                      name="interest"
-                      value={formData.interest}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        borderColor: getBorderColor(),
-                        color: getTextColor(),
-                        fontFamily: "'Calibri Light', sans-serif",
-                      }}
-                    >
-                      <option value="">Select a product</option>
-                      {PRODUCTS.map(product => (
-                        <option key={product.id} value={product.title}>
-                          {product.title}
-                        </option>
-                      ))}
-                    </select>
+  id="interest"
+  name="interest"
+  value={formData.interest}
+  onChange={handleInputChange}
+  className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+  style={{
+    backgroundColor: getInputBg(),
+    borderColor: getBorderColor(),
+    color: getTextColor(),
+    fontFamily: "'Calibri Light', sans-serif",
+    zIndex: 10, // Added z-index
+    position: 'relative', // Added position
+  }}
+>
+  <option value="">Select a product</option>
+  {PRODUCTS.map(product => (
+    <option key={product.id} value={product.title} style={{ 
+      backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
+      color: getTextColor(),
+      padding: '8px',
+    }}>
+      {product.title}
+    </option>
+  ))}
+</select>
                   </div>
                 </div>
 
@@ -719,10 +779,15 @@ export default function ProductShowcase() {
           }
         }
 
-        /* Input focus ring using box-shadow instead of focusRingColor */
+        /* Input focus ring using box-shadow */
         input:focus, select:focus {
-          box-shadow: 0 0 0 2px ${theme === 'dark' ? '#E8CA5E' : '#0066FF'} !important;
-          border-color: ${theme === 'dark' ? '#E8CA5E' : '#0066FF'} !important;
+          box-shadow: 0 0 0 2px #60A5FA !important;
+          border-color: #60A5FA !important;
+        }
+
+        /* Button hover effect */
+        button:hover {
+          opacity: 0.9;
         }
       `}</style>
     </>
