@@ -35,7 +35,7 @@ export default function SocialProofBar() {
 
     const context = ctx;
     const W = 1200,
-      H = 550;
+      H = 480; // Reduced height
     canvas.width = W;
     canvas.height = H;
     canvas.style.width = "100%";
@@ -133,7 +133,7 @@ export default function SocialProofBar() {
       sw: number,
       gc: string | null,
       gb: number,
-      radius: number = 12
+      radius: number = 10
     ) {
       context.save();
       if (gc) {
@@ -203,7 +203,7 @@ export default function SocialProofBar() {
     // ── ICONS ──
     function iHandshake(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 54 + offsetY;
+      const y0 = cy + 44 + offsetY;
       context.save();
       context.translate(cx, cy);
       context.scale(scale, scale);
@@ -239,7 +239,7 @@ export default function SocialProofBar() {
       context.shadowColor = color;
       context.shadowBlur = 5;
       const bx = cx - 12,
-        by = cy + 30 + offsetY;
+        by = cy + 24 + offsetY;
       context.strokeRect(bx + 7, by + 5, 18, 20);
       const fillColor = theme === 'dark' ? '#0b1d38' : '#F0F4FF';
       context.fillStyle = fillColor;
@@ -256,7 +256,7 @@ export default function SocialProofBar() {
 
     function iPeople(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 30 + offsetY;
+      const y0 = cy + 24 + offsetY;
       context.save();
       context.translate(cx, cy);
       context.scale(scale, scale);
@@ -292,7 +292,7 @@ export default function SocialProofBar() {
 
     function iArrow(cx: number, cy: number, scale: number = 1) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 46;
+      const y0 = cy + 40;
       context.save();
       context.translate(cx, cy);
       context.scale(scale, scale);
@@ -327,8 +327,8 @@ export default function SocialProofBar() {
       icon: (cx: number, cy: number, scale: number, offsetY?: number) => void,
       labelOffY: number,
       valOffY: number,
-      labelSize: number = 15,
-      valSize: number = 40,
+      labelSize: number = 13,
+      valSize: number = 34,
       boxIndex: number | null = null,
       iconOffsetY: number = 0
     ) {
@@ -340,15 +340,13 @@ export default function SocialProofBar() {
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       
       const isHovered = hoveredBox === boxIndex;
-      
-      // No scale animation - just blue glow on hover
       const glowIntensity = isHovered ? 50 : 16;
       
       const op = hexPts(cx, cy, R);
       const ip = hexPts(cx, cy, Ri);
       
-      polyRounded(op, fillColor, strokeColor, 1.5, shadowColor, glowIntensity, 14);
-      polyRounded(ip, null, innerStroke, 3.5, null, 0, 10);
+      polyRounded(op, fillColor, strokeColor, 1.5, shadowColor, glowIntensity, 12);
+      polyRounded(ip, null, innerStroke, 3.5, null, 0, 8);
       
       context.save();
       context.textAlign = "center";
@@ -362,66 +360,66 @@ export default function SocialProofBar() {
       context.fillText(val, cx, cy + (valOffY || 0));
       context.restore();
       
-      icon(cx, cy, 1, iconOffsetY);
+      icon(cx, cy, 0.85, iconOffsetY); // Reduced icon scale
     }
 
     // ══════════════════════════════════
-    //  LAYOUT - 1rem (16px) bottom push
+    //  LAYOUT - Smaller boxes
     // ══════════════════════════════════
 
-    const R = 88,
-      Ri = 73;
-    const offsetX = 95;
-    const BOTTOM_PUSH = 16; // 1rem = 16px
+    const R = 72; // Reduced from 88
+    const Ri = 60; // Reduced from 73
+    const offsetX = 120;
+    const BOTTOM_PUSH = 10;
 
     // CENTER OCTAGON
-    const TW = { cx: 510 + offsetX, cy: 260 + BOTTOM_PUSH };
-    const TWr = 148,
-      TWri = 128;
+    const TW = { cx: 510 + offsetX, cy: 230 + BOTTOM_PUSH };
+    const TWr = 125, // Reduced from 148
+      TWri = 108; // Reduced from 128
     const twP = octPts(TW.cx, TW.cy, TWr);
     const twPi = octPts(TW.cx, TW.cy, TWri);
     
     const twLMOriginal = mid(twP[4], twP[5]);
     const twLM: [number, number] = [
       twLMOriginal[0],
-      twLMOriginal[1] + 35
+      twLMOriginal[1] + 30
     ];
     
     const twUpperEdge = mid(twP[6], twP[7]);
     
     const twActiveUsersPoint: [number, number] = [
       twUpperEdge[0] + 20,
-      twUpperEdge[1] + 48
+      twUpperEdge[1] + 40
     ];
     
     const twTemplatesPoint: [number, number] = [
       twUpperEdge[0] - 20,
-      twUpperEdge[1] + 185
+      twUpperEdge[1] + 155
     ];
 
     // CLIENTS - Box 0
-    const CL = { cx: 100 + offsetX, cy: 248 + BOTTOM_PUSH };
+    const CL = { cx: 100 + offsetX, cy: 218 + BOTTOM_PUSH };
     const clP = hexPts(CL.cx, CL.cy, R);
     const clRight = clP[0];
 
     // TEMPLATES - Box 1
-    const TP = { cx: 240 + offsetX, cy: 362 + BOTTOM_PUSH };
+    const TP = { cx: 240 + offsetX, cy: 318 + BOTTOM_PUSH };
     const tpP = hexPts(TP.cx, TP.cy, R);
     const tpTopLeft = tpP[5];
     const tpTopRight = tpP[0];
     const tpTopOffset = mid(tpTopLeft, tpTopRight);
     const tpStartPoint: [number, number] = [
       tpTopOffset[0],
-      tpTopOffset[1] + 40
+      tpTopOffset[1] + 32
     ];
 
     // ACTIVE USERS - Box 2
-    const AU = { cx: 780 + offsetX, cy: 162 + BOTTOM_PUSH };
+    const AU = { cx: 780 + offsetX, cy: 142 + BOTTOM_PUSH };
     const auP = hexPts(AU.cx, AU.cy, R);
     const auLeft = auP[3];
 
     // SUCCESS RATE - Box 3
-    const SR = { cx: 920 + offsetX, cy: 282 + BOTTOM_PUSH };
+    const SR = { cx: 920 + offsetX, cy: 245 + BOTTOM_PUSH };
     const srP = hexPts(SR.cx, SR.cy, R);
     const srLeft = srP[3];
 
@@ -451,7 +449,7 @@ export default function SocialProofBar() {
     drawHexRounded(
       CL.cx, CL.cy, R, Ri, 
       "Clients", countersStarted ? "500+" : "0", 
-      iHandshake, -30, 20, 14, 36, 0, -16
+      iHandshake, -28, 18, 13, 32, 0, -14
     );
 
     // 2. TEMPLATES (Box 1)
@@ -467,18 +465,18 @@ export default function SocialProofBar() {
       
       const tpP_rounded = hexPts(TP.cx, TP.cy, R);
       const tpPi_rounded = hexPts(TP.cx, TP.cy, Ri);
-      polyRounded(tpP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
-      polyRounded(tpPi_rounded, null, innerStroke, 3.5, null, 0, 10);
+      polyRounded(tpP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(tpPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `14px Arial,sans-serif`;
-      context.fillText("Templates", TP.cx, TP.cy - 30);
+      context.font = `13px Arial,sans-serif`;
+      context.fillText("Templates", TP.cx, TP.cy - 28);
       context.fillStyle = valColor;
-      context.font = `bold 34px Arial,sans-serif`;
-      context.fillText(countersStarted ? "30+" : "0", TP.cx, (TP.cy + 14));
+      context.font = `bold 30px Arial,sans-serif`;
+      context.fillText(countersStarted ? "30+" : "0", TP.cx, (TP.cy + 12));
       context.restore();
-      iDocs(TP.cx, TP.cy, 1, -6);
+      iDocs(TP.cx, TP.cy, 0.85, -8);
     }
 
     // CENTER OCTAGON
@@ -490,16 +488,16 @@ export default function SocialProofBar() {
       
       const twP_rounded = octPts(TW.cx, TW.cy, TWr);
       const twPi_rounded = octPts(TW.cx, TW.cy, TWri);
-      polyRounded(twP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', 40, 16);
-      polyRounded(twPi_rounded, null, innerStroke, 3.5, null, 0, 12);
+      polyRounded(twP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', 40, 14);
+      polyRounded(twPi_rounded, null, innerStroke, 3.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = textColor;
-      context.font = "bold 30px Arial,sans-serif";
+      context.font = "bold 26px Arial,sans-serif";
       context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.1)';
       context.shadowBlur = 6;
       context.fillText("TRUSTED", TW.cx, TW.cy - 4);
-      context.fillText("WORLDWIDE", TW.cx, TW.cy + 42);
+      context.fillText("WORLDWIDE", TW.cx, TW.cy + 36);
       context.restore();
     }
 
@@ -516,18 +514,18 @@ export default function SocialProofBar() {
       
       const auP_rounded = hexPts(AU.cx, AU.cy, R);
       const auPi_rounded = hexPts(AU.cx, AU.cy, Ri);
-      polyRounded(auP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
-      polyRounded(auPi_rounded, null, innerStroke, 3.5, null, 0, 10);
+      polyRounded(auP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(auPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `13px Arial,sans-serif`;
-      context.fillText("Active Users", AU.cx, (AU.cy - 30));
+      context.font = `12px Arial,sans-serif`;
+      context.fillText("Active Users", AU.cx, (AU.cy - 28));
       context.fillStyle = valColor;
-      context.font = `bold 32px Arial,sans-serif`;
-      context.fillText(countersStarted ? "20.0K+" : "0", AU.cx, (AU.cy + 12));
+      context.font = `bold 28px Arial,sans-serif`;
+      context.fillText(countersStarted ? "20.0K+" : "0", AU.cx, (AU.cy + 10));
       context.restore();
-      iPeople(AU.cx, AU.cy - 12, 1, 16);
+      iPeople(AU.cx, AU.cy - 10, 0.85, 12);
     }
 
     // 4. SUCCESS RATE (Box 3)
@@ -543,18 +541,18 @@ export default function SocialProofBar() {
       
       const srP_rounded = hexPts(SR.cx, SR.cy, R);
       const srPi_rounded = hexPts(SR.cx, SR.cy, Ri);
-      polyRounded(srP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 14);
-      polyRounded(srPi_rounded, null, innerStroke, 3.5, null, 0, 10);
+      polyRounded(srP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(srPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `14px Arial,sans-serif`;
-      context.fillText("Success Rate", SR.cx, SR.cy - 28);
+      context.font = `13px Arial,sans-serif`;
+      context.fillText("Success Rate", SR.cx, SR.cy - 26);
       context.fillStyle = valColor;
-      context.font = `bold 36px Arial,sans-serif`;
-      context.fillText(countersStarted ? "99%" : "0%", SR.cx, SR.cy + 18);
+      context.font = `bold 32px Arial,sans-serif`;
+      context.fillText(countersStarted ? "99%" : "0%", SR.cx, SR.cy + 16);
       context.restore();
-      iArrow(SR.cx, SR.cy, 1);
+      iArrow(SR.cx, SR.cy, 0.85);
     }
   };
 
@@ -576,13 +574,13 @@ export default function SocialProofBar() {
       const mouseX = (e.clientX - rect.left) * scaleX;
       const mouseY = (e.clientY - rect.top) * scaleY;
       
-      const offsetX = 95;
-      const BOTTOM_PUSH = 16;
+      const offsetX = 120;
+      const BOTTOM_PUSH = 10;
       const boxes = [
-        { cx: 100 + offsetX, cy: 248 + BOTTOM_PUSH, R: 88, index: 0 },
-        { cx: 240 + offsetX, cy: 362 + BOTTOM_PUSH, R: 88, index: 1 },
-        { cx: 780 + offsetX, cy: 162 + BOTTOM_PUSH, R: 88, index: 2 },
-        { cx: 920 + offsetX, cy: 282 + BOTTOM_PUSH, R: 88, index: 3 },
+        { cx: 100 + offsetX, cy: 218 + BOTTOM_PUSH, R: 72, index: 0 },
+        { cx: 240 + offsetX, cy: 318 + BOTTOM_PUSH, R: 72, index: 1 },
+        { cx: 780 + offsetX, cy: 142 + BOTTOM_PUSH, R: 72, index: 2 },
+        { cx: 920 + offsetX, cy: 245 + BOTTOM_PUSH, R: 72, index: 3 },
       ];
       
       let foundIndex: number | null = null;

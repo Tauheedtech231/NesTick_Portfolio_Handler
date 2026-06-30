@@ -226,7 +226,7 @@ export default function TemplatesSection({
                 <div
                   key={template.id}
                   ref={el => addToRefs(el, templateCardsRef)}
-                  className="group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  className="group relative rounded-[2rem] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   style={{
                     backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
                     border: '1px solid',
@@ -277,7 +277,7 @@ export default function TemplatesSection({
                       className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-all duration-300 ease-in-out"
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
+                      <div className="px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
                         style={{
                           backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -311,11 +311,11 @@ export default function TemplatesSection({
                       {template.description}
                     </p>
 
-                    {/* Buttons */}
+                    {/* Buttons - Fully Rounded */}
                     <div className="mt-auto pt-2 flex gap-2">
                       <button
                         onClick={() => handleDetailsClick(template)}
-                        className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
+                        className="flex-1 py-2.5 px-3 rounded-full text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
                         style={{
                           backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                           border: '1px solid',
@@ -330,7 +330,7 @@ export default function TemplatesSection({
                       </button>
                       <button
                         onClick={() => handleBuyNowClick(template)}
-                        className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
+                        className="flex-1 py-2.5 px-3 rounded-full text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
                         style={{
                           backgroundColor: template.type === 'free'
                             ? '#22C55E'
@@ -351,12 +351,12 @@ export default function TemplatesSection({
               ))}
             </div>
 
-            {/* View More Button */}
+            {/* View More Button - Fully Rounded */}
             {!showAll && templates.length > 3 && (
               <div className="flex justify-center mt-12">
                 <button
                   onClick={handleViewMore}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
                   style={{
                     backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
                     color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
@@ -379,7 +379,7 @@ export default function TemplatesSection({
             ].map((template) => (
               <div
                 key={template.id}
-                className="rounded-2xl p-6 md:p-8 opacity-50 flex flex-col"
+                className="rounded-[2rem] p-6 md:p-8 opacity-50 flex flex-col"
                 style={{
                   backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
                   border: '1px solid',

@@ -102,6 +102,7 @@ export default function TestimonialSection() {
         accentLight: 'rgba(232, 202, 94, 0.15)',
         inputBg: 'rgba(11, 15, 25, 0.8)',
         modalBg: 'rgba(11, 15, 25, 0.95)',
+        shadowColor: 'rgba(0,0,0,0.3)',
       };
     } else {
       return {
@@ -115,6 +116,7 @@ export default function TestimonialSection() {
         accentLight: 'rgba(0, 102, 255, 0.08)',
         inputBg: 'rgba(249, 250, 251, 0.9)',
         modalBg: 'rgba(255, 255, 255, 0.95)',
+        shadowColor: 'rgba(0,0,0,0.15)',
       };
     }
   };
@@ -159,8 +161,146 @@ export default function TestimonialSection() {
       >
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12">
           
-          {/* ─── LEFT - Description ──────────────────────────────────────────── */}
-          <div className="flex-1 max-w-xl md:ml-[2%] z-10">
+          {/* ─── LEFT - 3D Frame ────────────────────────────────────────────── */}
+          <div className="relative flex-shrink-0 w-full max-w-sm md:max-w-md md:ml-[2%] order-1 md:order-1">
+            
+            {/* 3D Container */}
+            <div 
+              className="relative w-full cursor-pointer group"
+              style={{ aspectRatio: '4/3' }}
+            >
+              {/* 3D Shadow beneath */}
+              <div 
+                className="absolute -bottom-6 left-0 right-0 h-12 pointer-events-none"
+                style={{
+                  background: `linear-gradient(to bottom, ${colors.shadowColor}, transparent)`,
+                  transform: 'perspective(1000px) rotateX(10deg)',
+                  filter: 'blur(12px)',
+                }}
+              />
+              
+              {/* 3D Frame */}
+              <motion.div 
+                className="absolute inset-0 overflow-hidden"
+                initial={false}
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 8,
+                  rotateX: -4,
+                  transition: {
+                    duration: 0.6,
+                    ease: "easeOut"
+                  }
+                }}
+                style={{
+                  clipPath: 'polygon(0% 0%, 78% 0%, 100% 100%, 22% 100%)',
+                  transform: 'perspective(1000px) rotateY(-3deg) rotateX(2deg)',
+                  transformStyle: 'preserve-3d',
+                  cursor: 'pointer',
+                  boxShadow: `
+                    0 20px 60px ${colors.shadowColor},
+                    inset 0 0 60px rgba(0,0,0,0.2)
+                  `,
+                }}
+              >
+                {/* Background Image */}
+                <div className="absolute inset-0 w-full h-full">
+                  <Image
+                    src="/back.jpg"
+                    alt="Background"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                  {/* Dark/Light overlay */}
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      background: theme === 'dark' 
+                        ? 'linear-gradient(135deg, rgba(11, 15, 25, 0.7), rgba(11, 15, 25, 0.3))'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2))',
+                    }}
+                  />
+                </div>
+
+                {/* Profile Image - Centered */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="relative"
+                    style={{
+                      width: '65%',
+                      height: '80%',
+                      overflow: 'hidden',
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
+                    }}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={currentIndex}
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                        className="w-full h-full relative"
+                      >
+                        <Image
+                          src={currentTestimonial.imageUrl}
+                          alt={currentTestimonial.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          priority
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                    
+                    {/* Inner glow */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.2) 100%)`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 3D Edge effect */}
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: `
+                      linear-gradient(to right, rgba(255,255,255,0.1), transparent 30%),
+                      linear-gradient(to bottom, rgba(255,255,255,0.05), transparent 30%)
+                    `,
+                    clipPath: 'polygon(0% 0%, 78% 0%, 100% 100%, 22% 100%)',
+                  }}
+                />
+              </motion.div>
+            </div>
+
+            {/* Navigation Dots */}
+            <div className="flex justify-center gap-2 mt-6">
+              {testimonials.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  className="h-2 rounded-full transition-all duration-300 cursor-pointer"
+                  style={{
+                    width: currentIndex === idx ? "24px" : "8px",
+                    backgroundColor: currentIndex === idx 
+                      ? colors.accent 
+                      : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
+                    transition: 'background-color 0.3s ease, width 0.3s ease',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ─── RIGHT - Description ─────────────────────────────────────────── */}
+          <div className="flex-1 max-w-xl md:mr-[2%] order-2 md:order-2 z-10">
             {/* Badge */}
             <div 
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 cursor-pointer"
@@ -260,24 +400,6 @@ export default function TestimonialSection() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Navigation Dots - Only 2 dots */}
-            <div className="flex gap-2 mt-6">
-              {testimonials.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className="h-2 rounded-full transition-all duration-300 cursor-pointer"
-                  style={{
-                    width: currentIndex === idx ? "24px" : "8px",
-                    backgroundColor: currentIndex === idx 
-                      ? colors.accent 
-                      : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
-                    transition: 'background-color 0.3s ease, width 0.3s ease',
-                  }}
-                />
-              ))}
-            </div>
-
             {/* ─── FEEDBACK BUTTON ───────────────────────────────────────────── */}
             {!feedbackSubmitted ? (
               <button
@@ -304,80 +426,6 @@ export default function TestimonialSection() {
                 </span>
               </div>
             )}
-          </div>
-
-          {/* ─── RIGHT - Parallelogram with Background Image (Smaller) ────────────────── */}
-          <div className="relative flex-shrink-0 w-full max-w-sm md:max-w-md md:mr-[2%]">
-            {/* Wrapper */}
-            <div className="relative w-full" style={{ aspectRatio: '4/3' }}>
-              
-              {/* Parallelogram Container - NO BORDER, SMALLER */}
-              <div 
-                className="absolute inset-0 overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-500"
-                style={{
-                  clipPath: 'polygon(22% 0%, 100% 0%, 78% 100%, 0% 100%)',
-                  boxShadow: `0 0 30px ${colors.accent}20`,
-                  transition: 'box-shadow 0.6s ease, transform 0.3s ease',
-                  border: 'none',
-                  transform: 'scale(0.85)',
-                }}
-              >
-                {/* Background Image */}
-                <div className="absolute inset-0 w-full h-full">
-                  <Image
-                    src="/back.jpg"
-                    alt="Background"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
-                  />
-                  {/* Dark/Light overlay for better visibility */}
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: theme === 'dark' 
-                        ? 'linear-gradient(135deg, rgba(11, 15, 25, 0.7), rgba(11, 15, 25, 0.3))'
-                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2))',
-                    }}
-                  />
-                </div>
-
-                {/* Profile Image - Centered, increased height */}
-                <div 
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <div 
-                    className="relative"
-                    style={{
-                      width: '70%',
-                      height: '85%',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentIndex}
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: 0.5, ease: "easeInOut" }}
-                        className="w-full h-full relative"
-                      >
-                        <Image
-                          src={currentTestimonial.imageUrl}
-                          alt={currentTestimonial.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          priority
-                        />
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
