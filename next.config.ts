@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
       'ui-avatars.com', 
       'plus.unsplash.com', 
       'res.cloudinary.com',
-      'images.openai.com' // ✅ Add this
+      'images.openai.com',
+      'media.istockphoto.com' // ✅ Add this
     ],
 
     remotePatterns: [
@@ -33,7 +34,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'images.openai.com', // ✅ Add this too (for better control)
+        hostname: 'images.openai.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.istockphoto.com', // ✅ Add this too
         pathname: '/**',
       },
     ],

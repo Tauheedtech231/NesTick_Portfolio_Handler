@@ -1,149 +1,92 @@
-
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-.cards-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr 1px 1fr;
-  background: #f5f5f7;
-  border-radius: 12px;
-  overflow: hidden;
-  font-family: 'Segoe UI', sans-serif;
-}
-.divider-v { background: #ddd; }
-.card {
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 28px;
-}
-.photo-area {
-  width: 100%;
-  height: 260px;
-  position: relative;
-  overflow: hidden;
-  background: #fff;
-}
-.parallelogram {
-  position: absolute;
-  bottom: 0;
-  right: -10px;
-  width: 220px;
-  height: 220px;
-  background: #8800ff;
-  clip-path: polygon(30% 0%, 100% 0%, 70% 100%, 0% 100%);
-}
-.person-img {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 245px;
-  width: auto;
-  object-fit: contain;
-  z-index: 2;
-}
-.avatar-placeholder {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 240px;
-}
-.avatar-silhouette {
-  width: 130px;
-  height: 200px;
-}
-.person-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  text-align: center;
-  margin-top: 18px;
-  margin-bottom: 6px;
-  padding: 0 16px;
-}
-.person-role {
-  font-size: 13px;
-  color: #888;
-  text-align: center;
-  font-weight: 400;
-}
-</style>
-
-<h2 class="sr-only">Team members — three cards with purple parallelogram background design</h2>
-
-<div class="cards-wrap">
-
-  <div class="card">
-    <div class="photo-area">
-      <div class="parallelogram"></div>
-      <div class="avatar-placeholder">
-        <svg class="avatar-silhouette" viewBox="0 0 130 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="65" cy="52" rx="34" ry="38" fill="#d4a88a"/>
-          <path d="M10 200 C10 140 30 120 65 118 C100 120 120 140 120 200Z" fill="#c8a07a"/>
-          <ellipse cx="65" cy="50" rx="34" ry="36" fill="#e8c4a0"/>
-          <ellipse cx="52" cy="48" rx="5" ry="6" fill="#5a3a1a"/>
-          <ellipse cx="78" cy="48" rx="5" ry="6" fill="#5a3a1a"/>
-          <path d="M55 62 Q65 70 75 62" stroke="#a0603a" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <rect x="30" y="115" width="70" height="85" rx="8" fill="#a0703a"/>
-          <rect x="40" y="115" width="50" height="20" fill="#b88050"/>
-        </svg>
-      </div>
-    </div>
-    <div class="person-name">Dr. Sheraz Naseer</div>
-    <div class="person-role">Head of AI Department</div>
-  </div>
-
-  <div class="divider-v"></div>
-
-  <div class="card">
-    <div class="photo-area">
-      <div class="parallelogram"></div>
-      <div class="avatar-placeholder">
-        <svg class="avatar-silhouette" viewBox="0 0 130 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="65" cy="50" rx="32" ry="36" fill="#c8a078"/>
-          <ellipse cx="65" cy="48" rx="30" ry="33" fill="#d4aa88"/>
-          <ellipse cx="53" cy="47" rx="5" ry="6" fill="#3a2a1a"/>
-          <ellipse cx="77" cy="47" rx="5" ry="6" fill="#3a2a1a"/>
-          <path d="M53 62 Q65 72 77 62" stroke="#8a4a2a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M42 68 Q65 85 88 68" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
-          <rect x="25" y="112" width="80" height="88" rx="6" fill="#2a2a3a"/>
-          <rect x="40" y="112" width="50" height="18" fill="#383848"/>
-          <rect x="58" y="58" width="14" height="18" fill="#c8a078"/>
-          <path d="M25 130 Q65 140 105 130" stroke="#3a3a4a" stroke-width="2" fill="none"/>
-        </svg>
-      </div>
-    </div>
-    <div class="person-name">Prof. Dr. Javed Iqbal</div>
-    <div class="person-role">Healthcare SME</div>
-  </div>
-
-  <div class="divider-v"></div>
-
-  <div class="card">
-    <div class="photo-area">
-      <div class="parallelogram"></div>
-      <div class="avatar-placeholder">
-        <svg class="avatar-silhouette" viewBox="0 0 130 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="65" cy="48" rx="33" ry="36" fill="#b8886a"/>
-          <ellipse cx="65" cy="46" rx="30" ry="33" fill="#c89878"/>
-          <ellipse cx="52" cy="46" rx="5" ry="6" fill="#2a1a0a"/>
-          <ellipse cx="78" cy="46" rx="5" ry="6" fill="#2a1a0a"/>
-          <path d="M54 61 Q65 70 76 61" stroke="#7a3a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M35 30 Q65 10 95 30 Q98 48 90 52 Q65 20 40 52 Q32 48 35 30Z" fill="#1a1a1a"/>
-          <rect x="22" y="110" width="86" height="90" rx="6" fill="#111"/>
-          <rect x="38" y="110" width="54" height="16" fill="#1e1e1e"/>
-        </svg>
-      </div>
-    </div>
-    <div class="person-name">Yasir Bucha</div>
-    <div class="person-role">Strategic Advisor</div>
-  </div>
-
+<div style="background:#0d0518;width:100%;aspect-ratio:625/331;overflow:hidden;position:relative;border-radius:8px;">
+<svg width="100%" height="100%" viewBox="0 0 625 331" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+<defs>
+<linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#ff6a3d"/>
+<stop offset="35%" stop-color="#ffd23d"/>
+<stop offset="65%" stop-color="#b266ff"/>
+<stop offset="100%" stop-color="#8a7dff"/>
+</linearGradient>
+<linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#c93dff"/>
+<stop offset="50%" stop-color="#ff8a3d"/>
+<stop offset="100%" stop-color="#7d9fff"/>
+</linearGradient>
+<radialGradient id="bgGlow" cx="30%" cy="55%" r="60%">
+<stop offset="0%" stop-color="#2a1040"/>
+<stop offset="100%" stop-color="#0d0518"/>
+</radialGradient>
+</defs>
+<rect x="0" y="0" width="625" height="331" fill="url(#bgGlow)"/>
+<g id="spiralGroup" fill="none" stroke-linecap="round">
+</g>
+<g id="waveGroup" fill="none" stroke-linecap="round">
+</g>
+</svg>
 </div>
+<script>
+(function(){
+  var svg = document.currentScript.previousElementSibling.querySelector('svg');
+  var spiralGroup = svg.getElementById('spiralGroup');
+  var waveGroup = svg.getElementById('waveGroup');
+  var cx = 120, cy = 200;
+  var spiralColors = ['#ff6a3d','#ffae3d','#ff8a8a','#c97dff','#8a9fff','#6a7dff'];
+  for (var i = 0; i < 9; i++) {
+    var r = 18 + i * 13;
+    var d = 'M ' + (cx + r) + ' ' + cy + ' ';
+    var turns = 1.4;
+    var steps = 60;
+    for (var s = 1; s <= steps; s++) {
+      var t = s / steps;
+      var ang = t * turns * 2 * Math.PI;
+      var rad = r * (1 - t * 0.85);
+      var x = cx + rad * Math.cos(ang);
+      var y = cy + rad * Math.sin(ang) * 0.85;
+      d += 'L ' + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+    }
+    var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', spiralColors[i % spiralColors.length]);
+    path.setAttribute('stroke-width', '1.2');
+    path.setAttribute('opacity', 0.35 + (i % 3) * 0.15);
+    spiralGroup.appendChild(path);
+  }
+
+  var waveColors = ['#ff6a3d','#ff8a3d','#ffd23d','#ffb3a3','#c97dff','#a37dff','#8a9fff','#7dbfff','#b3d9ff'];
+  var baseCount = 16;
+  var paths = [];
+  for (var i = 0; i < baseCount; i++) {
+    var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('stroke', waveColors[i % waveColors.length]);
+    path.setAttribute('stroke-width', '1.3');
+    path.setAttribute('opacity', '0.75');
+    waveGroup.appendChild(path);
+    paths.push(path);
+  }
+
+  function buildPath(i, t) {
+    var phase = i * 0.35;
+    var wobble = Math.sin(t * 1.3 + phase) * 14;
+    var startX = 195 + i * 3;
+    var startY = 150 - i * 3.5;
+    var midX = 330 + Math.sin(t * 0.8 + phase) * 10;
+    var midY = 195 - i * 8 + wobble;
+    var peakX = 430 + i * 9;
+    var peakY = 55 - i * 2 + Math.cos(t * 0.9 + phase) * 12;
+    var endX = 600 + i * 1.5;
+    var endY = 75 + i * 11 + Math.sin(t * 1.1 + phase) * 10;
+    return 'M 205 158 Q ' + startX + ' ' + startY + ', ' + midX + ' ' + midY +
+      ' T ' + peakX + ' ' + peakY + ' T ' + endX + ' ' + endY;
+  }
+
+  var t0 = 0;
+  function animate() {
+    t0 += 0.012;
+    for (var i = 0; i < paths.length; i++) {
+      paths[i].setAttribute('d', buildPath(i, t0));
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>

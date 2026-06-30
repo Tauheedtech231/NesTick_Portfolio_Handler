@@ -204,7 +204,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
         }}
       >
-        {/* Video Background - with overlay matching template colors */}
+        {/* Video Background */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <div 
             ref={(el) => setParallaxRef(el)}
@@ -228,7 +228,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 Your browser does not support the video tag.
               </video>
               
-              {/* Fallback gradient - USING REFERENCE COLORS */}
+              {/* Fallback gradient */}
               {!videoLoaded && (
                 <div 
                   className="absolute inset-0 w-full h-full"
@@ -243,21 +243,21 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           </div>
         </div>
 
-        {/* Overlay - USING REFERENCE COLORS */}
-        <div 
-          className="absolute inset-0 z-10"
-          style={{
-            background: theme === 'dark' 
-              ? 'rgba(11, 15, 25, 0.7)' 
-              : 'rgba(255, 255, 255, 0.85)'
-          }}
-        />
+        {/* Overlay - Dark mode only */}
+        {theme === 'dark' && (
+          <div 
+            className="absolute inset-0 z-10"
+            style={{
+              background: 'rgba(11, 15, 25, 0.7)',
+            }}
+          />
+        )}
 
         {/* Main Content */}
         <div className="relative z-20 container mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
           <div className="flex flex-col items-center justify-center text-center">
             
-            {/* ─── Premium Badge - USING REFERENCE COLORS ─── */}
+            {/* ─── Premium Badge ─── */}
             <div 
               className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500"
               style={{
@@ -280,14 +280,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </span>
             </div>
 
-            {/* ─── HEADINGS - ORIGINAL FONT SIZES KEEP ─── */}
+            {/* ─── HEADINGS ─── */}
             <div className="mb-5 sm:mb-7">
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
                 <span 
                   className="block font-serif tracking-tight"
                   style={{ 
                     fontFamily: "'Poppins', sans-serif",
-                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    color: '#FFFFFF', // ← Always white
                   }}
                 >
                   Journey Through the
@@ -317,12 +317,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </h1>
             </div>
 
-            {/* ─── SUBHEADING - ORIGINAL FONT SIZE KEEP ─── */}
+            {/* ─── SUBHEADING - Always White ─── */}
             <p 
               className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide"
               style={{ 
                 fontFamily: "'Calibri Light', sans-serif",
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                color: '#FFFFFF', // ← Always white
               }}
             >
               Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
@@ -330,7 +330,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               presence across the universe of learning.
             </p>
 
-            {/* ─── CTA Buttons - USING REFERENCE COLORS ─── */}
+            {/* ─── CTA Buttons ─── */}
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
               
               {/* ── LEARN MORE BUTTON ── */}
@@ -349,17 +349,17 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               
-              {/* ── YOUR DESIGN BUTTON ── */}
+              {/* ── YOUR DESIGN BUTTON - Always White Text ── */}
               <button
                 onClick={handleDesignClick}
                 className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
                   backgroundColor: 'transparent',
-                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  color: '#FFFFFF', // ← Always white
                   borderRadius: '50px',
                   border: '2px solid',
-                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.3)',
                 }}
               >
                 <Palette className="w-4 h-4" />
@@ -369,14 +369,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           </div>
         </div>
 
-        {/* Scroll hint - USING REFERENCE COLORS */}
+        {/* Scroll hint */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
           <div className="flex flex-col items-center gap-1 opacity-50">
             <span 
               className="text-[9px] uppercase tracking-wider"
               style={{ 
                 fontFamily: "'Poppins', sans-serif",
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                color: theme === 'dark' ? '#FFFFFF' : '#FFFFFF', // ← Always white
               }}
             >
               Scroll
@@ -384,7 +384,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             <div 
               className="w-4 h-6 rounded-full flex justify-center"
               style={{
-                border: `2px solid ${theme === 'dark' ? '#FFFFFF' : '#1F2937'}`,
+                border: `2px solid ${theme === 'dark' ? '#FFFFFF' : '#FFFFFF'}`,
               }}
             >
               <div 
@@ -408,7 +408,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         `}</style>
       </section>
 
-      {/* ─── MODAL - USING REFERENCE COLORS ─── */}
+      {/* ─── MODAL ─── */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div

@@ -18,6 +18,10 @@ interface ProductSection {
   imagePosition: 'left' | 'right';
 }
 
+// Colors
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
+
 // 9 Real Products with realistic data
 const PRODUCTS: ProductSection[] = [
   {
@@ -217,11 +221,11 @@ export default function ProductShowcase() {
     return () => observer.disconnect();
   }, []);
 
-  // Intersection Observer for scroll reveal
+  // Intersection Observer for scroll reveal - threshold 0.5
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -50px 0px'
+      threshold: 0.5,
+      rootMargin: '0px 0px 0px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -273,25 +277,12 @@ export default function ProductShowcase() {
   };
 
   const getAccentColor = (color: string) => {
-    const colors: Record<string, string> = {
-      primary: '#60A5FA', // Sky blue for all products
-      tertiary: '#60A5FA',
-      secondary: '#60A5FA',
-      error: '#60A5FA',
-      success: '#60A5FA',
-    };
-    return colors[color] || colors.primary;
+    // Using GOLD and BLUE
+    return BLUE; // All accents blue
   };
 
   const getAccentLight = (color: string) => {
-    const colors: Record<string, string> = {
-      primary: 'rgba(96, 165, 250, 0.15)',
-      tertiary: 'rgba(96, 165, 250, 0.15)',
-      secondary: 'rgba(96, 165, 250, 0.15)',
-      error: 'rgba(96, 165, 250, 0.15)',
-      success: 'rgba(96, 165, 250, 0.15)',
-    };
-    return colors[color] || colors.primary;
+    return 'rgba(0, 102, 255, 0.12)';
   };
 
   const getSectionBg = () => {
@@ -311,7 +302,11 @@ export default function ProductShowcase() {
   };
 
   const getAccent = () => {
-    return '#60A5FA'; // Sky blue
+    return BLUE;
+  };
+
+  const getGold = () => {
+    return GOLD;
   };
 
   const getInputBg = () => {
@@ -334,9 +329,24 @@ export default function ProductShowcase() {
     setTimeout(() => setFormSubmitted(false), 5000);
   };
 
-  // Split NEEZAMIYA for colored 6th character
+  // Split NEEZAMIYA for colored characters
   const neezamiyaText = "NEEZAMIYA";
   const neezamiyaChars = neezamiyaText.split('');
+
+  // Image animation - slides from side
+  const getImageAnimationClass = (imagePosition: 'left' | 'right', isVisible: boolean) => {
+    if (!isVisible) {
+      return imagePosition === 'left' 
+        ? 'opacity-0 -translate-x-[200%]' 
+        : 'opacity-0 translate-x-[200%]';
+    }
+    return 'opacity-100 translate-x-0';
+  };
+
+  // Content animation - fast fade in (description pehle aayegi)
+  const getContentAnimationClass = (isVisible: boolean) => {
+    return isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6';
+  };
 
   return (
     <>
@@ -362,27 +372,28 @@ export default function ProductShowcase() {
                   }
                 }}
                 data-section-id={product.id}
-                className="min-h-screen flex items-center"
+                className="min-h-screen flex items-center overflow-hidden"
                 style={{
                   marginTop: '2.5rem',
                   padding: '1.5rem 0',
                 }}
               >
-                <div className={`w-full transition-all duration-700 ease-out ${
-                  isSectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-                style={{
-                  transitionDelay: `${index * 100}ms`,
-                }}>
-                  {/* REDUCED GAP - from gap-10 to gap-4 */}
-                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-start lg:items-stretch`}>
-                    {/* Image */}
-                    <div className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'}`} style={isLeft ? { paddingLeft: '0.3rem' } : undefined}>
+                <div className="w-full">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-start lg:items-stretch">
+                    
+                    {/* Image - Slides from far left or right (slow) */}
+                    <div 
+                      className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'} transition-all duration-1200 ease-out ${getImageAnimationClass(product.imagePosition, isSectionVisible)}`}
+                      style={{
+                        transitionTimingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                        transitionDelay: `${index * 80 + 300}ms`, // Delay so description pehle aaye
+                      }}
+                    >
                       <div
                         className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
                         style={{
                           backgroundColor: accentLight,
-                          opacity: 0.5,
+                          opacity: 0.4,
                         }}
                       />
                       <div
@@ -392,7 +403,7 @@ export default function ProductShowcase() {
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                       >
-                        <div className="w-full h-full relative">
+                        <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
                           <img
                             src={product.image}
                             alt={product.title}
@@ -403,17 +414,20 @@ export default function ProductShowcase() {
                       </div>
                     </div>
 
-                    {/* Content - REDUCED GAP here too */}
+                    {/* Content - Fast fade in (pehle aayega) */}
                     <div 
-                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col h-full`}
-                      style={isLeft ? { paddingRight: '0.3rem' } : { paddingLeft: '0.3rem' }}
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col h-full transition-all duration-500 ease-out ${getContentAnimationClass(isSectionVisible)}`}
+                      style={{
+                        transitionDelay: `${index * 50}ms`, // Fast - pehle show ho
+                      }}
                     >
                       <div className="flex-1 flex flex-col justify-center">
                         <span
                           className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
                           style={{ 
-                            color: accentColor,
+                            color: GOLD,
                             fontFamily: "'Poppins', sans-serif",
+                            letterSpacing: '0.15em',
                           }}
                         >
                           {product.subtitle}
@@ -453,7 +467,7 @@ export default function ProductShowcase() {
                                 className="material-symbols-outlined cursor-default flex-shrink-0"
                                 style={{
                                   fontSize: '18px',
-                                  color: accentColor,
+                                  color: BLUE,
                                 }}
                               >
                                 check_circle
@@ -466,15 +480,9 @@ export default function ProductShowcase() {
                         <div className="pt-3">
                           <button
                             onClick={scrollToCTA}
-                            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto ${
-                              product.buttonVariant === 'primary'
-                                ? 'text-white shadow-lg'
-                                : 'border'
-                            }`}
+                            className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto text-white shadow-lg`}
                             style={{
-                              backgroundColor: product.buttonVariant === 'primary' ? accentColor : 'transparent',
-                              color: product.buttonVariant === 'primary' ? '#FFFFFF' : getTextColor(),
-                              borderColor: product.buttonVariant === 'outline' ? getBorderColor() : 'transparent',
+                              backgroundColor: BLUE,
                               fontFamily: "'Poppins', sans-serif",
                             }}
                           >
@@ -489,7 +497,7 @@ export default function ProductShowcase() {
             );
           })}
 
-          {/* NEEZAMIYA */}
+          {/* NEEZAMIYA - with GOLD and BLUE */}
           <div
             ref={neezamiyaRef}
             className={`relative w-full flex items-center justify-center transition-all duration-1000 ease-out ${
@@ -511,12 +519,13 @@ export default function ProductShowcase() {
                 }}
               >
                 {neezamiyaChars.map((char, index) => {
-                  const isSixth = index === 5;
+                  // Alternate between GOLD and BLUE
+                  const isGold = index % 2 === 0;
                   return (
                     <span
                       key={index}
                       style={{
-                        color: isSixth ? getAccent() : getTextColor(),
+                        color: isGold ? GOLD : BLUE,
                       }}
                     >
                       {char}
@@ -527,8 +536,9 @@ export default function ProductShowcase() {
               <span
                 className="block mt-3 sm:mt-4 text-xs sm:text-sm font-light tracking-[0.2em] uppercase cursor-default"
                 style={{ 
-                  color: getTextMuted(),
+                  color: GOLD,
                   fontFamily: "'Calibri Light', sans-serif",
+                  letterSpacing: '0.3em',
                 }}
               >
                 Enterprise Solutions
@@ -668,31 +678,31 @@ export default function ProductShowcase() {
                       Product of Interest
                     </label>
                     <select
-  id="interest"
-  name="interest"
-  value={formData.interest}
-  onChange={handleInputChange}
-  className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-  style={{
-    backgroundColor: getInputBg(),
-    borderColor: getBorderColor(),
-    color: getTextColor(),
-    fontFamily: "'Calibri Light', sans-serif",
-    zIndex: 10, // Added z-index
-    position: 'relative', // Added position
-  }}
->
-  <option value="">Select a product</option>
-  {PRODUCTS.map(product => (
-    <option key={product.id} value={product.title} style={{ 
-      backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
-      color: getTextColor(),
-      padding: '8px',
-    }}>
-      {product.title}
-    </option>
-  ))}
-</select>
+                      id="interest"
+                      name="interest"
+                      value={formData.interest}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+                      style={{
+                        backgroundColor: getInputBg(),
+                        borderColor: getBorderColor(),
+                        color: getTextColor(),
+                        fontFamily: "'Calibri Light', sans-serif",
+                        zIndex: 10,
+                        position: 'relative',
+                      }}
+                    >
+                      <option value="">Select a product</option>
+                      {PRODUCTS.map(product => (
+                        <option key={product.id} value={product.title} style={{ 
+                          backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
+                          color: getTextColor(),
+                          padding: '8px',
+                        }}>
+                          {product.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -701,7 +711,7 @@ export default function ProductShowcase() {
                     type="submit"
                     className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 text-white shadow-lg cursor-pointer"
                     style={{
-                      backgroundColor: getAccent(),
+                      backgroundColor: BLUE,
                       fontFamily: "'Poppins', sans-serif",
                     }}
                   >
@@ -711,7 +721,7 @@ export default function ProductShowcase() {
                     <p
                       className="mt-3 text-sm text-center"
                       style={{ 
-                        color: getAccent(),
+                        color: BLUE,
                         fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
@@ -748,7 +758,6 @@ export default function ProductShowcase() {
           -webkit-font-smoothing: antialiased;
         }
 
-        /* Continuous Fade In Out Animation */
         @keyframes fadeInOut {
           0%, 100% {
             opacity: 1;
@@ -772,20 +781,17 @@ export default function ProductShowcase() {
           animation: fadeInOut 6s ease-in-out infinite;
         }
 
-        /* Responsive animation adjustments */
         @media (prefers-reduced-motion: reduce) {
           .animate-fade-in-out {
             animation: none;
           }
         }
 
-        /* Input focus ring using box-shadow */
         input:focus, select:focus {
-          box-shadow: 0 0 0 2px #60A5FA !important;
-          border-color: #60A5FA !important;
+          box-shadow: 0 0 0 2px ${BLUE} !important;
+          border-color: ${BLUE} !important;
         }
 
-        /* Button hover effect */
         button:hover {
           opacity: 0.9;
         }
