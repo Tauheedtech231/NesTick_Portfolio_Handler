@@ -93,9 +93,17 @@ interface PartnerBenefitsCardsProps {
   benefits?: Benefit[];
   theme: 'light' | 'dark';
   isInView: boolean;
+  activeColor?: string;
+  shadowColor?: string;
 }
 
-export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenefitsCardsProps) {
+export function PartnerBenefitsCards({ 
+  benefits, 
+  theme, 
+  isInView,
+  activeColor = '#0066FF',
+  shadowColor = 'rgba(0, 102, 255, 0.25)'
+}: PartnerBenefitsCardsProps) {
   const BENEFITS = benefits || DEFAULT_BENEFITS;
   const areaRef = useRef<HTMLDivElement>(null);
   const [positions, setPositions] = useState<CardPosition[]>([]);
@@ -174,8 +182,8 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
     let adjustedY = originalY;
     
     if (index === 0) {
-      adjustedX = originalX + firstCardLeftGap - 10; // Extra left push
-      adjustedY = originalY + firstCardTopGap - 8;   // Extra top margin
+      adjustedX = originalX + firstCardLeftGap - 10;
+      adjustedY = originalY + firstCardTopGap - 8;
     }
     
     if (index === 1) {
@@ -229,15 +237,26 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
+                  boxShadow: `0 4px 20px ${shadowColor}`,
                 }}
               >
                 {/* Glow effect on hover */}
                 <div 
                   className="absolute -inset-0.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
                   style={{
-                    background: `radial-gradient(circle at center, ${benefit.color}20, transparent 70%)`,
+                    background: `radial-gradient(circle at center, ${activeColor}25, transparent 70%)`,
                   }}
                 />
+
+                {/* Icon */}
+                <div 
+                  className="relative z-10 mb-1.5 transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    color: activeColor,
+                  }}
+                >
+                  {benefit.icon && <benefit.icon size={isMobile ? 20 : 28} strokeWidth={1.8} />}
+                </div>
 
                 <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
                   {/* Title */}
@@ -274,7 +293,7 @@ export function PartnerBenefitsCards({ benefits, theme, isInView }: PartnerBenef
               className="h-1 rounded-full transition-all duration-300"
               style={{
                 width: idx === 0 ? '16px' : '5px',
-                background: idx === 0 ? '#60A5FA' : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
+                background: idx === 0 ? activeColor : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
               }}
             />
           ))}

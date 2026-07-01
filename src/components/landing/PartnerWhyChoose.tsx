@@ -4,11 +4,12 @@
 import { motion } from 'framer-motion';
 import { Building2, Palette, Code2, LucideIcon, CheckCircle, TrendingUp, Megaphone, Target } from 'lucide-react';
 
+// FIXED: Color ko optional karo
 interface BenefitItem {
   icon: LucideIcon;
   title: string;
   description: string;
-  color: string;
+  color?: string; // ← OPTIONAL karo
 }
 
 interface PartnerWhyChooseProps {
@@ -29,11 +30,15 @@ export function PartnerWhyChoose({
   isInView, 
   categoryContent 
 }: PartnerWhyChooseProps) {
+  // REAL BLUE COLOR FROM TEMPLATES
+  const BLUE = '#0066FF';
+  const GOLD = '#E8CA5E';
+
   const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getAccentColor = () => '#60A5FA';
+  const getAccentColor = () => BLUE; // ← REAL BLUE
   const getButtonText = () => '#FFFFFF';
-  const getIconBg = () => theme === 'dark' ? 'rgba(96, 165, 250, 0.12)' : 'rgba(96, 165, 250, 0.08)';
+  const getIconBg = () => theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.08)';
 
   const getIcon = () => {
     if (activeForm === 'designer') return Palette;
@@ -64,7 +69,7 @@ export function PartnerWhyChoose({
       <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6">
         <div
           className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: getAccentColor() }}
+          style={{ backgroundColor: getAccentColor() }} // ← REAL BLUE
         >
           <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color: getButtonText() }} />
         </div>
@@ -119,10 +124,10 @@ export function PartnerWhyChoose({
                     e.currentTarget.style.transform = 'translateX(0px)';
                   }}
                 >
-                  {/* Check Icon */}
+                  {/* Check Icon - REAL BLUE */}
                   <div
                     className="flex-shrink-0 mt-0.5"
-                    style={{ color: getAccentColor() }}
+                    style={{ color: getAccentColor() }} // ← REAL BLUE
                   >
                     <CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   </div>
@@ -150,11 +155,12 @@ export function PartnerWhyChoose({
           )}
         </div>
 
+        {/* Quote Box - REAL BLUE */}
         <div
           className="p-4 md:p-5 rounded-xl"
           style={{
-            backgroundColor: theme === 'dark' ? 'rgba(96, 165, 250, 0.08)' : 'rgba(96, 165, 250, 0.04)',
-            borderLeft: `3px solid ${getAccentColor()}`,
+            backgroundColor: theme === 'dark' ? 'rgba(0, 102, 255, 0.08)' : 'rgba(0, 102, 255, 0.04)',
+            borderLeft: `3px solid ${getAccentColor()}`, // ← REAL BLUE
             borderTopRightRadius: '10px',
             borderBottomRightRadius: '10px',
           }}

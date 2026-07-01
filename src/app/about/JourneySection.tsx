@@ -14,10 +14,11 @@ interface Milestone {
   dotX: number;
 }
 
+// ─── All Y coordinates reduced by 30px ───
 const milestones: Milestone[] = [
   {
     id: 0,
-    cy: 85,
+    cy: 55,    // was 85
     dotX: 222,
     year: "'21",
     title: 'Start of NestickTech',
@@ -26,7 +27,7 @@ const milestones: Milestone[] = [
   },
   {
     id: 1,
-    cy: 210,
+    cy: 180,   // was 210
     dotX: 215,
     year: "'22",
     title: 'Good Client Base',
@@ -35,7 +36,7 @@ const milestones: Milestone[] = [
   },
   {
     id: 2,
-    cy: 322,
+    cy: 292,   // was 322
     dotX: 258,
     year: "'23",
     title: 'Global Expansion',
@@ -44,7 +45,7 @@ const milestones: Milestone[] = [
   },
   {
     id: 3,
-    cy: 418,
+    cy: 388,   // was 418
     dotX: 182,
     year: "'24",
     title: 'Launch — Neezamiya',
@@ -53,16 +54,16 @@ const milestones: Milestone[] = [
   },
   {
     id: 4,
-    cy: 522,
+    cy: 492,   // was 522
     dotX: 232,
     year: "'25",
-    title: 'Launch of PBM',
-    desc: ['Portfolio Business Manager', 'revolutionizing institutions.'],
+    title: 'Launch of PSM',
+    desc: ['Portfolio Site management', 'revolutionizing institutions.'],
     side: 'right',
   },
   {
     id: 5,
-    cy: 630,
+    cy: 600,   // was 630
     dotX: 190,
     year: "'26",
     title: 'Ready to Conquer',
@@ -71,11 +72,11 @@ const milestones: Milestone[] = [
   },
 ];
 
-// ─── PATH - Same but will be thinner ───
+// ─── PATH - shifted up by 30px ───
 const PATH_D =
-  'M222,85 C228,100 200,150 215,210 C228,252 272,278 258,322 C244,360 168,375 182,418 C196,455 245,480 232,522 C220,558 172,575 190,630';
+  'M222,55 C228,70 200,120 215,180 C228,222 272,248 258,292 C244,330 168,345 182,388 C196,425 245,450 232,492 C220,528 172,545 190,600';
 
-const GOLD = '#E8CA5E'; // ← UPDATED: Templates Gold
+const GOLD = '#E8CA5E';
 const BLUE = '#0066FF';
 
 export default function JourneySection() {
@@ -177,17 +178,16 @@ export default function JourneySection() {
   const textPrimary = isDark ? '#f8fafc' : '#1F2937';
   const textMuted = isDark ? '#9CA3AF' : '#6B7280';
   const bgColor = isDark ? '#0B0F19' : '#F5F5F5';
-  const badgeBg = isDark ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)'; // ← UPDATED: Gold
+  const badgeBg = isDark ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)';
   const circleFill = isDark ? '#1c1712' : '#f0ece6';
   
-  // ─── UPDATED: Thinner road colors ───
   const roadColors = isDark ? {
-    glow: 'rgba(232,202,94,0.15)', // ← UPDATED: Gold glow
-    mid: 'rgba(232,202,94,0.30)', // ← UPDATED: Gold mid
-    base: 'rgba(30,41,59,0.4)', // ← UPDATED: Thinner base
-    gradient: ['#E8CA5E', '#E8CA5E', '#E8CA5E', '#c49b2a'], // ← UPDATED: Gold
-    edge: 'rgba(232,202,94,0.4)', // ← UPDATED: Gold edge
-    dash: 'rgba(232,202,94,0.6)', // ← UPDATED: Gold dash
+    glow: 'rgba(232,202,94,0.15)',
+    mid: 'rgba(232,202,94,0.30)',
+    base: 'rgba(30,41,59,0.4)',
+    gradient: ['#E8CA5E', '#E8CA5E', '#E8CA5E', '#c49b2a'],
+    edge: 'rgba(232,202,94,0.4)',
+    dash: 'rgba(232,202,94,0.6)',
   } : {
     glow: 'rgba(0,102,255,0.12)',
     mid: 'rgba(0,102,255,0.25)',
@@ -216,12 +216,11 @@ export default function JourneySection() {
   const textYOffset = isMobile ? -10 : -13;
   const lineHeight = isMobile ? 16 : 11;
 
-  // ─── THINNER PATH STROKE WIDTHS ────────────────────────────────────────────
   const roadStrokeWidths = {
     glow: isMobile ? 6 : 6,
     mid: isMobile ? 3 : 3,
-    base: isMobile ? 8 : 6, // ← THINNER
-    main: isMobile ? 4 : 3.5, // ← THINNER
+    base: isMobile ? 8 : 6,
+    main: isMobile ? 4 : 3.5,
     edgeL: isMobile ? 1 : 1,
     edgeR: isMobile ? 1 : 1,
     dashes: isMobile ? 1.5 : 1.5,
@@ -229,7 +228,7 @@ export default function JourneySection() {
 
   return (
     <section
-      className="py-4 md:py-6 overflow-hidden w-full"
+      className="py-4 md:py-16 overflow-hidden w-full"
       style={{ backgroundColor: bgColor, fontFamily: "'Poppins', sans-serif", transition: 'background-color 0.6s ease' }}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -239,10 +238,10 @@ export default function JourneySection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: false, margin: '-10% 0px -10% 0px' }}
-          className="text-center mb-4 md:mb-6"
+          className="text-center mb-2 md:mb-3"
         >
           <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-2 mx-auto w-fit"
+            className="inline-flex mt-[0.5rem] items-center gap-2 px-3 py-1 rounded-full mb-1 mx-auto w-fit"
             style={{ backgroundColor: badgeBg }}
           >
             <Rocket className="w-3.5 h-3.5" style={{ color: isDark ? GOLD : BLUE }} />
@@ -252,7 +251,7 @@ export default function JourneySection() {
           </div>
 
           <h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 tracking-tight"
+            className="text-2xl sm:text-3xl md:text-4xl mt-[0.5rem] font-bold mb-0 tracking-tight"
             style={{ color: textPrimary }}
           >
             The Story of{' '}
@@ -260,7 +259,7 @@ export default function JourneySection() {
           </h2>
 
           <p
-            className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide"
+            className="text-sm md:text-base max-w-2xl mx-auto font-light tracking-wide mt-1"
             style={{ color: textMuted }}
           >
             From humble beginnings to transforming portfolio management across institutions worldwide.
@@ -268,17 +267,16 @@ export default function JourneySection() {
         </motion.div>
 
         {/* ── SVG Timeline ───────────────────────────────────────────────────── */}
-        <div ref={svgWrapRef} className="w-full flex justify-center -mt-2">
+        <div ref={svgWrapRef} className="w-full flex justify-center -mt-4 md:-mt-6">
           <div className="w-full max-w-full">
             <svg
-              viewBox="0 0 480 680"
+              viewBox="0 0 480 650"
               xmlns="http://www.w3.org/2000/svg"
               className="w-full h-auto"
               preserveAspectRatio="xMidYMid meet"
               style={{ width: '100%', maxWidth: '100%' }}
             >
               <defs>
-                {/* Road gradient - GOLD for dark, BLUE for light */}
                 <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%"   stopColor={roadColors.gradient[0]} />
                   <stop offset="35%"  stopColor={roadColors.gradient[1]} />
@@ -286,13 +284,11 @@ export default function JourneySection() {
                   <stop offset="100%" stopColor={roadColors.gradient[3]} />
                 </linearGradient>
 
-                {/* Dot fill */}
                 <radialGradient id="circleFill" cx="50%" cy="40%" r="65%">
                   <stop offset="0%"   stopColor={circleFill} />
                   <stop offset="100%" stopColor={isDark ? '#070502' : '#e0d8cc'} />
                 </radialGradient>
 
-                {/* Glow filters */}
                 <filter id="glowLg" x="-80%" y="-80%" width="260%" height="260%">
                   <feGaussianBlur stdDeviation="4" />
                 </filter>
@@ -301,9 +297,8 @@ export default function JourneySection() {
                 </filter>
               </defs>
 
-              {/* ── Road layers - THINNER ──────────────────────────────────── */}
+              {/* ── Road layers ──────────────────────────────────── */}
 
-              {/* 1. Outer glow - THINNER */}
               <path
                 id="road-glow"
                 d={PATH_D}
@@ -317,7 +312,6 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 2. Mid glow - THINNER */}
               <path
                 id="road-mid"
                 d={PATH_D}
@@ -331,7 +325,6 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 3. Asphalt base - THINNER */}
               <path
                 d={PATH_D}
                 fill="none"
@@ -340,7 +333,6 @@ export default function JourneySection() {
                 strokeLinecap="round"
               />
 
-              {/* 4. Road surface - THINNER */}
               <path
                 id="road-main"
                 d={PATH_D}
@@ -352,7 +344,6 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 5. Left edge line - THINNER */}
               <path
                 id="road-edge-l"
                 d={PATH_D}
@@ -366,7 +357,6 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 6. Right edge line - THINNER */}
               <path
                 id="road-edge-r"
                 d={PATH_D}
@@ -380,7 +370,6 @@ export default function JourneySection() {
                 strokeDashoffset={totalLength || 1}
               />
 
-              {/* 7. Center dashed line - THINNER */}
               <path
                 id="road-dashes"
                 d={PATH_D}

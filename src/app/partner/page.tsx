@@ -49,60 +49,60 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import  ContactSection  from './ContactSection';
 
-// 5 Partner Types - Only Blue & Yellow (Templates colors)
+// 5 Partner Types - Only Business Developer is Gold, rest Blue
 const partnerTypes = [
-  { value: 'designer', label: 'Designer', icon: Palette, color: '#0066FF' },  // ← UPDATED: Blue
-  { value: 'developer', label: 'Developer', icon: Code2, color: '#E8CA5E' },   // ← UPDATED: Gold
-  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: '#0066FF' },  // ← UPDATED: Blue
-  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: '#E8CA5E' },  // ← UPDATED: Gold
-  { value: 'sales', label: 'Sales Person', icon: Target, color: '#0066FF' },  // ← UPDATED: Blue
+  { value: 'designer', label: 'Designer', icon: Palette, color: '#0066FF' },
+  { value: 'developer', label: 'Developer', icon: Code2, color: '#0066FF' },
+  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: '#E8CA5E' }, // ← GOLD
+  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: '#0066FF' },
+  { value: 'sales', label: 'Sales Person', icon: Target, color: '#0066FF' },
 ];
 
-// Benefits data for each partner type - Only Blue & Yellow
+// Benefits data for each partner type - Dynamic colors based on active tab
 const partnerBenefitsMap = {
   designer: [
-    { icon: Palette, title: "Creative Freedom", description: "Express your artistic vision without limits.", color: "#0066FF" },
-    { icon: Award, title: "60% Revenue Share", description: "Earn competitive commissions on every sale.", color: "#E8CA5E" },
-    { icon: Globe, title: "Global Exposure", description: "Showcase your work to institutions worldwide.", color: "#0066FF" },
-    { icon: Users, title: "Direct Client Access", description: "Connect and collaborate with clients directly.", color: "#E8CA5E" },
-    { icon: Star, title: "Featured Spotlight", description: "Get highlighted as a top designer.", color: "#0066FF" },
-    { icon: Rocket, title: "Early Access", description: "Be the first to try new design tools.", color: "#E8CA5E" },
+    { icon: Palette, title: "Creative Freedom", description: "Express your artistic vision without limits." },
+    { icon: Award, title: "60% Revenue Share", description: "Earn competitive commissions on every sale." },
+    { icon: Globe, title: "Global Exposure", description: "Showcase your work to institutions worldwide." },
+    { icon: Users, title: "Direct Client Access", description: "Connect and collaborate with clients directly." },
+    { icon: Star, title: "Featured Spotlight", description: "Get highlighted as a top designer." },
+    { icon: Rocket, title: "Early Access", description: "Be the first to try new design tools." },
   ],
   developer: [
-    { icon: Code2, title: "70% Revenue Share", description: "Highest commission rate on template sales.", color: "#0066FF" },
-    { icon: Clock, title: "Flexible Schedule", description: "Work on your own terms and timeline.", color: "#E8CA5E" },
-    { icon: Globe, title: "Global Clients", description: "Access to international client base.", color: "#0066FF" },
-    { icon: Shield, title: "Technical Support", description: "Dedicated mentorship and support team.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Early Payments", description: "Get paid faster with milestone bonuses.", color: "#0066FF" },
-    { icon: Users, title: "Developer Community", description: "Join 100+ experienced developers.", color: "#E8CA5E" },
+    { icon: Code2, title: "70% Revenue Share", description: "Highest commission rate on template sales." },
+    { icon: Clock, title: "Flexible Schedule", description: "Work on your own terms and timeline." },
+    { icon: Globe, title: "Global Clients", description: "Access to international client base." },
+    { icon: Shield, title: "Technical Support", description: "Dedicated mentorship and support team." },
+    { icon: DollarSign, title: "Early Payments", description: "Get paid faster with milestone bonuses." },
+    { icon: Users, title: "Developer Community", description: "Join 100+ experienced developers." },
   ],
   business_dev: [
-    { icon: Handshake, title: "Strategic Partnership", description: "Build long-term business relationships.", color: "#0066FF" },
-    { icon: TrendingUp, title: "Growth Potential", description: "Access to 500+ educational institutions.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Attractive Commission", description: "Earn recurring revenue from referrals.", color: "#0066FF" },
-    { icon: Users, title: "Wide Network", description: "Connect with industry leaders and influencers.", color: "#E8CA5E" },
-    { icon: Award, title: "Industry Recognition", description: "Become a trusted partner in EdTech.", color: "#0066FF" },
-    { icon: Rocket, title: "Co-creation", description: "Shape the future of educational technology.", color: "#E8CA5E" },
+    { icon: Handshake, title: "Strategic Partnership", description: "Build long-term business relationships." },
+    { icon: TrendingUp, title: "Growth Potential", description: "Access to 500+ educational institutions." },
+    { icon: DollarSign, title: "Attractive Commission", description: "Earn recurring revenue from referrals." },
+    { icon: Users, title: "Wide Network", description: "Connect with industry leaders and influencers." },
+    { icon: Award, title: "Industry Recognition", description: "Become a trusted partner in EdTech." },
+    { icon: Rocket, title: "Co-creation", description: "Shape the future of educational technology." },
   ],
   marketing_agency: [
-    { icon: Megaphone, title: "Marketing Reach", description: "Access to a growing market of institutions.", color: "#0066FF" },
-    { icon: Users, title: "Client Base", description: "Connect with schools, colleges, and universities.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Lucrative Commissions", description: "Earn competitive referral commissions.", color: "#0066FF" },
-    { icon: Globe, title: "Global Presence", description: "Expand your agency's footprint worldwide.", color: "#E8CA5E" },
-    { icon: Shield, title: "Priority Support", description: "Get dedicated account management.", color: "#0066FF" },
-    { icon: Award, title: "Agency Recognition", description: "Be featured as a preferred marketing partner.", color: "#E8CA5E" },
+    { icon: Megaphone, title: "Marketing Reach", description: "Access to a growing market of institutions." },
+    { icon: Users, title: "Client Base", description: "Connect with schools, colleges, and universities." },
+    { icon: DollarSign, title: "Lucrative Commissions", description: "Earn competitive referral commissions." },
+    { icon: Globe, title: "Global Presence", description: "Expand your agency's footprint worldwide." },
+    { icon: Shield, title: "Priority Support", description: "Get dedicated account management." },
+    { icon: Award, title: "Agency Recognition", description: "Be featured as a preferred marketing partner." },
   ],
   sales: [
-    { icon: Target, title: "Sales Commission", description: "Earn up to 40% commission on sales.", color: "#0066FF" },
-    { icon: Users, title: "Lead Generation", description: "Access to quality leads and prospects.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Recurring Income", description: "Build a steady stream of recurring revenue.", color: "#0066FF" },
-    { icon: Award, title: "Performance Bonuses", description: "Earn additional bonuses for top performance.", color: "#E8CA5E" },
-    { icon: Rocket, title: "Fast Track Growth", description: "Rapid career advancement opportunities.", color: "#0066FF" },
-    { icon: Globe, title: "Global Opportunities", description: "Work with institutions across the world.", color: "#E8CA5E" },
+    { icon: Target, title: "Sales Commission", description: "Earn up to 40% commission on sales." },
+    { icon: Users, title: "Lead Generation", description: "Access to quality leads and prospects." },
+    { icon: DollarSign, title: "Recurring Income", description: "Build a steady stream of recurring revenue." },
+    { icon: Award, title: "Performance Bonuses", description: "Earn additional bonuses for top performance." },
+    { icon: Rocket, title: "Fast Track Growth", description: "Rapid career advancement opportunities." },
+    { icon: Globe, title: "Global Opportunities", description: "Work with institutions across the world." },
   ],
 };
 
-// Form interfaces (unchanged)
+// Form interfaces
 interface DesignerFormData {
   id: string;
   name: string;
@@ -185,7 +185,7 @@ interface PartnerSectionProps {
   onPartnerSubmit?: (data: any) => void;
 }
 
-// Form field options (unchanged)
+// Form field options
 const specializations = [
   'UI/UX Design',
   'Graphic Design',
@@ -372,18 +372,43 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     return () => observer.disconnect();
   }, []);
 
-  // Theme colors - UPDATED: Templates colors
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';  // ← UPDATED: Light BG
+  // INSAAN: FIXED - isBusinessDev helper with type assertion
+  const isBusinessDev = (activeForm as string) === 'business_dev';
+
+  // Get accent color based on active form - FIXED
+  const getActiveColor = () => {
+    return isBusinessDev ? '#E8CA5E' : '#0066FF';
+  };
+
+  const getActiveColorLight = () => {
+    return isBusinessDev ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.15)';
+  };
+
+  // Get shadow color for benefits cards hover - FIXED
+  const getShadowColor = () => {
+    return isBusinessDev ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)';
+  };
+
+  // Theme colors
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
   const getCardBg = () => theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.8)';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';  // ← UPDATED
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';  // ← UPDATED
+  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
   const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';  // ← UPDATED
-  const getAccentColor = () => '#0066FF';  // ← UPDATED: Blue (Templates)
-  const getAccentYellow = () => '#E8CA5E';  // ← UPDATED: Gold (Templates)
+  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
   const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : 'rgba(249, 250, 251, 0.9)';
-  const getButtonBg = () => '#0066FF';  // ← UPDATED: Blue
+
+  // Button background based on active form - FIXED
+  const getButtonBg = () => {
+    return isBusinessDev ? '#E8CA5E' : '#0066FF';
+  };
+
   const getButtonText = () => '#FFFFFF';
+
+  // Shadow color for benefits - FIXED
+  const getShadowColorForBenefits = () => {
+    return isBusinessDev ? 'rgba(232, 202, 94, 0.25)' : 'rgba(0, 102, 255, 0.25)';
+  };
 
   const getInputStyle = () => ({
     width: '100%',
@@ -399,7 +424,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
   });
 
   const getInputHoverStyle = {
-    borderColor: getAccentColor(),
+    borderColor: getActiveColor(),
   };
 
   // Get category content for each partner type
@@ -441,7 +466,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
 
   const categoryContent = getCategoryContent();
 
-  // File handlers (unchanged)
+  // File handlers
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'designer' | 'developer') => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -472,13 +497,13 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     }
   };
 
-  // Designer handlers (unchanged)
+  // Designer handlers
   const handleDesignerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDesignerForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Developer handlers (unchanged)
+  // Developer handlers
   const handleDeveloperChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setDeveloperForm(prev => ({ ...prev, [name]: value }));
@@ -493,19 +518,19 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     }));
   };
 
-  // Business Dev handlers (unchanged)
+  // Business Dev handlers
   const handleBusinessDevChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBusinessDevForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Marketing Agency handlers (unchanged)
+  // Marketing Agency handlers
   const handleMarketingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setMarketingForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Sales handlers (unchanged)
+  // Sales handlers
   const handleSalesChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setSalesForm(prev => ({ ...prev, [name]: value }));
@@ -520,7 +545,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     });
   };
 
-  // Submit handlers (unchanged - all APIs same)
+  // Submit handlers
   const handleDesignerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -841,9 +866,14 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     }
   };
 
-  // Get partner benefits for PartnerBenefitsCards
+  // Get partner benefits with dynamic colors
   const getCurrentBenefits = () => {
-    return partnerBenefitsMap[activeForm] || partnerBenefitsMap.designer;
+    const benefits = partnerBenefitsMap[activeForm] || partnerBenefitsMap.designer;
+    const activeColor = getActiveColor();
+    return benefits.map(benefit => ({
+      ...benefit,
+      color: activeColor,
+    }));
   };
 
   return (
@@ -862,10 +892,10 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit cursor-pointer"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(0, 102, 255, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+                backgroundColor: getActiveColorLight(),
               }}
             >
-              <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: getAccentColor() }} />
+              <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: getActiveColor() }} />
               <span className="text-xs md:text-sm font-medium tracking-wide cursor-pointer"
                 style={{ 
                   color: getTextMuted(),
@@ -878,7 +908,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight cursor-pointer">
               <span style={{ color: getTextColor(), fontFamily: "'Poppins', sans-serif" }}>Become a </span>
-              <span className="inline-block" style={{ color: getAccentColor(), fontFamily: "'Poppins', sans-serif" }}>
+              <span className="inline-block" style={{ color: getActiveColor(), fontFamily: "'Poppins', sans-serif" }}>
                 Partner
               </span>
             </h2>
@@ -893,7 +923,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             </p>
           </motion.div>
 
-          {/* Category Selection - 5 Tabs with Blue & Yellow */}
+          {/* Category Selection - Only Business Developer is Gold, rest Blue */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -917,6 +947,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     backgroundColor: isActive ? (isYellow ? '#E8CA5E' : '#0066FF') : undefined,
                     color: isActive ? '#FFFFFF' : undefined,
                     fontFamily: "'Poppins', sans-serif",
+                    boxShadow: isActive ? (isYellow ? '0 4px 20px rgba(232, 202, 94, 0.4)' : '0 4px 20px rgba(0, 102, 255, 0.4)') : undefined,
                   }}
                 >
                   <Icon className="w-4 h-4" />
@@ -926,16 +957,18 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             })}
           </motion.div>
 
-          {/* Benefits Cards - Dynamic per partner type */}
+          {/* Benefits Cards - Dynamic per partner type with hover shadow */}
           <PartnerBenefitsCards 
             benefits={getCurrentBenefits()}
             theme={theme}
             isInView={isInView}
+            activeColor={getActiveColor()}
+            shadowColor={getShadowColorForBenefits()}
           />
 
           {/* Form Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {/* Left Side - Why Choose */}
+            {/* Left Side - Why Choose - No color passed, stays as is */}
             <PartnerWhyChoose
               activeForm={activeForm}
               theme={theme}
@@ -957,7 +990,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: getAccentColor() }}
+                    style={{ backgroundColor: getActiveColor() }}
                   >
                     <FileText className="w-5 h-5 md:w-6 h-6" style={{ color: '#FFFFFF' }} />
                   </div>
@@ -1164,7 +1197,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       {designerForm.cvFileName ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4" style={{ color: getAccentColor() }} />
+                            <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
                             <span className="text-xs" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Calibri Light', sans-serif",
@@ -1200,6 +1233,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       fontFamily: "'Poppins', sans-serif",
                       width: 'auto',
                       minWidth: '180px',
+                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
                     }}
                   >
                     {isSubmitting ? (
@@ -1220,9 +1254,10 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* Developer Form */}
+              {/* Developer Form - Same structure as before, keep as is */}
               {activeForm === 'developer' && (
                 <form onSubmit={handleDeveloperSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                  {/* All developer form fields - same as before */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
@@ -1394,7 +1429,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                           } cursor-pointer`}
                           style={{
-                            backgroundColor: developerForm.skills.includes(skill) ? getAccentColor() : undefined,
+                            backgroundColor: developerForm.skills.includes(skill) ? getActiveColor() : undefined,
                             fontFamily: "'Calibri Light', sans-serif",
                           }}
                         >
@@ -1487,7 +1522,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       {developerForm.cvFileName ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4" style={{ color: getAccentColor() }} />
+                            <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
                             <span className="text-xs" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Calibri Light', sans-serif",
@@ -1523,6 +1558,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       fontFamily: "'Poppins', sans-serif",
                       width: 'auto',
                       minWidth: '180px',
+                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
                     }}
                   >
                     {isSubmitting ? (
@@ -1712,6 +1748,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       fontFamily: "'Poppins', sans-serif",
                       width: 'auto',
                       minWidth: '180px',
+                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
                     }}
                   >
                     {isSubmitting ? (
@@ -1732,7 +1769,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* Marketing Agency Form */}
+              {/* Marketing Agency Form - Keep as is */}
               {activeForm === 'marketing_agency' && (
                 <form onSubmit={handleMarketingSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -1900,6 +1937,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       fontFamily: "'Poppins', sans-serif",
                       width: 'auto',
                       minWidth: '180px',
+                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
                     }}
                   >
                     {isSubmitting ? (
@@ -1920,7 +1958,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* Sales Person Form */}
+              {/* Sales Person Form - Keep as is */}
               {activeForm === 'sales' && (
                 <form onSubmit={handleSalesSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -2093,6 +2131,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       fontFamily: "'Poppins', sans-serif",
                       width: 'auto',
                       minWidth: '180px',
+                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
                     }}
                   >
                     {isSubmitting ? (
@@ -2157,7 +2196,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 onClick={() => setShowSuccessModal(false)}
                 className="px-5 py-2 md:px-6 md:py-2 rounded-lg font-semibold text-xs md:text-sm hover:scale-105 transition-transform cursor-pointer"
                 style={{
-                  backgroundColor: getButtonBg(),
+                  backgroundColor: getActiveColor(),
                   color: getButtonText(),
                   fontFamily: "'Poppins', sans-serif",
                 }}

@@ -4,14 +4,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users } from 'lucide-react';
-import Image from 'next/image';
 
 interface TeamMemberProps {
   id: number;
   name: string;
   role: string;
   color: string;
-  image: string;
+  initials: string;
 }
 
 const teamMembers: TeamMemberProps[] = [
@@ -19,29 +18,29 @@ const teamMembers: TeamMemberProps[] = [
     id: 1,
     name: 'Talha Zaheer',
     role: 'CTO',
-    color: '#6366F1',
-    image: 'https://i.pravatar.cc/300?img=11',
+    color: '#0066FF',
+    initials: 'TZ',
   },
   {
     id: 2,
     name: 'Abdullah Amin',
     role: 'Founder',
-    color: '#8B5CF6',
-    image: 'https://i.pravatar.cc/300?img=12',
+    color: '#0066FF',
+    initials: 'AA',
   },
   {
     id: 3,
     name: 'Nimra Ali',
     role: 'Creative Lead',
-    color: '#EC4899',
-    image: 'https://i.pravatar.cc/300?img=25',
+    color: '#0066FF',
+    initials: 'NA',
   },
   {
     id: 4,
     name: 'Muhammad Tauheed',
     role: 'Senior Developer',
-    color: '#06B6D4',
-    image: 'https://i.pravatar.cc/300?img=33',
+    color: '#0066FF',
+    initials: 'MT',
   },
 ];
 
@@ -68,18 +67,17 @@ export function TeamSlider() {
 
   // ── Templates Section Colors ────────────────────────────────────────────────
   const isDark = theme === 'dark';
-  const bgColor = isDark ? '#0B0F19' : '#f5f5f7';
-  const accentColor = isDark ? '#E8CA5E' : '#8800ff';
-  const cardBg = isDark ? 'rgba(15, 23, 42, 0.8)' : '#ffffff';
-  const textPrimary = isDark ? '#FFFFFF' : '#111111';
-  const textSecondary = isDark ? '#9CA3AF' : '#888888';
-  const accentLight = isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(136, 0, 255, 0.08)';
+  const bgColor = isDark ? '#0B0F19' : '#FFFFFF';
+  const accentColor = isDark ? '#E8CA5E' : '#0066FF';
+  const textPrimary = isDark ? '#FFFFFF' : '#1F2937';
+  const textSecondary = isDark ? '#9CA3AF' : '#6B7280';
+  const accentLight = isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
 
-  // ─── SAME PARALLELOGRAM COLOR FOR ALL ──────────────────────────────────────
-  const parallelogramColor = '#8800ff';
+  // ─── BLUE COLOR FOR ALL ──────────────────────────────────────────────────
+  const parallelogramColor = '#0066FF';
 
   return (
-    <section className="py-8 md:py-16 overflow-hidden" style={{ 
+    <section className="py-8 md:py-18 overflow-hidden" style={{ 
       background: bgColor,
       transition: 'background-color 0.6s ease'
     }}>
@@ -123,8 +121,8 @@ export function TeamSlider() {
           </p>
         </motion.div>
 
-        {/* ─── CARDS - 4 in Row ─── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {/* ─── TEAM - Simple Blue Parallelogram ─── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {teamMembers.map((member, index) => (
             <motion.div
               key={member.id}
@@ -132,56 +130,53 @@ export function TeamSlider() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-col items-center pb-4 md:pb-6 relative overflow-hidden rounded-xl cursor-pointer hover:scale-[1.02] transition-transform duration-300 w-full"
-              style={{
-                background: cardBg,
-                transition: 'background-color 0.6s ease, transform 0.3s ease',
-                boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.06)',
-                minHeight: '380px',
-              }}
+              className="flex flex-col items-center cursor-pointer group"
             >
-              {/* Photo Area */}
-              <div className="w-full h-[240px] md:h-[280px] relative overflow-hidden">
-                {/* Parallelogram Background - Centered */}
-                <div 
-                  className="absolute bottom-[-16px] w-[200px] h-[200px] md:w-[220px] md:h-[220px]"
-                  style={{
-                    background: parallelogramColor,
-                    clipPath: 'polygon(30% 0%, 100% 0%, 70% 100%, 0% 100%)',
-                    opacity: isDark ? 0.7 : 0.9,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                  }}
-                />
+              {/* ─── Simple Parallelogram ─── */}
+              <div className="relative w-full aspect-[3/4] max-w-[200px] mx-auto">
                 
-                {/* Image - Centered */}
+                {/* Main Parallelogram - Flat, No Shadow */}
                 <div 
-                  className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 z-[2] w-[110px] h-[160px] md:w-[140px] md:h-[200px]"
+                  className="relative w-full h-full overflow-hidden transition-all duration-300 group-hover:scale-105"
+                  style={{
+                    clipPath: 'polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)',
+                    background: parallelogramColor,
+                  }}
                 >
-                  <div className="w-full h-full rounded-t-full overflow-hidden">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      width={140}
-                      height={200}
-                      className="w-full h-full object-cover object-top"
-                      unoptimized
-                    />
+                  {/* Avatar - Centered */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div 
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-110"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        borderColor: 'rgba(255,255,255,0.8)',
+                      }}
+                    >
+                      <span 
+                        className="text-2xl md:text-3xl font-bold"
+                        style={{ 
+                          color: parallelogramColor,
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
+                      >
+                        {member.initials}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Name & Role */}
-              <div className="text-center px-3 mt-3 md:mt-4" style={{
-                fontSize: '13px',
+              <div className="text-center mt-4" style={{
+                fontSize: '14px',
                 fontWeight: 700,
                 color: textPrimary,
                 fontFamily: "'Poppins', sans-serif",
               }}>
                 {member.name}
               </div>
-              <div className="text-center px-3 pb-1" style={{
-                fontSize: '11px',
+              <div className="text-center" style={{
+                fontSize: '12px',
                 color: textSecondary,
                 fontWeight: 400,
                 fontFamily: "'Poppins', sans-serif",

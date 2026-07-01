@@ -40,13 +40,14 @@ export default function FeaturedTemplates({
   };
 
   const isDark = theme === 'dark';
-  const bgColor = isDark ? '#080c18' : '#FFFFFF';
-  const textPrimary = isDark ? '#f8fafc' : '#1F2937';
-  const textSecondary = isDark ? '#94a3b8' : '#6B7280';
-  const textMuted = isDark ? '#475569' : '#9CA3AF';
-  const goldColor = '#e8ca5e';
+  const bgColor = isDark ? '#0B0F19' : '#FFFFFF';
+  const textPrimary = isDark ? '#FFFFFF' : '#1F2937';
+  const textSecondary = isDark ? '#9CA3AF' : '#6B7280';
+  const textMuted = isDark ? '#6B7280' : '#9CA3AF';
+  const goldColor = '#E8CA5E';
   const blueColor = '#0066FF';
-  const borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  const accentLight = isDark ? 'rgba(232, 202, 94, 0.12)' : 'rgba(0, 102, 255, 0.08)';
 
   const isImageLeft = currentIndex % 2 === 0;
 
@@ -94,15 +95,15 @@ export default function FeaturedTemplates({
           opacity: { duration: 0.2 },
         }}
         className="p-6 md:p-8 lg:p-10 flex flex-col justify-center"
-        style={{ backgroundColor: isDark ? '#0b0f1e' : '#FFFFFF' }}
+        style={{ backgroundColor: isDark ? '#0B0F19' : '#FFFFFF' }}
       >
         <div className="flex flex-wrap items-center gap-2 mb-3 md:mb-4">
           <span
             className="text-[8px] md:text-[9px] font-semibold tracking-[1.5px] uppercase px-3 py-1 rounded-full border"
             style={{
-              color: isDark ? '#a78bfa' : '#7c3aed',
-              borderColor: isDark ? 'rgba(167,139,250,0.3)' : 'rgba(124,58,237,0.3)',
-              backgroundColor: isDark ? 'rgba(167,139,250,0.08)' : 'rgba(124,58,237,0.06)',
+              color: goldColor,
+              borderColor: isDark ? 'rgba(232, 202, 94, 0.3)' : 'rgba(232, 202, 94, 0.3)',
+              backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(232, 202, 94, 0.06)',
             }}
           >
             Premium
@@ -133,13 +134,13 @@ export default function FeaturedTemplates({
             <div key={i} className="flex items-start gap-2.5">
               <span
                 className="text-[8px] md:text-[10px] mt-0.5"
-                style={{ color: isDark ? goldColor : blueColor }}
+                style={{ color: goldColor }}
               >
                 ●
               </span>
               <span
                 className="text-[11px] md:text-[12.5px]"
-                style={{ color: isDark ? '#cbd5e1' : '#374151' }}
+                style={{ color: isDark ? '#D1D5DB' : '#4B5563' }}
               >
                 {feature}
               </span>
@@ -150,7 +151,7 @@ export default function FeaturedTemplates({
         <div
           className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 md:p-4 rounded-2xl mb-4 md:mb-5 max-w-sm"
           style={{
-            backgroundColor: isDark ? '#0d1220' : '#f8f9fa',
+            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.5)' : '#F8F9FA',
             border: `1px solid ${borderColor}`,
           }}
         >
@@ -175,11 +176,11 @@ export default function FeaturedTemplates({
               <div
                 key={i}
                 className="flex items-center gap-1.5 text-[9px] md:text-[10.5px]"
-                style={{ color: isDark ? '#94a3b8' : '#6B7280' }}
+                style={{ color: isDark ? '#9CA3AF' : '#6B7280' }}
               >
                 <span
                   className="text-[7px] md:text-[8px]"
-                  style={{ color: isDark ? '#4ade80' : '#22c55e' }}
+                  style={{ color: '#22C55E' }}
                 >
                   ✓
                 </span>
@@ -193,8 +194,8 @@ export default function FeaturedTemplates({
           onClick={() => onBuyNowClick(currentTemplate)}
           className="px-6 md:px-8 py-2.5 md:py-3 rounded-full text-xs md:text-sm font-semibold transition-all hover:scale-105 active:scale-95 w-fit cursor-pointer"
           style={{
-            backgroundColor: isDark ? '#7c3aed' : '#0066FF',
-            color: '#FFFFFF',
+            backgroundColor: isDark ? goldColor : blueColor,
+            color: isDark ? '#1F4381' : '#FFFFFF',
           }}
         >
           Buy Now →
@@ -207,16 +208,16 @@ export default function FeaturedTemplates({
     <div
       className="relative min-h-[350px] md:min-h-[400px] lg:min-h-[480px] flex"
       style={{
-        backgroundColor: isDark ? '#0b0f1e' : '#F8F9FA',
+        backgroundColor: isDark ? '#0B0F19' : '#F8F9FA',
         borderRight: isDark
-          ? '1px solid rgba(255,255,255,0.04)'
+          ? '1px solid rgba(30, 41, 59, 0.5)'
           : '1px solid rgba(0,0,0,0.06)',
       }}
     >
       <div
         className="w-10 md:w-12 flex flex-col items-center justify-center gap-2 py-4 md:py-6 flex-shrink-0"
         style={{
-          backgroundColor: isDark ? '#080c18' : '#f0f0f0',
+          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.5)' : '#f0f0f0',
           borderRight: isDark
             ? '1px solid rgba(232,202,94,0.12)'
             : '1px solid rgba(0,0,0,0.06)',
@@ -257,7 +258,7 @@ export default function FeaturedTemplates({
         <div
           className="text-[5.5px] md:text-[6.5px] text-center leading-[1.6]"
           style={{
-            color: isDark ? '#475569' : '#9CA3AF',
+            color: isDark ? '#6B7280' : '#9CA3AF',
             writingMode: 'vertical-rl',
             letterSpacing: '0.3px',
           }}
@@ -309,14 +310,14 @@ export default function FeaturedTemplates({
             }`}
             style={{
               backgroundColor: index === currentIndex
-                ? (isDark ? goldColor : blueColor)
+                ? goldColor
                 : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'),
             }}
           />
         ))}
       </div>
 
-      {/* Desktop Navigation - Dots only (no numbers) */}
+      {/* Desktop Navigation - Dots only */}
       <div className="absolute bottom-4 left-16 hidden md:flex items-center gap-3">
         <div className="flex items-center gap-1.5">
           {featuredTemplates.map((_, index) => (
@@ -330,7 +331,7 @@ export default function FeaturedTemplates({
               }`}
               style={{
                 backgroundColor: index === currentIndex
-                  ? (isDark ? goldColor : blueColor)
+                  ? goldColor
                   : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'),
               }}
             />
@@ -347,7 +348,7 @@ export default function FeaturedTemplates({
       className="w-full min-h-screen"
       style={{
         backgroundColor: bgColor,
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Poppins', sans-serif",
       }}
     >
       {/* Top Bar - Tabs with Right Side Content */}
@@ -367,13 +368,13 @@ export default function FeaturedTemplates({
                 backgroundColor:
                   index === currentIndex
                     ? isDark
-                      ? '#0f1628'
-                      : '#f0f4ff'
+                      ? 'rgba(232, 202, 94, 0.1)'
+                      : 'rgba(0, 102, 255, 0.08)'
                     : 'transparent',
                 borderColor:
                   index === currentIndex
                     ? isDark
-                      ? '#2d3560'
+                      ? '#E8CA5E'
                       : '#0066FF'
                     : 'transparent',
                 borderWidth: '1px',
@@ -385,27 +386,25 @@ export default function FeaturedTemplates({
                   backgroundColor:
                     index === currentIndex
                       ? isDark
-                        ? 'rgba(124,58,237,0.2)'
-                        : 'rgba(0,102,255,0.08)'
+                        ? 'rgba(232, 202, 94, 0.15)'
+                        : 'rgba(0, 102, 255, 0.08)'
                       : isDark
-                      ? 'rgba(71,85,105,0.2)'
+                      ? 'rgba(30, 41, 59, 0.5)'
                       : 'rgba(0,0,0,0.05)',
                   border: `1px solid ${
                     index === currentIndex
                       ? isDark
-                        ? 'rgba(124,58,237,0.35)'
-                        : 'rgba(0,102,255,0.2)'
+                        ? 'rgba(232, 202, 94, 0.3)'
+                        : 'rgba(0, 102, 255, 0.2)'
                       : isDark
-                      ? 'rgba(71,85,105,0.35)'
+                      ? 'rgba(30, 41, 59, 0.3)'
                       : 'rgba(0,0,0,0.1)'
                   }`,
                   color:
                     index === currentIndex
-                      ? isDark
-                        ? '#a78bfa'
-                        : '#0066FF'
+                      ? goldColor
                       : isDark
-                      ? '#94a3b8'
+                      ? '#9CA3AF'
                       : '#6B7280',
                 }}
               >
@@ -414,7 +413,7 @@ export default function FeaturedTemplates({
               <div className="text-left hidden sm:block">
                 <div
                   className="text-[8px] md:text-[9.5px] font-medium"
-                  style={{ color: isDark ? '#475569' : '#9CA3AF' }}
+                  style={{ color: isDark ? '#6B7280' : '#9CA3AF' }}
                 >
                   Template
                 </div>
@@ -424,10 +423,10 @@ export default function FeaturedTemplates({
                     color:
                       index === currentIndex
                         ? isDark
-                          ? '#f1f5f9'
+                          ? '#FFFFFF'
                           : '#1F2937'
                         : isDark
-                        ? '#cbd5e1'
+                        ? '#9CA3AF'
                         : '#6B7280',
                   }}
                 >
@@ -443,9 +442,9 @@ export default function FeaturedTemplates({
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-medium"
               style={{
-                backgroundColor: isDark ? 'rgba(74,222,128,0.1)' : 'rgba(74,222,128,0.08)',
-                color: isDark ? '#4ade80' : '#16a34a',
-                border: `1px solid ${isDark ? 'rgba(74,222,128,0.2)' : 'rgba(74,222,128,0.2)'}`,
+                backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
+                color: '#22C55E',
+                border: `1px solid ${isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.2)'}`,
               }}
             >
               <span>●</span> Live Preview
@@ -453,9 +452,9 @@ export default function FeaturedTemplates({
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-medium"
               style={{
-                backgroundColor: isDark ? 'rgba(96,165,250,0.1)' : 'rgba(96,165,250,0.08)',
-                color: isDark ? '#60a5fa' : '#2563eb',
-                border: `1px solid ${isDark ? 'rgba(96,165,250,0.2)' : 'rgba(96,165,250,0.2)'}`,
+                backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(232, 202, 94, 0.08)',
+                color: goldColor,
+                border: `1px solid ${isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(232, 202, 94, 0.2)'}`,
               }}
             >
               <span>★</span> {currentIndex === 0 ? '4.9' : '4.8'} Rating
@@ -464,9 +463,9 @@ export default function FeaturedTemplates({
           <div
             className="text-[8px] md:text-[10px] font-medium px-2.5 md:px-3 py-1 md:py-1.5 rounded-full"
             style={{
-              backgroundColor: isDark ? 'rgba(232,202,94,0.1)' : 'rgba(232,202,94,0.08)',
+              backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(232, 202, 94, 0.08)',
               color: goldColor,
-              border: `1px solid ${isDark ? 'rgba(232,202,94,0.2)' : 'rgba(232,202,94,0.2)'}`,
+              border: `1px solid ${isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(232, 202, 94, 0.2)'}`,
             }}
           >
             {totalTemplates} Templates
@@ -493,7 +492,7 @@ export default function FeaturedTemplates({
       <div
         className="grid grid-cols-2 sm:grid-cols-4 rounded-2xl mx-4 sm:mx-6 lg:mx-8 mt-4 mb-4 overflow-hidden"
         style={{
-          backgroundColor: isDark ? '#080c18' : '#f8f9fa',
+          backgroundColor: isDark ? '#0B0F19' : '#f8f9fa',
           border: `1px solid ${borderColor}`,
         }}
       >
@@ -508,19 +507,19 @@ export default function FeaturedTemplates({
             label: '98%', 
             sub: 'Satisfaction',
             icon: '✓',
-            color: '#4ade80'
+            color: '#22C55E'
           },
           { 
             label: 'May 12', 
             sub: 'Updated',
             icon: '→',
-            color: '#a78bfa'
+            color: '#0066FF'
           },
           { 
             label: '1,200+', 
             sub: 'Customers',
             icon: '●',
-            color: '#f472b6'
+            color: '#E8CA5E'
           },
         ].map((stat, i) => (
           <div
@@ -538,13 +537,13 @@ export default function FeaturedTemplates({
             </div>
             <div
               className="text-[11px] md:text-[13px] font-bold mt-0.5"
-              style={{ color: isDark ? '#e2e8f0' : '#1F2937' }}
+              style={{ color: isDark ? '#FFFFFF' : '#1F2937' }}
             >
               {stat.label}
             </div>
             <div
               className="text-[8px] md:text-[9.5px]"
-              style={{ color: isDark ? '#334155' : '#9CA3AF' }}
+              style={{ color: isDark ? '#6B7280' : '#9CA3AF' }}
             >
               {stat.sub}
             </div>

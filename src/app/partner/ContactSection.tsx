@@ -163,7 +163,7 @@ export default function ContactSection() {
   return (
     <section 
       ref={sectionRef}
-      className="py-16 px-4 sm:px-6 relative overflow-hidden"
+      className="py-12 px-4 sm:px-6 relative overflow-hidden"
       style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
     >
       <div className="max-w-6xl mx-auto">

@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 
 const portals = [
   {
-    title: "Generic Portal",
+    title: "General Site",
     description: "Public-facing portal for previewing templates and submitting requests. No login required for basic access.",
     features: ["Template Preview", "Request Submission", "Public Access"],
     icon: Globe2,
@@ -128,13 +128,13 @@ export default function PortalArchitecture() {
     return theme === 'dark' ? '#9CA3AF' : '#6B7280';
   };
 
-  // 3D Icon Component with Continuous Floating - Fully Rounded
+  // 3D Icon Component - Fixed: No scale on hover
   const ThreeDIcon = ({ icon: Icon, gradient, shadowColor }: any) => {
     return (
       <motion.div 
         className="relative w-14 h-14 group cursor-pointer mx-auto"
         animate={{
-          y: [0, -10, 0],
+          y: [0, -8, 0],
         }}
         transition={{
           duration: 4,
@@ -142,16 +142,16 @@ export default function PortalArchitecture() {
           ease: "easeInOut",
         }}
       >
-        {/* 3D Shadow/Depth Effect - Rounded */}
+        {/* 3D Shadow/Depth Effect */}
         <div 
-          className="absolute inset-0 rounded-full blur-md transition-all duration-300 group-hover:blur-lg group-hover:scale-110"
+          className="absolute inset-0 rounded-full blur-md transition-all duration-300"
           style={{ 
             background: `radial-gradient(ellipse, ${shadowColor}, transparent)`,
             transform: 'translateY(4px) rotateX(5deg)',
           }}
         />
         
-        {/* Main Icon Container with 3D Transform - Rounded */}
+        {/* Main Icon Container with 3D Transform */}
         <motion.div
           className="relative w-full h-full rounded-full flex items-center justify-center cursor-pointer"
           style={{
@@ -173,7 +173,7 @@ export default function PortalArchitecture() {
             rotateY: 0,
           }}
         >
-          {/* 3D Top Face Highlight - Rounded */}
+          {/* 3D Top Face Highlight */}
           <div 
             className="absolute inset-0 rounded-full"
             style={{
@@ -182,7 +182,7 @@ export default function PortalArchitecture() {
             }}
           />
           
-          {/* 3D Bottom Face Shadow - Rounded */}
+          {/* 3D Bottom Face Shadow */}
           <div 
             className="absolute inset-0 rounded-full"
             style={{
@@ -208,7 +208,7 @@ export default function PortalArchitecture() {
             />
           </motion.div>
           
-          {/* 3D Edge Glow - Rounded */}
+          {/* 3D Edge Glow */}
           <div 
             className="absolute inset-0 rounded-full"
             style={{
@@ -222,7 +222,7 @@ export default function PortalArchitecture() {
   };
 
   return (
-    <div className="mt-12 md:mt-16">
+    <div className="mt-10">
       {/* Header */}
       <div className="text-center mb-8">
         <motion.div
@@ -272,7 +272,7 @@ export default function PortalArchitecture() {
         </motion.div>
       </div>
       
-      {/* Cards Grid - Fully Rounded */}
+      {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
         {portals.map((portal, index) => {
           const colors = getColors(portal.color);
@@ -287,14 +287,9 @@ export default function PortalArchitecture() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               whileHover={{ 
-                y: -8,
-                boxShadow: isCenter 
-                  ? `0 0 60px ${getAccentColor()}30, 0 20px 60px ${getAccentColor()}15`
-                  : `0 20px 60px ${getAccentColor()}15, 0 8px 24px ${getAccentColor()}08`,
+                y: -6,
               }}
-              className={`relative flex flex-col items-center rounded-[2rem] p-6 overflow-hidden group cursor-pointer ${
-                isCenter ? 'scale-105 z-20 shadow-2xl' : ''
-              }`}
+              className={`relative flex flex-col items-center rounded-[2rem] p-6 overflow-hidden cursor-pointer`}
               style={{
                 backgroundColor: getPortalBg(),
                 backdropFilter: 'blur(12px)',
@@ -305,6 +300,7 @@ export default function PortalArchitecture() {
                   ? `0 0 40px ${getAccentColor()}20, 0 8px 32px ${getAccentColor()}10`
                   : colors.cardShadow,
                 transition: 'box-shadow 0.3s ease, transform 0.3s ease',
+                height: 'auto', // Auto height - no extra space
               }}
             >
               {/* Tech Corners */}
@@ -315,20 +311,7 @@ export default function PortalArchitecture() {
                 style={{ borderColor: colors.accent, clipPath: 'polygon(0 0, 100% 15%, 100% 85%, 0 100%)', transform: 'scaleX(-1)' }}
               />
 
-              {/* Ribbon Badge - Only for Main Admin */}
-              {portal.tag && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 shadow-[0_4px_20px_rgba(251,191,36,0.3)] z-10 cursor-pointer rounded-full"
-                  style={{
-                    backgroundColor: '#fbbf24',
-                  }}
-                >
-                  <span className="text-[10px] font-black text-black uppercase tracking-wider">
-                    {portal.tag}
-                  </span>
-                </div>
-              )}
-
-              {/* 3D Icon with Continuous Floating - Fully Rounded */}
+              {/* 3D Icon */}
               <ThreeDIcon 
                 icon={Icon}
                 gradient={portal.gradient}
@@ -351,7 +334,7 @@ export default function PortalArchitecture() {
               />
 
               {/* Description */}
-              <p className="text-sm text-center leading-relaxed mb-6 max-w-[220px]"
+              <p className="text-sm text-center leading-relaxed mb-4 max-w-[220px]"
                 style={{ 
                   color: getTextSecondary(),
                   fontFamily: "'Calibri Light', sans-serif",
@@ -360,52 +343,7 @@ export default function PortalArchitecture() {
                 {portal.description}
               </p>
 
-              {/* Holographic Portal Base */}
-              <div className="relative w-full h-32 mb-4 flex items-center justify-center">
-                {/* Beam Effect */}
-                <div 
-                  className={`absolute bottom-2 w-40 h-24 bg-gradient-to-t ${colors.beamBg} to-transparent blur-2xl ${colors.beamOpacity} portal-beam pointer-events-none`}
-                />
-                
-                {/* Outer Ring */}
-                <div 
-                  className="absolute bottom-1 w-40 h-40 rounded-full border-[1.5px] pointer-events-none"
-                  style={{
-                    borderColor: colors.ringBorder,
-                    transform: 'rotateX(75deg)',
-                    animation: 'breathing-glow 3s ease-in-out infinite',
-                    boxShadow: theme === 'dark' ? `0 0 20px ${colors.accent}33` : `0 0 20px rgba(0,102,255,0.15)`,
-                  }}
-                />
-                
-                {/* Inner Ring */}
-                <div 
-                  className="absolute bottom-1 w-32 h-32 rounded-full border pointer-events-none"
-                  style={{
-                    borderColor: colors.ringBorderLight,
-                    opacity: 0.5,
-                    transform: 'rotateX(75deg)',
-                  }}
-                />
-                
-                {/* Bottom Glow Line */}
-                <div 
-                  className="absolute bottom-3 w-44 h-1 rounded-full opacity-60 blur-sm pointer-events-none"
-                  style={{ 
-                    backgroundColor: colors.accent,
-                    boxShadow: theme === 'dark' ? `0 0 10px ${colors.accent}` : 'none',
-                  }}
-                />
-
-                {/* Sparkle Effects - Only for Main Admin */}
-                {portal.tag && (
-                  <>
-                    <div className="absolute bottom-6 left-8 w-1 h-1 bg-white rounded-full animate-pulse pointer-events-none" />
-                    <div className="absolute bottom-10 right-10 w-1 h-1 bg-white rounded-full animate-pulse delay-500 pointer-events-none" />
-                  </>
-                )}
-              </div>
-
+              {/* Holographic Portal Base - REMOVED for cleaner look */}
               {/* Features */}
               <ul className="w-full space-y-2 text-sm">
                 {portal.features.map((feature, idx) => (
@@ -434,24 +372,6 @@ export default function PortalArchitecture() {
           );
         })}
       </div>
-
-      {/* Add Keyframe Animations */}
-      <style jsx>{`
-        @keyframes breathing-glow {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        
-        @keyframes beam-rise {
-          0% { opacity: 0.3; transform: translateY(0) scaleX(1); }
-          50% { opacity: 0.6; transform: translateY(-5px) scaleX(1.05); }
-          100% { opacity: 0.3; transform: translateY(0) scaleX(1); }
-        }
-        
-        .portal-beam {
-          animation: beam-rise 4s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

@@ -31,12 +31,12 @@ const STEPS: Step[] = [
     details: [],
   },
   {
-    num: "02",
-    ttl: "Admin Approval",
-    dsc: "Main admin reviews the request and sends login credentials to college thorugh email and college find the credentials in their inbox.",
-    tag: "",
-    details: ["Credentials generated", "Email sent to college"],
-  },
+  num: "02",
+  ttl: "Developer",
+  dsc: "Developer creates and designs the template based on the college's requirements. The template is then submitted for review.",
+  tag: "",
+  details: ["Template designed", "Submitted for review"],
+},
   {
     num: "03",
     ttl: "College Login",

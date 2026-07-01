@@ -1,9 +1,122 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useEffect, useState, useRef, FormEvent } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+
+// Particle Network Component - Only network particles, 80 particles on entire page
+function ParticleNetwork({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number>(0);
+  const particlesRef = useRef<any[]>([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Theme-based colors
+    const dotColor = theme === 'dark' ? 'rgba(232, 202, 94, 0.6)' : 'rgba(0, 102, 255, 0.5)';
+    const lineRGB = theme === 'dark' ? '232, 202, 94' : '0, 102, 255';
+
+    let W = 0;
+    let H = 0;
+
+    const resize = () => {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    };
+
+    const createParticle = () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: 1.5 + Math.random() * 1.5,
+    });
+
+    const init = () => {
+      resize();
+      particlesRef.current = Array.from({ length: 80 }, createParticle);
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+
+      const particles = particlesRef.current;
+
+      // Draw lines first
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+
+        // Lines to nearby particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const q = particles[j];
+          const dx = p.x - q.x;
+          const dy = p.y - q.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxDist = 150;
+
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = `rgba(${lineRGB}, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw dots
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    window.addEventListener('resize', resize);
+    init();
+    draw();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animRef.current);
+    };
+  }, [theme]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 0,
+        opacity: 0.7,
+      }}
+    />
+  );
+}
 
 interface ProductSection {
   id: string;
@@ -22,14 +135,14 @@ interface ProductSection {
 const GOLD = "#E8CA5E";
 const BLUE = "#0066FF";
 
-// 9 Real Products with realistic data
+// 9 Real Products with JPG Images
 const PRODUCTS: ProductSection[] = [
   {
     id: "portfolio-site",
     title: "Portfolio Site Management",
     subtitle: "Web Presence",
     description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website. Every school gets its own customized portal with no-code editing and real-time analytics.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
+    image: "/Portfolio site management.jpg",
     features: [
       "Custom Portfolio Website",
       "No-Code Content Updates",
@@ -47,7 +160,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Admission Automation System",
     subtitle: "Enrollment Engine",
     description: "Streamline the entire admission process from application to enrollment. Parents can apply from home, upload documents, and track progress digitally. Institutes can manage student data seamlessly with automated record generation and cloud storage.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0v_By-ZD17MH3x8-8ebL9kXpvq1ucsRAUKYF02VcOLnxE2_Mkn2v_ZKKDuLz_3MJ4N2tGarmuHavVvC6E7br6gVrFeto4EioicbeNtViS60Vzg9e79ihuJORKC9Yw7ivnTQt3Oy87qWlgO6qrjIsYaSKqx_XOeeGtTbQYbW6BvZUiSiibPhvvg938pDhO9h2OqWgZiA6Jl9PD7amnw3BXR6vzuGhe_FWjrJuHQ-PJNG6RcMM8OFDDfPPlb_dgR4v687A_8EPcUpb5",
+    image: "/admission automation system.jpg",
     features: [
       "Online Application Portal",
       "Document Upload & Verification",
@@ -65,7 +178,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Parent Teacher Management System",
     subtitle: "Communication Hub",
     description: "Bridge the gap between parents and teachers with seamless communication tools. Track attendance, monitor student progress, and foster collaborative engagement. Features include WhatsApp integration, real-time alerts, and a dedicated mobile app for parents.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8ct-6ljgpbedqVzynuMqUA-N4P9vSJI2efu6wQXuGRI5tr0BZsaHYIu-1t5xcNGgXzK9SRb-oLPjps7ujmA6mvTVypHZxbyiYOizYHscgjebW6pB1c-Dx7gZUb62aR5FEogFjAORYt5d-vs93KLq6Oces-uxfUp0btjgUH5gWhLceN_zI9qS3BZ3NSY5s4SQoO4quhsYt-y53Bn-6vomE9VxIw3KJOHIRPw0VNEKVL-nBcg7pHnKUl8FGsdsuqzZgaW6QffTBwW2i",
+    image: "/parent teacher management illustration.jpg",
     features: [
       "Real-time Communication",
       "Attendance & Progress Alerts",
@@ -83,7 +196,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Learning Management System",
     subtitle: "Digital Classroom",
     description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform. Supports live classes, recorded lectures, and hybrid learning models.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDCw2tL4WpL8lFescTP3sJeJ2IgCWjPgVNOH6ghlxsiEIZrGGsZhwwTiEveJUbQIpPRVuMKvVKoelYJm2Jw4ERjlq2bYBAG8_bMWghIqdNLyUSKAGQ2j2r99CAO6q2VWraE5KBI-Ffz69jyH61tgHPFxajV2bmM7iOlwYtKwJxPkCFv6CPPTD3h-v5ecZoXct2qZYbulD63Tl7TVPL9-U-9Yh6bTWQpIws395-Qcs0P6_6-HFGwuA3kCJEmiDq3hhIm9kdqUg3bRKjg",
+    image: "/learning management system.jpg",
     features: [
       "Online Live Classes",
       "Course & Subject Management",
@@ -101,7 +214,7 @@ const PRODUCTS: ProductSection[] = [
     title: "AI Exam Generator",
     subtitle: "Intelligent Assessment",
     description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels. Includes AI question generation, diagram support, question bank management, and instant PDF export.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCD95CfUWzepGxHgvl-vqBNZ4fIM8DtX6OIAxsm03exAi-qKzGFICBrwKiLGGwDlojGz8ntEeOX1dNc5UpkyMl9xIvC834cUfOUcCgFFWpBcbi3gIa1QWABWwVVqZD3GiP-0zRN8ejBUc0ba_m74NnHYtJIttbLr5qWtx85x66-5Yq-Q0AbpQyslbSnWVssuRm0_ck5k-v4ws9RXeTA3OVQGXe0wZkDDVZY5dT2u0pNy1osh2TiFeQlDmqzYC1bzshBV5BY77plzLap",
+    image: "/AI Exam Generator.jpg",
     features: [
       "AI Question Generation",
       "Syllabus-Aligned Papers",
@@ -119,7 +232,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Learning Resource Management",
     subtitle: "Knowledge Hub",
     description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content. Features AI-powered categorization, version control, and seamless LMS integration.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB1NzzttGVTvPn_9eDP-JQt7blKhxBt3pP4800OJooC3M8YUCl_D82H5Wb-raXAHvysQfiDLsvKlB3A5xSs9B0Idi0oFQJZKHPMKgLmjNtBhMb6bTX8M7dJhwijiYvyUa4BYP-sGoRcRKzkJfRYJzzveXRYOu3-CikfxSlRvT8xU5_Z5diz6KrutY7y-nZVKl4ICm8vXH1GcoeQyQWWp_1e_iysVx4TJQtz_HN3Dw4lUKO4kMs13Y8y_sC9rE0r6IYIwxd9VceuS3yb",
+    image: "/learning resource management.jpg",
     features: [
       "Digital Library Management",
       "AI-Powered Content Tagging",
@@ -137,7 +250,7 @@ const PRODUCTS: ProductSection[] = [
     title: "ERP System",
     subtitle: "Institution Management",
     description: "End-to-end resource management for schools and colleges. Covers finance, HR, academics, library, and inventory operations. Custom role-based access for departments and real-time dashboards for transparency and efficiency.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0v_By-ZD17MH3x8-8ebL9kXpvq1ucsRAUKYF02VcOLnxE2_Mkn2v_ZKKDuLz_3MJ4N2tGarmuHavVvC6E7br6gVrFeto4EioicbeNtViS60Vzg9e79ihuJORKC9Yw7ivnTQt3Oy87qWlgO6qrjIsYaSKqx_XOeeGtTbQYbW6BvZUiSiibPhvvg938pDhO9h2OqWgZiA6Jl9PD7amnw3BXR6vzuGhe_FWjrJuHQ-PJNG6RcMM8OFDDfPPlb_dgR4v687A_8EPcUpb5",
+    image: "/ERP System.jpg",
     features: [
       "Finance & Accounting",
       "HR & Staff Management",
@@ -155,7 +268,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Neezamiya Meet",
     subtitle: "Virtual Classroom",
     description: "A Google Meet-like platform specially crafted for educational systems. Conduct secure video classes, record sessions, share screens, and engage students with interactive whiteboards and breakout rooms designed for learning.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDCw2tL4WpL8lFescTP3sJeJ2IgCWjPgVNOH6ghlxsiEIZrGGsZhwwTiEveJUbQIpPRVuMKvVKoelYJm2Jw4ERjlq2bYBAG8_bMWghIqdNLyUSKAGQ2j2r99CAO6q2VWraE5KBI-Ffz69jyH61tgHPFxajV2bmM7iOlwYtKwJxPkCFv6CPPTD3h-v5ecZoXct2qZYbulD63Tl7TVPL9-U-9Yh6bTWQpIws395-Qcs0P6_6-HFGwuA3kCJEmiDq3hhIm9kdqUg3bRKjg",
+    image: "/neezamiya meet.jpg",
     features: [
       "Secure Video Conferencing",
       "Screen & Whiteboard Sharing",
@@ -173,7 +286,7 @@ const PRODUCTS: ProductSection[] = [
     title: "Neezamiya Muthamar",
     subtitle: "Virtual Seminar System",
     description: "A powerful virtual seminar platform designed for educational institutions. Host webinars, conferences, and guest lectures with ease. Features include live streaming, audience Q&A, polling, and detailed attendance tracking for large-scale events.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
+    image: "/Neezamiya Muthamar.jpg",
     features: [
       "Live Webinar Streaming",
       "Interactive Q&A Sessions",
@@ -221,20 +334,32 @@ export default function ProductShowcase() {
     return () => observer.disconnect();
   }, []);
 
-  // Intersection Observer for scroll reveal - threshold 0.5
+  // Intersection Observer for scroll animation - Har scroll par
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.5,
-      rootMargin: '0px 0px 0px 0px'
+      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+      rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute('data-section-id');
-          if (id) {
-            setVisibleSections(prev => new Set(prev).add(id));
-          }
+        const id = entry.target.getAttribute('data-section-id');
+        if (!id) return;
+        
+        const rect = entry.boundingClientRect;
+        const windowHeight = window.innerHeight;
+        const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
+        const visiblePercentage = Math.max(0, visibleHeight / rect.height);
+        const visibility = Math.min(1, Math.max(0, visiblePercentage));
+        
+        if (visibility > 0.05) {
+          setVisibleSections(prev => new Set(prev).add(id));
+        } else {
+          setVisibleSections(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(id);
+            return newSet;
+          });
         }
       });
     }, observerOptions);
@@ -251,7 +376,7 @@ export default function ProductShowcase() {
   // Observer for NEEZAMIYA
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.3,
+      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
       rootMargin: '0px'
     };
 
@@ -259,6 +384,8 @@ export default function ProductShowcase() {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           setIsNeezamiyaVisible(true);
+        } else {
+          setIsNeezamiyaVisible(false);
         }
       });
     }, observerOptions);
@@ -274,11 +401,6 @@ export default function ProductShowcase() {
 
   const scrollToCTA = () => {
     ctaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const getAccentColor = (color: string) => {
-    // Using GOLD and BLUE
-    return BLUE; // All accents blue
   };
 
   const getAccentLight = (color: string) => {
@@ -301,14 +423,6 @@ export default function ProductShowcase() {
     return theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   };
 
-  const getAccent = () => {
-    return BLUE;
-  };
-
-  const getGold = () => {
-    return GOLD;
-  };
-
   const getInputBg = () => {
     return theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
   };
@@ -329,23 +443,23 @@ export default function ProductShowcase() {
     setTimeout(() => setFormSubmitted(false), 5000);
   };
 
-  // Split NEEZAMIYA for colored characters
+  // Split NEEZAMIYA - Only 'M' will be Gold, rest White
   const neezamiyaText = "NEEZAMIYA";
   const neezamiyaChars = neezamiyaText.split('');
 
-  // Image animation - slides from side
+  // Image animation - Har scroll par trigger
   const getImageAnimationClass = (imagePosition: 'left' | 'right', isVisible: boolean) => {
     if (!isVisible) {
       return imagePosition === 'left' 
-        ? 'opacity-0 -translate-x-[200%]' 
-        : 'opacity-0 translate-x-[200%]';
+        ? 'opacity-0 -translate-x-[100%] scale-95' 
+        : 'opacity-0 translate-x-[100%] scale-95';
     }
-    return 'opacity-100 translate-x-0';
+    return 'opacity-100 translate-x-0 scale-100';
   };
 
-  // Content animation - fast fade in (description pehle aayegi)
+  // Content animation - Har scroll par trigger
   const getContentAnimationClass = (isVisible: boolean) => {
-    return isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6';
+    return isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8';
   };
 
   return (
@@ -353,13 +467,39 @@ export default function ProductShowcase() {
       {/* Navbar */}
       <Navbar />
 
-      {/* Main Content */}
-      <div className="w-full" style={{ backgroundColor: getSectionBg(), fontFamily: "'Poppins', sans-serif" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Main Content with Particle Network Background - Single instance for entire page */}
+      <div className="w-full relative" style={{ 
+        backgroundColor: getSectionBg(), 
+        fontFamily: "'Poppins', sans-serif",
+        overflow: 'hidden',
+        minHeight: '100vh',
+      }}>
+        
+        {/* Single Particle Network for entire page - 80 particles */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <ParticleNetwork theme={theme} />
+        </div>
+
+        {/* Subtle glow effects */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div 
+            className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl opacity-10"
+            style={{ 
+              background: `radial-gradient(circle, ${GOLD}, transparent 70%)`,
+            }}
+          />
+          <div 
+            className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-10"
+            style={{ 
+              background: `radial-gradient(circle, ${BLUE}, transparent 70%)`,
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Product Sections */}
           {PRODUCTS.map((product, index) => {
             const isLeft = product.imagePosition === 'left';
-            const accentColor = getAccentColor(product.accentColor);
             const accentLight = getAccentLight(product.accentColor);
             const isSectionVisible = isVisible(product.id);
 
@@ -372,21 +512,22 @@ export default function ProductShowcase() {
                   }
                 }}
                 data-section-id={product.id}
-                className="min-h-screen flex items-center overflow-hidden"
+                className="flex items-center overflow-hidden relative"
                 style={{
-                  marginTop: '2.5rem',
-                  padding: '1.5rem 0',
+                  minHeight: '100vh',
+                  padding: '0.5rem 0',
+                  marginTop: index === 0 ? '0' : '0',
+                  scrollMarginTop: '0',
                 }}
               >
                 <div className="w-full">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-start lg:items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-center">
                     
-                    {/* Image - Slides from far left or right (slow) */}
+                    {/* Image - Har scroll par animation */}
                     <div 
-                      className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'} transition-all duration-1200 ease-out ${getImageAnimationClass(product.imagePosition, isSectionVisible)}`}
+                      className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'} transition-all duration-800 ease-out ${getImageAnimationClass(product.imagePosition, isSectionVisible)}`}
                       style={{
                         transitionTimingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
-                        transitionDelay: `${index * 80 + 300}ms`, // Delay so description pehle aaye
                       }}
                     >
                       <div
@@ -397,31 +538,37 @@ export default function ProductShowcase() {
                         }}
                       />
                       <div
-                        className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02] h-full"
+                        className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02]"
                         style={{
                           borderColor: getBorderColor(),
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                          aspectRatio: '4/3',
+                          backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : 'rgba(245,245,245,0.5)',
+                          backdropFilter: 'blur(10px)',
                         }}
                       >
-                        <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
-                          <img
-                            src={product.image}
-                            alt={product.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"%3E%3C/rect%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"%3E%3C/circle%3E%3Cpolyline points="21 15 16 10 5 21"%3E%3C/polyline%3E%3C/svg%3E';
+                            target.className = 'w-full h-full object-contain p-8';
+                          }}
+                        />
                       </div>
                     </div>
 
-                    {/* Content - Fast fade in (pehle aayega) */}
+                    {/* Content - Har scroll par animation */}
                     <div 
-                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col h-full transition-all duration-500 ease-out ${getContentAnimationClass(isSectionVisible)}`}
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col transition-all duration-600 ease-out ${getContentAnimationClass(isSectionVisible)}`}
                       style={{
-                        transitionDelay: `${index * 50}ms`, // Fast - pehle show ho
+                        transitionTimingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
                       }}
                     >
-                      <div className="flex-1 flex flex-col justify-center">
+                      <div className="flex flex-col justify-center">
                         <span
                           className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
                           style={{ 
@@ -484,6 +631,7 @@ export default function ProductShowcase() {
                             style={{
                               backgroundColor: BLUE,
                               fontFamily: "'Poppins', sans-serif",
+                              boxShadow: `0 4px 20px rgba(0, 102, 255, 0.3)`,
                             }}
                           >
                             {product.buttonText}
@@ -497,7 +645,7 @@ export default function ProductShowcase() {
             );
           })}
 
-          {/* NEEZAMIYA - with GOLD and BLUE */}
+          {/* NEEZAMIYA */}
           <div
             ref={neezamiyaRef}
             className={`relative w-full flex items-center justify-center transition-all duration-1000 ease-out ${
@@ -505,7 +653,7 @@ export default function ProductShowcase() {
             }`}
             style={{
               minHeight: '40vh',
-              padding: '4rem 0 3rem 0',
+              padding: '2rem 0',
             }}
           >
             <div className="text-center px-4">
@@ -519,13 +667,12 @@ export default function ProductShowcase() {
                 }}
               >
                 {neezamiyaChars.map((char, index) => {
-                  // Alternate between GOLD and BLUE
-                  const isGold = index % 2 === 0;
+                  const isM = char === 'M';
                   return (
                     <span
                       key={index}
                       style={{
-                        color: isGold ? GOLD : BLUE,
+                        color: isM ? GOLD : '#FFFFFF',
                       }}
                     >
                       {char}
@@ -549,11 +696,13 @@ export default function ProductShowcase() {
           {/* Call to Action Section with Form */}
           <div
             ref={ctaRef}
-            className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 min-h-[50vh] flex items-center mb-8"
+            className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 flex items-center mb-0 relative"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
               borderColor: getBorderColor(),
               borderWidth: '1px',
+              marginTop: '1rem',
+              backdropFilter: 'blur(20px)',
             }}
           >
             <div className="max-w-4xl mx-auto w-full">
@@ -713,6 +862,7 @@ export default function ProductShowcase() {
                     style={{
                       backgroundColor: BLUE,
                       fontFamily: "'Poppins', sans-serif",
+                      boxShadow: `0 4px 30px rgba(0, 102, 255, 0.3)`,
                     }}
                   >
                     {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}
@@ -738,7 +888,6 @@ export default function ProductShowcase() {
       {/* Footer */}
       <Footer />
 
-      {/* Material Icons Font & Continuous Animations */}
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 
@@ -758,35 +907,6 @@ export default function ProductShowcase() {
           -webkit-font-smoothing: antialiased;
         }
 
-        @keyframes fadeInOut {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          25% {
-            opacity: 0.7;
-            transform: scale(0.98);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          75% {
-            opacity: 0.8;
-            transform: scale(0.99);
-          }
-        }
-
-        .animate-fade-in-out {
-          animation: fadeInOut 6s ease-in-out infinite;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .animate-fade-in-out {
-            animation: none;
-          }
-        }
-
         input:focus, select:focus {
           box-shadow: 0 0 0 2px ${BLUE} !important;
           border-color: ${BLUE} !important;
@@ -794,6 +914,14 @@ export default function ProductShowcase() {
 
         button:hover {
           opacity: 0.9;
+        }
+
+        footer {
+          margin-top: 0 !important;
+        }
+
+        section {
+          scroll-margin-top: 0;
         }
       `}</style>
     </>

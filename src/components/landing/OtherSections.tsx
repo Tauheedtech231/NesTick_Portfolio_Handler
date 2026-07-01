@@ -70,7 +70,7 @@ export default function OtherSections({
           backgroundColor: getSectionBg(),
         }}
       >
-        <div className="container mx-auto max-w-6xl">
+        <div className="container mt-10 mx-auto max-w-6xl">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
               <span className="relative inline-block"

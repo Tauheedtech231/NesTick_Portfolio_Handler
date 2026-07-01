@@ -1,295 +1,537 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Page Clone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #05070d;
+    --panel: #0c1120;
+    --panel-border: rgba(255,255,255,0.06);
+    --yellow: #f2c94c;
+    --yellow-dim: #d4af37;
+    --text-main: #f5f5f7;
+    --text-sub: #8b93a7;
+    --text-faint: #5a6070;
+    --input-bg: #0a0e1a;
+    --input-border: rgba(255,255,255,0.08);
+  }
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Portal Architecture - Three-Tier System</title>
-<!-- Tailwind CSS v3 CDN -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<!-- Google Fonts: Inter for a precise match -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'portal-dark': '#06090f',
-            'portal-blue': '#1e40af',
-            'portal-blue-glow': '#3b82f6',
-            'portal-gold': '#fbbf24',
-            'portal-gold-glow': '#f59e0b',
-            'portal-teal': '#14b8a6',
-            'portal-teal-glow': '#2dd4bf',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          letterSpacing: {
-            'ultra-wide': '0.35em',
-            'tighter-extra': '-0.03em',
-          }
-        }
-      }
-    }
-  </script>
-<style data-purpose="custom-styles">
-    /* Pixel-perfect background grid */
-    .bg-dotted-grid {
-      background-image: radial-gradient(circle, #ffffff15 1.5px, transparent 1.5px);
-      background-size: 32px 32px;
-    }
+  *{ box-sizing: border-box; margin:0; padding:0; }
 
-    /* Portal Glow Animations */
-    @keyframes beam-rise {
-      0% { opacity: 0.3; transform: translateY(0) scaleX(1); }
-      50% { opacity: 0.6; transform: translateY(-5px) scaleX(1.05); }
-      100% { opacity: 0.3; transform: translateY(0) scaleX(1); }
-    }
-    .portal-beam {
-      animation: beam-rise 4s ease-in-out infinite;
-    }
+  body{
+    background: radial-gradient(ellipse at top left, #0a1224 0%, #05070d 55%);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px 20px;
+  }
 
-    /* New Breathing Glow Animation for the circular portal base */
-    @keyframes breathing-glow-blue {
-      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); opacity: 0.6; }
-      50% { box-shadow: 0 0 50px rgba(59, 130, 246, 0.7); opacity: 1; }
-    }
-    @keyframes breathing-glow-gold {
-      0%, 100% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.4); opacity: 0.7; }
-      50% { box-shadow: 0 0 65px rgba(251, 191, 36, 0.9); opacity: 1; }
-    }
-    @keyframes breathing-glow-teal {
-      0%, 100% { box-shadow: 0 0 20px rgba(45, 212, 191, 0.3); opacity: 0.6; }
-      50% { box-shadow: 0 0 50px rgba(45, 212, 191, 0.7); opacity: 1; }
-    }
+  .wrapper{
+    display:grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 40px;
+    max-width: 1120px;
+    width:100%;
+    align-items:start;
+  }
 
-    .glow-pulse-blue { animation: breathing-glow-blue 3s ease-in-out infinite; }
-    .glow-pulse-gold { animation: breathing-glow-gold 2.5s ease-in-out infinite; }
-    .glow-pulse-teal { animation: breathing-glow-teal 3s ease-in-out infinite; }
+  /* ---------- LEFT SIDE ---------- */
+  .left{
+    padding: 24px 10px;
+  }
 
-    /* Floating 3D Animation for Icons */
-    @keyframes float-hologram {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-10px) scale(1.02); }
-    }
-    .icon-float {
-      animation: float-hologram 4s ease-in-out infinite;
-    }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color: var(--yellow);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .eyebrow svg{ width:14px; height:14px; }
+  .eyebrow .line{
+    width: 28px;
+    height: 1px;
+    background: var(--yellow);
+    opacity: 0.6;
+  }
 
-    /* Card Accents & Glassmorphism */
-    .glass-card {
-      background: rgba(13, 18, 29, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .primary-highlight {
-      border: 1px solid rgba(251, 191, 36, 0.4);
-      box-shadow: 0 0 40px rgba(251, 191, 36, 0.05);
-    }
+  h1{
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  h1 .accent{ color: var(--yellow); }
 
-    .ribbon-clip {
-      clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
-    }
+  .intro{
+    color: var(--text-sub);
+    font-size: 14.5px;
+    line-height: 1.7;
+    max-width: 380px;
+    margin-bottom: 30px;
+  }
 
-    /* Technical corner elements */
-    .tech-corner {
-      position: absolute;
-      width: 12px;
-      height: 48px;
-      border-left: 2px solid currentColor;
-      opacity: 0.3;
-    }
-    .tech-corner-top { top: 80px; }
-    .tech-corner-left { left: -1px; clip-path: polygon(0 0, 100% 15%, 100% 85%, 0 100%); }
-    .tech-corner-right { right: -1px; transform: scaleX(-1); }
+  .plane-wrap{
+    position: relative;
+    height: 0;
+  }
+  .plane-icon{
+    position: absolute;
+    top: -170px;
+    right: 20px;
+    width: 46px;
+    height: 46px;
+    color: var(--yellow);
+    transform: rotate(12deg);
+  }
+  .dashline{
+    position: absolute;
+    top: -110px;
+    right: 90px;
+    width: 90px;
+    height: 60px;
+    border: none;
+  }
 
-    /* Circular Portal Base Layout */
-    .portal-base-container {
-      perspective: 1000px;
-    }
-    .portal-ring {
-      transform: rotateX(75deg);
-    }
-  </style>
+  .info-card{
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 8px;
+    position: relative;
+  }
+
+  .info-row{
+    display:flex;
+    align-items:flex-start;
+    gap: 16px;
+    padding: 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .info-row:last-child{ border-bottom:none; }
+
+  .icon-circle{
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: #171c2c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--yellow);
+  }
+  .icon-circle svg{ width:18px; height:18px; }
+
+  .info-label{
+    font-size: 12.5px;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+  }
+  .info-value{
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 3px;
+  }
+  .info-value.yellow{ color: var(--yellow); }
+  .info-sub{
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .avatar-badge{
+    position:absolute;
+    left: -6px;
+    bottom: -46px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0c1120;
+    border: 1px solid var(--panel-border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-main);
+  }
+
+  /* ---------- RIGHT SIDE (FORM) ---------- */
+  .form-panel{
+    background: linear-gradient(180deg, #0d1324 0%, #0a0f1d 100%);
+    border: 1px solid rgba(242,201,76,0.15);
+    border-radius: 22px;
+    padding: 30px 34px 34px;
+    box-shadow: 0 0 0 1px rgba(242,201,76,0.03), 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .form-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 26px;
+  }
+
+  .form-title{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .form-title .icon-box{
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--yellow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#111;
+  }
+  .form-title .icon-box svg{ width:17px; height:17px; }
+
+  .status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 13px;
+    color: var(--text-sub);
+  }
+  .status .dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    background: var(--yellow);
+    box-shadow: 0 0 8px var(--yellow);
+  }
+
+  .field-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .field{
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    transition: border-color .15s ease;
+  }
+  .field:focus-within{
+    border-color: rgba(242,201,76,0.5);
+  }
+  .field .field-icon{
+    color: var(--text-faint);
+    display:flex;
+    align-items:center;
+  }
+  .field .field-icon svg{ width:17px; height:17px; }
+
+  .field-content{ flex:1; min-width:0; }
+  .field-content label{
+    display:block;
+    font-size: 12.5px;
+    color: #cfd3dd;
+    margin-bottom: 2px;
+    font-weight: 500;
+  }
+  .field-content label .req{ color: var(--yellow); }
+
+  .field input, .field select, .field textarea{
+    width:100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .field input::placeholder, .field textarea::placeholder{
+    color: var(--text-faint);
+  }
+
+  .field.full{ margin-bottom: 14px; }
+
+  .field.select-field{
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .field.select-field select{
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .chevron{ color: var(--text-faint); pointer-events:none; }
+  .chevron svg{ width:16px; height:16px; }
+
+  .field.textarea-field{
+    align-items: flex-start;
+    padding-top: 14px;
+  }
+  .field.textarea-field textarea{
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
+    font-family: inherit;
+  }
+
+  .perks{
+    display:flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 22px 0 22px;
+    padding: 16px 6px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .perk{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex: 1;
+  }
+  .perk-icon{
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 8px;
+    background: rgba(242,201,76,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--yellow);
+  }
+  .perk-icon svg{ width:15px; height:15px; }
+  .perk-title{
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1px;
+  }
+  .perk-sub{
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+
+  .submit-btn{
+    width:100%;
+    background: linear-gradient(180deg, #f5cf5e 0%, #e0b23a 100%);
+    color: #171208;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 15.5px;
+    font-weight: 700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 8px 24px rgba(242,201,76,0.25);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .submit-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(242,201,76,0.35);
+  }
+  .submit-btn svg{ width:16px; height:16px; }
+
+  @media (max-width: 880px){
+    .wrapper{ grid-template-columns: 1fr; }
+    .plane-icon, .dashline{ display:none; }
+    .field-row{ grid-template-columns: 1fr; }
+  }
+</style>
 </head>
-<body class="bg-portal-dark text-white font-sans antialiased min-h-screen flex flex-col items-center justify-start p-6 md:p-12 overflow-x-hidden">
-<!-- Background Layers -->
-<div class="fixed inset-0 bg-dotted-grid opacity-25 pointer-events-none"></div>
-<div class="fixed -top-[10%] -left-[10%] w-[50%] h-[50%] bg-portal-blue-glow/10 rounded-full blur-[120px] pointer-events-none"></div>
-<div class="fixed -top-[10%] -right-[10%] w-[40%] h-[40%] bg-portal-gold/5 rounded-full blur-[120px] pointer-events-none"></div>
-<!-- Header Section -->
-<header class="relative z-10 text-center mb-20 max-w-4xl mx-auto" data-purpose="page-header">
-<div class="inline-block px-5 py-1.5 border border-portal-gold/30 rounded-full mb-6 bg-portal-gold/5">
-<span class="text-[10px] uppercase tracking-ultra-wide font-bold text-portal-gold/90">Three-Tier</span>
-</div>
-<h1 class="text-6xl md:text-7xl font-extrabold tracking-tighter-extra mb-5 flex flex-col md:flex-row items-center justify-center gap-x-4">
-<span class="text-white">Portal</span>
-<span class="text-portal-gold">Architecture</span>
-</h1>
-<p class="text-gray-400 text-base md:text-lg max-w-xl mx-auto font-medium leading-snug">
-      Our system is built on a robust multi-portal architecture designed for maximum efficiency and security
+<body>
+
+<div class="wrapper">
+
+  <!-- LEFT SIDE -->
+  <div class="left">
+    <div class="eyebrow">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.1 6.8L12 15.6l-5.5 4.1 2.1-6.8L3 8.8h6.8z"/></svg>
+      GET IN TOUCH
+    </div>
+
+    <h1>Let's Start<br>a <span class="accent">Conversation</span></h1>
+
+    <p class="intro">
+      We're here to help and answer any question you might have. We look forward to hearing from you.
     </p>
-</header>
-<!-- Content Grid -->
-<main class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl mx-auto items-stretch pb-20">
-<!-- Generic Portal -->
-<article class="relative flex flex-col items-center glass-card p-10 rounded-[2.5rem] overflow-hidden border-portal-blue-glow/20 group">
-<div class="tech-corner tech-corner-top tech-corner-left text-portal-blue-glow"></div>
-<div class="tech-corner tech-corner-top tech-corner-right text-portal-blue-glow"></div>
-<div class="icon-float w-20 h-20 rounded-3xl border border-portal-blue-glow/30 flex items-center justify-center mb-8 bg-blue-900/20 shadow-[0_15px_35px_rgba(59,130,246,0.2),inset_0_0_15px_rgba(59,130,246,0.3)]">
-<svg class="w-10 h-10 text-white drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" fill="none" stroke="currentColor" stroke-width="1.2" viewbox="0 0 24 24">
-<path d="M12 21a9 9 0 100-18 9 9 0 000 18z"></path>
-<path d="M3.6 9h16.8M3.6 15h16.8M12 3a17 17 0 000 18M12 3a17 17 0 010 18"></path>
-</svg>
+
+    <div class="plane-wrap">
+      <svg class="plane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M22 2L11 13"/>
+        <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+      </svg>
+    </div>
+
+    <div class="info-card">
+
+      <div class="info-row">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div>
+          <div class="info-label">Phone</div>
+          <div class="info-value yellow">+92 319 3236529</div>
+          <div class="info-sub">Mon-Fri, 9AM-6PM</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        </div>
+        <div>
+          <div class="info-label">Email</div>
+          <div class="info-value yellow">support@portfoliohandler.com</div>
+          <div class="info-sub">We reply within 24 hours</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="info-label">Office</div>
+          <div class="info-value">Daska, Pakistan</div>
+          <div class="info-sub">Serving globally from Daska</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+          <div class="info-label">Business Hours</div>
+          <div class="info-value">Monday - Friday</div>
+          <div class="info-sub">9:00 AM - 6:00 PM (PKT)</div>
+        </div>
+      </div>
+
+      <div class="avatar-badge">N</div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="form-panel">
+    <div class="form-header">
+      <div class="form-title">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        </div>
+        Send us a Message
+      </div>
+      <div class="status">
+        We're just a message away!
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="field-content">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" placeholder="Enter your full name">
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+        </div>
+        <div class="field-content">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" placeholder="Enter your email">
+        </div>
+      </div>
+    </div>
+
+    <div class="field select-field full">
+      <div class="field-content">
+        <label>Subject <span class="req">*</span></label>
+        <select>
+          <option selected disabled>Select a subject</option>
+          <option>General Inquiry</option>
+          <option>Support</option>
+          <option>Partnership</option>
+        </select>
+      </div>
+      <div class="chevron">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="field textarea-field full">
+      <div class="field-content">
+        <label>Message <span class="req">*</span></label>
+        <textarea placeholder="Tell us about your inquiry..."></textarea>
+      </div>
+    </div>
+
+    <div class="perks">
+      <div class="perk">
+        <div class="perk-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+        </div>
+        <div>
+          <div class="perk-title">Quick Response</div>
+          <div class="perk-sub">We reply within 24 hours</div>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="perk-title">Secure &amp; Private</div>
+          <div class="perk-sub">Your information is safe</div>
+        </div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+        </div>
+        <div>
+          <div class="perk-title">Global Support</div>
+          <div class="perk-sub">We're here to help</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn">
+      Send Message
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </div>
+
 </div>
-<h2 class="text-3xl font-extrabold mb-1 tracking-tight text-white">Generic Portal</h2>
-<div class="w-8 h-0.5 bg-portal-blue-glow mb-8 opacity-60"></div>
-<p class="text-gray-400 text-[13px] text-center leading-relaxed mb-16 h-12 max-w-[240px]">
-        Public-facing portal for previewing templates and submitting requests. No login required for basic access.
-      </p>
-<!-- Holographic Portal Base -->
-<div class="relative w-full h-40 mb-10 flex items-center justify-center portal-base-container">
-<div class="portal-beam absolute bottom-4 w-48 h-32 bg-gradient-to-t from-portal-blue-glow/25 to-transparent blur-2xl opacity-40"></div>
-<div class="portal-ring glow-pulse-blue absolute bottom-2 w-48 h-48 rounded-full border-[1.5px] border-portal-blue-glow/60"></div>
-<div class="portal-ring absolute bottom-2 w-40 h-40 rounded-full border border-portal-blue-glow/40 opacity-50"></div>
-<div class="absolute bottom-6 w-52 h-1 bg-portal-blue-glow rounded-full opacity-60 blur-sm"></div>
-</div>
-<ul class="w-full space-y-4 mb-12 text-[15px]">
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-blue-glow/50 flex items-center justify-center mr-4 group-hover/item:border-portal-blue-glow transition-colors">
-<svg class="w-3 h-3 text-portal-blue-glow" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Template Preview
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-blue-glow/50 flex items-center justify-center mr-4 group-hover/item:border-portal-blue-glow transition-colors">
-<svg class="w-3 h-3 text-portal-blue-glow" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Request Submission
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-blue-glow/50 flex items-center justify-center mr-4 group-hover/item:border-portal-blue-glow transition-colors">
-<svg class="w-3 h-3 text-portal-blue-glow" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Public Access
-        </li>
-</ul>
-<button class="mt-auto w-full py-4 px-6 border border-portal-blue-glow/30 rounded-full text-[11px] font-bold tracking-[0.2em] text-portal-blue-glow hover:bg-portal-blue-glow/10 transition-all flex items-center justify-center group/btn">
-        EXPLORE PORTAL <span class="ml-2 group-hover/btn:translate-x-2 transition-transform">→</span>
-</button>
-</article>
-<!-- Main Admin Portal (High Contrast) -->
-<article class="relative flex flex-col items-center glass-card p-10 rounded-[2.5rem] primary-highlight z-20 scale-105 shadow-2xl overflow-visible group">
-<!-- Ribbon Badge -->
-<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-portal-gold px-5 py-2 ribbon-clip shadow-[0_4px_20px_rgba(251,191,36,0.3)]">
-<span class="text-[10px] font-black text-black uppercase tracking-widest">Primary Control</span>
-</div>
-<div class="tech-corner tech-corner-top tech-corner-left text-portal-gold"></div>
-<div class="tech-corner tech-corner-top tech-corner-right text-portal-gold"></div>
-<div class="icon-float w-20 h-20 rounded-3xl border border-portal-gold/50 flex items-center justify-center mb-8 bg-amber-900/20 shadow-[0_20px_45px_rgba(251,191,36,0.3),inset_0_0_20px_rgba(251,191,36,0.4)]">
-<svg class="w-10 h-10 text-portal-gold drop-shadow-[0_0_12px_rgba(251,191,36,0.9)]" fill="none" stroke="currentColor" stroke-width="1.2" viewbox="0 0 24 24">
-<path d="M5 19h14V7l-3.5 3.5L12 5l-3.5 5.5L5 7v12z" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-</div>
-<h2 class="text-3xl font-extrabold mb-1 tracking-tight text-white">Main Admin Portal</h2>
-<div class="w-8 h-0.5 bg-portal-gold mb-8 opacity-60"></div>
-<p class="text-gray-400 text-[13px] text-center leading-relaxed mb-16 h-12 max-w-[240px]">
-        Central control center for system administrators to manage all colleges and system-wide settings.
-      </p>
-<!-- Holographic Portal Base (Gold) - Enhanced intensity for Primary Control -->
-<div class="relative w-full h-40 mb-10 flex items-center justify-center portal-base-container">
-<div class="portal-beam absolute bottom-4 w-48 h-32 bg-gradient-to-t from-portal-gold/40 to-transparent blur-3xl opacity-60"></div>
-<div class="portal-ring glow-pulse-gold absolute bottom-2 w-48 h-48 rounded-full border-[2px] border-portal-gold/80"></div>
-<div class="portal-ring absolute bottom-2 w-40 h-40 rounded-full border border-portal-gold/50 opacity-60"></div>
-<div class="absolute bottom-6 w-52 h-1.5 bg-portal-gold rounded-full opacity-80 blur-md"></div>
-<!-- Sparkle effects -->
-<div class="absolute bottom-10 left-10 w-1 h-1 bg-white rounded-full animate-pulse"></div>
-<div class="absolute bottom-14 right-12 w-1 h-1 bg-white rounded-full animate-pulse delay-500"></div>
-</div>
-<ul class="w-full space-y-4 mb-12 text-[15px]">
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-gold/50 flex items-center justify-center mr-4 group-hover/item:border-portal-gold transition-colors">
-<svg class="w-3 h-3 text-portal-gold" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          College Management
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-gold/50 flex items-center justify-center mr-4 group-hover/item:border-portal-gold transition-colors">
-<svg class="w-3 h-3 text-portal-gold" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Template Approval
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-gold/50 flex items-center justify-center mr-4 group-hover/item:border-portal-gold transition-colors">
-<svg class="w-3 h-3 text-portal-gold" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          System Analytics
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-gold/50 flex items-center justify-center mr-4 group-hover/item:border-portal-gold transition-colors">
-<svg class="w-3 h-3 text-portal-gold" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Global Settings
-        </li>
-</ul>
-<button class="mt-auto w-full py-4 px-6 border border-portal-gold/50 rounded-full text-[11px] font-bold tracking-[0.2em] text-portal-gold hover:bg-portal-gold/10 transition-all flex items-center justify-center group/btn">
-        ADMIN ACCESS <span class="ml-2 group-hover/btn:translate-x-2 transition-transform">→</span>
-</button>
-</article>
-<!-- College Admin Portal -->
-<article class="relative flex flex-col items-center glass-card p-10 rounded-[2.5rem] overflow-hidden border-portal-teal-glow/20 group">
-<div class="tech-corner tech-corner-top tech-corner-left text-portal-teal"></div>
-<div class="tech-corner tech-corner-top tech-corner-right text-portal-teal"></div>
-<div class="icon-float w-20 h-20 rounded-3xl border border-portal-teal-glow/30 flex items-center justify-center mb-8 bg-teal-900/20 shadow-[0_15px_35px_rgba(45,212,191,0.2),inset_0_0_15px_rgba(45,212,191,0.3)]">
-<svg class="w-10 h-10 text-white drop-shadow-[0_0_8px_rgba(45,212,191,0.8)]" fill="none" stroke="currentColor" stroke-width="1.2" viewbox="0 0 24 24">
-<path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-</svg>
-</div>
-<h2 class="text-3xl font-extrabold mb-1 tracking-tight text-white text-center">College Admin Portal</h2>
-<div class="w-8 h-0.5 bg-portal-teal mb-8 opacity-60"></div>
-<p class="text-gray-400 text-[13px] text-center leading-relaxed mb-16 h-12 max-w-[240px]">
-        Secure portal for individual colleges to manage their content, portfolios, and student data.
-      </p>
-<!-- Holographic Portal Base (Teal) -->
-<div class="relative w-full h-40 mb-10 flex items-center justify-center portal-base-container">
-<div class="portal-beam absolute bottom-4 w-48 h-32 bg-gradient-to-t from-portal-teal/25 to-transparent blur-2xl opacity-40"></div>
-<div class="portal-ring glow-pulse-teal absolute bottom-2 w-48 h-48 rounded-full border-[1.5px] border-portal-teal-glow/60"></div>
-<div class="portal-ring absolute bottom-2 w-40 h-40 rounded-full border border-portal-teal-glow/40 opacity-50"></div>
-<div class="absolute bottom-6 w-52 h-1 bg-portal-teal rounded-full opacity-60 blur-sm"></div>
-</div>
-<ul class="w-full space-y-4 mb-12 text-[15px]">
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-teal/50 flex items-center justify-center mr-4 group-hover/item:border-portal-teal transition-colors">
-<svg class="w-3 h-3 text-portal-teal" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Content Management
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-teal/50 flex items-center justify-center mr-4 group-hover/item:border-portal-teal transition-colors">
-<svg class="w-3 h-3 text-portal-teal" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Student Portfolios
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-teal/50 flex items-center justify-center mr-4 group-hover/item:border-portal-teal transition-colors">
-<svg class="w-3 h-3 text-portal-teal" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          College Settings
-        </li>
-<li class="flex items-center text-gray-300 group/item">
-<div class="w-5 h-5 rounded-full border border-portal-teal/50 flex items-center justify-center mr-4 group-hover/item:border-portal-teal transition-colors">
-<svg class="w-3 h-3 text-portal-teal" fill="none" stroke="currentColor" stroke-width="3" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-</div>
-          Local Analytics
-        </li>
-</ul>
-<button class="mt-auto w-full py-4 px-6 border border-portal-teal/30 rounded-full text-[11px] font-bold tracking-[0.2em] text-portal-teal hover:bg-portal-teal/10 transition-all flex items-center justify-center group/btn">
-        MANAGE COLLEGE <span class="ml-2 group-hover/btn:translate-x-2 transition-transform">→</span>
-</button>
-</article>
-</main>
-<footer class="mt-auto py-12 opacity-30 text-[10px] tracking-[0.4em] uppercase font-bold text-gray-400">
-    Secure Infrastructure v2.4.0
-  </footer>
-</body></html>
+
+</body>
+</html>
