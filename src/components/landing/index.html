@@ -2,535 +2,527 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Page Clone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Portfolio Handler Footer</title>
 <style>
   :root{
-    --bg: #05070d;
-    --panel: #0c1120;
-    --panel-border: rgba(255,255,255,0.06);
-    --yellow: #f2c94c;
-    --yellow-dim: #d4af37;
-    --text-main: #f5f5f7;
-    --text-sub: #8b93a7;
-    --text-faint: #5a6070;
-    --input-bg: #0a0e1a;
-    --input-border: rgba(255,255,255,0.08);
+    --bg-1:#0a0a1f;
+    --bg-2:#12123a;
+    --blue-1:#123a5e;
+    --blue-2:#1a4d7a;
+    --gold:#e6b800;
+    --gold-2:#ffd54f;
+    --text-light:#e8f0f5;
+    --text-muted:#9db3c9;
+    --icon-bg:#1f5a8c;
   }
-
-  *{ box-sizing: border-box; margin:0; padding:0; }
-
+  *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background: radial-gradient(ellipse at top left, #0a1224 0%, #05070d 55%);
-    font-family: 'Inter', sans-serif;
-    color: var(--text-main);
-    min-height: 100vh;
+    background:#05050f;
+    font-family:'Segoe UI', Arial, sans-serif;
     display:flex;
-    align-items:center;
     justify-content:center;
-    padding: 40px 20px;
+    padding:0;
   }
-
-  .wrapper{
-    display:grid;
-    grid-template-columns: 1fr 1.15fr;
-    gap: 40px;
-    max-width: 1120px;
-    width:100%;
-    align-items:start;
+  .footer{
+    position:relative;
+    width:1100px;
+    max-width:100%;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(30,110,190,0.35), transparent 45%),
+      radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.3), transparent 50%),
+      linear-gradient(180deg, #090920 0%, #0d0d2b 40%, #10102f 100%);
+    overflow:hidden;
+    padding-top:6px;
   }
-
-  /* ---------- LEFT SIDE ---------- */
-  .left{
-    padding: 24px 10px;
+  .top-bar{
+    height:6px;
+    background:linear-gradient(90deg, #2a7fc9, #d8a83a, #2a7fc9);
   }
-
-  .eyebrow{
+  .content{
+    position:relative;
     display:flex;
-    align-items:center;
-    gap:8px;
-    color: var(--yellow);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 18px;
-  }
-  .eyebrow svg{ width:14px; height:14px; }
-  .eyebrow .line{
-    width: 28px;
-    height: 1px;
-    background: var(--yellow);
-    opacity: 0.6;
-  }
-
-  h1{
-    font-size: 38px;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 16px;
-    position: relative;
-  }
-  h1 .accent{ color: var(--yellow); }
-
-  .intro{
-    color: var(--text-sub);
-    font-size: 14.5px;
-    line-height: 1.7;
-    max-width: 380px;
-    margin-bottom: 30px;
-  }
-
-  .plane-wrap{
-    position: relative;
-    height: 0;
-  }
-  .plane-icon{
-    position: absolute;
-    top: -170px;
-    right: 20px;
-    width: 46px;
-    height: 46px;
-    color: var(--yellow);
-    transform: rotate(12deg);
-  }
-  .dashline{
-    position: absolute;
-    top: -110px;
-    right: 90px;
-    width: 90px;
-    height: 60px;
-    border: none;
-  }
-
-  .info-card{
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 18px;
-    padding: 8px;
-    position: relative;
-  }
-
-  .info-row{
-    display:flex;
-    align-items:flex-start;
-    gap: 16px;
-    padding: 18px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .info-row:last-child{ border-bottom:none; }
-
-  .icon-circle{
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    border-radius: 50%;
-    background: #171c2c;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: var(--yellow);
-  }
-  .icon-circle svg{ width:18px; height:18px; }
-
-  .info-label{
-    font-size: 12.5px;
-    color: var(--text-sub);
-    margin-bottom: 4px;
-  }
-  .info-value{
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 3px;
-  }
-  .info-value.yellow{ color: var(--yellow); }
-  .info-sub{
-    font-size: 12px;
-    color: var(--text-faint);
-  }
-
-  .avatar-badge{
-    position:absolute;
-    left: -6px;
-    bottom: -46px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #0c1120;
-    border: 1px solid var(--panel-border);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-main);
-  }
-
-  /* ---------- RIGHT SIDE (FORM) ---------- */
-  .form-panel{
-    background: linear-gradient(180deg, #0d1324 0%, #0a0f1d 100%);
-    border: 1px solid rgba(242,201,76,0.15);
-    border-radius: 22px;
-    padding: 30px 34px 34px;
-    box-shadow: 0 0 0 1px rgba(242,201,76,0.03), 0 20px 60px rgba(0,0,0,0.5);
-    position: relative;
-  }
-
-  .form-header{
-    display:flex;
-    align-items:center;
     justify-content:space-between;
-    margin-bottom: 26px;
+    padding:44px 56px 20px 56px;
+    z-index:3;
+    flex-wrap:wrap;
+    gap:30px;
   }
-
-  .form-title{
+  .col{
+    flex:1;
+    min-width:260px;
+  }
+  /* Brand column */
+  .brand-head{
     display:flex;
     align-items:center;
-    gap: 12px;
-    font-size: 19px;
-    font-weight: 700;
+    gap:16px;
+    margin-bottom:14px;
   }
-  .form-title .icon-box{
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: var(--yellow);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#111;
-  }
-  .form-title .icon-box svg{ width:17px; height:17px; }
-
-  .status{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size: 13px;
-    color: var(--text-sub);
-  }
-  .status .dot{
-    width:8px; height:8px;
+  .logo-circle{
+    width:56px;
+    height:56px;
     border-radius:50%;
-    background: var(--yellow);
-    box-shadow: 0 0 8px var(--yellow);
-  }
-
-  .field-row{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  .field{
-    background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    border-radius: 12px;
-    padding: 12px 16px;
-    display:flex;
-    align-items:center;
-    gap: 12px;
-    transition: border-color .15s ease;
-  }
-  .field:focus-within{
-    border-color: rgba(242,201,76,0.5);
-  }
-  .field .field-icon{
-    color: var(--text-faint);
-    display:flex;
-    align-items:center;
-  }
-  .field .field-icon svg{ width:17px; height:17px; }
-
-  .field-content{ flex:1; min-width:0; }
-  .field-content label{
-    display:block;
-    font-size: 12.5px;
-    color: #cfd3dd;
-    margin-bottom: 2px;
-    font-weight: 500;
-  }
-  .field-content label .req{ color: var(--yellow); }
-
-  .field input, .field select, .field textarea{
-    width:100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text-main);
-    font-size: 14px;
-    font-family: inherit;
-  }
-  .field input::placeholder, .field textarea::placeholder{
-    color: var(--text-faint);
-  }
-
-  .field.full{ margin-bottom: 14px; }
-
-  .field.select-field{
-    justify-content: space-between;
-    cursor: pointer;
-  }
-  .field.select-field select{
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-  }
-  .chevron{ color: var(--text-faint); pointer-events:none; }
-  .chevron svg{ width:16px; height:16px; }
-
-  .field.textarea-field{
-    align-items: flex-start;
-    padding-top: 14px;
-  }
-  .field.textarea-field textarea{
-    resize: vertical;
-    min-height: 90px;
-    line-height: 1.5;
-    font-family: inherit;
-  }
-
-  .perks{
-    display:flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 22px 0 22px;
-    padding: 16px 6px 0;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-  .perk{
-    display:flex;
-    align-items:center;
-    gap: 10px;
-    flex: 1;
-  }
-  .perk-icon{
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    border-radius: 8px;
-    background: rgba(242,201,76,0.08);
+    background:#fff;
     display:flex;
     align-items:center;
     justify-content:center;
-    color: var(--yellow);
+    flex-shrink:0;
+    box-shadow:0 0 15px rgba(255,255,255,0.15);
   }
-  .perk-icon svg{ width:15px; height:15px; }
-  .perk-title{
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 1px;
+  .logo-circle img{
+    width:70%;
   }
-  .perk-sub{
-    font-size: 10.5px;
-    color: var(--text-faint);
+  .brand-title h2{
+    color:#fff;
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .underline{
+    width:38px;
+    height:3px;
+    background:var(--gold);
+    border-radius:2px;
+    position:relative;
+  }
+  .underline::after{
+    content:'';
+    position:absolute;
+    right:-10px;
+    top:-2px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--gold);
+  }
+  .brand-desc{
+    color:var(--text-muted);
+    font-size:14px;
+    line-height:1.6;
+    margin:14px 0 20px 0;
+    max-width:280px;
+  }
+  .quote-box{
+    position:relative;
+    border:1px solid rgba(230,184,0,0.5);
+    border-radius:8px;
+    padding:18px 20px 18px 50px;
+    max-width:300px;
+    background:rgba(255,255,255,0.02);
+  }
+  .quote-mark{
+    position:absolute;
+    left:14px;
+    top:8px;
+    font-size:38px;
+    color:var(--gold);
+    font-family:Georgia, serif;
+    font-weight:700;
+    line-height:1;
+  }
+  .quote-box p{
+    color:var(--text-light);
+    font-style:italic;
+    font-size:14px;
+    line-height:1.6;
   }
 
-  .submit-btn{
-    width:100%;
-    background: linear-gradient(180deg, #f5cf5e 0%, #e0b23a 100%);
-    color: #171208;
-    border: none;
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 15.5px;
-    font-weight: 700;
+  /* Quick links & contact columns */
+  .col h3{
+    color:#fff;
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .col-underline{
+    width:38px;
+    height:3px;
+    background:var(--gold);
+    border-radius:2px;
+    position:relative;
+    margin-bottom:22px;
+  }
+  .col-underline::after{
+    content:'';
+    position:absolute;
+    right:-10px;
+    top:-2px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--gold);
+  }
+  .link-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+    cursor:pointer;
+  }
+  .icon-circle{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2472b8, #0f3556);
     display:flex;
     align-items:center;
     justify-content:center;
-    gap: 10px;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: 0 8px 24px rgba(242,201,76,0.25);
-    transition: transform .12s ease, box-shadow .12s ease;
+    flex-shrink:0;
+    color:#bfe3ff;
   }
-  .submit-btn:hover{
-    transform: translateY(-1px);
-    box-shadow: 0 10px 28px rgba(242,201,76,0.35);
+  .link-item span{
+    color:var(--text-light);
+    font-size:15px;
+    flex:1;
   }
-  .submit-btn svg{ width:16px; height:16px; }
+  .chevron{
+    color:var(--text-muted);
+    font-size:14px;
+  }
+  .contact-item span{
+    color:var(--text-light);
+    font-size:14px;
+  }
 
-  @media (max-width: 880px){
-    .wrapper{ grid-template-columns: 1fr; }
-    .plane-icon, .dashline{ display:none; }
-    .field-row{ grid-template-columns: 1fr; }
+  /* decorative background wave + shapes */
+  .wave-wrap{
+    position:relative;
+    width:100%;
+    height:180px;
+    margin-top:10px;
+  }
+  .wave-svg{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:100%;
+  }
+  .grad-cap{
+    position:absolute;
+    left:60px;
+    bottom:40px;
+    width:110px;
+    z-index:2;
+    filter:drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+  }
+  .sphere{
+    position:absolute;
+    left:195px;
+    bottom:55px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4fa8e0, #3b2f9e);
+    box-shadow:0 0 20px rgba(40,140,220,0.6);
+  }
+  .diamond{
+    position:absolute;
+    right:70px;
+    bottom:70px;
+    width:60px;
+    height:60px;
+    z-index:2;
+    filter:drop-shadow(0 0 15px rgba(40,140,220,0.5));
+  }
+  .plane{
+    position:absolute;
+    right:55px;
+    top:30px;
+    width:90px;
+    z-index:2;
+    filter:drop-shadow(0 0 10px rgba(40,140,220,0.4));
+  }
+  .badge{
+    position:absolute;
+    left:50%;
+    bottom:50px;
+    transform:translateX(-50%);
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#0c0c22;
+    border:5px solid;
+    border-image:linear-gradient(135deg, var(--gold), #2a7fc9) 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-size:26px;
+    font-weight:700;
+    box-shadow:0 0 25px rgba(40,140,220,0.5);
+    z-index:3;
+  }
+  .spark{
+    position:absolute;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 8px 2px rgba(230,184,0,0.7);
+    animation:twinkle 2.4s ease-in-out infinite;
+  }
+  .spark:nth-child(1){animation-delay:0s;}
+  .spark:nth-child(2){animation-delay:0.6s;}
+  .spark:nth-child(3){animation-delay:1.2s;}
+
+  @keyframes twinkle{
+    0%,100%{opacity:0.3; transform:scale(0.8);}
+    50%{opacity:1; transform:scale(1.3);}
+  }
+
+  .wave-line{
+    stroke-dasharray:6 8;
+    animation:flowLine 6s linear infinite;
+  }
+  .wave-line.slow{animation-duration:9s; animation-direction:reverse;}
+
+  @keyframes flowLine{
+    to{stroke-dashoffset:-140;}
+  }
+
+  .wave-fill{
+    animation:waveShift 8s ease-in-out infinite;
+    transform-origin:center;
+  }
+  @keyframes waveShift{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(6px);}
+  }
+
+  .sphere{
+    animation:floatY 3.5s ease-in-out infinite;
+  }
+  @keyframes floatY{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-10px);}
+  }
+
+  .diamond{
+    animation:floatRotate 6s ease-in-out infinite;
+    transform-origin:center;
+  }
+  @keyframes floatRotate{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-8px) rotate(6deg);}
+  }
+
+  .grad-cap{
+    animation:capBob 4s ease-in-out infinite;
+  }
+  @keyframes capBob{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-6px) rotate(-3deg);}
+  }
+
+  .plane{
+    animation:planeFly 4.5s ease-in-out infinite;
+  }
+  @keyframes planeFly{
+    0%{transform:translate(0,0) rotate(0deg);}
+    50%{transform:translate(-8px,-10px) rotate(-4deg);}
+    100%{transform:translate(0,0) rotate(0deg);}
+  }
+
+  .badge{
+    animation:badgePulse 2.8s ease-in-out infinite;
+  }
+  @keyframes badgePulse{
+    0%,100%{box-shadow:0 0 25px rgba(40,140,220,0.5);}
+    50%{box-shadow:0 0 40px 8px rgba(230,184,0,0.55);}
+  }
+
+  .bottom-bar{
+    position:relative;
+    z-index:3;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 40px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    font-size:13px;
+    color:var(--text-muted);
+  }
+  .bottom-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .shield{
+    width:26px;
+    height:26px;
+    border-radius:6px;
+    background:#1a4d7a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#bfe3ff;
+    font-size:13px;
+  }
+  .bottom-left b{color:var(--gold); font-weight:600;}
+  .bottom-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .bottom-right b{color:var(--gold); font-weight:600;}
+  .heart{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:#1a4d7a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#ff6b8a;
+    font-size:12px;
   }
 </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div class="footer">
+  <div class="top-bar"></div>
 
-  <!-- LEFT SIDE -->
-  <div class="left">
-    <div class="eyebrow">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.8H21l-5.6 4.1 2.1 6.8L12 15.6l-5.5 4.1 2.1-6.8L3 8.8h6.8z"/></svg>
-      GET IN TOUCH
+  <div class="content">
+    <!-- Brand -->
+    <div class="col" style="flex:1.1;">
+      <div class="brand-head">
+        <div class="logo-circle">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3 L20 8 L12 13 L4 8 Z" fill="#f5a623"/>
+            <path d="M4 8 V15 C4 15 7 18 12 18 C17 18 20 15 20 15 V8" stroke="#2e5bd8" stroke-width="1.2" fill="none"/>
+            <circle cx="12" cy="10" r="1.4" fill="#2e5bd8"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <h2>Portfolio Handler</h2>
+          <div class="underline"></div>
+        </div>
+      </div>
+      <p class="brand-desc">Empowering educational institutions with modern portfolio management solutions.</p>
+      <div class="quote-box">
+        <div class="quote-mark">&ldquo;</div>
+        <p>"Building the future of education, one portfolio at a time."</p>
+      </div>
     </div>
 
-    <h1>Let's Start<br>a <span class="accent">Conversation</span></h1>
-
-    <p class="intro">
-      We're here to help and answer any question you might have. We look forward to hearing from you.
-    </p>
-
-    <div class="plane-wrap">
-      <svg class="plane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-        <path d="M22 2L11 13"/>
-        <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
-      </svg>
+    <!-- Quick Links -->
+    <div class="col">
+      <h3>Quick Links</h3>
+      <div class="col-underline"></div>
+      <div class="link-item">
+        <div class="icon-circle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+        </div>
+        <span>Home</span>
+        <span class="chevron">&#8250;</span>
+      </div>
+      <div class="link-item">
+        <div class="icon-circle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <span>Vision</span>
+        <span class="chevron">&#8250;</span>
+      </div>
+      <div class="link-item">
+        <div class="icon-circle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <span>Templates</span>
+        <span class="chevron">&#8250;</span>
+      </div>
+      <div class="link-item">
+        <div class="icon-circle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </div>
+        <span>About</span>
+        <span class="chevron">&#8250;</span>
+      </div>
     </div>
 
-    <div class="info-card">
-
-      <div class="info-row">
+    <!-- Contact -->
+    <div class="col">
+      <h3>Get in Touch</h3>
+      <div class="col-underline"></div>
+      <div class="link-item contact-item">
         <div class="icon-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
         </div>
-        <div>
-          <div class="info-label">Phone</div>
-          <div class="info-value yellow">+92 319 3236529</div>
-          <div class="info-sub">Mon-Fri, 9AM-6PM</div>
-        </div>
+        <span>neezamiya@gmail.com</span>
       </div>
-
-      <div class="info-row">
+      <div class="link-item contact-item">
         <div class="icon-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/></svg>
         </div>
-        <div>
-          <div class="info-label">Email</div>
-          <div class="info-value yellow">support@portfoliohandler.com</div>
-          <div class="info-sub">We reply within 24 hours</div>
-        </div>
+        <span>03237594869</span>
       </div>
-
-      <div class="info-row">
+      <div class="link-item contact-item">
         <div class="icon-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10c-2.5-2.5-4-6-4-10s1.5-7.5 4-10z"/></svg>
         </div>
-        <div>
-          <div class="info-label">Office</div>
-          <div class="info-value">Daska, Pakistan</div>
-          <div class="info-sub">Serving globally from Daska</div>
-        </div>
+        <span>nesticktech.com</span>
       </div>
-
-      <div class="info-row">
-        <div class="icon-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        </div>
-        <div>
-          <div class="info-label">Business Hours</div>
-          <div class="info-value">Monday - Friday</div>
-          <div class="info-sub">9:00 AM - 6:00 PM (PKT)</div>
-        </div>
-      </div>
-
-      <div class="avatar-badge">N</div>
     </div>
   </div>
 
-  <!-- RIGHT SIDE -->
-  <div class="form-panel">
-    <div class="form-header">
-      <div class="form-title">
-        <div class="icon-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
-        </div>
-        Send us a Message
-      </div>
-      <div class="status">
-        We're just a message away!
-        <span class="dot"></span>
-      </div>
-    </div>
+  <!-- Decorative wave section -->
+  <div class="wave-wrap">
+    <svg class="wave-svg" viewBox="0 0 1100 180" preserveAspectRatio="none">
+      <path class="wave-fill" d="M0,90 C150,140 300,40 450,90 C600,140 750,40 900,80 C1000,105 1050,90 1100,70 L1100,180 L0,180 Z"
+            fill="rgba(20,90,160,0.25)"/>
+      <path class="wave-line" d="M0,100 C150,60 300,130 450,95 C600,60 750,130 900,90 C1000,65 1050,90 1100,110"
+            stroke="#e6b800" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path class="wave-line slow" d="M0,110 C150,150 300,70 450,105 C600,140 750,60 900,100 C1000,120 1050,100 1100,85"
+            stroke="#3487c9" stroke-width="1.5" fill="none" opacity="0.5"/>
+    </svg>
 
-    <div class="field-row">
-      <div class="field">
-        <div class="field-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <div class="field-content">
-          <label>Full Name <span class="req">*</span></label>
-          <input type="text" placeholder="Enter your full name">
-        </div>
-      </div>
+    <svg class="grad-cap" viewBox="0 0 100 90">
+      <ellipse cx="35" cy="72" rx="30" ry="7" fill="#3550c8"/>
+      <rect x="10" y="45" width="50" height="24" fill="#4a63d6"/>
+      <rect x="10" y="45" width="50" height="6" fill="#e8eaf6"/>
+      <rect x="10" y="55" width="50" height="6" fill="#e8eaf6"/>
+      <polygon points="35,10 75,25 35,40 -5,25" fill="#12123a"/>
+      <polygon points="35,10 75,25 35,32" fill="#1e1e50"/>
+      <circle cx="75" cy="25" r="2.5" fill="#e6b800"/>
+      <line x1="75" y1="25" x2="80" y2="50" stroke="#e6b800" stroke-width="1.5"/>
+      <circle cx="80" cy="52" r="4" fill="#e6b800"/>
+    </svg>
 
-      <div class="field">
-        <div class="field-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
-        </div>
-        <div class="field-content">
-          <label>Email Address <span class="req">*</span></label>
-          <input type="email" placeholder="Enter your email">
-        </div>
-      </div>
-    </div>
+    <div class="sphere"></div>
 
-    <div class="field select-field full">
-      <div class="field-content">
-        <label>Subject <span class="req">*</span></label>
-        <select>
-          <option selected disabled>Select a subject</option>
-          <option>General Inquiry</option>
-          <option>Support</option>
-          <option>Partnership</option>
-        </select>
-      </div>
-      <div class="chevron">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
-    </div>
+    <svg class="diamond" viewBox="0 0 100 100">
+      <polygon points="50,5 90,35 50,95 10,35" fill="#2472b8" opacity="0.9"/>
+      <polygon points="50,5 90,35 50,50" fill="#4fa8e0"/>
+      <polygon points="50,5 10,35 50,50" fill="#6a5bd0"/>
+      <polygon points="10,35 50,95 50,50" fill="#1a4d7a"/>
+      <polygon points="90,35 50,95 50,50" fill="#1f5a8c"/>
+    </svg>
 
-    <div class="field textarea-field full">
-      <div class="field-content">
-        <label>Message <span class="req">*</span></label>
-        <textarea placeholder="Tell us about your inquiry..."></textarea>
-      </div>
-    </div>
+    <svg class="plane" viewBox="0 0 100 80">
+      <polygon points="5,45 95,10 60,75 45,50" fill="#2f86c9"/>
+      <polygon points="45,50 60,75 50,55" fill="#2472b8"/>
+      <polygon points="5,45 45,50 25,35" fill="#7ec4ec"/>
+      <path d="M60,75 C75,60 90,40 95,10" stroke="#e6b800" stroke-width="1" stroke-dasharray="3,3" fill="none" opacity="0.6"/>
+    </svg>
 
-    <div class="perks">
-      <div class="perk">
-        <div class="perk-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
-        </div>
-        <div>
-          <div class="perk-title">Quick Response</div>
-          <div class="perk-sub">We reply within 24 hours</div>
-        </div>
-      </div>
-      <div class="perk">
-        <div class="perk-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div>
-          <div class="perk-title">Secure &amp; Private</div>
-          <div class="perk-sub">Your information is safe</div>
-        </div>
-      </div>
-      <div class="perk">
-        <div class="perk-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
-        </div>
-        <div>
-          <div class="perk-title">Global Support</div>
-          <div class="perk-sub">We're here to help</div>
-        </div>
-      </div>
-    </div>
+    <div class="badge">N</div>
 
-    <button class="submit-btn">
-      Send Message
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-    </button>
+    <div class="spark" style="left:355px; top:25px; width:5px; height:5px;"></div>
+    <div class="spark" style="right:210px; top:35px; width:5px; height:5px;"></div>
+    <div class="spark" style="right:60px; top:8px; width:4px; height:4px;"></div>
   </div>
 
+  <div class="bottom-bar">
+    <div class="bottom-left">
+      <div class="shield">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
+      </div>
+      <span>&copy; 2026 <b>Portfolio Handler.</b> All rights reserved.</span>
+    </div>
+    <div class="bottom-right">
+      <span>Powered by <b>Nestick Tech</b></span>
+      <div class="heart">&#9825;</div>
+    </div>
+  </div>
 </div>
 
 </body>

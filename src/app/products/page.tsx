@@ -135,14 +135,14 @@ interface ProductSection {
 const GOLD = "#E8CA5E";
 const BLUE = "#0066FF";
 
-// 9 Real Products - First image online, rest public folder
+// 9 Real Products - All images from public folder (real images)
 const PRODUCTS: ProductSection[] = [
   {
     id: "portfolio-site",
     title: "Portfolio Site Management",
     subtitle: "Web Presence",
     description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website. Every school gets its own customized portal with no-code editing and real-time analytics.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
+    image: "/Portfolio site management.jpg",
     features: [
       "Custom Portfolio Website",
       "No-Code Content Updates",
@@ -191,18 +191,21 @@ const PRODUCTS: ProductSection[] = [
     accentColor: 'primary',
     imagePosition: 'left'
   },
-  {
+ {
     id: "lms",
     title: "Learning Management System",
     subtitle: "Digital Classroom",
-    description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform. Supports live classes, recorded lectures, and hybrid learning models.",
+    description: "Transform traditional classrooms into digital learning environments. Deliver online classes, manage courses, and conduct assignments, quizzes, and grading all in one unified platform. Supports live classes, recorded lectures, and hybrid learning models. Empower educators with intuitive tools to create engaging content, track student progress in real-time, and foster collaborative learning experiences that prepare students for the future.",
     image: "/learning management system.jpg",
     features: [
       "Online Live Classes",
       "Course & Subject Management",
       "Assignments & Auto-Grading",
       "Student Performance Analytics",
-      "Parent Progress Portal"
+      "Parent Progress Portal",
+      "Interactive Whiteboard",
+      "Discussion Forums",
+      "Progress Reports & Certificates"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -213,14 +216,17 @@ const PRODUCTS: ProductSection[] = [
     id: "exam-generator",
     title: "AI Exam Generator",
     subtitle: "Intelligent Assessment",
-    description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels. Includes AI question generation, diagram support, question bank management, and instant PDF export.",
+    description: "Revolutionize exam creation with AI-powered paper generation. Automatically generate syllabus-aligned exams with varying difficulty levels. Includes AI question generation, diagram support, question bank management, and instant PDF export. Streamline the entire assessment process with intelligent question randomization, automated grading, and detailed performance analytics that help educators identify learning gaps and improve student outcomes.",
     image: "/AI Exam Generator.jpg",
     features: [
       "AI Question Generation",
       "Syllabus-Aligned Papers",
       "Question Bank Management",
       "PDF Export & Print",
-      "Analytics Dashboard"
+      "Analytics Dashboard",
+      "Automated Grading System",
+      "Question Randomization",
+      "Performance Analytics"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -231,7 +237,7 @@ const PRODUCTS: ProductSection[] = [
     id: "lrm",
     title: "Learning Resource Management",
     subtitle: "Knowledge Hub",
-    description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content. Features AI-powered categorization, version control, and seamless LMS integration.",
+    description: "Build a comprehensive digital library for your institution. Manage, organize, and share learning resources, study materials, and educational content. Features AI-powered categorization, version control, and seamless LMS integration. Empower your educators and students with easy access to a vast repository of knowledge and learning materials.",
     image: "/learning resource management.jpg",
     features: [
       "Digital Library Management",
@@ -245,54 +251,63 @@ const PRODUCTS: ProductSection[] = [
     accentColor: 'primary',
     imagePosition: 'right'
   },
-  {
+{
     id: "erp",
     title: "ERP System",
     subtitle: "Institution Management",
-    description: "End-to-end resource management for schools and colleges. Covers finance, HR, academics, library, and inventory operations. Custom role-based access for departments and real-time dashboards for transparency and efficiency.",
+    description: "End-to-end resource management for schools and colleges. Covers finance, HR, academics, library, and inventory operations. Custom role-based access for departments and real-time dashboards for transparency and efficiency. Streamline institutional workflows with integrated modules that provide comprehensive insights, automate administrative tasks, and enable data-driven decision-making for improved institutional performance.",
     image: "/ERP System.jpg",
     features: [
       "Finance & Accounting",
       "HR & Staff Management",
       "Academic Operations",
       "Library & Inventory",
-      "Real-Time Dashboards"
+      "Real-Time Dashboards",
+      "Student Information System",
+      "Fee Management",
+      "Departmental Analytics"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
     accentColor: 'primary',
     imagePosition: 'left'
   },
-  {
+{
     id: "neezamiya-meet",
     title: "Neezamiya Meet",
     subtitle: "Virtual Classroom",
-    description: "A Google Meet-like platform specially crafted for educational systems. Conduct secure video classes, record sessions, share screens, and engage students with interactive whiteboards and breakout rooms designed for learning.",
+    description: "A Google Meet-like platform specially crafted for educational systems. Conduct secure video classes, record sessions, share screens, and engage students with interactive whiteboards and breakout rooms designed for learning. Enhance student participation with real-time polls, Q&A sessions, and collaborative tools that make remote learning as interactive and effective as in-person classes.",
     image: "/neezamiya meet.jpg",
     features: [
       "Secure Video Conferencing",
       "Screen & Whiteboard Sharing",
       "Session Recording",
       "Breakout Rooms",
-      "Student Engagement Tools"
+      "Student Engagement Tools",
+      "Real-Time Polling",
+      "Interactive Q&A",
+      "Attendance Tracking"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
     accentColor: 'primary',
     imagePosition: 'right'
   },
-  {
+{
     id: "neezamiya-mutamar",
     title: "Neezamiya Mutamar",
     subtitle: "Virtual Seminar System",
-    description: "A powerful virtual seminar platform designed for educational institutions. Host webinars, conferences, and guest lectures with ease. Features include live streaming, audience Q&A, polling, and detailed attendance tracking for large-scale events.",
+    description: "A powerful virtual seminar platform designed for educational institutions. Host webinars, conferences, and guest lectures with ease. Features include live streaming, audience Q&A, polling, and detailed attendance tracking for large-scale events. Empower your institution to connect with global audiences through seamless virtual events, featuring multi-speaker support, screen sharing, and interactive engagement tools that make every seminar memorable and impactful.",
     image: "/Neezamiya Muthamar.jpg",
     features: [
       "Live Webinar Streaming",
       "Interactive Q&A Sessions",
       "Real-time Polling",
       "Attendance Tracking",
-      "Recording & Playback"
+      "Recording & Playback",
+      "Multi-Speaker Support",
+      "Screen Sharing",
+      "Event Analytics Dashboard"
     ],
     buttonText: "Learn More",
     buttonVariant: 'primary',
@@ -502,8 +517,6 @@ export default function ProductShowcase() {
             const isLeft = product.imagePosition === 'left';
             const accentLight = getAccentLight(product.accentColor);
             const isSectionVisible = isVisible(product.id);
-            // Sirf first product (index 0) ke liye minHeight 300px
-            const isFirstProduct = index === 0;
 
             return (
               <section
@@ -523,9 +536,9 @@ export default function ProductShowcase() {
                 }}
               >
                 <div className="w-full">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-stretch">
                     
-                    {/* Image - Har scroll par animation */}
+                    {/* Image - 4:3 aspect ratio */}
                     <div 
                       className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'} transition-all duration-800 ease-out ${getImageAnimationClass(product.imagePosition, isSectionVisible)}`}
                       style={{
@@ -546,17 +559,11 @@ export default function ProductShowcase() {
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                           backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : 'rgba(245,245,245,0.5)',
                           backdropFilter: 'blur(10px)',
-                          // Sirf first product ke liye minHeight 300px, baaki ke liye aspectRatio 4/3
-                          ...(isFirstProduct ? { minHeight: '300px' } : { aspectRatio: '4/3' }),
+                          aspectRatio: '4/3',
+                          width: '100%',
                         }}
                       >
-                        <div 
-                          className="w-full h-full relative"
-                          style={{
-                            // Sirf first product ke liye height 100%, baaki ke liye bhi 100%
-                            height: '100%',
-                          }}
-                        >
+                        <div className="w-full h-full relative">
                           <img
                             src={product.image}
                             alt={product.title}
@@ -572,16 +579,20 @@ export default function ProductShowcase() {
                       </div>
                     </div>
 
-                    {/* Content - Har scroll par animation */}
+                    {/* Content - Same height as image with proper spacing */}
                     <div 
-                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} space-y-3 md:space-y-4 pl-0 lg:pl-4 flex flex-col transition-all duration-600 ease-out ${getContentAnimationClass(isSectionVisible)}`}
+                      className={`${isLeft ? 'lg:order-2' : 'lg:order-1'} flex flex-col transition-all duration-600 ease-out ${getContentAnimationClass(isSectionVisible)}`}
                       style={{
                         transitionTimingFunction: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                        justifyContent: 'center',
+                        height: '100%',
+                        padding: '0.5rem 0',
                       }}
                     >
-                      <div className="flex flex-col justify-center">
+                      <div className="flex flex-col justify-center h-full w-full max-w-[90%]">
+                        {/* Subtitle - 0.5rem up push */}
                         <span
-                          className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default"
+                          className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest cursor-default -mt-2"
                           style={{ 
                             color: GOLD,
                             fontFamily: "'Poppins', sans-serif",
@@ -591,8 +602,9 @@ export default function ProductShowcase() {
                           {product.subtitle}
                         </span>
                         
+                        {/* Title */}
                         <h2
-                          className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif cursor-default leading-tight"
+                          className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif cursor-default leading-tight mt-0.5"
                           style={{ 
                             color: getTextColor(),
                             fontFamily: "'Poppins', sans-serif",
@@ -601,8 +613,9 @@ export default function ProductShowcase() {
                           {product.title}
                         </h2>
                         
+                        {/* Description with light gap - Longer for LRM */}
                         <p
-                          className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default" 
+                          className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default mt-3" 
                           style={{ 
                             color: getTextMuted(),
                             fontFamily: "'Calibri Light', sans-serif",
@@ -611,7 +624,8 @@ export default function ProductShowcase() {
                           {product.description}
                         </p>
                         
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                        {/* Features with light gap */}
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2.5">
                           {product.features.map((feature, idx) => (
                             <li
                               key={idx}
@@ -635,7 +649,8 @@ export default function ProductShowcase() {
                           ))}
                         </ul>
                         
-                        <div className="pt-3">
+                        {/* Learn More button - 0.5rem down push */}
+                        <div className="pt-4 mt-1">
                           <button
                             onClick={scrollToCTA}
                             className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-full sm:w-auto text-white shadow-lg`}

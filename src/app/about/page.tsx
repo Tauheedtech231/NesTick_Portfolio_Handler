@@ -10,7 +10,7 @@ import { PartnerSection } from '@/components/landing/PartnerSection';
 import JourneySection from './JourneySection';
 import { HeroSection } from './HeroSection'; 
 import { PurposeSection } from './PurposeSection';
-import { TeamSlider } from './TeamMember';
+import  TeamSlider  from './TeamMember';
 import ContactSection from './ContactSection'; // ← IMPORTED
 
 export default function AboutPage() {

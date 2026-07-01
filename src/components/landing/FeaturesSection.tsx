@@ -535,7 +535,7 @@ export default function FeaturesSection() {
           <div style={{ margin: "6px auto 0", height: 2, width: isMobile ? 80 : 160, backgroundColor: heading2, opacity: 0.6 }} />
         </div>
 
-        {/* Wheel */}
+        {/* Wheel Container */}
         <div
           ref={wheelRef}
           style={{
@@ -545,6 +545,8 @@ export default function FeaturesSection() {
             transition: wheelReady ? "opacity 1.1s ease, transform 1.5s ease" : "none",
           }}
         >
+       
+
           <svg width="100%" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
             {SEGMENTS.map((seg) => {
               const isActive = activeSeg?.id === seg.id;
@@ -569,7 +571,19 @@ export default function FeaturesSection() {
               );
             })}
             <circle cx={CX} cy={CY} r={INNER_CIRCLE_R} fill={innerFill} stroke={textColor} strokeWidth="2" />
-            <text x={CX} y={CY} textAnchor="middle" dominantBaseline="central" fill={textColor} fontFamily="Arial,sans-serif" fontSize={isMobile ? "14" : "22"} fontWeight="700" letterSpacing="3">
+            
+            {/* ─── "Neezamiya" - BOLD kiya gaya ─── */}
+            <text 
+              x={CX} y={CY} 
+              textAnchor="middle" 
+              dominantBaseline="central" 
+              fill={textColor} 
+              fontFamily="Arial,sans-serif" 
+              fontSize={isMobile ? "14" : "22"} 
+              fontWeight="800"  // ← CHANGED: 700 → 800 (more bold)
+              letterSpacing="4" // ← CHANGED: 3 → 4 (more spacing)
+              style={{ textShadow: isDark ? "0 0 20px rgba(232,202,94,0.15)" : "0 0 20px rgba(0,102,255,0.1)" }}
+            >
               Neezamiya
             </text>
           </svg>
