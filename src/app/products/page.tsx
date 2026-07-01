@@ -502,6 +502,8 @@ export default function ProductShowcase() {
             const isLeft = product.imagePosition === 'left';
             const accentLight = getAccentLight(product.accentColor);
             const isSectionVisible = isVisible(product.id);
+            // Sirf first product (index 0) ke liye minHeight 300px
+            const isFirstProduct = index === 0;
 
             return (
               <section
@@ -544,9 +546,17 @@ export default function ProductShowcase() {
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                           backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : 'rgba(245,245,245,0.5)',
                           backdropFilter: 'blur(10px)',
+                          // Sirf first product ke liye minHeight 300px, baaki ke liye aspectRatio 4/3
+                          ...(isFirstProduct ? { minHeight: '300px' } : { aspectRatio: '4/3' }),
                         }}
                       >
-                        <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
+                        <div 
+                          className="w-full h-full relative"
+                          style={{
+                            // Sirf first product ke liye height 100%, baaki ke liye bhi 100%
+                            height: '100%',
+                          }}
+                        >
                           <img
                             src={product.image}
                             alt={product.title}
