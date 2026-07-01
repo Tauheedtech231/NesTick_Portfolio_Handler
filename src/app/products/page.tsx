@@ -135,14 +135,14 @@ interface ProductSection {
 const GOLD = "#E8CA5E";
 const BLUE = "#0066FF";
 
-// 9 Real Products with JPG Images
+// 9 Real Products - First image online, rest public folder
 const PRODUCTS: ProductSection[] = [
   {
     id: "portfolio-site",
     title: "Portfolio Site Management",
     subtitle: "Web Presence",
     description: "A comprehensive platform for schools and colleges to manage their digital presence. Easily update content, maintain branding consistency, and showcase institutional achievements with a professional portfolio website. Every school gets its own customized portal with no-code editing and real-time analytics.",
-    image: "/Portfolio site management.jpg",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBGYcsSWmJrrm3xO8VRNz4aS0PGNIkzbzrUIhrz5QgQoNff6sMqbbvVMJSPOYPmz0HofjGQocvxd4UeoBv-6ed4XPgCjg-j0wWHBayrz_tinsFHuYC7BM1ORCVgagnF4KnUE6lE-CN_VyJ8iqNSe5AAGByeKff7jyfiChO_OfXzk1Rv8tdjNQBga8Udwf4pEFFEDvNbEULwny5rQ8ffiDtl5q1tYqsyjVDzYT6JMXtXVGPkSNcKU7510Rk5azPwMMagvDv8n9xUPuzl",
     features: [
       "Custom Portfolio Website",
       "No-Code Content Updates",
@@ -282,8 +282,8 @@ const PRODUCTS: ProductSection[] = [
     imagePosition: 'right'
   },
   {
-    id: "neezamiya-muthamar",
-    title: "Neezamiya Muthamar",
+    id: "neezamiya-mutamar",
+    title: "Neezamiya Mutamar",
     subtitle: "Virtual Seminar System",
     description: "A powerful virtual seminar platform designed for educational institutions. Host webinars, conferences, and guest lectures with ease. Features include live streaming, audience Q&A, polling, and detailed attendance tracking for large-scale events.",
     image: "/Neezamiya Muthamar.jpg",
@@ -542,22 +542,23 @@ export default function ProductShowcase() {
                         style={{
                           borderColor: getBorderColor(),
                           boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                          aspectRatio: '4/3',
                           backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : 'rgba(245,245,245,0.5)',
                           backdropFilter: 'blur(10px)',
                         }}
                       >
-                        <img
-                          src={product.image}
-                          alt={product.title}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"%3E%3C/rect%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"%3E%3C/circle%3E%3Cpolyline points="21 15 16 10 5 21"%3E%3C/polyline%3E%3C/svg%3E';
-                            target.className = 'w-full h-full object-contain p-8';
-                          }}
-                        />
+                        <div className="w-full h-full relative" style={{ minHeight: '300px' }}>
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"%3E%3C/rect%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"%3E%3C/circle%3E%3Cpolyline points="21 15 16 10 5 21"%3E%3C/polyline%3E%3C/svg%3E';
+                              target.className = 'w-full h-full object-contain p-8';
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -693,193 +694,198 @@ export default function ProductShowcase() {
             </div>
           </div>
 
-          {/* Call to Action Section with Form */}
-          <div
-            ref={ctaRef}
-            className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 flex items-center mb-0 relative"
-            style={{
-              backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-              borderColor: getBorderColor(),
-              borderWidth: '1px',
-              marginTop: '1rem',
-              backdropFilter: 'blur(20px)',
-            }}
-          >
-            <div className="max-w-4xl mx-auto w-full">
-              <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-                <h2
-                  className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif mb-3 cursor-default"
-                  style={{ 
-                    color: getTextColor(),
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  Ready to Transform Your Institution?
-                </h2>
-                <p
-                  className="text-sm sm:text-base max-w-2xl mx-auto cursor-default"
-                  style={{ 
-                    color: getTextMuted(),
-                    fontFamily: "'Calibri Light', sans-serif",
-                  }}
-                >
-                  Get a personalized demo and discover how NEEZAMIYA's enterprise solutions can revolutionize your educational institution.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
+          {/* Call to Action Section with Form - Gap from bottom with same bg */}
+          <div className="w-full relative" style={{ backgroundColor: getSectionBg() }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div
+                ref={ctaRef}
+                className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 flex items-center relative"
+                style={{
+                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                  borderColor: getBorderColor(),
+                  borderWidth: '1px',
+                  marginTop: '1rem',
+                  marginBottom: '3rem',
+                  backdropFilter: 'blur(20px)',
+                }}
+              >
+                <div className="max-w-4xl mx-auto w-full">
+                  <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+                    <h2
+                      className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif mb-3 cursor-default"
                       style={{ 
-                        color: getTextMuted(),
+                        color: getTextColor(),
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        borderColor: getBorderColor(),
-                        color: getTextColor(),
-                        fontFamily: "'Calibri Light', sans-serif",
-                      }}
-                      placeholder="John Doe"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      required
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        borderColor: getBorderColor(),
-                        color: getTextColor(),
-                        fontFamily: "'Calibri Light', sans-serif",
-                      }}
-                      placeholder="john@institution.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        borderColor: getBorderColor(),
-                        color: getTextColor(),
-                        fontFamily: "'Calibri Light', sans-serif",
-                      }}
-                      placeholder="+1 234 567 8900"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="interest"
-                      className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
-                      style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
-                      Product of Interest
-                    </label>
-                    <select
-                      id="interest"
-                      name="interest"
-                      value={formData.interest}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
-                      style={{
-                        backgroundColor: getInputBg(),
-                        borderColor: getBorderColor(),
-                        color: getTextColor(),
-                        fontFamily: "'Calibri Light', sans-serif",
-                        zIndex: 10,
-                        position: 'relative',
-                      }}
-                    >
-                      <option value="">Select a product</option>
-                      {PRODUCTS.map(product => (
-                        <option key={product.id} value={product.title} style={{ 
-                          backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
-                          color: getTextColor(),
-                          padding: '8px',
-                        }}>
-                          {product.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="pt-2 sm:pt-3">
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 text-white shadow-lg cursor-pointer"
-                    style={{
-                      backgroundColor: BLUE,
-                      fontFamily: "'Poppins', sans-serif",
-                      boxShadow: `0 4px 30px rgba(0, 102, 255, 0.3)`,
-                    }}
-                  >
-                    {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}
-                  </button>
-                  {formSubmitted && (
+                      Ready to Transform Your Institution?
+                    </h2>
                     <p
-                      className="mt-3 text-sm text-center"
+                      className="text-sm sm:text-base max-w-2xl mx-auto cursor-default"
                       style={{ 
-                        color: BLUE,
+                        color: getTextMuted(),
                         fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
-                      Thank you! We'll be in touch shortly.
+                      Get a personalized demo and discover how NEEZAMIYA's enterprise solutions can revolutionize your educational institution.
                     </p>
-                  )}
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <div>
+                        <label
+                          htmlFor="name"
+                          className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          name="name"
+                          required
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
+                          style={{
+                            backgroundColor: getInputBg(),
+                            borderColor: getBorderColor(),
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="email"
+                          className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          required
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
+                          style={{
+                            backgroundColor: getInputBg(),
+                            borderColor: getBorderColor(),
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                          placeholder="john@institution.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <div>
+                        <label
+                          htmlFor="phone"
+                          className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          id="phone"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-text"
+                          style={{
+                            backgroundColor: getInputBg(),
+                            borderColor: getBorderColor(),
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                          placeholder="+1 234 567 8900"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="interest"
+                          className="block text-xs sm:text-sm font-medium mb-1.5 cursor-default"
+                          style={{ 
+                            color: getTextMuted(),
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          Product of Interest
+                        </label>
+                        <select
+                          id="interest"
+                          name="interest"
+                          value={formData.interest}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base transition-all focus:outline-none focus:ring-2 cursor-pointer appearance-none"
+                          style={{
+                            backgroundColor: getInputBg(),
+                            borderColor: getBorderColor(),
+                            color: getTextColor(),
+                            fontFamily: "'Calibri Light', sans-serif",
+                            zIndex: 10,
+                            position: 'relative',
+                          }}
+                        >
+                          <option value="">Select a product</option>
+                          {PRODUCTS.map(product => (
+                            <option key={product.id} value={product.title} style={{ 
+                              backgroundColor: theme === 'dark' ? '#1a1a2e' : '#ffffff',
+                              color: getTextColor(),
+                              padding: '8px',
+                            }}>
+                              {product.title}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 sm:pt-3">
+                      <button
+                        type="submit"
+                        className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 text-white shadow-lg cursor-pointer"
+                        style={{
+                          backgroundColor: BLUE,
+                          fontFamily: "'Poppins', sans-serif",
+                          boxShadow: `0 4px 30px rgba(0, 102, 255, 0.3)`,
+                        }}
+                      >
+                        {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}
+                      </button>
+                      {formSubmitted && (
+                        <p
+                          className="mt-3 text-sm text-center"
+                          style={{ 
+                            color: BLUE,
+                            fontFamily: "'Calibri Light', sans-serif",
+                          }}
+                        >
+                          Thank you! We'll be in touch shortly.
+                        </p>
+                      )}
+                    </div>
+                  </form>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>

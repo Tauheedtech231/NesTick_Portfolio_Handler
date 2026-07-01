@@ -448,7 +448,7 @@ export default function SocialProofBar() {
     // 1. CLIENTS (Box 0)
     drawHexRounded(
       CL.cx, CL.cy, R, Ri, 
-      "Clients", countersStarted ? "500+" : "0", 
+      "Clients", countersStarted ? "35+" : "0", 
       iHandshake, -28, 18, 13, 32, 0, -14
     );
 
@@ -474,7 +474,7 @@ export default function SocialProofBar() {
       context.fillText("Templates", TP.cx, TP.cy - 28);
       context.fillStyle = valColor;
       context.font = `bold 30px Arial,sans-serif`;
-      context.fillText(countersStarted ? "30+" : "0", TP.cx, (TP.cy + 12));
+      context.fillText(countersStarted ? "15+" : "0", TP.cx, (TP.cy + 12));
       context.restore();
       iDocs(TP.cx, TP.cy, 0.85, -8);
     }
@@ -523,7 +523,7 @@ export default function SocialProofBar() {
       context.fillText("Active Users", AU.cx, (AU.cy - 28));
       context.fillStyle = valColor;
       context.font = `bold 28px Arial,sans-serif`;
-      context.fillText(countersStarted ? "20.0K+" : "0", AU.cx, (AU.cy + 10));
+      context.fillText(countersStarted ? "1500+" : "0", AU.cx, (AU.cy + 10));
       context.restore();
       iPeople(AU.cx, AU.cy - 10, 0.85, 12);
     }
@@ -550,7 +550,7 @@ export default function SocialProofBar() {
       context.fillText("Success Rate", SR.cx, SR.cy - 26);
       context.fillStyle = valColor;
       context.font = `bold 32px Arial,sans-serif`;
-      context.fillText(countersStarted ? "99%" : "0%", SR.cx, SR.cy + 16);
+      context.fillText(countersStarted ? "97%" : "0%", SR.cx, SR.cy + 16);
       context.restore();
       iArrow(SR.cx, SR.cy, 0.85);
     }
