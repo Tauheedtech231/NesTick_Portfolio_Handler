@@ -92,6 +92,7 @@ export default function TestimonialSection() {
     message: '',
     rating: 5
   });
+  const [isMobile, setIsMobile] = useState(false);
 
   // Animation refs
   const avatarRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -109,20 +110,46 @@ export default function TestimonialSection() {
 
   const N = testimonialsData.length;
   const SPACING = 360 / N;
-  const RADIUS = 220;
-  const DOCK_Y = -110;
+  
+  // Dynamic sizing based on screen
+  const getDimensions = () => {
+    if (typeof window === 'undefined') return { radius: 220, dockY: -110, avatarSize: 80 };
+    
+    const width = window.innerWidth;
+    if (width < 480) {
+      return { radius: 140, dockY: -70, avatarSize: 50 };
+    } else if (width < 768) {
+      return { radius: 170, dockY: -85, avatarSize: 60 };
+    } else if (width < 1024) {
+      return { radius: 200, dockY: -100, avatarSize: 70 };
+    } else {
+      return { radius: 220, dockY: -110, avatarSize: 80 };
+    }
+  };
+
+  const [dimensions, setDimensions] = useState(getDimensions());
+  const RADIUS = dimensions.radius;
+  const DOCK_Y = dimensions.dockY;
+  const AVATAR_SIZE = dimensions.avatarSize;
   const ROT_DEG_PER_MS = 360 / 20000;
   const SWITCH_MS = 8000;
   const WALK_MS = 700;
 
-  // Detect theme
+  // Detect theme and screen size
   useEffect(() => {
     const checkTheme = () => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
     };
     
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setDimensions(getDimensions());
+    };
+    
     checkTheme();
+    checkScreenSize();
     
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -133,7 +160,13 @@ export default function TestimonialSection() {
     });
     
     observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+    
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', checkScreenSize);
+    };
   }, []);
 
   // ─── Animation Functions ──────────────────────────────────────────────────
@@ -229,7 +262,7 @@ export default function TestimonialSection() {
         el.classList.remove(`ring-${color}`);
       }
     });
-  }, [avatarStates]);
+  }, [avatarStates, RADIUS, DOCK_Y]);
 
   // ─── Get colors based on theme ──────────────────────────────────────────
   const getColors = () => {
@@ -237,21 +270,27 @@ export default function TestimonialSection() {
       return {
         bg: '#0B0F19',
         text: '#FFFFFF',
-        textSecondary: '#E5E7EB',
+        textSecondary: '#D1D5DB',
         accent: GOLD,
         accentLight: 'rgba(232, 202, 94, 0.15)',
         modalBg: 'rgba(11, 15, 25, 0.95)',
         border: 'rgba(30, 41, 59, 0.5)',
+        circleColor: GOLD, // Gold for dark mode
+        circleBorder: 'rgba(255,255,255,0.06)',
+        circleDashed: 'rgba(255,255,255,0.08)',
       };
     } else {
       return {
-        bg: '#FFFFFF',
+        bg: '#F8FAFF', // Subtle off-white
         text: '#1F2937',
-        textSecondary: '#374151',
+        textSecondary: '#4B5563', // Darker for better contrast
         accent: BLUE,
         accentLight: 'rgba(0, 102, 255, 0.08)',
         modalBg: 'rgba(255, 255, 255, 0.95)',
         border: 'rgba(0, 0, 0, 0.06)',
+        circleColor: BLUE, // Blue for light mode
+        circleBorder: 'rgba(0, 102, 255, 0.08)',
+        circleDashed: 'rgba(0, 102, 255, 0.12)',
       };
     }
   };
@@ -310,7 +349,7 @@ export default function TestimonialSection() {
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className="text-2xl cursor-pointer transition-all duration-200 hover:scale-110"
+            className="text-xl md:text-2xl cursor-pointer transition-all duration-200 hover:scale-110"
             style={{
               color: star <= rating ? colors.accent : (theme === 'dark' ? '#374151' : '#D1D5DB'),
             }}
@@ -324,10 +363,22 @@ export default function TestimonialSection() {
 
   const activeTestimonial = testimonialsData[activeIndex];
 
+  // Get circle container size
+  const getCircleSize = () => {
+    if (typeof window === 'undefined') return { width: 520, height: 520 };
+    const width = window.innerWidth;
+    if (width < 480) return { width: 320, height: 320 };
+    if (width < 768) return { width: 380, height: 380 };
+    if (width < 1024) return { width: 460, height: 460 };
+    return { width: 520, height: 520 };
+  };
+
+  const circleSize = getCircleSize();
+
   return (
     <>
       <section 
-        className="py-12 md:py-16 px-4 sm:px-6 relative overflow-hidden min-h-screen flex items-center justify-center"
+        className="py-8 md:py-12 lg:py-16 px-4 sm:px-6 relative overflow-hidden min-h-screen flex items-center justify-center"
         style={{
           backgroundColor: colors.bg,
           fontFamily: "'Poppins', sans-serif",
@@ -337,9 +388,9 @@ export default function TestimonialSection() {
         <div className="max-w-6xl mx-auto w-full">
           
           {/* ─── Header ─────────────────────────────────────────────────────── */}
-          <div className="text-center mb-8 md:mb-10">
+          <div className="text-center mb-6 md:mb-8 lg:mb-10">
             <h2 
-              className="text-2xl md:text-3xl lg:text-4xl font-bold cursor-default"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold cursor-default"
               style={{ 
                 color: colors.text,
                 fontFamily: "'Poppins', sans-serif",
@@ -351,10 +402,10 @@ export default function TestimonialSection() {
           </div>
 
           {/* ─── Main Layout - Circle with Dots Left & Feedback Right ────── */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-4">
+          <div className={`flex flex-col ${!isMobile ? 'lg:flex-row' : ''} items-center justify-center gap-4 lg:gap-4`}>
             
             {/* Left Side - Dots (12px size) */}
-            <div className="flex lg:flex-col gap-3 order-2 lg:order-1 ml-0 lg:ml-40">
+            <div className={`flex ${!isMobile ? 'lg:flex-col' : 'flex-row'} gap-3 order-2 ${!isMobile ? 'lg:order-1' : ''} ${!isMobile ? 'ml-0 lg:ml-40' : ''} flex-wrap justify-center`}>
               {testimonialsData.map((item, idx) => (
                 <button
                   key={item.id}
@@ -362,8 +413,8 @@ export default function TestimonialSection() {
                     activeIndex === idx ? 'scale-125' : 'scale-100'
                   }`}
                   style={{
-                    width: '12px',
-                    height: '12px',
+                    width: isMobile ? '10px' : '12px',
+                    height: isMobile ? '10px' : '12px',
                     backgroundColor: activeIndex === idx 
                       ? colors.accent
                       : theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
@@ -377,26 +428,32 @@ export default function TestimonialSection() {
               ))}
             </div>
 
-            {/* Center - Big Circle with Avatars (pushed right less, left more space) */}
-            <div className="relative w-[520px] h-[520px] md:w-[580px] md:h-[580px] flex items-center justify-center order-1 lg:order-2 -mt-2 lg:ml-2">
-              {/* Outer Circle Line */}
+            {/* Center - Big Circle with Avatars */}
+            <div 
+              className="relative flex items-center justify-center order-1 lg:order-2"
+              style={{
+                width: circleSize.width,
+                height: circleSize.height,
+              }}
+            >
+              {/* Outer Circle Line - Theme aware */}
               <div 
                 className="absolute rounded-full"
                 style={{
-                  width: '460px',
-                  height: '460px',
-                  border: '2px solid rgba(255,255,255,0.06)',
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)',
+                  width: circleSize.width - 60,
+                  height: circleSize.height - 60,
+                  border: `2px solid ${colors.circleBorder}`,
+                  background: 'transparent', // No gradient
                 }}
               />
               
-              {/* Orbit Circle Line */}
+              {/* Orbit Circle Line - Theme aware */}
               <div 
                 className="absolute rounded-full"
                 style={{
-                  width: '420px',
-                  height: '420px',
-                  border: '1.5px dashed rgba(255,255,255,0.08)',
+                  width: circleSize.width - 100,
+                  height: circleSize.height - 100,
+                  border: `1.5px dashed ${colors.circleDashed}`,
                 }}
               />
 
@@ -411,8 +468,8 @@ export default function TestimonialSection() {
                       position: 'absolute',
                       left: 0,
                       top: 0,
-                      width: '80px',
-                      height: '80px',
+                      width: AVATAR_SIZE,
+                      height: AVATAR_SIZE,
                       borderRadius: '50%',
                     }}
                   >
@@ -426,7 +483,7 @@ export default function TestimonialSection() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '24px',
+                        fontSize: isMobile ? '14px' : '24px',
                         fontWeight: '700',
                         color: '#fff',
                         background: `linear-gradient(135deg, ${item.color === 'yellow' ? '#facc15' : item.color === 'purple' ? '#8b5cf6' : '#38bdf8'}, ${item.color === 'yellow' ? '#f59e0b' : item.color === 'purple' ? '#7c3aed' : '#0ea5e9'})`,
@@ -436,76 +493,84 @@ export default function TestimonialSection() {
                       {item.initials}
                     </div>
                     <div className="avatar-name">{item.name}</div>
-                    <div className={`avatar-badge ${item.badgeClass}`}>{item.badge}</div>
+                    <div 
+                      className={`avatar-badge ${item.badgeClass}`}
+                      style={{
+                        width: isMobile ? '20px' : '26px',
+                        height: isMobile ? '20px' : '26px',
+                        fontSize: isMobile ? '9px' : '11px',
+                      }}
+                    >
+                      {item.badge}
+                    </div>
                   </div>
                 ))}
               </div>
 
               {/* Center Card - Testimonial Display */}
-           <div 
-  className="center-card"
-  style={{
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    transform: 'translate(-50%, -50%) translateY(8px)',
-    width: '240px',
-    maxWidth: '90%',
-    textAlign: 'center',
-    zIndex: 5,
-    background: theme === 'dark' ? 'rgba(11, 15, 25, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-    backdropFilter: 'blur(16px)',
-    padding: '18px 16px 16px',
-    borderRadius: '24px',
-    border: `1px solid ${colors.border}`,
-    boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
-    pointerEvents: 'none',
-  }}
->
-  <div 
-    className="text-2xl font-bold leading-none mb-0.5"
-    style={{ color: colors.accent }}
-  >
-    &ldquo;
-  </div>
-  <p 
-    className="text-xs leading-relaxed mb-2"
-    style={{ 
-      color: colors.textSecondary,
-      minHeight: '40px',
-      lineHeight: '1.5',
-      fontSize: '11px',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      display: '-webkit-box',
-      WebkitLineClamp: 4,
-      WebkitBoxOrient: 'vertical',
-    }}
-  >
-    {activeTestimonial.text.length > 110 
-      ? activeTestimonial.text.substring(0, 110) + '...' 
-      : activeTestimonial.text}
-  </p>
-  <h4 
-    className="font-bold text-sm leading-tight"
-    style={{ color: colors.text }}
-  >
-    {activeTestimonial.name}
-  </h4>
-  <p 
-    className="text-[10px]"
-    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-  >
-    {activeTestimonial.role}
-  </p>
-</div>
+              <div 
+                className="center-card"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: isMobile ? '160px' : (circleSize.width < 460 ? '200px' : '240px'),
+                  maxWidth: '90%',
+                  textAlign: 'center',
+                  zIndex: 5,
+                  background: theme === 'dark' ? 'rgba(11, 15, 25, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+                  backdropFilter: 'blur(16px)',
+                  padding: isMobile ? '12px 10px' : '18px 16px',
+                  borderRadius: '24px',
+                  border: `1px solid ${colors.border}`,
+                  boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <div 
+                  className="text-xl md:text-2xl font-bold leading-none mb-0.5"
+                  style={{ color: colors.accent }}
+                >
+                  &ldquo;
+                </div>
+                <p 
+                  className="text-[10px] sm:text-[11px] md:text-xs leading-relaxed mb-1.5 md:mb-2"
+                  style={{ 
+                    color: colors.textSecondary,
+                    minHeight: isMobile ? '30px' : '40px',
+                    lineHeight: '1.5',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 4,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {activeTestimonial.text.length > (isMobile ? 80 : 110) 
+                    ? activeTestimonial.text.substring(0, isMobile ? 80 : 110) + '...' 
+                    : activeTestimonial.text}
+                </p>
+                <h4 
+                  className="font-bold text-xs sm:text-sm md:text-base leading-tight"
+                  style={{ color: colors.text }}
+                >
+                  {activeTestimonial.name}
+                </h4>
+                <p 
+                  className="text-[8px] sm:text-[9px] md:text-[10px]"
+                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                >
+                  {activeTestimonial.role}
+                </p>
+              </div>
             </div>
 
-            {/* Right Side - Feedback Button (less space on right) */}
-            <div className="order-3 mr-0 lg:mr-2">
+            {/* Right Side - Feedback Button */}
+            <div className={`order-3 ${!isMobile ? 'mr-0 lg:mr-2' : 'mt-2'}`}>
               <button
                 onClick={() => setShowFeedbackModal(true)}
-                className="px-6 py-3 lg:px-8 lg:py-4 rounded-2xl font-semibold text-sm lg:text-base lg:ml-3 transition-all duration-300 hover:scale-105  active:scale-95 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap"
+                className="px-4 sm:px-6 py-2.5 sm:py-3 lg:px-8 lg:py-4 rounded-2xl font-semibold text-xs sm:text-sm lg:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap"
                 style={{
                   backgroundColor: colors.accent,
                   color: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
@@ -538,7 +603,7 @@ export default function TestimonialSection() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               transition={{ type: 'spring', damping: 25 }}
-              className="relative w-full max-w-lg rounded-2xl p-6 md:p-8"
+              className="relative w-full max-w-lg rounded-2xl p-5 md:p-6 lg:p-8"
               style={{
                 backgroundColor: colors.modalBg,
                 border: `1px solid ${colors.border}`,
@@ -547,15 +612,15 @@ export default function TestimonialSection() {
             >
               <button
                 onClick={() => setShowFeedbackModal(false)}
-                className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100/10 transition-colors cursor-pointer"
+                className="absolute top-3 right-3 md:top-4 md:right-4 p-1 rounded-full hover:bg-gray-100/10 transition-colors cursor-pointer"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: colors.text }}>
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: colors.text }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
               <h3 
-                className="text-xl md:text-2xl font-bold mb-2"
+                className="text-lg md:text-xl lg:text-2xl font-bold mb-2"
                 style={{ 
                   color: colors.text,
                   fontFamily: "'Poppins', sans-serif",
@@ -564,7 +629,7 @@ export default function TestimonialSection() {
                 Share Your Feedback
               </h3>
               <p 
-                className="text-sm mb-5"
+                className="text-xs md:text-sm mb-4 md:mb-5"
                 style={{ 
                   color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                 }}
@@ -572,10 +637,10 @@ export default function TestimonialSection() {
                 We value your opinion. Help us improve our services.
               </p>
 
-              <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+              <form onSubmit={handleFeedbackSubmit} className="space-y-3 md:space-y-4">
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5"
+                    className="block text-xs md:text-sm font-medium mb-1.5"
                     style={{ 
                       color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
@@ -588,7 +653,7 @@ export default function TestimonialSection() {
                     required
                     value={feedbackData.name}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl border text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
                     style={{
                       backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
@@ -600,7 +665,7 @@ export default function TestimonialSection() {
 
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5"
+                    className="block text-xs md:text-sm font-medium mb-1.5"
                     style={{ 
                       color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
@@ -613,7 +678,7 @@ export default function TestimonialSection() {
                     required
                     value={feedbackData.email}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl border text-xs md:text-sm focus:outline-none focus:ring-2 transition-all"
                     style={{
                       backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
@@ -625,7 +690,7 @@ export default function TestimonialSection() {
 
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-2"
+                    className="block text-xs md:text-sm font-medium mb-2"
                     style={{ 
                       color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
@@ -640,7 +705,7 @@ export default function TestimonialSection() {
 
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5"
+                    className="block text-xs md:text-sm font-medium mb-1.5"
                     style={{ 
                       color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
@@ -653,7 +718,7 @@ export default function TestimonialSection() {
                     rows={4}
                     value={feedbackData.message}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all resize-none"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl border text-xs md:text-sm focus:outline-none focus:ring-2 transition-all resize-none"
                     style={{
                       backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
@@ -666,7 +731,7 @@ export default function TestimonialSection() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: colors.accent,
                     color: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
@@ -693,8 +758,6 @@ export default function TestimonialSection() {
           position: absolute;
           left: 0;
           top: 0;
-          width: 80px;
-          height: 80px;
           border-radius: 50%;
           will-change: transform;
           transition: filter 0.3s;
@@ -728,13 +791,10 @@ export default function TestimonialSection() {
           position: absolute;
           bottom: -4px;
           right: -4px;
-          width: 26px;
-          height: 26px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 11px;
           border: 3px solid #0d0d24;
         }
 
@@ -758,63 +818,24 @@ export default function TestimonialSection() {
         .ring-purple { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.55); }
         .ring-blue { box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.55); }
 
-        @media (max-width: 1024px) {
-          .center-card {
-            width: 220px !important;
-            padding: 18px 16px !important;
+        /* Mobile specific overrides */
+        @media (max-width: 480px) {
+          .avatar-name {
+            font-size: 7px !important;
+            bottom: -16px !important;
+            padding: 1px 6px !important;
           }
-          .center-card p {
-            font-size: 12px !important;
-            min-height: 50px !important;
+          .avatar-badge {
+            border-width: 2px !important;
           }
         }
 
-        @media (max-width: 768px) {
-          .avatar {
-            width: 60px !important;
-            height: 60px !important;
-          }
-          .avatar-circle {
-            font-size: 18px !important;
-          }
-          .avatar-badge {
-            width: 22px !important;
-            height: 22px !important;
-            font-size: 9px !important;
-          }
+        /* Tablet specific adjustments */
+        @media (min-width: 481px) and (max-width: 768px) {
           .avatar-name {
             font-size: 8px !important;
             bottom: -18px !important;
             padding: 1px 8px !important;
-          }
-          .center-card {
-            width: 180px !important;
-            padding: 14px 12px !important;
-          }
-          .center-card p {
-            font-size: 11px !important;
-            min-height: 40px !important;
-          }
-          .center-card h4 {
-            font-size: 13px !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .avatar {
-            width: 50px !important;
-            height: 50px !important;
-          }
-          .avatar-circle {
-            font-size: 14px !important;
-          }
-          .center-card {
-            width: 150px !important;
-            padding: 10px 8px !important;
-          }
-          .center-card p {
-            font-size: 10px !important;
-            min-height: 32px !important;
           }
         }
       `}</style>

@@ -131,9 +131,9 @@ export default function TemplatesSection({
   return (
     <section
       id="templates"
-      className="py-12  px-4 sm:px-6 relative"
+      className="py-12 px-4 sm:px-6 relative"
       style={{
-        backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F8FAFF', // Light mode: subtle off-white
         fontFamily: "'Poppins', sans-serif",
       }}
     >
@@ -196,7 +196,7 @@ export default function TemplatesSection({
           <p 
             className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light transition-all duration-1000 ease-out will-change-transform"
             style={{ 
-              color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+              color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker text for light mode
               opacity: headerInView ? 1 : 0,
               transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
               transitionDelay: '400ms',
@@ -295,7 +295,7 @@ export default function TemplatesSection({
                   <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
                     <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
                       style={{ 
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937', // Darker for light mode
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -304,7 +304,7 @@ export default function TemplatesSection({
                     
                     <p className="leading-relaxed text-base mb-4 line-clamp-2"
                       style={{ 
-                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker for light mode
                         fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
@@ -362,6 +362,7 @@ export default function TemplatesSection({
                     color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
                     fontFamily: "'Poppins', sans-serif",
                     cursor: 'pointer',
+                    boxShadow: theme === 'dark' ? 'none' : '0 2px 12px rgba(0,102,255,0.25)',
                   }}
                 >
                   <span>View More Templates</span>

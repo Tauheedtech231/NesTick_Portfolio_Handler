@@ -18,8 +18,8 @@ function ParticleNetwork({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Theme-based colors
-    const dotColor = theme === 'dark' ? 'rgba(232, 202, 94, 0.6)' : 'rgba(0, 102, 255, 0.5)';
+    // Theme-based colors - Improved for light mode visibility
+    const dotColor = theme === 'dark' ? 'rgba(232, 202, 94, 0.6)' : 'rgba(0, 102, 255, 0.4)';
     const lineRGB = theme === 'dark' ? '232, 202, 94' : '0, 102, 255';
 
     let W = 0;
@@ -112,7 +112,7 @@ function ParticleNetwork({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
         inset: 0,
         pointerEvents: 'none',
         zIndex: 0,
-        opacity: 0.7,
+        opacity: theme === 'dark' ? 0.7 : 0.5,
       }}
     />
   );
@@ -426,19 +426,19 @@ export default function ProductShowcase() {
   };
 
   const getAccentLight = (color: string) => {
-    return 'rgba(0, 102, 255, 0.12)';
+    return theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.08)';
   };
 
   const getSectionBg = () => {
-    return theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+    return theme === 'dark' ? '#0B0F19' : '#F8FAFF'; // Subtle off-white for light mode
   };
 
   const getTextColor = () => {
-    return theme === 'dark' ? '#FFFFFF' : '#1F2937';
+    return theme === 'dark' ? '#FFFFFF' : '#1F2937'; // Darker for light mode
   };
 
   const getTextMuted = () => {
-    return theme === 'dark' ? '#9CA3AF' : '#6B7280';
+    return theme === 'dark' ? '#9CA3AF' : '#4B5563'; // Darker for light mode
   };
 
   const getBorderColor = () => {
@@ -446,7 +446,7 @@ export default function ProductShowcase() {
   };
 
   const getInputBg = () => {
-    return theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
+    return theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF';
   };
 
   const isVisible = (id: string) => visibleSections.has(id);
@@ -502,18 +502,20 @@ export default function ProductShowcase() {
           <ParticleNetwork theme={theme} />
         </div>
 
-        {/* Subtle glow effects */}
+        {/* Subtle glow effects - Light mode mein softer */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div 
-            className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl opacity-10"
+            className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl"
             style={{ 
               background: `radial-gradient(circle, ${GOLD}, transparent 70%)`,
+              opacity: theme === 'dark' ? 0.1 : 0.04,
             }}
           />
           <div 
-            className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-10"
+            className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl"
             style={{ 
               background: `radial-gradient(circle, ${BLUE}, transparent 70%)`,
+              opacity: theme === 'dark' ? 0.1 : 0.04,
             }}
           />
         </div>
@@ -556,15 +558,15 @@ export default function ProductShowcase() {
                         className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
                         style={{
                           backgroundColor: accentLight,
-                          opacity: 0.4,
+                          opacity: theme === 'dark' ? 0.4 : 0.2,
                         }}
                       />
                       <div
                         className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02]"
                         style={{
                           borderColor: getBorderColor(),
-                          boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
-                          backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : 'rgba(245,245,245,0.5)',
+                          boxShadow: theme === 'dark' ? 'none' : '0 4px 20px rgba(0,0,0,0.04)',
+                          backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : '#FFFFFF',
                           backdropFilter: 'blur(10px)',
                           aspectRatio: '4/3',
                           width: '100%',
@@ -664,7 +666,9 @@ export default function ProductShowcase() {
                             style={{
                               backgroundColor: BLUE,
                               fontFamily: "'Poppins', sans-serif",
-                              boxShadow: `0 4px 20px rgba(0, 102, 255, 0.3)`,
+                              boxShadow: theme === 'dark' 
+                                ? `0 4px 20px rgba(0, 102, 255, 0.3)`
+                                : `0 4px 20px rgba(0, 102, 255, 0.25)`,
                             }}
                           >
                             {product.buttonText}
@@ -705,7 +709,7 @@ export default function ProductShowcase() {
                     <span
                       key={index}
                       style={{
-                        color: isM ? GOLD : '#FFFFFF',
+                        color: isM ? GOLD : (theme === 'dark' ? '#FFFFFF' : '#1F2937'),
                       }}
                     >
                       {char}
@@ -733,12 +737,13 @@ export default function ProductShowcase() {
                 ref={ctaRef}
                 className="w-full py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 rounded-3xl transition-all duration-700 flex items-center relative"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF',
                   borderColor: getBorderColor(),
                   borderWidth: '1px',
                   marginTop: '1rem',
                   marginBottom: '3rem',
                   backdropFilter: 'blur(20px)',
+                  boxShadow: theme === 'dark' ? 'none' : '0 4px 30px rgba(0,0,0,0.04)',
                 }}
               >
                 <div className="max-w-4xl mx-auto w-full">
@@ -898,7 +903,9 @@ export default function ProductShowcase() {
                         style={{
                           backgroundColor: BLUE,
                           fontFamily: "'Poppins', sans-serif",
-                          boxShadow: `0 4px 30px rgba(0, 102, 255, 0.3)`,
+                          boxShadow: theme === 'dark' 
+                            ? `0 4px 30px rgba(0, 102, 255, 0.3)`
+                            : `0 4px 30px rgba(0, 102, 255, 0.25)`,
                         }}
                       >
                         {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}

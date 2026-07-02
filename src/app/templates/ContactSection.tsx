@@ -79,10 +79,12 @@ export default function ContactSection() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isMobile, setIsMobile] = useState(false);
+  const [sectionOffset, setSectionOffset] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const sectionRef = useRef<HTMLElement | null>(null);
+  const phoneRef = useRef<HTMLDivElement | null>(null);
 
   // ── Theme detection ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -117,34 +119,38 @@ export default function ContactSection() {
   const BLUE = "#0066FF";
   
   const colors = {
-    bg: isDark ? '#0B0F19' : '#FDFCFB',
-    textPrimary: isDark ? '#FFFFFF' : '#17141F',
-    textSecondary: isDark ? '#9CA3AF' : '#716C82',
-    textMuted: isDark ? '#6B7280' : '#9C97AB',
+    bg: isDark ? '#0B0F19' : '#F8FAFF',
+    textPrimary: isDark ? '#FFFFFF' : '#1F2937',
+    textSecondary: isDark ? '#9CA3AF' : '#4B5563',
+    textMuted: isDark ? '#6B7280' : '#6B7280',
     cardBg: isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
-    border: isDark ? 'rgba(30, 41, 59, 0.5)' : '#E8E4F0',
+    border: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
     accent: isDark ? GOLD : BLUE,
     accentLight: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
     inputBg: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
-    inputBorder: isDark ? 'rgba(30, 41, 59, 0.5)' : '#E8E4F0',
-    shadow: isDark ? '0 40px 80px rgba(0,0,0,0.4)' : '0 40px 80px rgba(23,20,31,0.08)',
+    inputBorder: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.08)',
+    shadow: isDark ? '0 40px 80px rgba(0,0,0,0.4)' : '0 40px 80px rgba(0,0,0,0.06)',
     phoneBg: isDark ? '#0F172A' : '#17141F',
-    overlay: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)',
+    overlay: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.2)',
     formBg: isDark ? '#0F172A' : '#FFFFFF',
     inputFocus: isDark ? GOLD : BLUE,
     buttonBg: isDark ? GOLD : BLUE,
     buttonText: isDark ? '#1F4381' : '#FFFFFF',
-    // Dark mode mein phone corners gold, light mode mein transparent
     phoneBorder: isDark ? GOLD : 'rgba(0,0,0,0.08)',
   };
 
-  // Live clock
+  // ─── Live clock - 12hr format for both mobile and laptop ────────────────────
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
-      const hh = String(now.getHours()).padStart(2, "0");
+      let hh = now.getHours();
       const mm = String(now.getMinutes()).padStart(2, "0");
-      setTime(`${hh}:${mm}`);
+      
+      // 12hr format for both mobile and laptop
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12 || 12;
+      setTime(`${hh}:${mm} ${ampm}`);
+      
       setDateStr(now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }));
     };
     updateClock();
@@ -165,15 +171,30 @@ export default function ContactSection() {
     }
   };
 
-  // ─── Smooth scroll to section - Full window ────────────────────────────────
-  const scrollToSection = () => {
-    if (sectionRef.current) {
-      const rect = sectionRef.current.getBoundingClientRect();
-      window.scrollTo({
-        top: window.scrollY + rect.top - 60,
-        behavior: 'smooth',
-      });
-    }
+  // ─── Smooth scroll and push up ──────────────────────────────────────────────
+  const scrollAndPushUp = () => {
+    return new Promise<void>((resolve) => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        // Step 1: Scroll to show section in current window
+        const targetY = scrollY + rect.top - 60;
+        
+        window.scrollTo({
+          top: targetY,
+          behavior: 'smooth',
+        });
+
+        // Step 2: After scroll, push up (7rem on laptop, 14rem on mobile)
+        const pushUpPx = isMobile ? -224 : -112; // 14rem = 224px, 7rem = 112px
+        setTimeout(() => {
+          setSectionOffset(pushUpPx);
+          resolve();
+        }, 700);
+      } else {
+        resolve();
+      }
+    });
   };
 
   const showField = (index: number) => {
@@ -194,11 +215,14 @@ export default function ContactSection() {
     timerRef.current = setTimeout(() => showField(index + 1), 2000);
   };
 
-  const openForm = () => {
+  const openForm = async () => {
     if (formOpen) return;
     
-    scrollToSection();
+    // Step 1: Scroll to show section in current window
+    // Step 2: Push up (7rem laptop / 14rem mobile)
+    await scrollAndPushUp();
     
+    // Step 3: Open form smoothly
     setTimeout(() => {
       setFormOpen(true);
       setVisibleCount(0);
@@ -207,11 +231,12 @@ export default function ContactSection() {
       setSendState("idle");
       clearTimer();
       setTimeout(() => showField(0), 850);
-    }, 450);
+    }, 300);
   };
 
   const closeForm = () => {
     setFormOpen(false);
+    setSectionOffset(0);
     clearTimer();
     setVisibleCount(0);
     setSendBtnVisible(false);
@@ -267,12 +292,14 @@ export default function ContactSection() {
   return (
     <section
       ref={sectionRef}
-      className={`${inter.variable} ${fraunces.variable} relative max-w-[1360px] mx-auto px-3 sm:px-8 md:px-16 pt-6 sm:pt-12 pb-8 sm:pb-16 md:pb-24 overflow-visible transition-colors duration-300`}
+      className={`${inter.variable} ${fraunces.variable} relative max-w-[1360px] mx-auto px-3 sm:px-8 md:px-16 pt-6 sm:pt-12 pb-8 sm:pb-16 md:pb-24 overflow-visible transition-all duration-700 ease-in-out`}
       style={{ 
         fontFamily: "var(--font-inter), sans-serif", 
         background: colors.bg, 
         color: colors.textPrimary,
         minHeight: isMobile ? 'auto' : '100vh',
+        transform: `translateY(${sectionOffset}px)`,
+        transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
       }}
       onKeyDown={handleKeyDown}
     >
@@ -293,7 +320,7 @@ export default function ContactSection() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] items-center gap-6 lg:gap-0">
           {/* ---------------- LEFT ---------------- */}
-          <div className="relative z-[3] pr-0 lg:pr-14 -mt-6 sm:-mt-4 md:-mt-6">
+          <div className="relative z-[3] pr-0 lg:pr-14 ml-15 sm:ml-0 md:-mt-6">
             <h1
               className="text-[clamp(24px,3vw,42px)] leading-[1.08] tracking-[-0.01em] max-w-[420px]"
               style={{ fontFamily: "var(--font-fraunces), serif", fontWeight: 500, color: colors.textPrimary }}
@@ -301,9 +328,9 @@ export default function ContactSection() {
               Let&rsquo;s start
               <br />
               a real{" "}
-              <em className="not-italic italic font-normal" style={{ fontStyle: "italic", fontWeight: 400, color: colors.accent }}>
+              <span style={{ fontWeight: 400, color: colors.accent }}>
                 conversation
-              </em>
+              </span>
             </h1>
 
             <p 
@@ -366,13 +393,13 @@ export default function ContactSection() {
           </div>
 
           {/* ---------------- RIGHT (Phone) ---------------- */}
-          <div className="relative flex justify-center items-center z-[2] min-h-[480px] sm:min-h-[560px] md:min-h-[500px]">
+          <div ref={phoneRef} className="relative flex justify-center items-center z-[2] min-h-[480px] sm:min-h-[560px] md:min-h-[500px]">
             <div className="absolute bottom-[12px] sm:bottom-[18px] left-1/2 -translate-x-1/2 w-[200px] sm:w-[260px] md:w-[300px] h-8 sm:h-10 rounded-full opacity-10 blur-[24px] sm:blur-[28px]" style={{ background: colors.textPrimary }} />
 
             <div className="relative z-[2]">
-              {/* Phone container - border changes with theme */}
+              {/* Phone container */}
               <div 
-                className="relative w-[260px] sm:w-[290px] md:w-[280px] h-[500px] sm:h-[560px] md:h-[520px] rounded-[32px] sm:rounded-[40px] md:rounded-[48px] p-2.5 sm:p-3 overflow-hidden transition-colors duration-300"
+                className="relative w-[300px] sm:w-[290px] md:w-[280px] h-[500px] sm:h-[560px] md:h-[520px] rounded-[32px] sm:rounded-[40px] md:rounded-[48px] p-2.5 sm:p-3 overflow-hidden transition-colors duration-300"
                 style={{
                   background: colors.phoneBg,
                   boxShadow: `0 40px 70px -20px rgba(0,0,0,0.3), 0 20px 30px -10px rgba(0,0,0,0.2)`,
@@ -478,12 +505,12 @@ export default function ContactSection() {
 
                   {/* FORM SCREEN */}
                   <div
-                    className={`absolute inset-0 rounded-[26px] sm:rounded-[30px] md:rounded-[36px] flex flex-col z-30 overflow-hidden transition-transform duration-500 ${
+                    className={`absolute inset-0 rounded-[26px] sm:rounded-[30px] md:rounded-[36px] flex flex-col z-30 overflow-hidden transition-transform duration-700 ease-out ${
                       formOpen ? "translate-y-0" : "translate-y-full"
                     }`}
                     style={{ 
                       background: colors.formBg,
-                      transitionTimingFunction: "cubic-bezier(0.4,0,0.2,1)",
+                      transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
                       borderRadius: 'inherit',
                     }}
                   >
@@ -506,14 +533,14 @@ export default function ContactSection() {
                         style={{ fontFamily: "var(--font-fraunces), serif", fontWeight: 500, color: colors.textPrimary }}
                       >
                         Send a{" "}
-                        <em className="italic font-normal" style={{ color: colors.accent }}>message</em>
+                        <span style={{ color: colors.accent }}>message</span>
                       </span>
                       <button
                         type="button"
                         onClick={closeForm}
                         className="bg-transparent border-none text-base sm:text-xl cursor-pointer px-2 py-1 rounded-lg transition-colors flex-shrink-0"
                         style={{ color: colors.textMuted }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#E8E4F0'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#F3F4F6'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
                         ✕
@@ -560,7 +587,7 @@ export default function ContactSection() {
                                   }}
                                   onFocus={(e) => {
                                     e.currentTarget.style.borderColor = colors.inputFocus;
-                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#FBFAFF';
+                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
                                   }}
                                   onBlur={(e) => {
                                     e.currentTarget.style.borderColor = colors.inputBorder;
@@ -587,7 +614,7 @@ export default function ContactSection() {
                                   }}
                                   onFocus={(e) => {
                                     e.currentTarget.style.borderColor = colors.inputFocus;
-                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#FBFAFF';
+                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
                                   }}
                                   onBlur={(e) => {
                                     e.currentTarget.style.borderColor = colors.inputBorder;
@@ -625,7 +652,7 @@ export default function ContactSection() {
                     </form>
 
                     {/* Bottom home indicator */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[80px] sm:w-[100px] md:w-[90px] h-0.5 sm:h-1 rounded-[2px] sm:rounded-[3px]" style={{ background: isDark ? 'rgba(255,255,255,0.12)' : '#E3E0EC' }} />
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[80px] sm:w-[100px] md:w-[90px] h-0.5 sm:h-1 rounded-[2px] sm:rounded-[3px]" style={{ background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)' }} />
                   </div>
                 </div>
               </div>

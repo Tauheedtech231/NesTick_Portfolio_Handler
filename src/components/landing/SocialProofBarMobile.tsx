@@ -434,10 +434,10 @@ export default function SocialProofBarMobile() {
 
   // Stats data
   const stats: HexStatData[] = [
-    { label: 'Clients', value: '500+', iconType: 'handshake', delay: 0 },
-    { label: 'Active Users', value: '20.0K+', iconType: 'users', delay: 0.35 },
-    { label: 'Templates', value: '30+', iconType: 'templates', delay: 0.7 },
-    { label: 'Success Rate', value: '99%', iconType: 'success', delay: 1.05 },
+    { label: 'Clients', value: '35+', iconType: 'handshake', delay: 0 },
+    { label: 'Active Users', value: '1500+', iconType: 'users', delay: 0.35 },
+    { label: 'Templates', value: '15+', iconType: 'templates', delay: 0.7 },
+    { label: 'Success Rate', value: '97%', iconType: 'success', delay: 1.05 },
   ];
 
   const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';

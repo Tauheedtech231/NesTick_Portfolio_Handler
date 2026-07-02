@@ -55,9 +55,9 @@ export default function Footer() {
           ? `radial-gradient(ellipse at 15% 20%, rgba(30,110,190,0.35), transparent 45%),
              radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.3), transparent 50%),
              linear-gradient(180deg, #090920 0%, #0d0d2b 40%, #10102f 100%)`
-          : `radial-gradient(ellipse at 15% 20%, rgba(30,110,190,0.10), transparent 45%),
-             radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.08), transparent 50%),
-             linear-gradient(180deg, #f0f2f8 0%, #e8ecf5 40%, #e0e4f0 100%)`,
+          : `radial-gradient(ellipse at 15% 20%, rgba(30,110,190,0.08), transparent 45%),
+             radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.06), transparent 50%),
+             linear-gradient(180deg, #F8FAFF 0%, #F0F2F8 40%, #E8ECF5 100%)`, // Lighter gradient for light mode
         fontFamily: "'Inter', sans-serif",
       }}
     >
@@ -66,9 +66,9 @@ export default function Footer() {
         className="absolute bottom-[-60px] left-[-60px] w-[200px] h-[200px] pointer-events-none z-0"
         viewBox="0 0 260 260"
       >
-        <circle cx="0" cy="260" r="90" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
-        <circle cx="0" cy="260" r="130" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
-        <circle cx="0" cy="260" r="170" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.12)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="90" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.10)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="130" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.10)"} strokeWidth="1"/>
+        <circle cx="0" cy="260" r="170" fill="none" stroke={isDark ? "rgba(232, 202, 94, 0.18)" : "rgba(232, 202, 94, 0.10)"} strokeWidth="1"/>
       </svg>
 
       {/* ─── MAIN FOOTER ─── */}
@@ -81,7 +81,7 @@ export default function Footer() {
               className="w-[52px] h-[52px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer"
               style={{
                 background: '#fff',
-                border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}`,
+                border: `2px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.10)'}`,
               }}
             >
               <Image
@@ -115,7 +115,7 @@ export default function Footer() {
           <p 
             className="text-[13px] leading-[1.65] max-w-[280px] transition-colors duration-300"
             style={{ 
-              color: isDark ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)',
+              color: isDark ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.55)', // Darker for light mode
               fontFamily: "'Inter', sans-serif",
             }}
           >
@@ -136,7 +136,7 @@ export default function Footer() {
             <p 
               className="text-[12px] leading-[1.6] italic transition-colors duration-300"
               style={{ 
-                color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)',
+                color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
                 fontFamily: "'Inter', sans-serif",
               }}
             >
@@ -151,7 +151,7 @@ export default function Footer() {
             <div 
               className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
-                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.08)',
               }}
             >
               <Compass className="w-[18px] h-[18px]" style={{ color: gold }} />
@@ -189,7 +189,7 @@ export default function Footer() {
                   >
                     <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-[15px] h-[15px]" style={{ 
-                        color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'
+                        color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)'
                       }} />
                     </span>
                     {item.name}
@@ -206,7 +206,7 @@ export default function Footer() {
             <div 
               className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer"
               style={{ 
-                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.08)',
               }}
             >
               <MessageCircle className="w-[18px] h-[18px]" style={{ color: gold }} />
@@ -233,7 +233,7 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.08)',
                 }}
               >
                 <Mail className="w-[15px] h-[15px]" style={{ color: gold }} />
@@ -249,7 +249,7 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.08)',
                 }}
               >
                 <Phone className="w-[15px] h-[15px]" style={{ color: gold }} />
@@ -265,7 +265,7 @@ export default function Footer() {
               <div 
                 className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ 
-                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.10)',
+                  background: isDark ? 'rgba(100,60,220,0.35)' : 'rgba(100,60,220,0.08)',
                 }}
               >
                 <Globe className="w-[15px] h-[15px]" style={{ color: gold }} />
@@ -286,7 +286,7 @@ export default function Footer() {
         {/* Wave SVG */}
         <svg className="absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
           <path d="M0,35 C150,65 300,15 450,35 C600,65 750,15 900,32 C1000,45 1050,35 1200,30 L1200,100 L0,100 Z"
-                fill={isDark ? "rgba(20,90,160,0.15)" : "rgba(20,90,160,0.05)"}/>
+                fill={isDark ? "rgba(20,90,160,0.15)" : "rgba(20,90,160,0.04)"}/>
         </svg>
 
         {/* Left Text */}

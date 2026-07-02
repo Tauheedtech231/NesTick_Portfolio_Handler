@@ -41,11 +41,11 @@ const SEG_META = [
 
 // ─── Constants - UPDATED COLORS ONLY ────────────────────────────────────────
 const CX = 340, CY = 340;
-const GOLD = "#E8CA5E";        // ← CHANGED: #FFD700 → #E8CA5E
-const BLUE = "#0066FF";        // ← KEPT SAME
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
 const FILL = "#0f1e38", FILL_HOVER = "#1a3060", INNER_FILL = "#07101e", BG = "#0B0F19";
-const LIGHT_BG = "#FFFFFF", LIGHT_FILL = "#f0f4ff", LIGHT_FILL_HOVER = "#dce6ff";
-const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#6B7280";
+const LIGHT_BG = "#F8FAFF", LIGHT_FILL = "#f0f4ff", LIGHT_FILL_HOVER = "#dce6ff";
+const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#4B5563"; // Darker for better contrast
 
 const OUTER_R = 320, STRIP_OUTER = 320, STRIP_INNER = 294;
 const SEG_OUTER = 278, SEG_INNER = 130, INNER_CIRCLE_R = 116;
@@ -210,7 +210,7 @@ function SegPaths({
 function InfoPanel({ seg, visible, theme, isMobile }: { seg: Segment; visible: boolean; theme: string; isMobile: boolean }) {
   const { displayed, done } = useTypewriter(seg.description);
   const titleColor = theme === "dark" ? GOLD : BLUE;
-  const descColor  = theme === "dark" ? "#D1D5DB" : LIGHT_DESC;
+  const descColor  = theme === "dark" ? "#D1D5DB" : "#4B5563"; // Darker for light mode
   const dotColor   = theme === "dark" ? GOLD : BLUE;
 
   const titleFontSize = isMobile ? 16 : 22;
@@ -504,9 +504,9 @@ export default function FeaturesSection() {
   const segFillHov  = isDark ? FILL_HOVER : LIGHT_FILL_HOVER;
   const innerFill   = isDark ? INNER_FILL : LIGHT_INNER_FILL;
   const textColor   = isDark ? GOLD       : BLUE;
-  const heading1    = isDark ? "#FFFFFF"  : "#1F2937";
+  const heading1    = isDark ? "#FFFFFF"  : "#1F2937"; // Darker for light mode
   const heading2    = isDark ? GOLD       : BLUE;
-  const subColor    = isDark ? "#9CA3AF"  : "#6B7280";
+  const subColor    = isDark ? "#9CA3AF"  : "#4B5563"; // Darker for light mode
 
   const wheelMaxWidth = isMobile ? 320 : 520;
 
@@ -545,8 +545,6 @@ export default function FeaturesSection() {
             transition: wheelReady ? "opacity 1.1s ease, transform 1.5s ease" : "none",
           }}
         >
-       
-
           <svg width="100%" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
             {SEGMENTS.map((seg) => {
               const isActive = activeSeg?.id === seg.id;
@@ -572,7 +570,6 @@ export default function FeaturesSection() {
             })}
             <circle cx={CX} cy={CY} r={INNER_CIRCLE_R} fill={innerFill} stroke={textColor} strokeWidth="2" />
             
-            {/* ─── "Neezamiya" - BOLD kiya gaya ─── */}
             <text 
               x={CX} y={CY} 
               textAnchor="middle" 
@@ -580,8 +577,8 @@ export default function FeaturesSection() {
               fill={textColor} 
               fontFamily="Arial,sans-serif" 
               fontSize={isMobile ? "14" : "22"} 
-              fontWeight="800"  // ← CHANGED: 700 → 800 (more bold)
-              letterSpacing="4" // ← CHANGED: 3 → 4 (more spacing)
+              fontWeight="800"
+              letterSpacing="4"
               style={{ textShadow: isDark ? "0 0 20px rgba(232,202,94,0.15)" : "0 0 20px rgba(0,102,255,0.1)" }}
             >
               Neezamiya
@@ -589,7 +586,7 @@ export default function FeaturesSection() {
           </svg>
         </div>
 
-        {/* Dim overlay - UPDATED COLOR */}
+        {/* Dim overlay - UPDATED with better light mode opacity */}
         {activeSeg && (
           <div
             onClick={handleClose}

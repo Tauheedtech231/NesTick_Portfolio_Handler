@@ -82,7 +82,10 @@ export default function TemplatesGrid({
     <section 
       id="templates-grid" 
       className="py-8 md:py-10 lg:py-12"
-      style={{ fontFamily: "'Poppins', sans-serif" }}
+      style={{ 
+        fontFamily: "'Poppins', sans-serif",
+        backgroundColor: theme === 'dark' ? 'transparent' : '#F8FAFF', // Subtle off-white for light mode
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header - No left animation */}
@@ -134,7 +137,7 @@ export default function TemplatesGrid({
           <p 
             className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light"
             style={{ 
-              color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+              color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker for light mode
               fontFamily: "'Calibri Light', sans-serif",
             }}
           >
@@ -166,6 +169,7 @@ export default function TemplatesGrid({
                     borderWidth: '1px',
                     color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
                     fontFamily: "'Calibri Light', sans-serif",
+                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                   }}
                 />
                 {searchQuery && (
@@ -185,8 +189,9 @@ export default function TemplatesGrid({
                   backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
                   borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                   borderWidth: '1px',
-                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                  color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
                   fontFamily: "'Poppins', sans-serif",
+                  boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
                 <Filter className="w-4 h-4 cursor-pointer" />
@@ -201,6 +206,7 @@ export default function TemplatesGrid({
                 backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
                 borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
                 borderWidth: '1px',
+                boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
               }}
             >
               <button
@@ -212,7 +218,7 @@ export default function TemplatesGrid({
                     : 'transparent',
                   color: selectedType === 'all'
                     ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                    : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -227,7 +233,7 @@ export default function TemplatesGrid({
                     : 'transparent',
                   color: selectedType === 'free'
                     ? '#FFFFFF'
-                    : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -242,7 +248,7 @@ export default function TemplatesGrid({
                     : 'transparent',
                   color: selectedType === 'paid'
                     ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                    : (theme === 'dark' ? '#9CA3AF' : '#6B7280'),
+                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -254,7 +260,7 @@ export default function TemplatesGrid({
           <div className="flex justify-between items-center mt-3">
             <p className="text-xs tracking-wide cursor-default"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >
@@ -359,7 +365,7 @@ export default function TemplatesGrid({
                   
                   <p className="leading-relaxed text-base mb-4 line-clamp-2 cursor-default"
                     style={{ 
-                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
                       fontFamily: "'Calibri Light', sans-serif",
                     }}
                   >
@@ -426,7 +432,7 @@ export default function TemplatesGrid({
             </h3>
             <p className="text-sm font-light tracking-wide cursor-default"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >

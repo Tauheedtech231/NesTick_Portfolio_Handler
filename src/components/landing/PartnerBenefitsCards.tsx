@@ -157,14 +157,14 @@ export function PartnerBenefitsCards({
   const { width: cardW, height: cardH } = getCardDimensions();
   const LAST_CARD_LEFT_OFFSET = isMobile ? 5 : 20;
 
-  // Custom position adjustments
+  // Custom position adjustments - 1rem down + 1rem left push
   const getCustomPosition = (index: number, originalX: number, originalY: number) => {
     if (!isMobile) {
-      // Desktop: First card ko top se thora margin aur left push
+      // Desktop: 1rem down (16px) + 1rem left (-16px)
       if (index === 0) {
         return { 
-          x: originalX - 25,  // Left push
-          y: originalY - 20   // Top margin
+          x: originalX - 20,   // 1rem left
+          y: originalY + 2    // 1rem down
         };
       }
       return { x: originalX, y: originalY };
@@ -182,8 +182,8 @@ export function PartnerBenefitsCards({
     let adjustedY = originalY;
     
     if (index === 0) {
-      adjustedX = originalX + firstCardLeftGap - 10;
-      adjustedY = originalY + firstCardTopGap - 8;
+      adjustedX = originalX + firstCardLeftGap - 10 - 16; // 1rem left push
+      adjustedY = originalY + firstCardTopGap - 8 + 16;   // 1rem down
     }
     
     if (index === 1) {

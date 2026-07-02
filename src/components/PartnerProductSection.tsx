@@ -35,7 +35,7 @@ export default function SocialProofBar() {
 
     const context = ctx;
     const W = 1200,
-      H = 480; // Reduced height
+      H = 480;
     canvas.width = W;
     canvas.height = H;
     canvas.style.width = "100%";
@@ -43,12 +43,12 @@ export default function SocialProofBar() {
     canvas.style.cursor = "pointer";
 
     // ── FLAT BACKGROUND ──
-    context.fillStyle = theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+    context.fillStyle = theme === 'dark' ? '#0B0F19' : '#F8FAFF'; // Light mode: subtle off-white
     context.fillRect(0, 0, W, H);
 
     // ── MAP DOTS ──
     (function () {
-      const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.1)';
+      const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.08)';
       context.fillStyle = dotColor;
       function d(x: number, y: number) {
         context.beginPath();
@@ -340,12 +340,24 @@ export default function SocialProofBar() {
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       
       const isHovered = hoveredBox === boxIndex;
-      const glowIntensity = isHovered ? 50 : 16;
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
       
       const op = hexPts(cx, cy, R);
       const ip = hexPts(cx, cy, Ri);
       
-      polyRounded(op, fillColor, strokeColor, 1.5, shadowColor, glowIntensity, 12);
+      polyRounded(op, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, shadowColor, glowIntensity, 12);
+      // Light mode: subtle border for cards
+      if (theme === 'light') {
+        context.save();
+        context.shadowColor = 'rgba(0,0,0,0.04)';
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 2;
+        roundPolygon(context, op, 12);
+        context.strokeStyle = 'rgba(0,0,0,0.06)';
+        context.lineWidth = 1;
+        context.stroke();
+        context.restore();
+      }
       polyRounded(ip, null, innerStroke, 3.5, null, 0, 8);
       
       context.save();
@@ -355,27 +367,27 @@ export default function SocialProofBar() {
       context.fillText(label, cx, cy + (labelOffY || 0));
       context.fillStyle = valColor;
       context.font = `bold ${valSize}px Arial,sans-serif`;
-      context.shadowColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+      context.shadowColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)';
       context.shadowBlur = 3;
       context.fillText(val, cx, cy + (valOffY || 0));
       context.restore();
       
-      icon(cx, cy, 0.85, iconOffsetY); // Reduced icon scale
+      icon(cx, cy, 0.85, iconOffsetY);
     }
 
     // ══════════════════════════════════
     //  LAYOUT - Smaller boxes
     // ══════════════════════════════════
 
-    const R = 72; // Reduced from 88
-    const Ri = 60; // Reduced from 73
+    const R = 72;
+    const Ri = 60;
     const offsetX = 120;
     const BOTTOM_PUSH = 10;
 
     // CENTER OCTAGON
     const TW = { cx: 510 + offsetX, cy: 230 + BOTTOM_PUSH };
-    const TWr = 125, // Reduced from 148
-      TWri = 108; // Reduced from 128
+    const TWr = 125,
+      TWri = 108;
     const twP = octPts(TW.cx, TW.cy, TWr);
     const twPi = octPts(TW.cx, TW.cy, TWri);
     
@@ -461,11 +473,23 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 1;
-      const glowIntensity = isHovered ? 50 : 16;
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
       
       const tpP_rounded = hexPts(TP.cx, TP.cy, R);
       const tpPi_rounded = hexPts(TP.cx, TP.cy, Ri);
-      polyRounded(tpP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(tpP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
+      // Light mode: subtle border for cards
+      if (theme === 'light') {
+        context.save();
+        context.shadowColor = 'rgba(0,0,0,0.04)';
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 2;
+        roundPolygon(context, tpP_rounded, 12);
+        context.strokeStyle = 'rgba(0,0,0,0.06)';
+        context.lineWidth = 1;
+        context.stroke();
+        context.restore();
+      }
       polyRounded(tpPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
@@ -488,13 +512,25 @@ export default function SocialProofBar() {
       
       const twP_rounded = octPts(TW.cx, TW.cy, TWr);
       const twPi_rounded = octPts(TW.cx, TW.cy, TWri);
-      polyRounded(twP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', 40, 14);
+      polyRounded(twP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', theme === 'dark' ? 40 : 20, 14);
+      // Light mode: subtle border for center
+      if (theme === 'light') {
+        context.save();
+        context.shadowColor = 'rgba(0,0,0,0.04)';
+        context.shadowBlur = 16;
+        context.shadowOffsetY = 2;
+        roundPolygon(context, twP_rounded, 14);
+        context.strokeStyle = 'rgba(0,0,0,0.06)';
+        context.lineWidth = 1;
+        context.stroke();
+        context.restore();
+      }
       polyRounded(twPi_rounded, null, innerStroke, 3.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = textColor;
       context.font = "bold 26px Arial,sans-serif";
-      context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.1)';
+      context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.08)';
       context.shadowBlur = 6;
       context.fillText("TRUSTED", TW.cx, TW.cy - 4);
       context.fillText("WORLDWIDE", TW.cx, TW.cy + 36);
@@ -510,11 +546,23 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 2;
-      const glowIntensity = isHovered ? 50 : 16;
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
       
       const auP_rounded = hexPts(AU.cx, AU.cy, R);
       const auPi_rounded = hexPts(AU.cx, AU.cy, Ri);
-      polyRounded(auP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(auP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
+      // Light mode: subtle border for cards
+      if (theme === 'light') {
+        context.save();
+        context.shadowColor = 'rgba(0,0,0,0.04)';
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 2;
+        roundPolygon(context, auP_rounded, 12);
+        context.strokeStyle = 'rgba(0,0,0,0.06)';
+        context.lineWidth = 1;
+        context.stroke();
+        context.restore();
+      }
       polyRounded(auPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
@@ -537,11 +585,23 @@ export default function SocialProofBar() {
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 3;
-      const glowIntensity = isHovered ? 50 : 16;
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
       
       const srP_rounded = hexPts(SR.cx, SR.cy, R);
       const srPi_rounded = hexPts(SR.cx, SR.cy, Ri);
-      polyRounded(srP_rounded, fillColor, strokeColor, 1.5, '#3B82F6', glowIntensity, 12);
+      polyRounded(srP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
+      // Light mode: subtle border for cards
+      if (theme === 'light') {
+        context.save();
+        context.shadowColor = 'rgba(0,0,0,0.04)';
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 2;
+        roundPolygon(context, srP_rounded, 12);
+        context.strokeStyle = 'rgba(0,0,0,0.06)';
+        context.lineWidth = 1;
+        context.stroke();
+        context.restore();
+      }
       polyRounded(srPi_rounded, null, innerStroke, 3.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
@@ -610,7 +670,7 @@ export default function SocialProofBar() {
     };
   }, []);
 
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFF';
 
   return (
     <>

@@ -76,10 +76,11 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
     return () => clearTimeout(timer);
   }, []);
 
-  // Get colors based on theme
+  // Get colors based on theme - OPTIMIZED FOR BETTER CONTRAST
   const getColors = () => {
     if (theme === 'dark') {
       return {
+        // Dark mode: subtle overlay
         overlay: 'linear-gradient(180deg, rgba(11, 15, 25, 0.7) 0%, rgba(11, 15, 25, 0.3) 100%)',
         badgeBg: 'rgba(232, 202, 94, 0.15)',
         badgeBorder: 'rgba(232, 202, 94, 0.2)',
@@ -93,22 +94,25 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         pulseColor: 'rgba(232, 202, 94, 0.4)',
         newBadgeBg: '#E8CA5E',
         newBadgeText: '#1F4381',
+        particleColor: '#3B82F6',
       };
     } else {
       return {
-        overlay: 'linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 100%)',
-        badgeBg: 'rgba(0, 102, 255, 0.1)',
-        badgeBorder: 'rgba(0, 102, 255, 0.2)',
-        badgeColor: '#0066FF',
+        // LIGHT MODE: Darker overlay for better text readability on images
+        overlay: 'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%)',
+        badgeBg: 'rgba(255, 255, 255, 0.15)',
+        badgeBorder: 'rgba(255, 255, 255, 0.2)',
+        badgeColor: '#FFFFFF',
         headingColor: '#FFFFFF',
-        headingAccent: '#0066FF',
-        textColor: '#E5E7EB',
+        headingAccent: '#60A5FA', // Lighter blue for better visibility
+        textColor: '#F3F4F6', // Brighter for better contrast
         buttonBg: '#0066FF',
         buttonText: '#FFFFFF',
         borderColor: '#0066FF',
         pulseColor: 'rgba(0, 102, 255, 0.4)',
         newBadgeBg: '#0066FF',
         newBadgeText: '#FFFFFF',
+        particleColor: '#60A5FA',
       };
     }
   };
@@ -125,7 +129,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         <ParticleNetwork theme={theme} />
       </div>
       
-      {/* Overlay gradient for better readability - White mode mein dark overlay */}
+      {/* Overlay gradient - Darker in light mode for better text readability */}
       <div 
         className="absolute inset-0 z-1"
         style={{
@@ -147,6 +151,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               backgroundColor: colors.badgeBg,
               border: '1px solid',
               borderColor: colors.badgeBorder,
+              backdropFilter: 'blur(8px)',
             }}
           >
             <Sparkles className="w-3.5 h-3.5 cursor-pointer"
@@ -158,7 +163,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-               Ready-to-Use Portfolio Templates
+              ✨ Ready-to-Use Portfolio Templates
             </span>
           </motion.div>
 
@@ -170,6 +175,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{ 
                 color: colors.headingColor,
                 fontFamily: "'Poppins', sans-serif",
+                textShadow: theme === 'light' ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
               }}
             >
               Beautiful
@@ -178,6 +184,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{ 
                 color: colors.headingAccent,
                 fontFamily: "'Poppins', sans-serif",
+                textShadow: theme === 'light' ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
               }}
             >
               Portfolio Templates
@@ -190,6 +197,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
             style={{ 
               color: colors.textColor,
               fontFamily: "'Calibri Light', sans-serif",
+              textShadow: theme === 'light' ? '0 1px 12px rgba(0,0,0,0.4)' : 'none',
             }}
           >
             Professionally designed templates for every academic discipline. 
@@ -209,6 +217,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                 backgroundColor: colors.buttonBg,
                 color: colors.buttonText,
                 fontFamily: "'Poppins', sans-serif",
+                boxShadow: theme === 'light' ? '0 4px 20px rgba(0,102,255,0.3)' : '0 4px 20px rgba(232,202,94,0.3)',
               }}
             >
               <span>Browse Templates</span>
@@ -223,6 +232,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                 borderColor: colors.borderColor,
                 color: colors.borderColor,
                 fontFamily: "'Poppins', sans-serif",
+                textShadow: theme === 'light' ? '0 1px 12px rgba(0,0,0,0.2)' : 'none',
               }}
               animate={isPulsing ? {
                 scale: [1, 1.05, 1],
