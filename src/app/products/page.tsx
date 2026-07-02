@@ -328,6 +328,7 @@ export default function ProductShowcase() {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const neezamiyaRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
@@ -349,8 +350,13 @@ export default function ProductShowcase() {
     return () => observer.disconnect();
   }, []);
 
-  // Intersection Observer for scroll animation - Har scroll par
+  // Intersection Observer for scroll animation - FIXED: Re-observes on scroll
   useEffect(() => {
+    // Disconnect previous observer if exists
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
     const observerOptions = {
       threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
       rootMargin: '0px 0px -50px 0px'
@@ -361,13 +367,8 @@ export default function ProductShowcase() {
         const id = entry.target.getAttribute('data-section-id');
         if (!id) return;
         
-        const rect = entry.boundingClientRect;
-        const windowHeight = window.innerHeight;
-        const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0);
-        const visiblePercentage = Math.max(0, visibleHeight / rect.height);
-        const visibility = Math.min(1, Math.max(0, visiblePercentage));
-        
-        if (visibility > 0.05) {
+        // Check if element is intersecting (visible)
+        if (entry.isIntersecting) {
           setVisibleSections(prev => new Set(prev).add(id));
         } else {
           setVisibleSections(prev => {
@@ -379,14 +380,20 @@ export default function ProductShowcase() {
       });
     }, observerOptions);
 
+    // Store observer reference
+    observerRef.current = observer;
+
+    // Observe all sections
     sectionRefs.current.forEach((el: HTMLDivElement) => {
       observer.observe(el);
     });
 
     return () => {
-      observer.disconnect();
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
     };
-  }, []);
+  }, []); // Empty dependency array - only runs once
 
   // Observer for NEEZAMIYA
   useEffect(() => {
@@ -512,7 +519,7 @@ export default function ProductShowcase() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Product Sections */}
+          {/* Product Sections - Gap reduced between products */}
           {PRODUCTS.map((product, index) => {
             const isLeft = product.imagePosition === 'left';
             const accentLight = getAccentLight(product.accentColor);
@@ -530,8 +537,8 @@ export default function ProductShowcase() {
                 className="flex items-center overflow-hidden relative"
                 style={{
                   minHeight: '100vh',
-                  padding: '0.5rem 0',
-                  marginTop: index === 0 ? '0' : '0',
+                  padding: '0.25rem 0',
+                  marginTop: index === 0 ? '0' : '-2rem',
                   scrollMarginTop: '0',
                 }}
               >
