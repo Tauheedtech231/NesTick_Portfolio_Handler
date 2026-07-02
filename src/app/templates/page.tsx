@@ -372,7 +372,7 @@ export default function TemplatesPage() {
       </main>
 
       <TestimonialSection />
-      <ContactSection theme={theme} />
+      <ContactSection  />
       <Footer />
 
       {/* Preview Modal */}

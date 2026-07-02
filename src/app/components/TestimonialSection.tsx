@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Testimonial {
@@ -8,69 +9,111 @@ interface Testimonial {
   name: string;
   role: string;
   text: string;
+  color: string;
+  initials: string;
+  badge: string;
+  badgeClass: string;
 }
 
-interface FeedbackData {
-  name: string;
-  email: string;
-  message: string;
-  rating: number;
-}
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
 
-const testimonials: Testimonial[] = [
+const testimonialsData: Testimonial[] = [
+  {
+    id: 0,
+    name: "M. Tauheed",
+    role: "UI/UX Designer",
+    text: "when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic.",
+    color: "yellow",
+    initials: "MT",
+    badge: "★",
+    badgeClass: "badge-yellow"
+  },
   {
     id: 1,
-    name: "Parker Robert",
-    role: "UI Designer",
-    text: "when an unknown printer took a galley of type and scrambled to make a type specimen book. It has survived not only five centuries, but also the leap into electronic."
+    name: "Emily Johnson",
+    role: "Web Developer",
+    text: "The learning experience was amazing! The instructors are very knowledgeable and the curriculum is well-structured.",
+    color: "purple",
+    initials: "EJ",
+    badge: "♥",
+    badgeClass: "badge-purple"
   },
   {
     id: 2,
-    name: "Emily Johnson",
-    role: "Web Developer",
-    text: "The learning experience was amazing! The instructors are very knowledgeable and the curriculum is well-structured."
+    name: "Michael Chen",
+    role: "Product Manager",
+    text: "This platform transformed my career. The practical approach to teaching really helped me understand complex concepts easily.",
+    color: "blue",
+    initials: "MC",
+    badge: "👍",
+    badgeClass: "badge-blue"
   },
   {
     id: 3,
-    name: "Michael Chen",
-    role: "Product Manager",
-    text: "This platform transformed my career. The practical approach to teaching really helped me understand complex concepts easily."
+    name: "Sophia Martinez",
+    role: "Graphic Designer",
+    text: "Excellent content and great support. The projects are real-world based which helped me build a strong portfolio.",
+    color: "yellow",
+    initials: "SM",
+    badge: "✦",
+    badgeClass: "badge-yellow"
   },
   {
     id: 4,
-    name: "Sophia Martinez",
-    role: "Graphic Designer",
-    text: "Excellent content and great support. The projects are real-world based which helped me build a strong portfolio."
+    name: "James Wilson",
+    role: "Data Scientist",
+    text: "One of the best decisions I made for my education. The community is supportive and the resources are top-notch.",
+    color: "purple",
+    initials: "JW",
+    badge: "◆",
+    badgeClass: "badge-purple"
   },
   {
     id: 5,
-    name: "James Wilson",
-    role: "Data Scientist",
-    text: "One of the best decisions I made for my education. The community is supportive and the resources are top-notch."
-  },
-  {
-    id: 6,
     name: "Sarah Ahmed",
     role: "Marketing Lead",
-    text: "The platform helped us streamline our marketing efforts. The analytics and reporting features are exceptional."
+    text: "The platform helped us streamline our marketing efforts. The analytics and reporting features are exceptional.",
+    color: "blue",
+    initials: "SA",
+    badge: "●",
+    badgeClass: "badge-blue"
   }
 ];
 
 export default function TestimonialSection() {
-  const [startIndex, setStartIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbackData, setFeedbackData] = useState<FeedbackData>({
+  const [feedbackData, setFeedbackData] = useState({
     name: '',
     email: '',
     message: '',
     rating: 5
   });
 
-  const itemsPerPage = 3;
-  const totalItems = testimonials.length;
+  // Animation refs
+  const avatarRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const animationRef = useRef<number>(null);
+  const lastSwitchTime = useRef<number>(performance.now());
+  const globalPhase = useRef<number>(0);
+
+  // Avatar states
+  const [avatarStates, setAvatarStates] = useState(() => 
+    testimonialsData.map((_, i) => ({
+      radius: i === 0 ? 0 : 1,
+      tween: null as any
+    }))
+  );
+
+  const N = testimonialsData.length;
+  const SPACING = 360 / N;
+  const RADIUS = 220;
+  const DOCK_Y = -110;
+  const ROT_DEG_PER_MS = 360 / 20000;
+  const SWITCH_MS = 8000;
+  const WALK_MS = 700;
 
   // Detect theme
   useEffect(() => {
@@ -93,69 +136,129 @@ export default function TestimonialSection() {
     return () => observer.disconnect();
   }, []);
 
-  // ─── NO AUTO-SLIDE ─────────────────────────────────────────────────────────
-  // Auto-slide removed completely
+  // ─── Animation Functions ──────────────────────────────────────────────────
+  const easeInOutCubic = (t: number) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  };
 
-  // Check if feedback already submitted
+  const polar = (deg: number, r: number) => {
+    const rad = deg * Math.PI / 180;
+    return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
+  };
+
+  const goToIndex = useCallback((newIndex: number) => {
+    if (newIndex === activeIndex) return;
+    const now = performance.now();
+    const oldActive = activeIndex;
+
+    setAvatarStates(prev => {
+      const newStates = [...prev];
+      newStates[oldActive] = { 
+        ...newStates[oldActive], 
+        tween: { start: now, duration: WALK_MS, from: newStates[oldActive].radius, to: 1 } 
+      };
+      newStates[newIndex] = { 
+        ...newStates[newIndex], 
+        tween: { start: now, duration: WALK_MS, from: newStates[newIndex].radius, to: 0 } 
+      };
+      return newStates;
+    });
+
+    setActiveIndex(newIndex);
+    lastSwitchTime.current = now;
+  }, [activeIndex]);
+
+  // ─── Animation Loop ──────────────────────────────────────────────────────
   useEffect(() => {
-    const hasSubmitted = localStorage.getItem('feedbackSubmitted');
-    if (hasSubmitted === 'true') {
-      setFeedbackSubmitted(true);
-    }
-  }, []);
+    const frame = (now: number) => {
+      const dt = now - lastSwitchTime.current;
+      lastSwitchTime.current = now;
 
-  // ─── Only Dot Click ──────────────────────────────────────────────────────
-  const goToIndex = (index: number) => {
-    if (index === startIndex) return;
-    setStartIndex(index);
-  };
+      globalPhase.current = (globalPhase.current + ROT_DEG_PER_MS * dt) % 360;
 
-  // ─── Get current items ──────────────────────────────────────────────────────
-  const getCurrentItems = () => {
-    const items: Testimonial[] = [];
-    for (let i = 0; i < itemsPerPage; i++) {
-      const index = (startIndex + i) % totalItems;
-      items.push(testimonials[index]);
-    }
-    return items;
-  };
+      // Auto switch
+      if (now - lastSwitchTime.current >= SWITCH_MS) {
+        goToIndex((activeIndex + 1) % N);
+      }
 
-  const currentItems = getCurrentItems();
+      // Update avatar positions
+      setAvatarStates(prev => {
+        const newStates = prev.map((av, i) => {
+          let radius = av.radius;
+          if (av.tween) {
+            const t = Math.min(1, (now - av.tween.start) / av.tween.duration);
+            radius = av.tween.from + (av.tween.to - av.tween.from) * easeInOutCubic(t);
+            if (t >= 1) av.tween = null;
+          }
+          return { ...av, radius };
+        });
+        return newStates;
+      });
 
-  // ─── TEMPLATES COLORS ──────────────────────────────────────────────────────
+      animationRef.current = requestAnimationFrame(frame);
+    };
+
+    animationRef.current = requestAnimationFrame(frame);
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [activeIndex, goToIndex, N]);
+
+  // ─── Apply transforms to avatars ──────────────────────────────────────
+  useEffect(() => {
+    avatarRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const state = avatarStates[i];
+      const angle = (globalPhase.current + i * SPACING) % 360;
+      const { x: rx, y: ry } = polar(angle, RADIUS * state.radius);
+      const x = rx;
+      const y = ry + DOCK_Y * (1 - state.radius);
+      const scale = 0.7 + (0.98 - 0.7) * (1 - state.radius);
+      
+      el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scale(${scale})`;
+      el.style.zIndex = state.radius < 0.3 ? '6' : '2';
+      
+      el.classList.toggle('docked', state.radius < 0.3);
+      
+      const color = testimonialsData[i].color;
+      if (state.radius < 0.3) {
+        el.classList.add(`ring-${color}`);
+      } else {
+        el.classList.remove(`ring-${color}`);
+      }
+    });
+  }, [avatarStates]);
+
+  // ─── Get colors based on theme ──────────────────────────────────────────
   const getColors = () => {
     if (theme === 'dark') {
       return {
         bg: '#0B0F19',
-        cardBg: '#0F172A',
         text: '#FFFFFF',
-        textSecondary: '#9CA3AF',
-        textMuted: '#6B7280',
-        border: 'rgba(30, 41, 59, 0.5)',
-        accent: '#E8CA5E',
+        textSecondary: '#E5E7EB',
+        accent: GOLD,
         accentLight: 'rgba(232, 202, 94, 0.15)',
-        inputBg: 'rgba(11, 15, 25, 0.8)',
         modalBg: 'rgba(11, 15, 25, 0.95)',
+        border: 'rgba(30, 41, 59, 0.5)',
       };
     } else {
       return {
         bg: '#FFFFFF',
-        cardBg: '#F8F9FA',
         text: '#1F2937',
-        textSecondary: '#6B7280',
-        textMuted: '#9CA3AF',
-        border: 'rgba(0, 0, 0, 0.06)',
-        accent: '#0066FF',
+        textSecondary: '#374151',
+        accent: BLUE,
         accentLight: 'rgba(0, 102, 255, 0.08)',
-        inputBg: 'rgba(249, 250, 251, 0.9)',
         modalBg: 'rgba(255, 255, 255, 0.95)',
+        border: 'rgba(0, 0, 0, 0.06)',
       };
     }
   };
 
   const colors = getColors();
 
-  // ─── Feedback handlers ─────────────────────────────────────────────────────
+  // ─── Feedback handlers ──────────────────────────────────────────────────
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -172,18 +275,14 @@ export default function TestimonialSection() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        localStorage.setItem('feedbackSubmitted', 'true');
-        localStorage.setItem('feedbackData', JSON.stringify(feedbackData));
-        
-        setFeedbackSubmitted(true);
         setShowFeedbackModal(false);
-        
         setFeedbackData({
           name: '',
           email: '',
           message: '',
           rating: 5
         });
+        alert('Thank you for your feedback!');
       } else {
         throw new Error(result.message || 'Failed to submit feedback');
       }
@@ -195,15 +294,14 @@ export default function TestimonialSection() {
     }
   };
 
-  const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFeedbackData(prev => ({
       ...prev,
-      [name]: name === 'rating' ? parseInt(value) : value
+      [name]: value
     }));
   };
 
-  // ─── Rating Stars ──────────────────────────────────────────────────────────
   const RatingStars = ({ rating, onChange }: { rating: number; onChange: (value: number) => void }) => {
     return (
       <div className="flex gap-1">
@@ -212,7 +310,7 @@ export default function TestimonialSection() {
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className="text-xl cursor-pointer transition-all duration-200 hover:scale-110"
+            className="text-2xl cursor-pointer transition-all duration-200 hover:scale-110"
             style={{
               color: star <= rating ? colors.accent : (theme === 'dark' ? '#374151' : '#D1D5DB'),
             }}
@@ -224,155 +322,200 @@ export default function TestimonialSection() {
     );
   };
 
+  const activeTestimonial = testimonialsData[activeIndex];
+
   return (
     <>
       <section 
-        className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 relative overflow-hidden"
+        className="py-12 md:py-16 px-4 sm:px-6 relative overflow-hidden min-h-screen flex items-center justify-center"
         style={{
           backgroundColor: colors.bg,
           fontFamily: "'Poppins', sans-serif",
           transition: 'background-color 0.6s ease',
         }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto w-full">
           
           {/* ─── Header ─────────────────────────────────────────────────────── */}
           <div className="text-center mb-8 md:mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit"
-              style={{
-                backgroundColor: colors.accentLight,
-              }}
-            >
-              <span className="text-xs font-medium" style={{ 
-                color: colors.accent,
-                fontFamily: "'Poppins', sans-serif",
-              }}>
-                💬 Testimonials
-              </span>
-            </div>
-
             <h2 
-              className="text-2xl md:text-3xl lg:text-4xl font-bold font-serif cursor-default"
+              className="text-2xl md:text-3xl lg:text-4xl font-bold cursor-default"
               style={{ 
                 color: colors.text,
                 fontFamily: "'Poppins', sans-serif",
-                marginBottom: '6px',
               }}
             >
-              What Our Clients <br /> Say About Us
+              What Our Clients <br /> 
+              <span style={{ color: colors.accent }}>Say About Us</span>
             </h2>
-
-            <p 
-              className="text-sm md:text-base font-light tracking-wide cursor-default"
-              style={{ 
-                color: colors.textSecondary,
-                fontFamily: "'Calibri Light', sans-serif",
-              }}
-            >
-              Real stories from real people who trusted us
-            </p>
           </div>
 
-          {/* ─── SLIDER - 3 Items ───────────────────────────────────────────── */}
-          <div className="relative overflow-hidden">
+          {/* ─── Main Layout - Circle with Dots Left & Feedback Right ────── */}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-4">
             
-            {/* Cards Grid - 3 items - NO SMOOTHNESS */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-              {currentItems.map((testimonial, idx) => (
-                <div
-                  key={`${startIndex}-${testimonial.id}`}
-                  className="rounded-2xl p-5 md:p-6 flex flex-col items-center text-center transition-all duration-200"
+            {/* Left Side - Dots (12px size) */}
+            <div className="flex lg:flex-col gap-3 order-2 lg:order-1 ml-0 lg:ml-40">
+              {testimonialsData.map((item, idx) => (
+                <button
+                  key={item.id}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${
+                    activeIndex === idx ? 'scale-125' : 'scale-100'
+                  }`}
                   style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                    boxShadow: theme === 'dark' 
-                      ? '0 4px 20px rgba(0,0,0,0.2)' 
-                      : '0 4px 20px rgba(0,0,0,0.04)',
+                    width: '12px',
+                    height: '12px',
+                    backgroundColor: activeIndex === idx 
+                      ? colors.accent
+                      : theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+                    boxShadow: activeIndex === idx 
+                      ? `0 0 20px ${colors.accent}`
+                      : 'none',
                   }}
-                >
-                  {/* Quote */}
-                  <div className="text-3xl leading-none mb-2" style={{ color: colors.accent }}>
-                    “
-                  </div>
-                  
-                  <p 
-                    className="text-sm leading-relaxed mb-4 line-clamp-4"
-                    style={{ 
-                      color: colors.textSecondary,
-                      fontFamily: "'Calibri Light', sans-serif",
-                    }}
-                  >
-                    {testimonial.text}
-                  </p>
-                  
-                  <div className="w-10 h-0.5 rounded-full mb-3" style={{ backgroundColor: colors.accent }} />
-                  
-                  <h4 
-                    className="font-semibold text-sm"
-                    style={{ 
-                      color: colors.text,
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
-                    {testimonial.name}
-                  </h4>
-                  <p 
-                    className="text-xs"
-                    style={{ 
-                      color: colors.textMuted,
-                      fontFamily: "'Calibri Light', sans-serif",
-                    }}
-                  >
-                    {testimonial.role}
-                  </p>
-                </div>
+                  onClick={() => goToIndex(idx)}
+                  aria-label={`Show ${item.name}`}
+                />
               ))}
             </div>
-          </div>
 
-          {/* ─── Dots Indicator - 6 Dots ───────────────────────────────────── */}
-          <div className="flex justify-center gap-2 mt-6 flex-wrap">
-            {testimonials.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goToIndex(idx)}
-                className="h-2 rounded-full transition-all duration-200 cursor-pointer"
+            {/* Center - Big Circle with Avatars (pushed right less, left more space) */}
+            <div className="relative w-[520px] h-[520px] md:w-[580px] md:h-[580px] flex items-center justify-center order-1 lg:order-2 -mt-2 lg:ml-2">
+              {/* Outer Circle Line */}
+              <div 
+                className="absolute rounded-full"
                 style={{
-                  width: startIndex === idx ? "28px" : "8px",
-                  backgroundColor: startIndex === idx 
-                    ? colors.accent 
-                    : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
+                  width: '460px',
+                  height: '460px',
+                  border: '2px solid rgba(255,255,255,0.06)',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)',
                 }}
               />
-            ))}
-          </div>
+              
+              {/* Orbit Circle Line */}
+              <div 
+                className="absolute rounded-full"
+                style={{
+                  width: '420px',
+                  height: '420px',
+                  border: '1.5px dashed rgba(255,255,255,0.08)',
+                }}
+              />
 
-          {/* ─── FEEDBACK BUTTON ───────────────────────────────────────────── */}
-          {!feedbackSubmitted ? (
-            <button
-              onClick={() => setShowFeedbackModal(true)}
-              className="mt-6 mx-auto block px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
-              style={{
-                backgroundColor: colors.accent,
-                color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              ✍️ Give Feedback
-            </button>
-          ) : (
-            <div 
-              className="mt-6 mx-auto flex items-center gap-2 px-4 py-2.5 rounded-xl cursor-default w-fit"
-              style={{
-                backgroundColor: colors.accentLight,
-                border: `1px solid ${colors.accent}`,
-              }}
-            >
-              <span className="text-sm" style={{ color: colors.accent }}>
-                ✅ Thank you for your feedback!
-              </span>
+              {/* Pivot for Avatars */}
+              <div className="pivot">
+                {testimonialsData.map((item, i) => (
+                  <div
+                    key={item.id}
+                    ref={(el) => { avatarRefs.current[i] = el; }}
+                    className="avatar"
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      width: '80px',
+                      height: '80px',
+                      borderRadius: '50%',
+                    }}
+                  >
+                    {/* Avatar Circle with Initials */}
+                    <div 
+                      className="avatar-circle"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px',
+                        fontWeight: '700',
+                        color: '#fff',
+                        background: `linear-gradient(135deg, ${item.color === 'yellow' ? '#facc15' : item.color === 'purple' ? '#8b5cf6' : '#38bdf8'}, ${item.color === 'yellow' ? '#f59e0b' : item.color === 'purple' ? '#7c3aed' : '#0ea5e9'})`,
+                        border: '2px solid rgba(255,255,255,0.2)',
+                      }}
+                    >
+                      {item.initials}
+                    </div>
+                    <div className="avatar-name">{item.name}</div>
+                    <div className={`avatar-badge ${item.badgeClass}`}>{item.badge}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Center Card - Testimonial Display */}
+           <div 
+  className="center-card"
+  style={{
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%) translateY(8px)',
+    width: '240px',
+    maxWidth: '90%',
+    textAlign: 'center',
+    zIndex: 5,
+    background: theme === 'dark' ? 'rgba(11, 15, 25, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+    backdropFilter: 'blur(16px)',
+    padding: '18px 16px 16px',
+    borderRadius: '24px',
+    border: `1px solid ${colors.border}`,
+    boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+    pointerEvents: 'none',
+  }}
+>
+  <div 
+    className="text-2xl font-bold leading-none mb-0.5"
+    style={{ color: colors.accent }}
+  >
+    &ldquo;
+  </div>
+  <p 
+    className="text-xs leading-relaxed mb-2"
+    style={{ 
+      color: colors.textSecondary,
+      minHeight: '40px',
+      lineHeight: '1.5',
+      fontSize: '11px',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      display: '-webkit-box',
+      WebkitLineClamp: 4,
+      WebkitBoxOrient: 'vertical',
+    }}
+  >
+    {activeTestimonial.text.length > 110 
+      ? activeTestimonial.text.substring(0, 110) + '...' 
+      : activeTestimonial.text}
+  </p>
+  <h4 
+    className="font-bold text-sm leading-tight"
+    style={{ color: colors.text }}
+  >
+    {activeTestimonial.name}
+  </h4>
+  <p 
+    className="text-[10px]"
+    style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+  >
+    {activeTestimonial.role}
+  </p>
+</div>
             </div>
-          )}
+
+            {/* Right Side - Feedback Button (less space on right) */}
+            <div className="order-3 mr-0 lg:mr-2">
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="px-6 py-3 lg:px-8 lg:py-4 rounded-2xl font-semibold text-sm lg:text-base lg:ml-3 transition-all duration-300 hover:scale-105  active:scale-95 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap"
+                style={{
+                  backgroundColor: colors.accent,
+                  color: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                ✍️ Give Feedback
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -402,7 +545,6 @@ export default function TestimonialSection() {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close Button */}
               <button
                 onClick={() => setShowFeedbackModal(false)}
                 className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100/10 transition-colors cursor-pointer"
@@ -413,7 +555,7 @@ export default function TestimonialSection() {
               </button>
 
               <h3 
-                className="text-xl md:text-2xl font-bold mb-2 font-serif cursor-default"
+                className="text-xl md:text-2xl font-bold mb-2"
                 style={{ 
                   color: colors.text,
                   fontFamily: "'Poppins', sans-serif",
@@ -422,23 +564,20 @@ export default function TestimonialSection() {
                 Share Your Feedback
               </h3>
               <p 
-                className="text-sm mb-5 cursor-default"
+                className="text-sm mb-5"
                 style={{ 
-                  color: colors.textSecondary,
-                  fontFamily: "'Calibri Light', sans-serif",
+                  color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                 }}
               >
                 We value your opinion. Help us improve our services.
               </p>
 
               <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-                {/* Name */}
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5 cursor-default"
+                    className="block text-sm font-medium mb-1.5"
                     style={{ 
-                      color: colors.textSecondary,
-                      fontFamily: "'Poppins', sans-serif",
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
                   >
                     Your Name *
@@ -449,24 +588,21 @@ export default function TestimonialSection() {
                     required
                     value={feedbackData.name}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all cursor-text"
+                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all"
                     style={{
-                      backgroundColor: colors.inputBg,
+                      backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
                       color: colors.text,
-                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="Enter your name"
                   />
                 </div>
 
-                {/* Email */}
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5 cursor-default"
+                    className="block text-sm font-medium mb-1.5"
                     style={{ 
-                      color: colors.textSecondary,
-                      fontFamily: "'Poppins', sans-serif",
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
                   >
                     Email Address *
@@ -477,24 +613,21 @@ export default function TestimonialSection() {
                     required
                     value={feedbackData.email}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all cursor-text"
+                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all"
                     style={{
-                      backgroundColor: colors.inputBg,
+                      backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
                       color: colors.text,
-                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="Enter your email"
                   />
                 </div>
 
-                {/* Rating */}
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-2 cursor-default"
+                    className="block text-sm font-medium mb-2"
                     style={{ 
-                      color: colors.textSecondary,
-                      fontFamily: "'Poppins', sans-serif",
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
                   >
                     Rating *
@@ -503,22 +636,13 @@ export default function TestimonialSection() {
                     rating={feedbackData.rating} 
                     onChange={(value) => setFeedbackData(prev => ({ ...prev, rating: value }))} 
                   />
-                  <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
-                    {feedbackData.rating === 5 && '⭐ Excellent'}
-                    {feedbackData.rating === 4 && '⭐ Very Good'}
-                    {feedbackData.rating === 3 && '⭐ Good'}
-                    {feedbackData.rating === 2 && '⭐ Fair'}
-                    {feedbackData.rating === 1 && '⭐ Poor'}
-                  </p>
                 </div>
 
-                {/* Message */}
                 <div>
                   <label 
-                    className="block text-sm font-medium mb-1.5 cursor-default"
+                    className="block text-sm font-medium mb-1.5"
                     style={{ 
-                      color: colors.textSecondary,
-                      fontFamily: "'Poppins', sans-serif",
+                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
                     }}
                   >
                     Your Feedback *
@@ -529,12 +653,11 @@ export default function TestimonialSection() {
                     rows={4}
                     value={feedbackData.message}
                     onChange={handleFeedbackChange}
-                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all resize-none cursor-text"
+                    className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all resize-none"
                     style={{
-                      backgroundColor: colors.inputBg,
+                      backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       borderColor: colors.border,
                       color: colors.text,
-                      fontFamily: "'Calibri Light', sans-serif",
                     }}
                     placeholder="Tell us about your experience..."
                   />
@@ -546,27 +669,155 @@ export default function TestimonialSection() {
                   className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: colors.accent,
-                    color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
-                    fontFamily: "'Poppins', sans-serif",
+                    color: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
                   }}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Feedback'
-                  )}
+                  {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
                 </button>
               </form>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style jsx>{`
+        .pivot {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 0;
+          height: 0;
+        }
+
+        .avatar {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          will-change: transform;
+          transition: filter 0.3s;
+        }
+
+        .avatar-name {
+          position: absolute;
+          bottom: -22px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 10px;
+          font-weight: 600;
+          color: #e5e7eb;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(4px);
+          padding: 2px 12px;
+          border-radius: 20px;
+          white-space: nowrap;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+
+        .avatar.docked .avatar-name {
+          opacity: 1;
+          background: rgba(0, 0, 0, 0.85);
+        }
+
+        .avatar-badge {
+          position: absolute;
+          bottom: -4px;
+          right: -4px;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          border: 3px solid #0d0d24;
+        }
+
+        .badge-yellow { 
+          background: #241c04; 
+          color: #facc15; 
+          box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.5); 
+        }
+        .badge-purple { 
+          background: #241833; 
+          color: #8b5cf6; 
+          box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5); 
+        }
+        .badge-blue { 
+          background: #04202b; 
+          color: #38bdf8; 
+          box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5); 
+        }
+
+        .ring-yellow { box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.55); }
+        .ring-purple { box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.55); }
+        .ring-blue { box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.55); }
+
+        @media (max-width: 1024px) {
+          .center-card {
+            width: 220px !important;
+            padding: 18px 16px !important;
+          }
+          .center-card p {
+            font-size: 12px !important;
+            min-height: 50px !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .avatar {
+            width: 60px !important;
+            height: 60px !important;
+          }
+          .avatar-circle {
+            font-size: 18px !important;
+          }
+          .avatar-badge {
+            width: 22px !important;
+            height: 22px !important;
+            font-size: 9px !important;
+          }
+          .avatar-name {
+            font-size: 8px !important;
+            bottom: -18px !important;
+            padding: 1px 8px !important;
+          }
+          .center-card {
+            width: 180px !important;
+            padding: 14px 12px !important;
+          }
+          .center-card p {
+            font-size: 11px !important;
+            min-height: 40px !important;
+          }
+          .center-card h4 {
+            font-size: 13px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .avatar {
+            width: 50px !important;
+            height: 50px !important;
+          }
+          .avatar-circle {
+            font-size: 14px !important;
+          }
+          .center-card {
+            width: 150px !important;
+            padding: 10px 8px !important;
+          }
+          .center-card p {
+            font-size: 10px !important;
+            min-height: 32px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

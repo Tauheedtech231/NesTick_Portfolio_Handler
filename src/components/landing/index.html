@@ -2,528 +2,973 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Portfolio Handler Footer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Say Hello</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-1:#0a0a1f;
-    --bg-2:#12123a;
-    --blue-1:#123a5e;
-    --blue-2:#1a4d7a;
-    --gold:#e6b800;
-    --gold-2:#ffd54f;
-    --text-light:#e8f0f5;
-    --text-muted:#9db3c9;
-    --icon-bg:#1f5a8c;
+    --bg: #FDFCFB;
+    --ink: #17141F;
+    --muted: #716C82;
+    --muted-2: #9C97AB;
+    --line: #E8E4F0;
+    --purple: #6E43F2;
+    --purple-deep: #5127D6;
+    --purple-soft: #F4F1FC;
+    --purple-soft-2: #EDE8FB;
+    --white: #FFFFFF;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
   body{
-    background:#05050f;
-    font-family:'Segoe UI', Arial, sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:0;
-  }
-  .footer{
-    position:relative;
-    width:1100px;
-    max-width:100%;
-    background:
-      radial-gradient(ellipse at 15% 20%, rgba(30,110,190,0.35), transparent 45%),
-      radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.3), transparent 50%),
-      linear-gradient(180deg, #090920 0%, #0d0d2b 40%, #10102f 100%);
-    overflow:hidden;
-    padding-top:6px;
-  }
-  .top-bar{
-    height:6px;
-    background:linear-gradient(90deg, #2a7fc9, #d8a83a, #2a7fc9);
-  }
-  .content{
-    position:relative;
-    display:flex;
-    justify-content:space-between;
-    padding:44px 56px 20px 56px;
-    z-index:3;
-    flex-wrap:wrap;
-    gap:30px;
-  }
-  .col{
-    flex:1;
-    min-width:260px;
-  }
-  /* Brand column */
-  .brand-head{
-    display:flex;
-    align-items:center;
-    gap:16px;
-    margin-bottom:14px;
-  }
-  .logo-circle{
-    width:56px;
-    height:56px;
-    border-radius:50%;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    box-shadow:0 0 15px rgba(255,255,255,0.15);
-  }
-  .logo-circle img{
-    width:70%;
-  }
-  .brand-title h2{
-    color:#fff;
-    font-size:22px;
-    font-weight:700;
-    margin-bottom:6px;
-  }
-  .underline{
-    width:38px;
-    height:3px;
-    background:var(--gold);
-    border-radius:2px;
-    position:relative;
-  }
-  .underline::after{
-    content:'';
-    position:absolute;
-    right:-10px;
-    top:-2px;
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:var(--gold);
-  }
-  .brand-desc{
-    color:var(--text-muted);
-    font-size:14px;
-    line-height:1.6;
-    margin:14px 0 20px 0;
-    max-width:280px;
-  }
-  .quote-box{
-    position:relative;
-    border:1px solid rgba(230,184,0,0.5);
-    border-radius:8px;
-    padding:18px 20px 18px 50px;
-    max-width:300px;
-    background:rgba(255,255,255,0.02);
-  }
-  .quote-mark{
-    position:absolute;
-    left:14px;
-    top:8px;
-    font-size:38px;
-    color:var(--gold);
-    font-family:Georgia, serif;
-    font-weight:700;
-    line-height:1;
-  }
-  .quote-box p{
-    color:var(--text-light);
-    font-style:italic;
-    font-size:14px;
-    line-height:1.6;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Quick links & contact columns */
-  .col h3{
-    color:#fff;
-    font-size:20px;
-    font-weight:700;
-    margin-bottom:8px;
-  }
-  .col-underline{
-    width:38px;
-    height:3px;
-    background:var(--gold);
-    border-radius:2px;
-    position:relative;
-    margin-bottom:22px;
-  }
-  .col-underline::after{
-    content:'';
-    position:absolute;
-    right:-10px;
-    top:-2px;
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:var(--gold);
-  }
-  .link-item{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-bottom:18px;
-    cursor:pointer;
-  }
-  .icon-circle{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #2472b8, #0f3556);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    color:#bfe3ff;
-  }
-  .link-item span{
-    color:var(--text-light);
-    font-size:15px;
-    flex:1;
-  }
-  .chevron{
-    color:var(--text-muted);
-    font-size:14px;
-  }
-  .contact-item span{
-    color:var(--text-light);
-    font-size:14px;
+  .section{
+    position: relative;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 80px 64px 100px;
+    overflow: visible;
   }
 
-  /* decorative background wave + shapes */
-  .wave-wrap{
-    position:relative;
-    width:100%;
-    height:180px;
-    margin-top:10px;
+  /* ---------- Eyebrow ---------- */
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 28px;
   }
-  .wave-svg{
-    position:absolute;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:100%;
+  .eyebrow::before{
+    content:'';
+    width: 28px;
+    height: 1px;
+    background: var(--purple);
+    display:inline-block;
   }
-  .grad-cap{
-    position:absolute;
-    left:60px;
-    bottom:40px;
-    width:110px;
-    z-index:2;
-    filter:drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+
+  /* ---------- Main Card Container ---------- */
+  .main-card {
+    background: var(--white);
+    border-radius: 32px;
+    box-shadow: 0 40px 80px rgba(23,20,31,0.08), 0 8px 24px rgba(23,20,31,0.04);
+    padding: 48px 56px;
+    border: 1px solid var(--line);
   }
-  .sphere{
-    position:absolute;
-    left:195px;
-    bottom:55px;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #4fa8e0, #3b2f9e);
-    box-shadow:0 0 20px rgba(40,140,220,0.6);
+
+  /* ---------- Grid ---------- */
+  .grid{
+    display: grid;
+    grid-template-columns: 40% 60%;
+    align-items: center;
+    gap: 0;
+    position: relative;
   }
-  .diamond{
+
+  /* ================= LEFT ================= */
+  .left{
+    position: relative;
+    padding-right: 56px;
+    z-index: 3;
+  }
+
+  h1.heading{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(32px, 3.5vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    max-width: 420px;
+  }
+  h1.heading em{
+    font-style: italic;
+    font-weight: 400;
+    color: var(--purple);
+  }
+
+  .sub{
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 380px;
+  }
+
+  .info-list{
+    margin-top: 36px;
+    list-style: none;
+  }
+  .info-row{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .info-row:first-child{ border-top: 1px solid var(--line); }
+  .info-icon{
+    width: 18px;
+    height: 18px;
+    flex-shrink:0;
+    color: var(--purple);
+  }
+  .info-icon svg{ width:100%; height:100%; display:block; }
+  .info-text{ display:flex; flex-direction:column; gap:1px; }
+  .info-label{
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    font-weight: 600;
+  }
+  .info-value{
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ================= RIGHT (Phone) ================= */
+  .right{
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    z-index: 2;
+    min-height: 660px;
+  }
+
+  .phone-shadow{
     position:absolute;
-    right:70px;
-    bottom:70px;
-    width:60px;
+    bottom: 18px;
+    left: 50%;
+    width: 300px;
+    height: 40px;
+    background: #17141F;
+    opacity: 0.12;
+    filter: blur(28px);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+
+  .phone-stage{
+    position: relative;
+    z-index: 2;
+  }
+
+  .phone{
+    width: 330px;
+    height: 670px;
+    background: #17141F;
+    border-radius: 48px;
+    padding: 14px;
+    box-shadow:
+      0 60px 90px -30px rgba(23,20,31,0.3),
+      0 25px 40px -15px rgba(23,20,31,0.2),
+      inset 0 0 0 2px rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .phone::before{
+    content:'';
+    position:absolute;
+    left:-3px;
+    top:130px;
+    width:3px;
     height:60px;
-    z-index:2;
-    filter:drop-shadow(0 0 15px rgba(40,140,220,0.5));
+    background:#0F0C17;
+    border-radius: 2px 0 0 2px;
+    z-index: 10;
   }
-  .plane{
+  .phone::after{
+    content:'';
     position:absolute;
-    right:55px;
-    top:30px;
-    width:90px;
-    z-index:2;
-    filter:drop-shadow(0 0 10px rgba(40,140,220,0.4));
+    right:-3px;
+    top:160px;
+    width:3px;
+    height:40px;
+    background:#0F0C17;
+    border-radius: 0 2px 2px 0;
+    z-index: 10;
   }
-  .badge{
-    position:absolute;
-    left:50%;
-    bottom:50px;
-    transform:translateX(-50%);
-    width:78px;
-    height:78px;
-    border-radius:50%;
-    background:#0c0c22;
-    border:5px solid;
-    border-image:linear-gradient(135deg, var(--gold), #2a7fc9) 1;
+
+  .phone-screen{
+    width: 100%;
+    height: 100%;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
     display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-size:26px;
-    font-weight:700;
-    box-shadow:0 0 25px rgba(40,140,220,0.5);
-    z-index:3;
+    flex-direction:column;
   }
-  .spark{
+  
+  /* ===== HOME SCREEN BACKGROUND IMAGE ===== */
+  .home-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&h=1200&fit=crop&crop=center');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+  .home-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.15);
+    backdrop-filter: blur(0.5px);
+  }
+  
+  .notch{
     position:absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 26px;
+    background: #17141F;
+    border-radius: 20px;
+    z-index: 5;
+  }
+  .notch::after{
+    content:'';
+    position:absolute;
+    right:20px;
+    top:50%;
+    transform:translateY(-50%);
+    width:8px;
+    height:8px;
+    background: #2D2A3A;
     border-radius:50%;
-    background:var(--gold);
-    box-shadow:0 0 8px 2px rgba(230,184,0,0.7);
-    animation:twinkle 2.4s ease-in-out infinite;
-  }
-  .spark:nth-child(1){animation-delay:0s;}
-  .spark:nth-child(2){animation-delay:0.6s;}
-  .spark:nth-child(3){animation-delay:1.2s;}
-
-  @keyframes twinkle{
-    0%,100%{opacity:0.3; transform:scale(0.8);}
-    50%{opacity:1; transform:scale(1.3);}
+    border:1px solid #1A1825;
   }
 
-  .wave-line{
-    stroke-dasharray:6 8;
-    animation:flowLine 6s linear infinite;
-  }
-  .wave-line.slow{animation-duration:9s; animation-direction:reverse;}
-
-  @keyframes flowLine{
-    to{stroke-dashoffset:-140;}
-  }
-
-  .wave-fill{
-    animation:waveShift 8s ease-in-out infinite;
-    transform-origin:center;
-  }
-  @keyframes waveShift{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(6px);}
-  }
-
-  .sphere{
-    animation:floatY 3.5s ease-in-out infinite;
-  }
-  @keyframes floatY{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-10px);}
-  }
-
-  .diamond{
-    animation:floatRotate 6s ease-in-out infinite;
-    transform-origin:center;
-  }
-  @keyframes floatRotate{
-    0%,100%{transform:translateY(0) rotate(0deg);}
-    50%{transform:translateY(-8px) rotate(6deg);}
-  }
-
-  .grad-cap{
-    animation:capBob 4s ease-in-out infinite;
-  }
-  @keyframes capBob{
-    0%,100%{transform:translateY(0) rotate(0deg);}
-    50%{transform:translateY(-6px) rotate(-3deg);}
-  }
-
-  .plane{
-    animation:planeFly 4.5s ease-in-out infinite;
-  }
-  @keyframes planeFly{
-    0%{transform:translate(0,0) rotate(0deg);}
-    50%{transform:translate(-8px,-10px) rotate(-4deg);}
-    100%{transform:translate(0,0) rotate(0deg);}
-  }
-
-  .badge{
-    animation:badgePulse 2.8s ease-in-out infinite;
-  }
-  @keyframes badgePulse{
-    0%,100%{box-shadow:0 0 25px rgba(40,140,220,0.5);}
-    50%{box-shadow:0 0 40px 8px rgba(230,184,0,0.55);}
-  }
-
-  .bottom-bar{
-    position:relative;
-    z-index:3;
+  .status-row{
+    padding: 22px 28px 6px;
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    padding:16px 40px;
-    border-top:1px solid rgba(255,255,255,0.08);
-    font-size:13px;
-    color:var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 2;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.3);
   }
-  .bottom-left{
-    display:flex;
-    align-items:center;
-    gap:10px;
+
+  /* ================= HOME SCREEN ================= */
+  .home-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px 20px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 2;
   }
-  .shield{
-    width:26px;
-    height:26px;
-    border-radius:6px;
-    background:#1a4d7a;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#bfe3ff;
-    font-size:13px;
+  .home-screen::-webkit-scrollbar { display: none; }
+
+  .home-date {
+    text-align: center;
+    color: #fff;
+    margin-top: 14px;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.6);
   }
-  .bottom-left b{color:var(--gold); font-weight:600;}
-  .bottom-right{
-    display:flex;
-    align-items:center;
-    gap:10px;
+  .home-date .time {
+    font-size: 48px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
   }
-  .bottom-right b{color:var(--gold); font-weight:600;}
-  .heart{
-    width:26px;
-    height:26px;
-    border-radius:50%;
-    background:#1a4d7a;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#ff6b8a;
-    font-size:12px;
+  .home-date .date {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+  }
+
+  /* App Grid - Contact Related Only */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px 16px;
+    margin-top: 28px;
+  }
+  .app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .app-item:hover { transform: scale(1.05); }
+  .app-item:active { transform: scale(0.92); }
+  .app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .app-icon.purple { background: linear-gradient(135deg, rgba(110,67,242,0.85), rgba(81,39,214,0.85)); }
+  .app-icon.blue { background: linear-gradient(135deg, rgba(59,130,246,0.85), rgba(29,78,216,0.85)); }
+  .app-icon.green { background: linear-gradient(135deg, rgba(16,185,129,0.85), rgba(5,150,105,0.85)); }
+  .app-icon.orange { background: linear-gradient(135deg, rgba(245,158,11,0.85), rgba(217,119,6,0.85)); }
+  .app-icon.red { background: linear-gradient(135deg, rgba(239,68,68,0.85), rgba(220,38,38,0.85)); }
+  .app-icon.pink { background: linear-gradient(135deg, rgba(236,72,153,0.85), rgba(219,39,119,0.85)); }
+
+  .app-name {
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    font-weight: 500;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+
+  /* Home Screen Bottom Dock */
+  .dock {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: auto;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .dock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .dock-item:hover { transform: scale(1.05); }
+  .dock-item:active { transform: scale(0.92); }
+  .dock-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .dock-icon.purple { background: linear-gradient(135deg, rgba(110,67,242,0.85), rgba(81,39,214,0.85)); }
+  .dock-icon.blue { background: linear-gradient(135deg, rgba(59,130,246,0.85), rgba(29,78,216,0.85)); }
+  .dock-icon.green { background: linear-gradient(135deg, rgba(16,185,129,0.85), rgba(5,150,105,0.85)); }
+  .dock-name {
+    font-size: 9px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+
+  /* ================= FORM SCREEN ================= */
+  .form-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--white);
+    border-radius: 36px;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  .form-screen.open {
+    transform: translateY(0);
+  }
+
+  .form-header {
+    padding: 18px 22px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+  }
+  .form-header .title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .form-header .title em { font-style: italic; color: var(--purple); }
+  .close-form-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--muted-2);
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .close-form-btn:hover { background: var(--line); }
+
+  .form-wrap {
+    flex: 1;
+    padding: 18px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .form-wrap::-webkit-scrollbar { display: none; }
+
+  .form-caption {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .field {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .field.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .field label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .field input,
+  .field textarea {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--white);
+    border: 1.4px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .2s ease, background .2s ease;
+    resize: none;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: #C4C0D1; }
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--purple);
+    background: #FBFAFF;
+  }
+  .field textarea { min-height: 56px; line-height: 1.5; }
+
+  .field input:focus, .field textarea:focus {
+    animation: ripple 0.6s ease;
+  }
+  @keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(110, 67, 242, 0.2); }
+    100% { box-shadow: 0 0 0 8px rgba(110, 67, 242, 0); }
+  }
+
+  .field.pulse {
+    animation: pulseField 0.5s ease;
+  }
+  @keyframes pulseField {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); background: rgba(110, 67, 242, 0.04); border-radius: 14px; }
+    100% { transform: scale(1); }
+  }
+
+  .send-btn {
+    margin-top: 6px;
+    width: 100%;
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background .2s ease, transform .15s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .send-btn.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .send-btn:hover { background: var(--purple-deep); }
+  .send-btn:active { transform: scale(0.98); }
+  .send-btn svg { width: 16px; height: 16px; transition: transform .2s ease; }
+  .send-btn:hover svg { transform: translateX(3px); }
+  .send-btn.sent { background: #1D9E6D; }
+
+  .home-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    border-radius: 3px;
+    background: #E3E0EC;
+  }
+
+  /* ================= Responsive ================= */
+  @media (max-width: 1080px) {
+    .section{ padding: 60px 24px 80px; }
+    .main-card{ padding: 32px 28px; }
+    .grid{ grid-template-columns: 1fr; gap: 60px; }
+    .left{ padding-right: 0; }
+    h1.heading, .sub{ max-width: 560px; }
+    .right{ min-height: 600px; }
+    .phone{ width: 300px; height: 620px; }
+  }
+  @media (max-width: 480px) {
+    .main-card{ padding: 20px 16px; border-radius: 20px; }
+    .phone{ width: 280px; height: 580px; border-radius: 40px; }
+    .phone-screen{ border-radius: 30px; }
+    .form-screen{ border-radius: 30px; }
+    .phone::before, .phone::after{ display:none; }
+    h1.heading{ font-size: 28px; }
+    .notch{ width: 80px; height: 22px; }
+    .home-date .time { font-size: 40px; }
+    .app-grid { gap: 14px 12px; }
+    .app-icon { width: 52px; height: 52px; font-size: 22px; }
+    .dock { gap: 16px; padding: 10px 14px; }
+    .dock-icon { width: 40px; height: 40px; font-size: 16px; }
   }
 </style>
 </head>
 <body>
 
-<div class="footer">
-  <div class="top-bar"></div>
+<section class="section">
+  <div class="eyebrow">Say hello</div>
 
-  <div class="content">
-    <!-- Brand -->
-    <div class="col" style="flex:1.1;">
-      <div class="brand-head">
-        <div class="logo-circle">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3 L20 8 L12 13 L4 8 Z" fill="#f5a623"/>
-            <path d="M4 8 V15 C4 15 7 18 12 18 C17 18 20 15 20 15 V8" stroke="#2e5bd8" stroke-width="1.2" fill="none"/>
-            <circle cx="12" cy="10" r="1.4" fill="#2e5bd8"/>
-          </svg>
-        </div>
-        <div class="brand-title">
-          <h2>Portfolio Handler</h2>
-          <div class="underline"></div>
-        </div>
-      </div>
-      <p class="brand-desc">Empowering educational institutions with modern portfolio management solutions.</p>
-      <div class="quote-box">
-        <div class="quote-mark">&ldquo;</div>
-        <p>"Building the future of education, one portfolio at a time."</p>
-      </div>
-    </div>
+  <!-- Main Card Container -->
+  <div class="main-card">
 
-    <!-- Quick Links -->
-    <div class="col">
-      <h3>Quick Links</h3>
-      <div class="col-underline"></div>
-      <div class="link-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
-        </div>
-        <span>Home</span>
-        <span class="chevron">&#8250;</span>
-      </div>
-      <div class="link-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <span>Vision</span>
-        <span class="chevron">&#8250;</span>
-      </div>
-      <div class="link-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </div>
-        <span>Templates</span>
-        <span class="chevron">&#8250;</span>
-      </div>
-      <div class="link-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-        </div>
-        <span>About</span>
-        <span class="chevron">&#8250;</span>
-      </div>
-    </div>
+    <div class="grid">
 
-    <!-- Contact -->
-    <div class="col">
-      <h3>Get in Touch</h3>
-      <div class="col-underline"></div>
-      <div class="link-item contact-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
-        </div>
-        <span>neezamiya@gmail.com</span>
+      <!-- ================= LEFT ================= -->
+      <div class="left">
+        <h1 class="heading">Let's start<br>a real <em>conversation</em></h1>
+        <p class="sub">No forms that vanish into a void. Tell us what's on your mind — a project, a question, or just a hello — and a real person gets back to you within a day.</p>
+
+        <ul class="info-list">
+          <li class="info-row">
+            <span class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M3 7l9 6 9-6"/></svg>
+            </span>
+            <span class="info-text">
+              <span class="info-label">Email</span>
+              <span class="info-value">hello@studioname.com</span>
+            </span>
+          </li>
+          <li class="info-row">
+            <span class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+            </span>
+            <span class="info-text">
+              <span class="info-label">Phone</span>
+              <span class="info-value">+1 (415) 555-0132</span>
+            </span>
+          </li>
+          <li class="info-row">
+            <span class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            <span class="info-text">
+              <span class="info-label">Studio</span>
+              <span class="info-value">148 Mercer St, New York</span>
+            </span>
+          </li>
+        </ul>
       </div>
-      <div class="link-item contact-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1z"/></svg>
+
+      <!-- ================= RIGHT (Phone) ================= -->
+      <div class="right">
+        <div class="phone-shadow" aria-hidden="true"></div>
+
+        <div class="phone-stage">
+          <div class="phone">
+            <div class="phone-screen">
+              
+              <!-- HOME SCREEN BACKGROUND IMAGE -->
+              <div class="home-bg"></div>
+              
+              <div class="notch"></div>
+              <div class="status-row">
+                <span id="statusTime">9:41</span>
+                <span>●●●●</span>
+              </div>
+
+              <!-- HOME SCREEN -->
+              <div class="home-screen" id="homeScreen">
+                <div class="home-date">
+                  <div class="time" id="homeTime">9:41</div>
+                  <div class="date" id="homeDate">Tuesday, January 14</div>
+                </div>
+
+                <!-- App Grid - Contact Related Only -->
+                <div class="app-grid">
+                  <div class="app-item" data-app="messages">
+                    <div class="app-icon purple">💬</div>
+                    <span class="app-name">Messages</span>
+                  </div>
+                  <div class="app-item" data-app="email">
+                    <div class="app-icon blue">✉️</div>
+                    <span class="app-name">Email</span>
+                  </div>
+                  <div class="app-item" data-app="phone">
+                    <div class="app-icon green">📞</div>
+                    <span class="app-name">Phone</span>
+                  </div>
+                  <div class="app-item" data-app="contacts">
+                    <div class="app-icon orange">👤</div>
+                    <span class="app-name">Contacts</span>
+                  </div>
+                  <div class="app-item" data-app="mail">
+                    <div class="app-icon red">📬</div>
+                    <span class="app-name">Mail</span>
+                  </div>
+                  <div class="app-item" data-app="message">
+                    <div class="app-icon pink">💌</div>
+                    <span class="app-name">Message</span>
+                  </div>
+                </div>
+
+                <!-- Dock - Contact Apps -->
+                <div class="dock">
+                  <div class="dock-item" data-app="phone">
+                    <div class="dock-icon purple">📞</div>
+                    <span class="dock-name">Phone</span>
+                  </div>
+                  <div class="dock-item" data-app="messages">
+                    <div class="dock-icon blue">💬</div>
+                    <span class="dock-name">Messages</span>
+                  </div>
+                  <div class="dock-item" data-app="contacts">
+                    <div class="dock-icon green">👤</div>
+                    <span class="dock-name">Contacts</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FORM SCREEN (Slide Up) -->
+              <div class="form-screen" id="formScreen">
+                <div class="form-header">
+                  <span class="title">Send a <em>message</em></span>
+                  <button class="close-form-btn" id="closeFormBtn">✕</button>
+                </div>
+
+                <div class="form-wrap" id="formWrap">
+                  <div class="form-caption">Fill in your details below</div>
+
+                  <div class="field" id="field1">
+                    <label for="fname">Full Name</label>
+                    <input id="fname" type="text" placeholder="Jordan Ellis" required>
+                  </div>
+                  <div class="field" id="field2">
+                    <label for="femail">Email Address</label>
+                    <input id="femail" type="email" placeholder="jordan@email.com" required>
+                  </div>
+                  <div class="field" id="field3">
+                    <label for="fphone">Phone Number</label>
+                    <input id="fphone" type="tel" placeholder="+1 (555) 000-0000">
+                  </div>
+                  <div class="field" id="field4">
+                    <label for="fsubject">Subject</label>
+                    <input id="fsubject" type="text" placeholder="Project inquiry" required>
+                  </div>
+                  <div class="field" id="field5">
+                    <label for="fmessage">Message</label>
+                    <textarea id="fmessage" placeholder="Tell us a little about it..." required></textarea>
+                  </div>
+
+                  <button type="submit" class="send-btn" id="sendBtn">
+                    <span id="sendBtnLabel">Send Message</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+
+                <div class="home-indicator"></div>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <span>03237594869</span>
       </div>
-      <div class="link-item contact-item">
-        <div class="icon-circle">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10c-2.5-2.5-4-6-4-10s1.5-7.5 4-10z"/></svg>
-        </div>
-        <span>nesticktech.com</span>
-      </div>
+
     </div>
   </div>
+</section>
 
-  <!-- Decorative wave section -->
-  <div class="wave-wrap">
-    <svg class="wave-svg" viewBox="0 0 1100 180" preserveAspectRatio="none">
-      <path class="wave-fill" d="M0,90 C150,140 300,40 450,90 C600,140 750,40 900,80 C1000,105 1050,90 1100,70 L1100,180 L0,180 Z"
-            fill="rgba(20,90,160,0.25)"/>
-      <path class="wave-line" d="M0,100 C150,60 300,130 450,95 C600,60 750,130 900,90 C1000,65 1050,90 1100,110"
-            stroke="#e6b800" stroke-width="1.5" fill="none" opacity="0.6"/>
-      <path class="wave-line slow" d="M0,110 C150,150 300,70 450,105 C600,140 750,60 900,100 C1000,120 1050,100 1100,85"
-            stroke="#3487c9" stroke-width="1.5" fill="none" opacity="0.5"/>
-    </svg>
+<script>
+  // =============================================
+  // PHONE HOME SCREEN - REAL TIME CLOCK
+  // =============================================
+  
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = hours + ':' + minutes;
+    
+    document.getElementById('statusTime').textContent = timeStr;
+    document.getElementById('homeTime').textContent = timeStr;
+    
+    const options = { weekday: 'long', month: 'long', day: 'numeric' };
+    document.getElementById('homeDate').textContent = now.toLocaleDateString('en-US', options);
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
 
-    <svg class="grad-cap" viewBox="0 0 100 90">
-      <ellipse cx="35" cy="72" rx="30" ry="7" fill="#3550c8"/>
-      <rect x="10" y="45" width="50" height="24" fill="#4a63d6"/>
-      <rect x="10" y="45" width="50" height="6" fill="#e8eaf6"/>
-      <rect x="10" y="55" width="50" height="6" fill="#e8eaf6"/>
-      <polygon points="35,10 75,25 35,40 -5,25" fill="#12123a"/>
-      <polygon points="35,10 75,25 35,32" fill="#1e1e50"/>
-      <circle cx="75" cy="25" r="2.5" fill="#e6b800"/>
-      <line x1="75" y1="25" x2="80" y2="50" stroke="#e6b800" stroke-width="1.5"/>
-      <circle cx="80" cy="52" r="4" fill="#e6b800"/>
-    </svg>
+  // =============================================
+  // OPEN / CLOSE FORM - Smooth Animation
+  // =============================================
+  
+  const homeScreen = document.getElementById('homeScreen');
+  const formScreen = document.getElementById('formScreen');
+  const closeBtn = document.getElementById('closeFormBtn');
+  const fields = document.querySelectorAll('.field');
+  const sendBtn = document.getElementById('sendBtn');
+  let formOpen = false;
+  let currentFieldIndex = 0;
+  let formTimer = null;
 
-    <div class="sphere"></div>
+  function openForm() {
+    if (formOpen) return;
+    formOpen = true;
+    formScreen.classList.add('open');
+    // Reset fields
+    fields.forEach(f => f.classList.remove('visible'));
+    sendBtn.classList.remove('visible');
+    currentFieldIndex = 0;
+    // Start animation after slide up
+    setTimeout(() => {
+      startFormAnimation();
+    }, 550);
+  }
 
-    <svg class="diamond" viewBox="0 0 100 100">
-      <polygon points="50,5 90,35 50,95 10,35" fill="#2472b8" opacity="0.9"/>
-      <polygon points="50,5 90,35 50,50" fill="#4fa8e0"/>
-      <polygon points="50,5 10,35 50,50" fill="#6a5bd0"/>
-      <polygon points="10,35 50,95 50,50" fill="#1a4d7a"/>
-      <polygon points="90,35 50,95 50,50" fill="#1f5a8c"/>
-    </svg>
+  function closeForm() {
+    formOpen = false;
+    formScreen.classList.remove('open');
+    if (formTimer) {
+      clearTimeout(formTimer);
+      formTimer = null;
+    }
+    fields.forEach(f => f.classList.remove('visible'));
+    sendBtn.classList.remove('visible');
+  }
 
-    <svg class="plane" viewBox="0 0 100 80">
-      <polygon points="5,45 95,10 60,75 45,50" fill="#2f86c9"/>
-      <polygon points="45,50 60,75 50,55" fill="#2472b8"/>
-      <polygon points="5,45 45,50 25,35" fill="#7ec4ec"/>
-      <path d="M60,75 C75,60 90,40 95,10" stroke="#e6b800" stroke-width="1" stroke-dasharray="3,3" fill="none" opacity="0.6"/>
-    </svg>
+  closeBtn.addEventListener('click', closeForm);
 
-    <div class="badge">N</div>
+  // =============================================
+  // APP ICONS - Open Form on Click
+  // =============================================
+  
+  document.querySelectorAll('.app-item, .dock-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Haptic feedback
+      this.style.transform = 'scale(0.92)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 200);
+      // Open form smoothly
+      openForm();
+    });
+  });
 
-    <div class="spark" style="left:355px; top:25px; width:5px; height:5px;"></div>
-    <div class="spark" style="right:210px; top:35px; width:5px; height:5px;"></div>
-    <div class="spark" style="right:60px; top:8px; width:4px; height:4px;"></div>
-  </div>
+  // Click on home screen background also opens form
+  homeScreen.addEventListener('click', function(e) {
+    if (e.target === homeScreen || e.target.closest('.home-date')) {
+      openForm();
+    }
+  });
 
-  <div class="bottom-bar">
-    <div class="bottom-left">
-      <div class="shield">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
-      </div>
-      <span>&copy; 2026 <b>Portfolio Handler.</b> All rights reserved.</span>
-    </div>
-    <div class="bottom-right">
-      <span>Powered by <b>Nestick Tech</b></span>
-      <div class="heart">&#9825;</div>
-    </div>
-  </div>
-</div>
+  // =============================================
+  // FORM ANIMATION - Fields appear one by one
+  // =============================================
+  
+  function showField(index) {
+    if (index >= fields.length) {
+      sendBtn.classList.add('visible');
+      return;
+    }
+
+    const field = fields[index];
+    field.classList.add('pulse');
+    field.classList.add('visible');
+    
+    const input = field.querySelector('input, textarea');
+    if (input) {
+      setTimeout(() => {
+        input.focus();
+        input.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+          input.style.transform = 'scale(1)';
+        }, 150);
+        input.style.animation = 'none';
+        setTimeout(() => {
+          input.style.animation = 'ripple 0.6s ease';
+        }, 10);
+      }, 300);
+    }
+    
+    setTimeout(() => {
+      field.classList.remove('pulse');
+    }, 600);
+    
+    currentFieldIndex = index + 1;
+    
+    formTimer = setTimeout(() => {
+      showField(currentFieldIndex);
+    }, 2000);
+  }
+
+  function startFormAnimation() {
+    if (formTimer) {
+      clearTimeout(formTimer);
+      formTimer = null;
+    }
+    currentFieldIndex = 0;
+    fields.forEach(f => f.classList.remove('visible'));
+    sendBtn.classList.remove('visible');
+    setTimeout(() => {
+      showField(0);
+    }, 300);
+  }
+
+  // =============================================
+  // CLICK ON FORM TO ADVANCE
+  // =============================================
+  
+  document.getElementById('formWrap').addEventListener('click', function(e) {
+    if (!formOpen) return;
+    const target = e.target.closest('.field');
+    if (target) {
+      const index = Array.from(fields).indexOf(target);
+      if (index !== -1) {
+        if (target.classList.contains('visible')) {
+          const input = target.querySelector('input, textarea');
+          if (input) {
+            input.focus();
+            input.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+              input.style.transform = 'scale(1)';
+            }, 150);
+          }
+          return;
+        }
+        const nextHiddenIndex = Array.from(fields).findIndex(f => !f.classList.contains('visible'));
+        if (nextHiddenIndex !== -1) {
+          if (formTimer) clearTimeout(formTimer);
+          showField(nextHiddenIndex);
+        }
+      }
+    }
+  });
+
+  // =============================================
+  // KEYBOARD SUPPORT
+  // =============================================
+  
+  document.addEventListener('keydown', function(e) {
+    if (!formOpen) return;
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.closest('.field')) {
+        e.preventDefault();
+        const nextHiddenIndex = Array.from(fields).findIndex(f => !f.classList.contains('visible'));
+        if (nextHiddenIndex !== -1) {
+          if (formTimer) clearTimeout(formTimer);
+          showField(nextHiddenIndex);
+        } else {
+          const form = document.getElementById('contactForm');
+          if (form) {
+            const submitBtn = document.getElementById('sendBtn');
+            if (submitBtn) {
+              submitBtn.click();
+            }
+          }
+        }
+      }
+    }
+    if (e.key === 'Escape') {
+      closeForm();
+    }
+  });
+
+  // =============================================
+  // FORM SUBMISSION
+  // =============================================
+  
+  const form = document.getElementById('contactForm');
+  const btn = document.getElementById('sendBtn');
+  const label = document.getElementById('sendBtnLabel');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(btn.classList.contains('sent')) return;
+    label.textContent = 'Sending...';
+    btn.disabled = true;
+    setTimeout(() => {
+      label.textContent = 'Message sent ✓';
+      btn.classList.add('sent');
+      setTimeout(() => {
+        label.textContent = 'Send Message';
+        btn.classList.remove('sent');
+        btn.disabled = false;
+        form.reset();
+        setTimeout(() => {
+          closeForm();
+        }, 400);
+      }, 2000);
+    }, 900);
+  });
+
+  console.log('📱 Real Phone Home Screen Ready! Click any app icon to open form.');
+</script>
 
 </body>
 </html>
