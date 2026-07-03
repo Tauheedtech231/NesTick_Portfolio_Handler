@@ -34,21 +34,48 @@ export default function SocialProofBar() {
     if (!ctx) return;
 
     const context = ctx;
-    const W = 1200,
-      H = 480;
+    // Make canvas responsive - use container width
+    const container = canvas.parentElement;
+    const containerWidth = container ? container.clientWidth : 1200;
+    // Calculate height based on aspect ratio (1200:480 = 2.5:1)
+    const aspectRatio = 1200 / 480;
+    const W = containerWidth;
+    const H = W / aspectRatio;
+    
     canvas.width = W;
     canvas.height = H;
     canvas.style.width = "100%";
+    canvas.style.height = "auto";
     canvas.style.borderRadius = "12px";
     canvas.style.cursor = "pointer";
 
-    // ── FLAT BACKGROUND ──
-    context.fillStyle = theme === 'dark' ? '#0B0F19' : '#F8FAFF'; // Light mode: subtle off-white
-    context.fillRect(0, 0, W, H);
+    // ── FLAT BACKGROUND with subtle gradient for depth ──
+    if (theme === 'dark') {
+      context.fillStyle = '#0B0F19';
+      context.fillRect(0, 0, W, H);
+    } else {
+      // Light mode: subtle gradient for depth
+      const gradient = context.createLinearGradient(0, 0, 0, H);
+      gradient.addColorStop(0, '#F8FAFF');
+      gradient.addColorStop(0.5, '#F4F7FC');
+      gradient.addColorStop(1, '#EEF2F7');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, W, H);
+      
+      // Subtle decorative dots for light mode depth
+      context.fillStyle = 'rgba(59, 130, 246, 0.03)';
+      for (let i = 0; i < 30; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        context.beginPath();
+        context.arc(x, y, 1 + Math.random() * 2, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
 
     // ── MAP DOTS ──
     (function () {
-      const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.08)';
+      const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.06)';
       context.fillStyle = dotColor;
       function d(x: number, y: number) {
         context.beginPath();
@@ -153,7 +180,7 @@ export default function SocialProofBar() {
       context.restore();
     }
 
-    // ── GLOW CURVE LINE ──
+    // ── GLOW CURVE LINE - Improved for light mode ──
     function gCurve(
       x1: number,
       y1: number,
@@ -168,18 +195,22 @@ export default function SocialProofBar() {
       const colors = theme === 'dark' 
         ? ['rgba(0,210,255,', 'rgba(0,230,255,', 'rgba(200,248,255,']
         : ['rgba(59,130,246,', 'rgba(96,165,250,', 'rgba(147,197,253,'];
+      const shadowColor = theme === 'dark' ? '#00ddff' : '#3B82F6';
+      const glowIntensity = theme === 'dark' ? [16, 8, 4] : [8, 4, 2];
+      const alphaMultiplier = theme === 'dark' ? 1 : 0.6;
+      
       for (let pass = 0; pass < 3; pass++) {
         const width = [9, 3.5, 1.6][pass];
         context.save();
-        context.shadowColor = theme === 'dark' ? '#00ddff' : '#3B82F6';
-        context.shadowBlur = [16, 8, 4][pass];
+        context.shadowColor = shadowColor;
+        context.shadowBlur = glowIntensity[pass];
         context.lineCap = "round";
         for (let i = 0; i < steps; i++) {
           const t0 = i / steps,
             t1 = (i + 1) / steps;
           const tm = (t0 + t1) / 2;
           const fade = Math.sin(tm * Math.PI);
-          const alpha = [0.07, 0.3, 1.0][pass] * fade;
+          const alpha = [0.07, 0.3, 1.0][pass] * fade * alphaMultiplier;
           context.strokeStyle = colors[pass] + alpha + ")";
           context.lineWidth = width;
           function bp(t: number) {
@@ -200,7 +231,7 @@ export default function SocialProofBar() {
       }
     }
 
-    // ── ICONS ──
+    // ── ICONS with better visibility in light mode ──
     function iHandshake(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
       const y0 = cy + 44 + offsetY;
@@ -213,7 +244,7 @@ export default function SocialProofBar() {
       context.lineCap = "round";
       context.lineJoin = "round";
       context.shadowColor = color;
-      context.shadowBlur = 6;
+      context.shadowBlur = theme === 'dark' ? 6 : 4;
       context.beginPath();
       context.moveTo(cx - 22, y0 + 5);
       context.lineTo(cx - 11, y0 - 1);
@@ -237,7 +268,7 @@ export default function SocialProofBar() {
       context.lineWidth = 1.5;
       context.lineCap = "round";
       context.shadowColor = color;
-      context.shadowBlur = 5;
+      context.shadowBlur = theme === 'dark' ? 5 : 3;
       const bx = cx - 12,
         by = cy + 24 + offsetY;
       context.strokeRect(bx + 7, by + 5, 18, 20);
@@ -265,7 +296,7 @@ export default function SocialProofBar() {
       context.lineWidth = 1.5;
       context.lineCap = "round";
       context.shadowColor = color;
-      context.shadowBlur = 5;
+      context.shadowBlur = theme === 'dark' ? 5 : 3;
       context.beginPath();
       context.arc(cx - 16, y0, 5.5, 0, Math.PI * 2);
       context.stroke();
@@ -302,7 +333,7 @@ export default function SocialProofBar() {
       context.lineCap = "round";
       context.lineJoin = "round";
       context.shadowColor = color;
-      context.shadowBlur = 7;
+      context.shadowBlur = theme === 'dark' ? 7 : 4;
       context.beginPath();
       context.moveTo(cx - 19, y0 + 8);
       context.lineTo(cx - 6, y0 - 5);
@@ -334,31 +365,37 @@ export default function SocialProofBar() {
     ) {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
-      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
+      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
       const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       
       const isHovered = hoveredBox === boxIndex;
-      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
+      const shadowOpacity = theme === 'dark' ? 1 : 0.5;
       
       const op = hexPts(cx, cy, R);
       const ip = hexPts(cx, cy, Ri);
       
-      polyRounded(op, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, shadowColor, glowIntensity, 12);
-      // Light mode: subtle border for cards
+      polyRounded(op, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, shadowColor, glowIntensity * shadowOpacity, 12);
+      
+      // Light mode: subtle card shadow for depth
       if (theme === 'light') {
         context.save();
-        context.shadowColor = 'rgba(0,0,0,0.04)';
-        context.shadowBlur = 12;
-        context.shadowOffsetY = 2;
+        context.shadowColor = 'rgba(0,0,0,0.06)';
+        context.shadowBlur = 16;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 4;
         roundPolygon(context, op, 12);
+        context.fillStyle = 'transparent';
+        context.fill();
         context.strokeStyle = 'rgba(0,0,0,0.06)';
         context.lineWidth = 1;
         context.stroke();
         context.restore();
       }
-      polyRounded(ip, null, innerStroke, 3.5, null, 0, 8);
+      
+      polyRounded(ip, null, innerStroke, theme === 'dark' ? 3.5 : 2.5, null, 0, 8);
       
       context.save();
       context.textAlign = "center";
@@ -468,29 +505,31 @@ export default function SocialProofBar() {
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
-      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
+      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
       const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 1;
-      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
+      const shadowOpacity = theme === 'dark' ? 1 : 0.5;
       
       const tpP_rounded = hexPts(TP.cx, TP.cy, R);
       const tpPi_rounded = hexPts(TP.cx, TP.cy, Ri);
-      polyRounded(tpP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
-      // Light mode: subtle border for cards
+      polyRounded(tpP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, '#3B82F6', glowIntensity * shadowOpacity, 12);
+      
       if (theme === 'light') {
         context.save();
-        context.shadowColor = 'rgba(0,0,0,0.04)';
-        context.shadowBlur = 12;
-        context.shadowOffsetY = 2;
+        context.shadowColor = 'rgba(0,0,0,0.06)';
+        context.shadowBlur = 16;
+        context.shadowOffsetY = 4;
         roundPolygon(context, tpP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
         context.lineWidth = 1;
         context.stroke();
         context.restore();
       }
-      polyRounded(tpPi_rounded, null, innerStroke, 3.5, null, 0, 8);
+      
+      polyRounded(tpPi_rounded, null, innerStroke, theme === 'dark' ? 3.5 : 2.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
@@ -507,30 +546,34 @@ export default function SocialProofBar() {
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
-      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
+      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
       const textColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const twP_rounded = octPts(TW.cx, TW.cy, TWr);
       const twPi_rounded = octPts(TW.cx, TW.cy, TWri);
-      polyRounded(twP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', theme === 'dark' ? 40 : 20, 14);
-      // Light mode: subtle border for center
+      const glowIntensity = theme === 'dark' ? 40 : 12;
+      const shadowOpacity = theme === 'dark' ? 1 : 0.5;
+      
+      polyRounded(twP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, '#3B82F6', glowIntensity * shadowOpacity, 14);
+      
       if (theme === 'light') {
         context.save();
-        context.shadowColor = 'rgba(0,0,0,0.04)';
-        context.shadowBlur = 16;
-        context.shadowOffsetY = 2;
+        context.shadowColor = 'rgba(0,0,0,0.06)';
+        context.shadowBlur = 20;
+        context.shadowOffsetY = 4;
         roundPolygon(context, twP_rounded, 14);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
         context.lineWidth = 1;
         context.stroke();
         context.restore();
       }
-      polyRounded(twPi_rounded, null, innerStroke, 3.5, null, 0, 10);
+      
+      polyRounded(twPi_rounded, null, innerStroke, theme === 'dark' ? 3.5 : 2.5, null, 0, 10);
       context.save();
       context.textAlign = "center";
       context.fillStyle = textColor;
       context.font = "bold 26px Arial,sans-serif";
-      context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.08)';
+      context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.06)';
       context.shadowBlur = 6;
       context.fillText("TRUSTED", TW.cx, TW.cy - 4);
       context.fillText("WORLDWIDE", TW.cx, TW.cy + 36);
@@ -541,29 +584,31 @@ export default function SocialProofBar() {
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
-      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
+      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
       const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 2;
-      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
+      const shadowOpacity = theme === 'dark' ? 1 : 0.5;
       
       const auP_rounded = hexPts(AU.cx, AU.cy, R);
       const auPi_rounded = hexPts(AU.cx, AU.cy, Ri);
-      polyRounded(auP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
-      // Light mode: subtle border for cards
+      polyRounded(auP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, '#3B82F6', glowIntensity * shadowOpacity, 12);
+      
       if (theme === 'light') {
         context.save();
-        context.shadowColor = 'rgba(0,0,0,0.04)';
-        context.shadowBlur = 12;
-        context.shadowOffsetY = 2;
+        context.shadowColor = 'rgba(0,0,0,0.06)';
+        context.shadowBlur = 16;
+        context.shadowOffsetY = 4;
         roundPolygon(context, auP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
         context.lineWidth = 1;
         context.stroke();
         context.restore();
       }
-      polyRounded(auPi_rounded, null, innerStroke, 3.5, null, 0, 8);
+      
+      polyRounded(auPi_rounded, null, innerStroke, theme === 'dark' ? 3.5 : 2.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
@@ -580,29 +625,31 @@ export default function SocialProofBar() {
     {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
-      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.8)';
+      const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
       const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
       
       const isHovered = hoveredBox === 3;
-      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 8);
+      const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
+      const shadowOpacity = theme === 'dark' ? 1 : 0.5;
       
       const srP_rounded = hexPts(SR.cx, SR.cy, R);
       const srPi_rounded = hexPts(SR.cx, SR.cy, Ri);
-      polyRounded(srP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1.5, '#3B82F6', glowIntensity, 12);
-      // Light mode: subtle border for cards
+      polyRounded(srP_rounded, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, '#3B82F6', glowIntensity * shadowOpacity, 12);
+      
       if (theme === 'light') {
         context.save();
-        context.shadowColor = 'rgba(0,0,0,0.04)';
-        context.shadowBlur = 12;
-        context.shadowOffsetY = 2;
+        context.shadowColor = 'rgba(0,0,0,0.06)';
+        context.shadowBlur = 16;
+        context.shadowOffsetY = 4;
         roundPolygon(context, srP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
         context.lineWidth = 1;
         context.stroke();
         context.restore();
       }
-      polyRounded(srPi_rounded, null, innerStroke, 3.5, null, 0, 8);
+      
+      polyRounded(srPi_rounded, null, innerStroke, theme === 'dark' ? 3.5 : 2.5, null, 0, 8);
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
@@ -688,7 +735,8 @@ export default function SocialProofBar() {
           style={{
             borderRadius: "12px",
             display: "block",
-            maxWidth: "1200px",
+            width: "100%",
+            maxWidth: "100%",
             margin: "0 auto",
             cursor: "pointer",
           }}

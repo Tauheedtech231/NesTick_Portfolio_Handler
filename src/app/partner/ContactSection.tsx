@@ -17,6 +17,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+// ==========================================
+// BRAND COLORS - Consistent with PartnerSection
+// ==========================================
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -58,43 +64,107 @@ export default function ContactSection() {
     return () => observer.disconnect();
   }, []);
 
-  // Theme colors
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
-  const getAccentColor = () => '#E8CA5E';
-  const getAccentBg = () => theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(232, 202, 94, 0.08)';
-  const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : 'rgba(249, 250, 251, 0.9)';
-  const getButtonBg = () => theme === 'dark' ? '#E8CA5E' : '#0066FF';
-  const getButtonText = () => theme === 'dark' ? '#1F4381' : '#FFFFFF';
-  const getCurveColor = () => theme === 'dark' ? '#6B7280' : '#9CA3AF';
-  const getCenterLineColor = () => theme === 'dark' ? '#6B7280' : '#9CA3AF';
-  const getIconBg = () => theme === 'dark' ? '#1F2937' : '#374151';
-  const getIconBorder = () => '#E8CA5E';
-  const getIconColor = () => '#FFFFFF';
-  const getArrowCircleBg = () => '#E8CA5E';
+  // ==========================================
+  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // ==========================================
+
+  // 1️⃣ Background - Gradient for depth (not flat)
+  const getBgColor = () => {
+    if (theme === 'dark') return '#0B0F19';
+    // Light theme: subtle gradient for visual depth
+    return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
+  };
+
+  // 2️⃣ Card Background - Clean with subtle depth
+  const getCardBg = () => {
+    if (theme === 'dark') return 'rgba(15, 23, 42, 0.6)';
+    return 'rgba(255, 255, 255, 0.92)';
+  };
+
+  // 3️⃣ Border - Subtle & refined
+  const getBorderColor = () => {
+    if (theme === 'dark') return 'rgba(30, 41, 59, 0.5)';
+    return 'rgba(0, 0, 0, 0.06)';
+  };
+
+  // 4️⃣ Text Colors - Better contrast for readability
+  const getTextColor = () => {
+    if (theme === 'dark') return '#F1F5F9';
+    return '#0F172A'; // Darker for better contrast
+  };
+
+  const getTextSecondary = () => {
+    if (theme === 'dark') return '#D1D5DB';
+    return '#334155';
+  };
+
+  const getTextMuted = () => {
+    if (theme === 'dark') return '#94A3B8';
+    return '#475569'; // Better readability
+  };
+
+  // 5️⃣ Input Background - Consistent with theme
+  const getInputBg = () => {
+    if (theme === 'dark') return 'rgba(11, 15, 25, 0.8)';
+    return 'rgba(249, 250, 251, 0.9)';
+  };
+
+  // 6️⃣ Button - Brand colors (Blue in light, Gold in dark)
+  const getButtonBg = () => {
+    return theme === 'dark' ? GOLD : BLUE;
+  };
+
+  const getButtonText = () => {
+    return theme === 'dark' ? '#1F4381' : '#FFFFFF';
+  };
+
+  // 7️⃣ Accent Color - Consistent Gold
+  const getAccentColor = () => GOLD;
+
+  // 8️⃣ Icon Background
+  const getIconBg = () => {
+    if (theme === 'dark') return '#1F2937';
+    return '#f1f5f9';
+  };
+
+  const getIconBorder = () => GOLD;
+  const getIconColor = () => theme === 'dark' ? '#FFFFFF' : '#0F172A';
+
+  // 9️⃣ Curve & Line Colors
+  const getCurveColor = () => {
+    if (theme === 'dark') return 'rgba(148, 163, 184, 0.3)';
+    return 'rgba(0, 0, 0, 0.15)';
+  };
+
+  const getCenterLineColor = () => {
+    if (theme === 'dark') return 'rgba(148, 163, 184, 0.3)';
+    return 'rgba(0, 0, 0, 0.15)';
+  };
+
+  // 🔟 Arrow Circle
+  const getArrowCircleBg = () => GOLD;
   const getArrowColor = () => '#FFFFFF';
 
+  // 1️⃣1️⃣ Input Style - Larger & refined
   const getInputStyle = () => ({
     width: '100%',
-    padding: '0.8rem 1rem 0.8rem 2.8rem',
+    padding: '0.75rem 1rem 0.75rem 2.8rem',
     borderRadius: '0.75rem',
-    fontSize: '0.95rem',
+    fontSize: '0.875rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
     outline: 'none',
     transition: 'all 0.3s ease',
     fontFamily: "'Calibri Light', sans-serif",
+    boxShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.02)' : 'none',
   });
 
   const getTextareaStyle = () => ({
     width: '100%',
-    padding: '0.8rem 1rem 0.8rem 2.8rem',
+    padding: '0.75rem 1rem 0.75rem 2.8rem',
     borderRadius: '0.75rem',
-    fontSize: '0.95rem',
+    fontSize: '0.875rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
@@ -103,6 +173,13 @@ export default function ContactSection() {
     fontFamily: "'Calibri Light', sans-serif",
     resize: 'none' as const,
     minHeight: '140px',
+    boxShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.02)' : 'none',
+  });
+
+  // 1️⃣2️⃣ Focus Style
+  const getFocusStyle = () => ({
+    borderColor: getAccentColor(),
+    boxShadow: `0 0 0 4px ${getAccentColor()}15`,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -164,7 +241,11 @@ export default function ContactSection() {
     <section 
       ref={sectionRef}
       className="py-12 px-4 sm:px-6 relative overflow-hidden"
-      style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
+      style={{ 
+        background: getBgColor(), 
+        fontFamily: "'Poppins', sans-serif",
+        boxShadow: theme === 'light' ? 'inset 0 1px 0 rgba(255,255,255,0.8)' : 'none',
+      }}
     >
       <div className="max-w-6xl mx-auto">
         <motion.div
@@ -173,8 +254,11 @@ export default function ContactSection() {
           transition={{ duration: 0.6 }}
           className="relative overflow-hidden rounded-3xl"
           style={{
-            backgroundColor: 'transparent',
-            border: 'none',
+            backgroundColor: getCardBg(),
+            border: `1px solid ${getBorderColor()}`,
+            boxShadow: theme === 'light' 
+              ? '0 4px 24px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)' 
+              : '0 4px 24px rgba(0,0,0,0.2)',
           }}
         >
           <div className="flex flex-col md:flex-row relative">
@@ -187,16 +271,16 @@ export default function ContactSection() {
               />
               
               <div 
-                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 relative cursor-pointer group transition-all duration-300 hover:scale-110"
+                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 relative cursor-pointer group transition-all duration-300 hover:scale-110 hover:shadow-lg"
                 style={{
                   backgroundColor: getArrowCircleBg(),
                   border: `2px solid ${getAccentColor()}`,
                   zIndex: 2,
-                  boxShadow: `0 0 30px rgba(232, 202, 94, 0.15)`,
+                  boxShadow: `0 0 30px ${getAccentColor()}20`,
                 }}
               >
                 <ArrowRight 
-                  className="w-6 h-6 relative z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(232,202,94,0.8)] group-hover:scale-110"
+                  className="w-6 h-6 relative z-10 transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(232,202,94,0.6)] group-hover:scale-110"
                   style={{ color: getArrowColor() }}
                 />
               </div>
@@ -241,7 +325,7 @@ export default function ContactSection() {
               {/* Contact Details - WITH CURVE SHAPE AND GAPS */}
               <div className="space-y-10 relative">
                 
-                {/* Curved Timeline Line - GRAY */}
+                {/* Curved Timeline Line */}
                 <svg 
                   className="absolute left-[10px] top-6 bottom-6 w-8 h-[calc(100%-48px)]"
                   preserveAspectRatio="none" 
@@ -266,24 +350,24 @@ export default function ContactSection() {
                   }}
                 />
                 
-                {/* Middle Dot - GOLD - 1rem RIGHT push */}
+                {/* Middle Dot - GOLD */}
                 <div 
                   className="absolute w-3 h-3 rounded-full"
                   style={{ 
                     backgroundColor: getAccentColor(),
-                    left: 'calc(6px + 1.2rem)', // ← 1rem RIGHT push (0.2rem + 1rem)
+                    left: 'calc(6px + 1.2rem)',
                     top: '50%',
                     transform: 'translateY(-50%)',
                   }}
                 />
                 
-                {/* Bottom Dot - GOLD - 1rem DOWN and 0.3rem RIGHT */}
+                {/* Bottom Dot - GOLD */}
                 <div 
                   className="absolute w-3 h-3 rounded-full"
                   style={{ 
                     backgroundColor: getAccentColor(),
-                    left: 'calc(6px + 0.2rem)', // ← 0.3rem RIGHT (0.2rem + 0.3rem)
-                    bottom: 'calc(-1.5rem + 0px)', // ← 1rem DOWN
+                    left: 'calc(6px + 0.2rem)',
+                    bottom: 'calc(-1.5rem + 0px)',
                   }}
                 />
 
@@ -301,10 +385,11 @@ export default function ContactSection() {
                   return (
                     <div key={index} className={`flex items-start gap-6 ${plValue} cursor-pointer`}>
                       <div 
-                        className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105"
+                        className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-lg"
                         style={{
                           backgroundColor: getIconBg(),
                           border: `2px solid ${getIconBorder()}`,
+                          boxShadow: theme === 'light' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                         }}
                       >
                         <item.icon 
@@ -385,11 +470,12 @@ export default function ContactSection() {
                     className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = getAccentColor();
+                      Object.assign(e.currentTarget.style, getFocusStyle());
                     }}
                     onBlur={(e) => {
                       if (!e.currentTarget.value) {
                         e.currentTarget.style.borderColor = getBorderColor();
+                        e.currentTarget.style.boxShadow = 'none';
                       }
                     }}
                   />
@@ -413,11 +499,12 @@ export default function ContactSection() {
                     className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = getAccentColor();
+                      Object.assign(e.currentTarget.style, getFocusStyle());
                     }}
                     onBlur={(e) => {
                       if (!e.currentTarget.value) {
                         e.currentTarget.style.borderColor = getBorderColor();
+                        e.currentTarget.style.boxShadow = 'none';
                       }
                     }}
                   />
@@ -441,11 +528,12 @@ export default function ContactSection() {
                     className="w-full rounded-xl focus:outline-none transition-all cursor-text"
                     style={getInputStyle()}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = getAccentColor();
+                      Object.assign(e.currentTarget.style, getFocusStyle());
                     }}
                     onBlur={(e) => {
                       if (!e.currentTarget.value) {
                         e.currentTarget.style.borderColor = getBorderColor();
+                        e.currentTarget.style.boxShadow = 'none';
                       }
                     }}
                   />
@@ -470,11 +558,12 @@ export default function ContactSection() {
                     className="w-full rounded-xl focus:outline-none transition-all resize-none cursor-text"
                     style={getTextareaStyle()}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = getAccentColor();
+                      Object.assign(e.currentTarget.style, getFocusStyle());
                     }}
                     onBlur={(e) => {
                       if (!e.currentTarget.value) {
                         e.currentTarget.style.borderColor = getBorderColor();
+                        e.currentTarget.style.boxShadow = 'none';
                       }
                     }}
                   />
@@ -494,11 +583,14 @@ export default function ContactSection() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-50 cursor-pointer hover:scale-105 active:scale-95"
+                    className="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-all duration-300 disabled:opacity-50 cursor-pointer hover:scale-105 active:scale-95 hover:shadow-lg"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
+                      boxShadow: theme === 'light' 
+                        ? '0 4px 16px rgba(0, 102, 255, 0.25)' 
+                        : '0 4px 16px rgba(232, 202, 94, 0.25)',
                     }}
                   >
                     {isSubmitting ? (
@@ -517,14 +609,17 @@ export default function ContactSection() {
         </motion.div>
       </div>
 
-      {/* Success Modal */}
+      {/* Success Modal - Updated with theme */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
           <div 
             className="rounded-xl md:rounded-2xl p-5 md:p-8 max-w-md w-full mx-4 text-center animate-scaleIn"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: getCardBg(),
               border: `1px solid ${getBorderColor()}`,
+              boxShadow: theme === 'light' 
+                ? '0 20px 60px rgba(0,0,0,0.10)' 
+                : '0 20px 60px rgba(0,0,0,0.30)',
             }}
           >
             <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-3 md:mb-4">
@@ -567,7 +662,7 @@ export default function ContactSection() {
         <div 
           className="fixed bottom-4 right-4 p-3 md:p-4 rounded-lg flex items-center gap-3 animate-slideUp border"
           style={{
-            backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: getCardBg(),
             borderColor: 'rgba(239, 68, 68, 0.3)',
             boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
           }}

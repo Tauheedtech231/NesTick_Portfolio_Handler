@@ -66,41 +66,46 @@ export default function PortalArchitecture() {
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+
   const getColors = (color: string) => {
     const colors = {
       blue: {
-        accent: '#3b82f6',
-        uline: '#3b82f6',
-        checkColor: '#3b82f6',
-        ringBorder: 'rgba(59,130,246,0.6)',
-        ringBorderLight: 'rgba(59,130,246,0.4)',
+        accent: isDark ? '#3b82f6' : '#0066FF',
+        uline: isDark ? '#3b82f6' : '#0066FF',
+        checkColor: isDark ? '#3b82f6' : '#0066FF',
+        ringBorder: isDark ? 'rgba(59,130,246,0.6)' : 'rgba(0,102,255,0.5)',
+        ringBorderLight: isDark ? 'rgba(59,130,246,0.4)' : 'rgba(0,102,255,0.3)',
         beamBg: 'from-blue-500/25',
         beamOpacity: 'opacity-40',
-        cardShadow: theme === 'dark' 
+        cardShadow: isDark 
           ? '0 8px 32px rgba(59,130,246,0.08), 0 4px 16px rgba(59,130,246,0.04)'
           : '0 8px 32px rgba(0,102,255,0.06), 0 4px 16px rgba(0,102,255,0.03)',
       },
       gold: {
-        accent: '#fbbf24',
-        uline: '#fbbf24',
-        checkColor: '#fbbf24',
-        ringBorder: 'rgba(251,191,36,0.8)',
-        ringBorderLight: 'rgba(251,191,36,0.5)',
+        accent: isDark ? '#fbbf24' : '#0066FF',
+        uline: isDark ? '#fbbf24' : '#0066FF',
+        checkColor: isDark ? '#fbbf24' : '#0066FF',
+        ringBorder: isDark ? 'rgba(251,191,36,0.8)' : 'rgba(0,102,255,0.5)',
+        ringBorderLight: isDark ? 'rgba(251,191,36,0.5)' : 'rgba(0,102,255,0.3)',
         beamBg: 'from-amber-500/40',
         beamOpacity: 'opacity-60',
-        cardShadow: theme === 'dark'
+        cardShadow: isDark
           ? '0 8px 32px rgba(251,191,36,0.12), 0 4px 16px rgba(251,191,36,0.06)'
           : '0 8px 32px rgba(0,102,255,0.06), 0 4px 16px rgba(0,102,255,0.03)',
       },
       teal: {
-        accent: '#2dd4bf',
-        uline: '#2dd4bf',
-        checkColor: '#2dd4bf',
-        ringBorder: 'rgba(45,212,191,0.6)',
-        ringBorderLight: 'rgba(45,212,191,0.4)',
+        accent: isDark ? '#2dd4bf' : '#0066FF',
+        uline: isDark ? '#2dd4bf' : '#0066FF',
+        checkColor: isDark ? '#2dd4bf' : '#0066FF',
+        ringBorder: isDark ? 'rgba(45,212,191,0.6)' : 'rgba(0,102,255,0.5)',
+        ringBorderLight: isDark ? 'rgba(45,212,191,0.4)' : 'rgba(0,102,255,0.3)',
         beamBg: 'from-emerald-500/25',
         beamOpacity: 'opacity-40',
-        cardShadow: theme === 'dark'
+        cardShadow: isDark
           ? '0 8px 32px rgba(45,212,191,0.08), 0 4px 16px rgba(45,212,191,0.04)'
           : '0 8px 32px rgba(0,102,255,0.06), 0 4px 16px rgba(0,102,255,0.03)',
       }
@@ -109,23 +114,27 @@ export default function PortalArchitecture() {
   };
 
   const getAccentColor = () => {
-    return theme === 'dark' ? '#E8CA5E' : '#0066FF';
+    return isDark ? GOLD : BLUE;
   };
 
   const getBorderColor = () => {
-    return theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+    return isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   };
 
   const getPortalBg = () => {
-    return theme === 'dark' ? 'rgba(13, 18, 29, 0.7)' : 'rgba(248, 249, 250, 0.7)';
+    return isDark ? 'rgba(13, 18, 29, 0.7)' : '#FFFFFF';
   };
 
   const getTextColor = () => {
-    return theme === 'dark' ? '#FFFFFF' : '#1F2937';
+    return isDark ? '#FFFFFF' : '#1F2937';
   };
 
   const getTextSecondary = () => {
-    return theme === 'dark' ? '#9CA3AF' : '#6B7280';
+    return isDark ? '#9CA3AF' : '#4B5563';
+  };
+
+  const getCardShadow = () => {
+    return isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)';
   };
 
   // 3D Icon Component - Fixed: No scale on hover
@@ -223,26 +232,27 @@ export default function PortalArchitecture() {
 
   return (
     <div className="mt-10">
-      {/* Header */}
+      {/* Header - UPDATED with better contrast */}
       <div className="text-center mb-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="inline-block px-3 py-1 border rounded-full mb-3 cursor-pointer"
+          <div 
+            className="inline-block px-3 py-1 rounded-full mb-3 cursor-pointer"
             style={{
-              borderColor: theme === 'dark' ? 'rgba(232,184,75,0.3)' : 'rgba(0,102,255,0.3)',
-              backgroundColor: theme === 'dark' ? 'rgba(232,184,75,0.05)' : 'rgba(0,102,255,0.05)',
+              border: 'none',
+              backgroundColor: isDark ? 'rgba(232,184,75,0.05)' : 'rgba(0,102,255,0.08)',
             }}
           >
             <span className="text-[10px] uppercase tracking-[0.2em] font-bold"
               style={{
-                color: theme === 'dark' ? '#fbbf24' : '#0066FF',
+                color: accentColor,
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Three-Tier
+              Three-Tier Architecture
             </span>
           </div>
           
@@ -254,7 +264,7 @@ export default function PortalArchitecture() {
               Portal
             </span>{' '}
             <span style={{ 
-              color: getAccentColor(),
+              color: accentColor,
               fontFamily: "'Poppins', sans-serif",
             }}>
               Architecture
@@ -269,10 +279,17 @@ export default function PortalArchitecture() {
           >
             Our system is built on a robust multi-portal architecture designed for maximum efficiency and security
           </p>
+
+          {/* Decorative divider */}
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <div className="h-px w-12" style={{ background: accentColor, opacity: 0.3 }} />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: accentColor, opacity: 0.5 }} />
+            <div className="h-px w-12" style={{ background: accentColor, opacity: 0.3 }} />
+          </div>
         </motion.div>
       </div>
       
-      {/* Cards Grid */}
+      {/* Cards Grid - UPDATED with better light mode styling */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
         {portals.map((portal, index) => {
           const colors = getColors(portal.color);
@@ -289,25 +306,27 @@ export default function PortalArchitecture() {
               whileHover={{ 
                 y: -6,
               }}
-              className={`relative flex flex-col items-center rounded-[2rem] p-6 overflow-hidden cursor-pointer`}
+              className={`relative flex flex-col items-center rounded-2xl p-6 overflow-hidden cursor-pointer`}
               style={{
                 backgroundColor: getPortalBg(),
                 backdropFilter: 'blur(12px)',
                 border: isCenter 
-                  ? `2px solid ${getAccentColor()}`
+                  ? `2px solid ${accentColor}`
                   : `1px solid ${getBorderColor()}`,
                 boxShadow: isCenter 
-                  ? `0 0 40px ${getAccentColor()}20, 0 8px 32px ${getAccentColor()}10`
-                  : colors.cardShadow,
+                  ? (isDark 
+                    ? `0 0 40px ${accentColor}20, 0 8px 32px ${accentColor}10`
+                    : `0 0 40px rgba(0,102,255,0.08), 0 8px 32px rgba(0,102,255,0.04)`)
+                  : getCardShadow(),
                 transition: 'box-shadow 0.3s ease, transform 0.3s ease',
-                height: 'auto', // Auto height - no extra space
+                height: 'auto',
               }}
             >
               {/* Tech Corners */}
-              <div className="absolute top-16 left-0 w-3 h-10 border-l-2 opacity-30 pointer-events-none"
+              <div className="absolute top-16 left-0 w-3 h-10 border-l-2 opacity-20 pointer-events-none"
                 style={{ borderColor: colors.accent, clipPath: 'polygon(0 0, 100% 15%, 100% 85%, 0 100%)' }}
               />
-              <div className="absolute top-16 right-0 w-3 h-10 border-r-2 opacity-30 pointer-events-none"
+              <div className="absolute top-16 right-0 w-3 h-10 border-r-2 opacity-20 pointer-events-none"
                 style={{ borderColor: colors.accent, clipPath: 'polygon(0 0, 100% 15%, 100% 85%, 0 100%)', transform: 'scaleX(-1)' }}
               />
 
@@ -329,8 +348,8 @@ export default function PortalArchitecture() {
               </h4>
 
               {/* Underline */}
-              <div className="w-8 h-0.5 mb-4 opacity-60 rounded-full"
-                style={{ backgroundColor: colors.accent }}
+              <div className="w-8 h-0.5 mb-4 rounded-full"
+                style={{ backgroundColor: colors.accent, opacity: 0.6 }}
               />
 
               {/* Description */}
@@ -343,7 +362,6 @@ export default function PortalArchitecture() {
                 {portal.description}
               </p>
 
-              {/* Holographic Portal Base - REMOVED for cleaner look */}
               {/* Features */}
               <ul className="w-full space-y-2 text-sm">
                 {portal.features.map((feature, idx) => (
@@ -356,7 +374,7 @@ export default function PortalArchitecture() {
                     <div 
                       className="w-4 h-4 rounded-full border flex items-center justify-center mr-3 transition-colors flex-shrink-0"
                       style={{ 
-                        borderColor: `${colors.accent}50`,
+                        borderColor: `${colors.accent}40`,
                       }}
                     >
                       <CheckCircle2 
@@ -368,6 +386,19 @@ export default function PortalArchitecture() {
                   </li>
                 ))}
               </ul>
+
+              {/* Center badge - UPDATED */}
+              {isCenter && (
+                <div className="mt-4 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-[0.1em]"
+                  style={{
+                    backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+                    color: accentColor,
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  ★ Primary Portal
+                </div>
+              )}
             </motion.div>
           );
         })}

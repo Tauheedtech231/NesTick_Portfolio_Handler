@@ -56,7 +56,7 @@ const DotGrid: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => (
           width: "4px",
           height: "4px",
           borderRadius: "50%",
-          background: theme === 'dark' ? "#1e2d52" : "#c5cfe0",
+          background: theme === 'dark' ? "#1e2d52" : "#d1d9e8",
           display: "block",
         }}
       />
@@ -72,9 +72,9 @@ const IconCircle: React.FC<{
 }> = ({ children, dotColor, theme }) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
-  const borderColor = theme === 'dark' ? "#1e3366" : "#c5cfe0";
-  const bgColor = theme === 'dark' ? "rgba(12, 22, 58, 0.8)" : "rgba(240, 244, 255, 0.8)";
-  const glowColor = theme === 'dark' ? "rgba(232,202,94,0.15)" : "rgba(232,202,94,0.12)";
+  const borderColor = theme === 'dark' ? "#1e3366" : "#e0e6f0";
+  const bgColor = theme === 'dark' ? "rgba(12, 22, 58, 0.8)" : "rgba(255, 255, 255, 0.9)";
+  const shadowColor = theme === 'dark' ? "rgba(232,202,94,0.15)" : "rgba(0, 102, 255, 0.08)";
 
   return (
     <motion.div
@@ -90,12 +90,15 @@ const IconCircle: React.FC<{
         flexShrink: 0,
         position: "relative",
         cursor: "pointer",
-        transition: "border-color 0.3s ease, background 0.3s ease",
+        boxShadow: theme === 'light' ? `0 4px 15px ${shadowColor}` : 'none',
+        transition: "border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease",
       }}
       whileHover={{
         scale: 1.1,
         borderColor: dotColor,
-        boxShadow: `0 0 25px ${dotColor}40`,
+        boxShadow: theme === 'light' 
+          ? `0 8px 30px rgba(0, 102, 255, 0.15)` 
+          : `0 0 25px ${dotColor}40`,
         transition: {
           duration: 0.3,
           ease: [0.25, 0.46, 0.45, 0.94],
@@ -115,12 +118,12 @@ const IconCircle: React.FC<{
           position: "absolute",
           inset: "-5px",
           borderRadius: "50%",
-          border: `1px solid ${glowColor}`,
+          border: `1px solid ${shadowColor}`,
           pointerEvents: "none",
           transition: "border-color 0.3s ease",
         }}
         animate={{
-          borderColor: isHovered ? dotColor : glowColor,
+          borderColor: isHovered ? dotColor : shadowColor,
           scale: isHovered ? 1.15 : 1,
           opacity: isHovered ? 0.8 : 0.3,
         }}
@@ -169,31 +172,52 @@ const IconCircle: React.FC<{
   );
 };
 
-// ─── Cards with Animation ───
-const MissionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' | 'dark' }> = ({ 
-  data, 
-  isInView,
-  theme 
-}) => {
-  const textColor = theme === 'dark' ? '#fff' : '#1F2937';
-  const bodyColor = theme === 'dark' ? '#7a8daa' : '#4B5563';
-  const dotColor = theme === 'dark' ? '#1e2d52' : '#c5cfe0';
+// ─── Shared Card Component ───
+const PurposeCard: React.FC<{ 
+  data: CardData; 
+  isInView: boolean; 
+  theme: 'light' | 'dark';
+  direction: 'left' | 'right';
+}> = ({ data, isInView, theme, direction }) => {
+  const textColor = theme === 'dark' ? '#fff' : '#1A2332';
+  const bodyColor = theme === 'dark' ? '#7a8daa' : '#4A5B6E';
+  const bgColor = theme === 'dark' ? 'transparent' : '#FFFFFF';
+  const shadowColor = theme === 'dark' ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.06)';
+  const borderColor = theme === 'dark' ? 'none' : '1px solid rgba(0, 0, 0, 0.04)';
+
+  const initialX = direction === 'left' ? -120 : 120;
+  const delay = direction === 'left' ? 0.2 : 0.3;
+
+  // Border radius based on direction - only round outer edges
+  let borderRadius = '0px';
+  if (theme === 'light') {
+    if (direction === 'left') {
+      borderRadius = '16px 0 0 16px'; // Round left side only
+    } else {
+      borderRadius = '0 16px 16px 0'; // Round right side only
+    }
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -120 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -120 }}
+      initial={{ opacity: 0, x: initialX }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: initialX }}
       transition={{ 
         duration: 0.8,
-        delay: 0.2,
+        delay: delay,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        padding: "0 20px",
+        padding: theme === 'light' ? "32px 28px" : "0 20px",
         width: "100%",
+        background: bgColor,
+        borderRadius: borderRadius,
+        boxShadow: theme === 'light' ? shadowColor : 'none',
+        border: theme === 'light' ? borderColor : 'none',
+        transition: "all 0.3s ease",
       }}
     >
       <div
@@ -203,101 +227,6 @@ const MissionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' 
           gap: "16px",
           marginBottom: "18px",
           width: "100%",
-          flexWrap: "wrap",
-        }}
-      >
-        <IconCircle dotColor={data.accentColor} theme={theme}>
-          {data.icon}
-        </IconCircle>
-        <div>
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: data.labelColor,
-              marginBottom: "4px",
-            }}
-          >
-            {data.label}
-          </p>
-          <h3
-            style={{
-              fontSize: "22px",
-              fontWeight: 800,
-              color: textColor,
-              lineHeight: 1.18,
-              transition: "color 0.3s ease",
-            }}
-          >
-            {data.title.split("\n").map((line, i) => (
-              <React.Fragment key={i}>
-                {line}
-                {i < data.title.split("\n").length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </h3>
-        </div>
-      </div>
-
-      <div
-        style={{
-          width: "28px",
-          height: "2.5px",
-          borderRadius: "2px",
-          background: data.accentColor,
-          margin: "14px 0 16px",
-        }}
-      />
-
-      <p
-        style={{
-          fontSize: "14px",
-          color: bodyColor,
-          lineHeight: 1.7,
-          fontWeight: 400,
-          maxWidth: "480px",
-          transition: "color 0.3s ease",
-          width: "100%",
-        }}
-      >
-        {data.body}
-      </p>
-
-      <DotGrid theme={theme} />
-    </motion.div>
-  );
-};
-
-const VisionCard: React.FC<{ data: CardData; isInView: boolean; theme: 'light' | 'dark' }> = ({ 
-  data, 
-  isInView,
-  theme 
-}) => {
-  const textColor = theme === 'dark' ? '#fff' : '#1F2937';
-  const bodyColor = theme === 'dark' ? '#7a8daa' : '#4B5563';
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 120 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 120 }}
-      transition={{ 
-        duration: 0.8,
-        delay: 0.3,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      style={{ 
-        padding: "0 20px",
-        width: "100%",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-          marginBottom: "18px",
           flexWrap: "wrap",
         }}
       >
@@ -407,22 +336,22 @@ export function PurposeSection() {
     label: "Our Vision",
     title: "Shaping\nthe Future",
     body: "To become the global standard for educational portfolio management, connecting institutions, students, and opportunities through innovative technology that showcases potential and celebrates achievement.",
-    accentColor: "#5b9bff",
-    labelColor: "#5b9bff",
-    icon: <EyeIcon color="#5b9bff" />,
+    accentColor: "#0066FF",
+    labelColor: "#0066FF",
+    icon: <EyeIcon color="#0066FF" />,
   };
 
   // Theme-based colors
-  const bgColor = theme === 'dark' ? "#0B0F19" : "#f0f4f9";
-  const textColor = theme === 'dark' ? '#fff' : '#1F2937';
-  const mutedColor = theme === 'dark' ? '#8899bb' : '#6B7280';
-  const centerDotColor = theme === 'dark' ? '#E8CA5E' : '#E8CA5E';
+  const bgColor = theme === 'dark' ? "#0B0F19" : "#F4F7FC";
+  const textColor = theme === 'dark' ? '#fff' : '#1A2332';
+  const mutedColor = theme === 'dark' ? '#8899bb' : '#6B7A8F';
+  const centerDotColor = theme === 'dark' ? '#E8CA5E' : '#0066FF';
   const centerLineColor = theme === 'dark' 
     ? "linear-gradient(to bottom, transparent 0%, #2a4080 20%, #E8CA5E 50%, #2a4080 80%, transparent 100%)"
-    : "linear-gradient(to bottom, transparent 0%, #c5cfe0 20%, #E8CA5E 50%, #c5cfe0 80%, transparent 100%)";
+    : "linear-gradient(to bottom, transparent 0%, #d1d9e8 20%, #0066FF 50%, #d1d9e8 80%, transparent 100%)";
 
   // Header animation
-  const headerVariants:Variants = {
+  const headerVariants: Variants = {
     hidden: { opacity: 0, y: -30 },
     visible: { 
       opacity: 1, 
@@ -440,16 +369,30 @@ export function PurposeSection() {
       style={{
         background: bgColor,
         minHeight: "450px",
-        padding: "40px 20px 50px",
-        marginTop: "4rem", // ← ADDED: 1rem top margin
+        padding: theme === 'light' ? "60px 20px 70px" : "40px 20px 50px",
+        marginTop: "4rem", 
         fontFamily: "'Inter', sans-serif",
         position: "relative",
         overflow: "hidden",
         width: "100%",
         boxSizing: "border-box",
-        transition: "background 0.6s ease, margin 0.3s ease",
+        transition: "background 0.6s ease, padding 0.3s ease",
       }}
     >
+      {/* Subtle background gradient for light mode */}
+      {theme === 'light' && (
+        <div style={{
+          position: "absolute",
+          top: "-50%",
+          right: "-20%",
+          width: "600px",
+          height: "600px",
+          background: "radial-gradient(circle, rgba(0, 102, 255, 0.03) 0%, transparent 70%)",
+          borderRadius: "50%",
+          pointerEvents: "none",
+        }} />
+      )}
+
       {/* Header with Animation */}
       <motion.div
         initial="hidden"
@@ -461,6 +404,8 @@ export function PurposeSection() {
           justifyContent: "center",
           gap: "10px",
           marginBottom: "14px",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <span
@@ -482,7 +427,13 @@ export function PurposeSection() {
         animate={isInView ? "visible" : "hidden"}
         variants={headerVariants}
         transition={{ delay: 0.1 }}
-        style={{ textAlign: "center", marginBottom: "12px", lineHeight: 1.15 }}
+        style={{ 
+          textAlign: "center", 
+          marginBottom: "12px", 
+          lineHeight: 1.15,
+          position: "relative",
+          zIndex: 1,
+        }}
       >
         <h1 style={{ 
           fontSize: "clamp(24px, 4vw, 30px)", 
@@ -492,7 +443,7 @@ export function PurposeSection() {
           margin: 0,
           transition: "color 0.3s ease",
         }}>
-          Purpose & <span style={{ color: "#E8CA5E" }}>Impact</span>
+          Purpose & <span style={{ color: theme === 'dark' ? "#E8CA5E" : "#0066FF" }}>Impact</span>
         </h1>
       </motion.div>
 
@@ -507,11 +458,32 @@ export function PurposeSection() {
           justifyContent: "center",
           gap: "8px",
           marginBottom: "36px",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        <div style={{ width: "26px", height: "2.5px", background: "#E8CA5E", borderRadius: "2px" }} />
-        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: theme === 'dark' ? "#e8e8e8" : "#1F2937", transition: "background 0.3s ease" }} />
-        <div style={{ width: "26px", height: "2.5px", background: "#5b9bff", borderRadius: "2px" }} />
+        <div style={{ 
+          width: "26px", 
+          height: "2.5px", 
+          background: theme === 'dark' ? "#E8CA5E" : "#0066FF", 
+          borderRadius: "2px",
+          opacity: 0.6,
+        }} />
+        <div style={{ 
+          width: "5px", 
+          height: "5px", 
+          borderRadius: "50%", 
+          background: textColor, 
+          transition: "background 0.3s ease",
+          opacity: 0.3,
+        }} />
+        <div style={{ 
+          width: "26px", 
+          height: "2.5px", 
+          background: theme === 'dark' ? "#5b9bff" : "#0066FF", 
+          borderRadius: "2px",
+          opacity: 0.6,
+        }} />
       </motion.div>
 
       {/* Mission & Vision - Responsive Grid */}
@@ -523,12 +495,19 @@ export function PurposeSection() {
           maxWidth: "1100px",
           margin: "0 auto",
           alignItems: "start",
+          position: "relative",
+          zIndex: 1,
         }}
         className="purpose-grid"
       >
-        <MissionCard data={missionData} isInView={isInView} theme={theme} />
+        <PurposeCard 
+          data={missionData} 
+          isInView={isInView} 
+          theme={theme} 
+          direction="left"
+        />
 
-        {/* Center Line with Glowing Dot - GOLD */}
+        {/* Center Line with Glowing Dot */}
         <div
           style={{
             background: centerLineColor,
@@ -564,7 +543,12 @@ export function PurposeSection() {
           />
         </div>
 
-        <VisionCard data={visionData} isInView={isInView} theme={theme} />
+        <PurposeCard 
+          data={visionData} 
+          isInView={isInView} 
+          theme={theme} 
+          direction="right"
+        />
       </div>
 
       {/* ─── RESPONSIVE STYLES ─── */}
@@ -579,6 +563,10 @@ export function PurposeSection() {
           }
           .center-dot {
             display: none !important;
+          }
+          /* On mobile, both cards should have full rounded corners */
+          .purpose-grid > div {
+            border-radius: 16px !important;
           }
         }
 

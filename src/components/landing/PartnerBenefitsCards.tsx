@@ -22,12 +22,12 @@ interface Benefit {
 }
 
 const DEFAULT_BENEFITS: Benefit[] = [
-  { id: 1, icon: Handshake, title: "Strategic Collaboration", desc: "Work with us to shape the future of education.", color: "#60A5FA" },
-  { id: 2, icon: TrendingUp, title: "Growth Opportunities", desc: "Access to a growing network of institutions.", color: "#E8CA5E" },
-  { id: 3, icon: Shield, title: "Priority Support", desc: "Dedicated support team for all your needs.", color: "#60A5FA" },
-  { id: 4, icon: Zap, title: "Early Access", desc: "Get early access to new features and products.", color: "#E8CA5E" },
-  { id: 5, icon: BarChart3, title: "Analytics Dashboard", desc: "Comprehensive insights into your performance.", color: "#60A5FA" },
-  { id: 6, icon: Globe, title: "Global Reach", desc: "Connect with institutions across the globe.", color: "#E8CA5E" },
+  { id: 1, icon: Handshake, title: "Strategic Collaboration", desc: "Work with us to shape the future of education.", color: "#2563EB" },
+  { id: 2, icon: TrendingUp, title: "Growth Opportunities", desc: "Access to a growing network of institutions.", color: "#F59E0B" },
+  { id: 3, icon: Shield, title: "Priority Support", desc: "Dedicated support team for all your needs.", color: "#2563EB" },
+  { id: 4, icon: Zap, title: "Early Access", desc: "Get early access to new features and products.", color: "#F59E0B" },
+  { id: 5, icon: BarChart3, title: "Analytics Dashboard", desc: "Comprehensive insights into your performance.", color: "#2563EB" },
+  { id: 6, icon: Globe, title: "Global Reach", desc: "Connect with institutions across the globe.", color: "#F59E0B" },
 ];
 
 const CARD_W = 155;
@@ -101,15 +101,14 @@ export function PartnerBenefitsCards({
   benefits, 
   theme, 
   isInView,
-  activeColor = '#0066FF',
-  shadowColor = 'rgba(0, 102, 255, 0.25)'
+  activeColor = '#2563EB', // Changed to brand blue
+  shadowColor = 'rgba(37, 99, 235, 0.15)' // Lighter, subtle shadow
 }: PartnerBenefitsCardsProps) {
   const BENEFITS = benefits || DEFAULT_BENEFITS;
   const areaRef = useRef<HTMLDivElement>(null);
   const [positions, setPositions] = useState<CardPosition[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -119,7 +118,6 @@ export function PartnerBenefitsCards({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Get visible benefits based on device
   const getVisibleBenefits = useCallback(() => {
     if (isMobile) {
       return BENEFITS.slice(0, 3);
@@ -141,12 +139,61 @@ export function PartnerBenefitsCards({
     return () => window.removeEventListener("resize", recalculate);
   }, [recalculate]);
 
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F5F5F5';
-  const getCardBg = () => theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.9)';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.3)' : 'rgba(0, 0, 0, 0.06)';
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
-  
+  // ===== DESIGNER CHANGES START HERE =====
+
+  // 1️⃣ Light Theme - Depth & Contrast with gradients
+  const getBgColor = () => {
+    if (theme === 'dark') return '#0B0F19';
+    // Light theme: subtle gradient for depth instead of flat #F5F5F5
+    return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
+  };
+
+  // 2️⃣ Card Background - Clean white with subtle gradient
+  const getCardBg = () => {
+    if (theme === 'dark') return 'rgba(15, 23, 42, 0.85)';
+    // Light theme: pure white with subtle gradient for premium feel
+    return 'rgba(255, 255, 255, 0.95)';
+  };
+
+  // 3️⃣ Card Border - Subtle & refined
+  const getBorderColor = () => {
+    if (theme === 'dark') return 'rgba(30, 41, 59, 0.4)';
+    // Light theme: very subtle border
+    return 'rgba(0, 0, 0, 0.06)';
+  };
+
+  // 4️⃣ Card Shadow - Layered shadows for depth (not flat)
+  const getCardShadow = () => {
+    if (theme === 'dark') {
+      return '0 4px 24px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)';
+    }
+    // Light theme: multi-layered shadows for depth
+    return '0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(37, 99, 235, 0.06), 0 2px 8px rgba(0,0,0,0.04)';
+  };
+
+  // 5️⃣ Card Hover Shadow - Premium hover effect
+  const getCardHoverShadow = () => {
+    if (theme === 'dark') {
+      return '0 8px 40px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2)';
+    }
+    // Light theme: elevated shadow on hover
+    return '0 8px 40px rgba(37, 99, 235, 0.10), 0 4px 16px rgba(0,0,0,0.06)';
+  };
+
+  // 6️⃣ Text Colors - Better contrast
+  const getTextColor = () => {
+    if (theme === 'dark') return '#F1F5F9';
+    // Light theme: darker for better contrast
+    return '#0F172A';
+  };
+
+  const getTextMuted = () => {
+    if (theme === 'dark') return '#94A3B8';
+    // Light theme: slate color for better readability
+    return '#475569';
+  };
+
+  // 7️⃣ Card Dimensions
   const getCardDimensions = () => {
     if (isMobile) {
       return { width: 110, height: 130 };
@@ -155,22 +202,25 @@ export function PartnerBenefitsCards({
   };
 
   const { width: cardW, height: cardH } = getCardDimensions();
-  const LAST_CARD_LEFT_OFFSET = isMobile ? 5 : 20;
 
-  // Custom position adjustments - 1rem down + 1rem left push
   const getCustomPosition = (index: number, originalX: number, originalY: number) => {
     if (!isMobile) {
-      // Desktop: 1rem down (16px) + 1rem left (-16px)
       if (index === 0) {
         return { 
-          x: originalX - 20,   // 1rem left
-          y: originalY + 2    // 1rem down
+          x: originalX - 20,   
+          y: originalY + 30    
+        };
+      }
+      
+      if (index === visibleBenefits.length - 1) {
+        return {
+          x: originalX + (1.3 * 16), 
+          y: originalY + (2 * 16),   
         };
       }
       return { x: originalX, y: originalY };
     }
     
-    // Mobile adjustments
     const firstCardLeftGap = 20;
     const firstCardTopGap = 15;
     const secondCardLeftGap = 20;
@@ -182,8 +232,8 @@ export function PartnerBenefitsCards({
     let adjustedY = originalY;
     
     if (index === 0) {
-      adjustedX = originalX + firstCardLeftGap - 10 - 16; // 1rem left push
-      adjustedY = originalY + firstCardTopGap - 8 + 16;   // 1rem down
+      adjustedX = originalX + firstCardLeftGap - 10 - 16;
+      adjustedY = originalY + firstCardTopGap - 8 + 16;
     }
     
     if (index === 1) {
@@ -196,15 +246,23 @@ export function PartnerBenefitsCards({
       adjustedY = originalY + thirdCardTopGap;
     }
     
+    if (index === visibleBenefits.length - 1) {
+      adjustedX += (0.3 * 16);
+      adjustedY += (1 * 16);
+    }
+    
     return { x: adjustedX, y: adjustedY };
   };
 
   return (
     <section 
       className="w-full rounded-xl px-5 pt-6 pb-10 relative overflow-visible"
-      style={{ backgroundColor: getBgColor() }}
+      style={{ 
+        background: getBgColor(),
+        // Subtle inner shadow for depth
+        boxShadow: theme === 'light' ? 'inset 0 1px 0 rgba(255,255,255,0.8)' : 'none'
+      }}
     >
-      {/* Arc area */}
       <div
         ref={areaRef}
         className="relative w-full"
@@ -220,9 +278,9 @@ export function PartnerBenefitsCards({
             return (
               <div
                 key={benefit.id || i}
-                className="absolute group cursor-pointer rounded-xl text-center transition-all duration-500 hover:scale-105 hover:shadow-xl"
+                className="absolute group cursor-pointer rounded-2xl text-center transition-all duration-500 hover:-translate-y-1"
                 style={{
-                  left: customPos.x + (i === visibleBenefits.length - 1 ? LAST_CARD_LEFT_OFFSET : 0),
+                  left: customPos.x,
                   top: customPos.y,
                   width: cardW,
                   height: cardH,
@@ -237,29 +295,39 @@ export function PartnerBenefitsCards({
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: `0 4px 20px ${shadowColor}`,
+                  // 8️⃣ Multi-layered shadow for depth
+                  boxShadow: getCardShadow(),
+                }}
+                // 9️⃣ Hover styles using CSS custom properties
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = getCardHoverShadow();
+                  e.currentTarget.style.borderColor = theme === 'light' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = getCardShadow();
+                  e.currentTarget.style.borderColor = getBorderColor();
                 }}
               >
-                {/* Glow effect on hover */}
+                {/* 🔟 Subtle gradient glow - only on hover */}
                 <div 
-                  className="absolute -inset-0.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
+                  className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
-                    background: `radial-gradient(circle at center, ${activeColor}25, transparent 70%)`,
+                    background: `radial-gradient(circle at 50% 0%, ${activeColor}15, transparent 70%)`,
+                    zIndex: 0,
                   }}
                 />
 
-                {/* Icon */}
+                {/* Icon with brand color */}
                 <div 
                   className="relative z-10 mb-1.5 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    color: activeColor,
+                    color: theme === 'light' ? activeColor : '#60A5FA',
                   }}
                 >
                   {benefit.icon && <benefit.icon size={isMobile ? 20 : 28} strokeWidth={1.8} />}
                 </div>
 
                 <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
-                  {/* Title */}
                   <p className="font-bold leading-tight mb-1 font-sans tracking-wide text-center"
                     style={{ 
                       color: getTextColor(),
@@ -269,7 +337,6 @@ export function PartnerBenefitsCards({
                     {benefit.title}
                   </p>
 
-                  {/* Description */}
                   <p className="leading-relaxed font-light text-center"
                     style={{ 
                       color: getTextMuted(),
@@ -284,7 +351,7 @@ export function PartnerBenefitsCards({
           })}
       </div>
 
-      {/* Mobile indicator dots */}
+      {/* Mobile indicator dots - refined */}
       {isMobile && visibleBenefits.length > 1 && (
         <div className="flex justify-center gap-1.5 mt-3">
           {visibleBenefits.map((_, idx) => (
@@ -293,7 +360,7 @@ export function PartnerBenefitsCards({
               className="h-1 rounded-full transition-all duration-300"
               style={{
                 width: idx === 0 ? '16px' : '5px',
-                background: idx === 0 ? activeColor : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
+                background: idx === 0 ? activeColor : (theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
               }}
             />
           ))}

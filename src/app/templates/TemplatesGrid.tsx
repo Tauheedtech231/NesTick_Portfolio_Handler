@@ -78,17 +78,42 @@ export default function TemplatesGrid({
     return matchesSearch && matchesType;
   });
 
+  // Theme-based colors for better contrast
+  const isDark = theme === 'dark';
+  const textColor = isDark ? '#FFFFFF' : '#1F2937';
+  const textMuted = isDark ? '#9CA3AF' : '#4B5563';
+  const textLight = isDark ? '#6B7280' : '#9CA3AF';
+  const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  const cardBg = isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF';
+  const inputBg = isDark ? '#0F172A' : '#FFFFFF';
+  const accentColor = isDark ? '#E8CA5E' : '#0066FF';
+  const accentLight = isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
+  const sectionBg = isDark ? 'transparent' : '#F8FAFF';
+
+  // Handle input focus
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsSearchFocused(true);
+    e.currentTarget.style.borderColor = accentColor;
+    e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+  };
+
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsSearchFocused(false);
+    e.currentTarget.style.borderColor = borderColor;
+    e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+  };
+
   return (
     <section 
       id="templates-grid" 
       className="py-8 md:py-10 lg:py-12"
       style={{ 
         fontFamily: "'Poppins', sans-serif",
-        backgroundColor: theme === 'dark' ? 'transparent' : '#F8FAFF', // Subtle off-white for light mode
+        backgroundColor: sectionBg,
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header - No left animation */}
+        {/* Header */}
         <div 
           ref={headerRef}
           className="mb-10 md:mb-12 text-center md:text-left"
@@ -96,19 +121,15 @@ export default function TemplatesGrid({
           <div 
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto md:mx-0 w-fit"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+              backgroundColor: accentLight,
               border: 'none',
             }}
           >
-            <Sparkles className="w-3.5 h-3.5"
-              style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-            />
-            <span className="text-xs font-medium"
-              style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
+            <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
+            <span className="text-xs font-medium" style={{ 
+              color: accentColor,
+              fontFamily: "'Poppins', sans-serif",
+            }}>
               ✨ All Available Templates
             </span>
           </div>
@@ -117,7 +138,7 @@ export default function TemplatesGrid({
             <span 
               className="relative inline-block"
               style={{ 
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                color: textColor,
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
@@ -126,7 +147,7 @@ export default function TemplatesGrid({
             <span 
               className="inline-block"
               style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                color: accentColor,
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
@@ -135,9 +156,9 @@ export default function TemplatesGrid({
           </h2>
           
           <p 
-            className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light"
+            className="text-base md:text-lg max-w-2xl mx-auto md:mx-0 leading-relaxed font-light"
             style={{ 
-              color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker for light mode
+              color: textMuted,
               fontFamily: "'Calibri Light', sans-serif",
             }}
           >
@@ -152,24 +173,24 @@ export default function TemplatesGrid({
           <div className="relative">
             <div className="relative flex items-center gap-2">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer"
-                  style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: textLight }}
                 />
                 <input
                   type="text"
                   placeholder="Search templates by name or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                  className="w-full rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none transition-colors duration-300 cursor-text"
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  className="w-full rounded-xl py-3 pl-10 pr-10 text-sm focus:outline-none transition-all duration-300 cursor-text"
                   style={{
-                    backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                    borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                    backgroundColor: inputBg,
+                    borderColor: borderColor,
                     borderWidth: '1px',
-                    color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                    color: textColor,
                     fontFamily: "'Calibri Light', sans-serif",
-                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                   }}
                 />
                 {searchQuery && (
@@ -177,7 +198,7 @@ export default function TemplatesGrid({
                     onClick={() => setSearchQuery('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5 cursor-pointer" style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }} />
+                    <X className="w-3.5 h-3.5" style={{ color: textLight }} />
                   </button>
                 )}
               </div>
@@ -186,16 +207,16 @@ export default function TemplatesGrid({
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                 className="px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer"
                 style={{
-                  backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                  borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                  backgroundColor: inputBg,
+                  borderColor: borderColor,
                   borderWidth: '1px',
-                  color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
+                  color: textMuted,
                   fontFamily: "'Poppins', sans-serif",
-                  boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                  boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
-                <Filter className="w-4 h-4 cursor-pointer" />
-                <span className="text-sm hidden sm:inline cursor-pointer">Filter</span>
+                <Filter className="w-4 h-4" />
+                <span className="text-sm hidden sm:inline">Filter</span>
               </button>
             </div>
           </div>
@@ -203,22 +224,20 @@ export default function TemplatesGrid({
           {isFilterOpen && (
             <div className="mt-3 p-2 rounded-xl flex gap-2"
               style={{
-                backgroundColor: theme === 'dark' ? '#0F172A' : '#FFFFFF',
-                borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                backgroundColor: inputBg,
+                borderColor: borderColor,
                 borderWidth: '1px',
-                boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
               }}
             >
               <button
                 onClick={() => setSelectedType('all')}
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 tracking-wide cursor-pointer"
                 style={{
-                  backgroundColor: selectedType === 'all'
-                    ? (theme === 'dark' ? '#E8CA5E' : '#0066FF')
-                    : 'transparent',
+                  backgroundColor: selectedType === 'all' ? accentColor : 'transparent',
                   color: selectedType === 'all'
-                    ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
+                    ? (isDark ? '#1F4381' : '#FFFFFF')
+                    : textMuted,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -228,12 +247,8 @@ export default function TemplatesGrid({
                 onClick={() => setSelectedType('free')}
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 tracking-wide cursor-pointer"
                 style={{
-                  backgroundColor: selectedType === 'free'
-                    ? '#22C55E'
-                    : 'transparent',
-                  color: selectedType === 'free'
-                    ? '#FFFFFF'
-                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
+                  backgroundColor: selectedType === 'free' ? '#22C55E' : 'transparent',
+                  color: selectedType === 'free' ? '#FFFFFF' : textMuted,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -243,12 +258,10 @@ export default function TemplatesGrid({
                 onClick={() => setSelectedType('paid')}
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 tracking-wide cursor-pointer"
                 style={{
-                  backgroundColor: selectedType === 'paid'
-                    ? (theme === 'dark' ? '#E8CA5E' : '#0066FF')
-                    : 'transparent',
+                  backgroundColor: selectedType === 'paid' ? accentColor : 'transparent',
                   color: selectedType === 'paid'
-                    ? (theme === 'dark' ? '#1F4381' : '#FFFFFF')
-                    : (theme === 'dark' ? '#9CA3AF' : '#4B5563'),
+                    ? (isDark ? '#1F4381' : '#FFFFFF')
+                    : textMuted,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -258,9 +271,9 @@ export default function TemplatesGrid({
           )}
 
           <div className="flex justify-between items-center mt-3">
-            <p className="text-xs tracking-wide cursor-default"
+            <p className="text-xs tracking-wide"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
+                color: textMuted,
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >
@@ -271,10 +284,10 @@ export default function TemplatesGrid({
 
         {loadingTemplates ? (
           <div className="flex justify-center items-center py-16">
-            <div className="w-10 h-10 border-4 rounded-full animate-spin cursor-wait"
+            <div className="w-10 h-10 border-4 rounded-full animate-spin"
               style={{
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.2)',
-                borderTopColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                borderColor: isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.2)',
+                borderTopColor: accentColor,
               }}
             />
           </div>
@@ -290,22 +303,22 @@ export default function TemplatesGrid({
                 key={template.id}
                 variants={itemVariants}
                 whileHover={{ y: -8 }}
-                className="group relative rounded-2xl overflow-hidden flex flex-col cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                className="group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
+                  backgroundColor: cardBg,
                   border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                  boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                  borderColor: borderColor,
+                  boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)',
                 }}
               >
-                {/* 🔥 Template Image - 16:9 Landscape with object-contain */}
-                <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
+                {/* Template Image - 16:9 Landscape with object-contain */}
+                <div className="relative w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <Image
                       src={template.image}
                       alt={template.name}
                       fill
-                      className="object-contain"  
+                      className="object-contain"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={false}
                       onError={(e) => {
@@ -318,15 +331,15 @@ export default function TemplatesGrid({
                   
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex gap-1.5 z-20">
-                    <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full cursor-default"
+                    <span className="text-[10px] font-medium text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full"
                       style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
                       Template
                     </span>
-                    <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm cursor-default ${
+                    <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm ${
                       template.type === 'free' 
                         ? 'bg-green-500/80' 
-                        : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
+                        : (isDark ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
                     }`}
                     style={{ fontFamily: "'Poppins', sans-serif" }}
                     >
@@ -341,8 +354,8 @@ export default function TemplatesGrid({
                   >
                     <div className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
                       style={{
-                        backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                        color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                        backgroundColor: accentColor,
+                        color: isDark ? '#1F4381' : '#FFFFFF',
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -354,18 +367,18 @@ export default function TemplatesGrid({
 
                 {/* Content area */}
                 <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold mb-3 transition-colors duration-300 cursor-default"
+                  <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
                     style={{ 
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      color: textColor,
                       fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     {template.name}
                   </h3>
                   
-                  <p className="leading-relaxed text-base mb-4 line-clamp-2 cursor-default"
+                  <p className="leading-relaxed text-base mb-4 line-clamp-2"
                     style={{ 
-                      color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
+                      color: textMuted,
                       fontFamily: "'Calibri Light', sans-serif",
                     }}
                   >
@@ -378,10 +391,10 @@ export default function TemplatesGrid({
                       onClick={() => onDetailsClick(template)}
                       className="flex-1 py-2 px-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                       style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                         border: '1px solid',
-                        borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
-                        color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+                        color: textMuted,
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -394,11 +407,14 @@ export default function TemplatesGrid({
                       style={{
                         backgroundColor: template.type === 'free'
                           ? '#22C55E'
-                          : (theme === 'dark' ? '#E8CA5E' : '#0066FF'),
+                          : accentColor,
                         color: template.type === 'free'
                           ? '#FFFFFF'
-                          : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                          : (isDark ? '#1F4381' : '#FFFFFF'),
                         fontFamily: "'Poppins', sans-serif",
+                        boxShadow: template.type === 'free' 
+                          ? 'none' 
+                          : (isDark ? '0 4px 16px rgba(232,202,94,0.25)' : '0 4px 16px rgba(0,102,255,0.2)'),
                       }}
                     >
                       <Sparkles size={14} />
@@ -411,28 +427,26 @@ export default function TemplatesGrid({
           </motion.div>
         ) : (
           <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center cursor-default"
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center"
               style={{
-                backgroundColor: theme === 'dark' ? '#0F172A' : '#F5F5F5',
+                backgroundColor: isDark ? '#0F172A' : '#F5F5F5',
                 border: '1px solid',
-                borderColor: theme === 'dark' ? '#1E293B' : '#E5E7EB',
+                borderColor: borderColor,
               }}
             >
-              <Search className="w-6 h-6 cursor-default"
-                style={{ color: theme === 'dark' ? '#9CA3AF' : '#6B7280' }}
-              />
+              <Search className="w-6 h-6" style={{ color: textLight }} />
             </div>
-            <h3 className="text-lg font-bold mb-1 font-serif tracking-tight cursor-default"
+            <h3 className="text-lg font-bold mb-1 font-serif tracking-tight"
               style={{ 
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                color: textColor,
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
               No templates found
             </h3>
-            <p className="text-sm font-light tracking-wide cursor-default"
+            <p className="text-sm font-light tracking-wide"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#4B5563',
+                color: textMuted,
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >

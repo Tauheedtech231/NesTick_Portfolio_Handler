@@ -115,24 +115,41 @@ export default function PackagesSection() {
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+  
   const getSectionBg = () => {
-    return theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+    return isDark ? '#0B0F19' : '#F8FAFF';
   };
 
   const getCardBg = () => {
-    return theme === 'dark' ? 'rgba(15, 23, 42, 0.9)' : '#FFFFFF';
+    return isDark ? 'rgba(15, 23, 42, 0.9)' : '#FFFFFF';
   };
 
   const getBorderColor = () => {
-    return theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+    return isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   };
 
   const getAccentColor = () => {
-    return theme === 'dark' ? '#E8CA5E' : '#0066FF';
+    return isDark ? GOLD : BLUE;
   };
 
   const getAccentBg = () => {
-    return theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
+    return isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
+  };
+
+  const getCardShadow = () => {
+    return isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)';
+  };
+
+  const getTextColor = () => {
+    return isDark ? '#FFFFFF' : '#1F2937';
+  };
+
+  const getTextMuted = () => {
+    return isDark ? '#9CA3AF' : '#4B5563';
   };
 
   // 3D Icon Component with Continuous Floating
@@ -249,11 +266,11 @@ export default function PackagesSection() {
               }}
             >
               <Rocket className="w-3.5 h-3.5"
-                style={{ color: getAccentColor() }}
+                style={{ color: accentColor }}
               />
               <span className="text-xs font-medium"
                 style={{ 
-                  color: getAccentColor(),
+                  color: accentColor,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -264,7 +281,7 @@ export default function PackagesSection() {
             <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
               <span className="relative inline-block"
                 style={{ 
-                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  color: getTextColor(),
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -272,7 +289,7 @@ export default function PackagesSection() {
               </span>{' '}
               <span className="inline-block"
                 style={{ 
-                  color: getAccentColor(),
+                  color: accentColor,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -282,7 +299,7 @@ export default function PackagesSection() {
             
             <p className="text-lg md:text-xl font-light"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                color: getTextMuted(),
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >
@@ -299,11 +316,11 @@ export default function PackagesSection() {
             // Determine shadow based on theme
             const getShadow = (isHover: boolean = false) => {
               if (isHover) {
-                return theme === 'dark'
+                return isDark
                   ? pkg.cardShadowHover
                   : pkg.cardShadowHover;
               }
-              return theme === 'dark'
+              return isDark
                 ? pkg.cardShadow
                 : pkg.cardShadow;
             };
@@ -319,13 +336,13 @@ export default function PackagesSection() {
                   y: -8,
                   boxShadow: getShadow(true),
                 }}
-                className={`relative rounded-[2rem] p-6 md:p-8 transition-all duration-300 cursor-pointer ${
+                className={`relative rounded-2xl p-6 md:p-8 transition-all duration-300 cursor-pointer ${
                   isPopular ? 'shadow-2xl' : ''
                 }`}
                 style={{
                   backgroundColor: getCardBg(),
                   border: isPopular 
-                    ? `2px solid ${getAccentColor()}`
+                    ? `2px solid ${accentColor}`
                     : `1px solid ${getBorderColor()}`,
                   boxShadow: getShadow(false),
                   transition: 'box-shadow 0.3s ease, transform 0.3s ease',
@@ -335,10 +352,10 @@ export default function PackagesSection() {
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <div className="px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 cursor-pointer shadow-lg"
                       style={{
-                        backgroundColor: getAccentColor(),
-                        color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                        backgroundColor: accentColor,
+                        color: isDark ? '#1F4381' : '#FFFFFF',
                         fontFamily: "'Poppins', sans-serif",
-                        boxShadow: theme === 'dark' 
+                        boxShadow: isDark 
                           ? '0 4px 20px rgba(232,202,94,0.4)'
                           : '0 4px 20px rgba(0,102,255,0.4)',
                       }}
@@ -357,7 +374,7 @@ export default function PackagesSection() {
                   />
                   <h3 className="text-2xl font-bold mb-2 mt-4"
                     style={{ 
-                      color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                      color: getTextColor(),
                       fontFamily: "'Poppins', sans-serif",
                     }}
                   >
@@ -366,7 +383,7 @@ export default function PackagesSection() {
                   <div className="mb-2">
                     <span className="text-3xl font-bold"
                       style={{ 
-                        color: getAccentColor(),
+                        color: accentColor,
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -375,7 +392,7 @@ export default function PackagesSection() {
                   </div>
                   <p className="text-sm"
                     style={{ 
-                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                      color: getTextMuted(),
                       fontFamily: "'Calibri Light', sans-serif",
                     }}
                   >
@@ -394,14 +411,14 @@ export default function PackagesSection() {
                           }}
                         >
                           {feature.included ? (
-                            <Check className="w-3 h-3" style={{ color: getAccentColor() }} />
+                            <Check className="w-3 h-3" style={{ color: accentColor }} />
                           ) : (
                             <Lock className="w-3 h-3" style={{ color: '#6B7280' }} />
                           )}
                         </div>
-                        <FeatureIcon className="w-3.5 h-3.5" style={{ color: feature.included ? getAccentColor() : '#6B7280' }} />
+                        <FeatureIcon className="w-3.5 h-3.5" style={{ color: feature.included ? accentColor : '#6B7280' }} />
                         <span style={{ 
-                          color: feature.included ? (theme === 'dark' ? '#D1D5DB' : '#4B5563') : '#6B7280',
+                          color: feature.included ? (isDark ? '#D1D5DB' : '#4B5563') : '#6B7280',
                           fontFamily: "'Calibri Light', sans-serif",
                         }}>
                           {feature.text}
@@ -415,24 +432,24 @@ export default function PackagesSection() {
                   <motion.button
                     className="w-full py-3.5 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: isPopular ? getAccentColor() : (theme === 'dark' ? 'rgba(255,255,255,0.08)' : '#F5F5F5'),
-                      color: isPopular ? (theme === 'dark' ? '#1F4381' : '#FFFFFF') : (theme === 'dark' ? '#D1D5DB' : '#4B5563'),
+                      backgroundColor: isPopular ? accentColor : (isDark ? 'rgba(255,255,255,0.08)' : '#F5F5F5'),
+                      color: isPopular ? (isDark ? '#1F4381' : '#FFFFFF') : (isDark ? '#D1D5DB' : '#4B5563'),
                       fontFamily: "'Poppins', sans-serif",
                       boxShadow: isPopular
-                        ? (theme === 'dark' 
+                        ? (isDark 
                           ? '0 8px 30px rgba(232,202,94,0.3)'
                           : '0 8px 30px rgba(0,102,255,0.2)')
-                        : (theme === 'dark'
+                        : (isDark
                           ? '0 4px 15px rgba(0,0,0,0.2)'
                           : '0 4px 15px rgba(0,0,0,0.05)'),
                     }}
                     whileHover={{ 
                       scale: 1.05,
                       boxShadow: isPopular
-                        ? (theme === 'dark' 
+                        ? (isDark 
                           ? '0 12px 40px rgba(232,202,94,0.5)'
                           : '0 12px 40px rgba(0,102,255,0.35)')
-                        : (theme === 'dark'
+                        : (isDark
                           ? '0 8px 30px rgba(0,0,0,0.3)'
                           : '0 8px 30px rgba(0,0,0,0.1)'),
                     }}

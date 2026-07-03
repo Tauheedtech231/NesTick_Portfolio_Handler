@@ -95,6 +95,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         newBadgeBg: '#E8CA5E',
         newBadgeText: '#1F4381',
         particleColor: '#3B82F6',
+        // Your Design button specific
+        designButtonBg: 'rgba(255,255,255,0.1)',
+        designButtonText: '#FFFFFF',
+        designButtonBorder: '#E8CA5E',
       };
     } else {
       return {
@@ -104,8 +108,8 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         badgeBorder: 'rgba(255, 255, 255, 0.2)',
         badgeColor: '#FFFFFF',
         headingColor: '#FFFFFF',
-        headingAccent: '#60A5FA', // Lighter blue for better visibility
-        textColor: '#F3F4F6', // Brighter for better contrast
+        headingAccent: '#0066FF',
+        textColor: '#F3F4F6',
         buttonBg: '#0066FF',
         buttonText: '#FFFFFF',
         borderColor: '#0066FF',
@@ -113,6 +117,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         newBadgeBg: '#0066FF',
         newBadgeText: '#FFFFFF',
         particleColor: '#60A5FA',
+        // Your Design button specific - SOLID WHITE for visibility
+        designButtonBg: 'rgba(255,255,255,0.9)',
+        designButtonText: '#0066FF',
+        designButtonBorder: '#0066FF',
       };
     }
   };
@@ -224,23 +232,33 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform cursor-pointer" />
             </button>
             
-            {/* Your Design Button - Full Rounded */}
+            {/* Your Design Button - Full Rounded with SOLID BACKGROUND in light mode */}
             <motion.button
               onClick={onDesignClick}
-              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 bg-transparent border-2 cursor-pointer hover:scale-105 active:scale-95 relative"
+              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 relative"
               style={{
-                borderColor: colors.borderColor,
-                color: colors.borderColor,
+                backgroundColor: colors.designButtonBg,
+                color: colors.designButtonText,
+                border: `2px solid ${colors.designButtonBorder}`,
                 fontFamily: "'Poppins', sans-serif",
-                textShadow: theme === 'light' ? '0 1px 12px rgba(0,0,0,0.2)' : 'none',
+                textShadow: theme === 'light' ? '0 1px 4px rgba(0,0,0,0.05)' : 'none',
+                boxShadow: theme === 'light' 
+                  ? '0 4px 20px rgba(0,102,255,0.15)' 
+                  : '0 4px 20px rgba(232,202,94,0.15)',
               }}
               animate={isPulsing ? {
                 scale: [1, 1.05, 1],
-                boxShadow: [
-                  `0 0 0 0 ${colors.pulseColor}`,
-                  `0 0 0 15px ${colors.pulseColor.replace('0.4', '0')}`,
-                  `0 0 0 0 ${colors.pulseColor.replace('0.4', '0')}`
-                ]
+                boxShadow: theme === 'light' 
+                  ? [
+                      `0 0 0 0 rgba(0,102,255,0.3)`,
+                      `0 0 0 15px rgba(0,102,255,0)`,
+                      `0 0 0 0 rgba(0,102,255,0)`
+                    ]
+                  : [
+                      `0 0 0 0 rgba(232,202,94,0.3)`,
+                      `0 0 0 15px rgba(232,202,94,0)`,
+                      `0 0 0 0 rgba(232,202,94,0)`
+                    ]
               } : {}}
               transition={{
                 duration: 2,
@@ -258,7 +276,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                   className="absolute -inset-1 rounded-full animate-ping opacity-40"
                   style={{
                     border: '2px solid',
-                    borderColor: colors.borderColor,
+                    borderColor: colors.designButtonBorder,
                   }}
                 />
               )}

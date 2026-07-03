@@ -72,9 +72,6 @@ export default function ContactSection() {
   const [time, setTime] = useState("9:41");
   const [dateStr, setDateStr] = useState("");
   const [formOpen, setFormOpen] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [pulseIndex, setPulseIndex] = useState<number | null>(null);
-  const [sendBtnVisible, setSendBtnVisible] = useState(false);
   const [sendState, setSendState] = useState<"idle" | "sending" | "sent">("idle");
   const [values, setValues] = useState<Record<string, string>>({});
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -119,10 +116,10 @@ export default function ContactSection() {
   const BLUE = "#0066FF";
   
   const colors = {
-    bg: isDark ? '#0B0F19' : '#F8FAFF',
-    textPrimary: isDark ? '#FFFFFF' : '#1F2937',
-    textSecondary: isDark ? '#9CA3AF' : '#4B5563',
-    textMuted: isDark ? '#6B7280' : '#6B7280',
+    bg: isDark ? '#0B0F19' : '#F4F7FC',
+    textPrimary: isDark ? '#FFFFFF' : '#1A2332',
+    textSecondary: isDark ? '#9CA3AF' : '#4A5B6E',
+    textMuted: isDark ? '#6B7280' : '#6B7A8F',
     cardBg: isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
     border: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
     accent: isDark ? GOLD : BLUE,
@@ -137,6 +134,7 @@ export default function ContactSection() {
     buttonBg: isDark ? GOLD : BLUE,
     buttonText: isDark ? '#1F4381' : '#FFFFFF',
     phoneBorder: isDark ? GOLD : 'rgba(0,0,0,0.08)',
+    sectionBg: isDark ? '#0B0F19' : '#F4F7FC',
   };
 
   // ─── Live clock - 12hr format for both mobile and laptop ────────────────────
@@ -146,7 +144,6 @@ export default function ContactSection() {
       let hh = now.getHours();
       const mm = String(now.getMinutes()).padStart(2, "0");
       
-      // 12hr format for both mobile and laptop
       const ampm = hh >= 12 ? 'PM' : 'AM';
       hh = hh % 12 || 12;
       setTime(`${hh}:${mm} ${ampm}`);
@@ -177,7 +174,6 @@ export default function ContactSection() {
       if (sectionRef.current) {
         const rect = sectionRef.current.getBoundingClientRect();
         const scrollY = window.scrollY;
-        // Step 1: Scroll to show section in current window
         const targetY = scrollY + rect.top - 60;
         
         window.scrollTo({
@@ -185,8 +181,7 @@ export default function ContactSection() {
           behavior: 'smooth',
         });
 
-        // Step 2: After scroll, push up (7rem on laptop, 14rem on mobile)
-        const pushUpPx = isMobile ? -224 : -112; // 14rem = 224px, 7rem = 112px
+        const pushUpPx = isMobile ? -224 : -112;
         setTimeout(() => {
           setSectionOffset(pushUpPx);
           resolve();
@@ -197,40 +192,21 @@ export default function ContactSection() {
     });
   };
 
-  const showField = (index: number) => {
-    if (index >= FIELDS.length) {
-      setSendBtnVisible(true);
-      return;
-    }
-    setVisibleCount(index + 1);
-    setPulseIndex(index);
-
-    setTimeout(() => {
-      const field = FIELDS[index];
-      inputRefs.current[field.id]?.focus();
-    }, 300);
-
-    setTimeout(() => setPulseIndex((p) => (p === index ? null : p)), 600);
-
-    timerRef.current = setTimeout(() => showField(index + 1), 2000);
-  };
-
+  // ─── Open form - ALL FIELDS AT ONCE ─────────────────────────────────────────
   const openForm = async () => {
     if (formOpen) return;
     
-    // Step 1: Scroll to show section in current window
-    // Step 2: Push up (7rem laptop / 14rem mobile)
     await scrollAndPushUp();
     
-    // Step 3: Open form smoothly
     setTimeout(() => {
       setFormOpen(true);
-      setVisibleCount(0);
-      setPulseIndex(null);
-      setSendBtnVisible(false);
       setSendState("idle");
-      clearTimer();
-      setTimeout(() => showField(0), 850);
+      setValues({});
+      
+      // Focus first field after form opens
+      setTimeout(() => {
+        inputRefs.current["fname"]?.focus();
+      }, 400);
     }, 300);
   };
 
@@ -238,20 +214,7 @@ export default function ContactSection() {
     setFormOpen(false);
     setSectionOffset(0);
     clearTimer();
-    setVisibleCount(0);
-    setSendBtnVisible(false);
-  };
-
-  const handleFieldClick = (index: number) => {
-    if (!formOpen) return;
-    if (index < visibleCount) {
-      inputRefs.current[FIELDS[index].id]?.focus();
-      return;
-    }
-    if (index === visibleCount) {
-      clearTimer();
-      showField(index);
-    }
+    setSendState("idle");
   };
 
   const handleChange = (id: string, val: string) => {
@@ -274,15 +237,6 @@ export default function ContactSection() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!formOpen) return;
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (visibleCount < FIELDS.length) {
-        clearTimer();
-        showField(visibleCount);
-      } else {
-        handleSubmit(e as unknown as React.FormEvent);
-      }
-    }
     if (e.key === "Escape") closeForm();
   };
 
@@ -295,7 +249,7 @@ export default function ContactSection() {
       className={`${inter.variable} ${fraunces.variable} relative max-w-[1360px] mx-auto px-3 sm:px-8 md:px-16 pt-6 sm:pt-12 pb-8 sm:pb-16 md:pb-24 overflow-visible transition-all duration-700 ease-in-out`}
       style={{ 
         fontFamily: "var(--font-inter), sans-serif", 
-        background: colors.bg, 
+        background: colors.sectionBg, 
         color: colors.textPrimary,
         minHeight: isMobile ? 'auto' : '100vh',
         transform: `translateY(${sectionOffset}px)`,
@@ -305,7 +259,7 @@ export default function ContactSection() {
     >
       {/* Eyebrow */}
       <div className="flex items-center gap-3 text-[10px] sm:text-[13px] font-semibold tracking-[0.16em] uppercase mb-3 sm:mb-5 md:mb-7 transition-colors duration-300">
-        <span className="w-5 sm:w-6 h-px bg-[#6E43F2] inline-block" />
+        <span className="w-5 sm:w-6 h-px inline-block" style={{ background: colors.accent }} />
         <span style={{ color: colors.accent }}>Say hello</span>
       </div>
 
@@ -323,7 +277,12 @@ export default function ContactSection() {
           <div className="relative z-[3] pr-0 lg:pr-14 ml-15 sm:ml-0 md:-mt-6">
             <h1
               className="text-[clamp(24px,3vw,42px)] leading-[1.08] tracking-[-0.01em] max-w-[420px]"
-              style={{ fontFamily: "var(--font-fraunces), serif", fontWeight: 500, color: colors.textPrimary }}
+              style={{ 
+                fontFamily: "var(--font-fraunces), serif", 
+                fontWeight: 500, 
+                color: colors.textPrimary,
+                fontStyle: 'normal', // Removed italic
+              }}
             >
               Let&rsquo;s start
               <br />
@@ -503,7 +462,7 @@ export default function ContactSection() {
                     </div>
                   </div>
 
-                  {/* FORM SCREEN */}
+                  {/* FORM SCREEN - ALL FIELDS VISIBLE AT ONCE */}
                   <div
                     className={`absolute inset-0 rounded-[26px] sm:rounded-[30px] md:rounded-[36px] flex flex-col z-30 overflow-hidden transition-transform duration-700 ease-out ${
                       formOpen ? "translate-y-0" : "translate-y-full"
@@ -547,99 +506,87 @@ export default function ContactSection() {
                       </button>
                     </div>
 
-                    {/* Form Body */}
+                    {/* Form Body - ALL FIELDS VISIBLE AT ONCE */}
                     <form
                       onSubmit={handleSubmit}
                       className="flex-1 px-3 sm:px-[22px] pt-2 sm:pt-3 pb-2 sm:pb-3 flex flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                     >
                       <div className="flex-1 space-y-1.5 sm:space-y-2">
-                        {FIELDS.map((field, index) => {
-                          const isVisible = index < visibleCount;
-                          const isPulsing = pulseIndex === index;
-                          return (
-                            <div
-                              key={field.id}
-                              onClick={() => handleFieldClick(index)}
-                              className={`flex flex-col gap-0.5 transition-all duration-400 ${
-                                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2.5"
-                              } ${isPulsing ? "animate-[pulseField_0.5s_ease]" : ""}`}
-                              style={{ transitionTimingFunction: "cubic-bezier(0.4,0,0.2,1)" }}
-                            >
-                              <label htmlFor={field.id} className="text-[8px] sm:text-[10px] font-semibold tracking-[0.05em] uppercase transition-colors duration-300" style={{ color: colors.textMuted }}>
-                                {field.label}
-                              </label>
-                              {field.type === "textarea" ? (
-                                <textarea
-                                  id={field.id}
-                                  ref={(el) => {
-                                    inputRefs.current[field.id] = el;
-                                  }}
-                                  placeholder={field.placeholder}
-                                  required={field.required}
-                                  value={values[field.id] ?? ""}
-                                  onChange={(e) => handleChange(field.id, e.target.value)}
-                                  className="font-sans text-[11px] sm:text-[13px] rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 outline-none resize-none min-h-[32px] sm:min-h-[42px] leading-[1.4] sm:leading-[1.5] transition-colors duration-300"
-                                  style={{
-                                    fontFamily: "var(--font-inter), sans-serif",
-                                    background: colors.inputBg,
-                                    border: `1.4px solid ${colors.inputBorder}`,
-                                    color: colors.textPrimary,
-                                  }}
-                                  onFocus={(e) => {
-                                    e.currentTarget.style.borderColor = colors.inputFocus;
-                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
-                                  }}
-                                  onBlur={(e) => {
-                                    e.currentTarget.style.borderColor = colors.inputBorder;
-                                    e.currentTarget.style.background = colors.inputBg;
-                                  }}
-                                />
-                              ) : (
-                                <input
-                                  id={field.id}
-                                  ref={(el) => {
-                                    inputRefs.current[field.id] = el;
-                                  }}
-                                  type={field.type}
-                                  placeholder={field.placeholder}
-                                  required={field.required}
-                                  value={values[field.id] ?? ""}
-                                  onChange={(e) => handleChange(field.id, e.target.value)}
-                                  className="font-sans text-[11px] sm:text-[13px] rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 outline-none transition-colors duration-300"
-                                  style={{
-                                    fontFamily: "var(--font-inter), sans-serif",
-                                    background: colors.inputBg,
-                                    border: `1.4px solid ${colors.inputBorder}`,
-                                    color: colors.textPrimary,
-                                  }}
-                                  onFocus={(e) => {
-                                    e.currentTarget.style.borderColor = colors.inputFocus;
-                                    e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
-                                  }}
-                                  onBlur={(e) => {
-                                    e.currentTarget.style.borderColor = colors.inputBorder;
-                                    e.currentTarget.style.background = colors.inputBg;
-                                  }}
-                                />
-                              )}
-                            </div>
-                          );
-                        })}
+                        {FIELDS.map((field) => (
+                          <div key={field.id} className="flex flex-col gap-0.5 transition-all duration-300 opacity-100 translate-y-0">
+                            <label htmlFor={field.id} className="text-[8px] sm:text-[10px] font-semibold tracking-[0.05em] uppercase transition-colors duration-300" style={{ color: colors.textMuted }}>
+                              {field.label}
+                            </label>
+                            {field.type === "textarea" ? (
+                              <textarea
+                                id={field.id}
+                                ref={(el) => {
+                                  inputRefs.current[field.id] = el;
+                                }}
+                                placeholder={field.placeholder}
+                                required={field.required}
+                                value={values[field.id] ?? ""}
+                                onChange={(e) => handleChange(field.id, e.target.value)}
+                                className="font-sans text-[11px] sm:text-[13px] rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 outline-none resize-none min-h-[32px] sm:min-h-[42px] leading-[1.4] sm:leading-[1.5] transition-colors duration-300"
+                                style={{
+                                  fontFamily: "var(--font-inter), sans-serif",
+                                  background: colors.inputBg,
+                                  border: `1.4px solid ${colors.inputBorder}`,
+                                  color: colors.textPrimary,
+                                }}
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = colors.inputFocus;
+                                  e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = colors.inputBorder;
+                                  e.currentTarget.style.background = colors.inputBg;
+                                }}
+                              />
+                            ) : (
+                              <input
+                                id={field.id}
+                                ref={(el) => {
+                                  inputRefs.current[field.id] = el;
+                                }}
+                                type={field.type}
+                                placeholder={field.placeholder}
+                                required={field.required}
+                                value={values[field.id] ?? ""}
+                                onChange={(e) => handleChange(field.id, e.target.value)}
+                                className="font-sans text-[11px] sm:text-[13px] rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 outline-none transition-colors duration-300"
+                                style={{
+                                  fontFamily: "var(--font-inter), sans-serif",
+                                  background: colors.inputBg,
+                                  border: `1.4px solid ${colors.inputBorder}`,
+                                  color: colors.textPrimary,
+                                }}
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = colors.inputFocus;
+                                  e.currentTarget.style.background = isDark ? 'rgba(11,15,25,0.9)' : '#F8FAFF';
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = colors.inputBorder;
+                                  e.currentTarget.style.background = colors.inputBg;
+                                }}
+                              />
+                            )}
+                          </div>
+                        ))}
                       </div>
 
-                      {/* Submit Button */}
+                      {/* Submit Button - Always visible when form is open */}
                       <div className="flex-shrink-0 mt-1.5 sm:mt-2">
                         <button
                           type="submit"
                           disabled={sendState !== "idle"}
-                          className={`w-full border-none rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs md:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all duration-400 text-white ${
-                            sendBtnVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2.5 pointer-events-none"
-                          } ${sendState === "sent" ? "bg-[#1D9E6D]" : ""}`}
+                          className={`w-full border-none rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs md:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all duration-400 text-white opacity-100 translate-y-0 ${
+                            sendState === "sent" ? "bg-[#1D9E6D]" : ""
+                          }`}
                           style={{
                             fontFamily: "var(--font-inter), sans-serif",
                             background: sendState === "sent" ? '#1D9E6D' : colors.buttonBg,
                             color: sendState === "sent" ? '#FFFFFF' : colors.buttonText,
-                            transitionTimingFunction: "cubic-bezier(0.4,0,0.2,1)",
                           }}
                         >
                           <span>{sendLabel}</span>

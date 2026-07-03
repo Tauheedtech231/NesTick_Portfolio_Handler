@@ -275,22 +275,22 @@ export default function TestimonialSection() {
         accentLight: 'rgba(232, 202, 94, 0.15)',
         modalBg: 'rgba(11, 15, 25, 0.95)',
         border: 'rgba(30, 41, 59, 0.5)',
-        circleColor: GOLD, // Gold for dark mode
-        circleBorder: 'rgba(255,255,255,0.06)',
-        circleDashed: 'rgba(255,255,255,0.08)',
+        circleColor: GOLD,
+        circleBorder: 'rgba(232, 202, 94, 0.4)', // Solid gold border
+        circleDashed: 'rgba(232, 202, 94, 0.25)', // Dashed gold
       };
     } else {
       return {
-        bg: '#F8FAFF', // Subtle off-white
+        bg: '#F8FAFF',
         text: '#1F2937',
-        textSecondary: '#4B5563', // Darker for better contrast
+        textSecondary: '#4B5563',
         accent: BLUE,
         accentLight: 'rgba(0, 102, 255, 0.08)',
         modalBg: 'rgba(255, 255, 255, 0.95)',
         border: 'rgba(0, 0, 0, 0.06)',
-        circleColor: BLUE, // Blue for light mode
-        circleBorder: 'rgba(0, 102, 255, 0.08)',
-        circleDashed: 'rgba(0, 102, 255, 0.12)',
+        circleColor: BLUE,
+        circleBorder: 'rgba(0, 102, 255, 0.35)', // Solid blue border
+        circleDashed: 'rgba(0, 102, 255, 0.2)', // Dashed blue
       };
     }
   };
@@ -436,24 +436,34 @@ export default function TestimonialSection() {
                 height: circleSize.height,
               }}
             >
-              {/* Outer Circle Line - Theme aware */}
+              {/* Outer Circle Line - CLEAR SOLID */}
               <div 
                 className="absolute rounded-full"
                 style={{
-                  width: circleSize.width - 60,
-                  height: circleSize.height - 60,
-                  border: `2px solid ${colors.circleBorder}`,
-                  background: 'transparent', // No gradient
+                  width: circleSize.width - 40,
+                  height: circleSize.height - 40,
+                  border: `2.5px solid ${colors.circleBorder}`,
+                  background: 'transparent',
                 }}
               />
               
-              {/* Orbit Circle Line - Theme aware */}
+              {/* Orbit Circle Line - CLEAR DASHED */}
               <div 
                 className="absolute rounded-full"
                 style={{
-                  width: circleSize.width - 100,
-                  height: circleSize.height - 100,
-                  border: `1.5px dashed ${colors.circleDashed}`,
+                  width: circleSize.width - 80,
+                  height: circleSize.height - 80,
+                  border: `2px dashed ${colors.circleDashed}`,
+                }}
+              />
+
+              {/* Inner subtle circle */}
+              <div 
+                className="absolute rounded-full"
+                style={{
+                  width: circleSize.width - 120,
+                  height: circleSize.height - 120,
+                  border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
                 }}
               />
 
@@ -575,6 +585,9 @@ export default function TestimonialSection() {
                   backgroundColor: colors.accent,
                   color: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
                   fontFamily: "'Poppins', sans-serif",
+                  boxShadow: theme === 'dark'
+                    ? '0 4px 20px rgba(232,202,94,0.3)'
+                    : '0 4px 24px rgba(0,102,255,0.2)',
                 }}
               >
                 ✍️ Give Feedback

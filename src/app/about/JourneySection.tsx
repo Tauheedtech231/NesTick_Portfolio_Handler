@@ -175,11 +175,12 @@ export default function JourneySection() {
 
   // ── Derived values ───────────────────────────────────────────────────────────
   const isDark = theme === 'dark';
-  const textPrimary = isDark ? '#f8fafc' : '#1F2937';
-  const textMuted = isDark ? '#9CA3AF' : '#6B7280';
-  const bgColor = isDark ? '#0B0F19' : '#F5F5F5';
+  const textPrimary = isDark ? '#f8fafc' : '#1A2332';
+  const textMuted = isDark ? '#9CA3AF' : '#6B7A8F';
+  const bgColor = isDark ? '#0B0F19' : '#F4F7FC';
   const badgeBg = isDark ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)';
-  const circleFill = isDark ? '#1c1712' : '#f0ece6';
+  const circleFill = isDark ? '#1c1712' : '#FFFFFF';
+  const circleStroke = isDark ? '#1c1712' : '#e8eef5';
   
   const roadColors = isDark ? {
     glow: 'rgba(232,202,94,0.15)',
@@ -190,11 +191,11 @@ export default function JourneySection() {
     dash: 'rgba(232,202,94,0.6)',
   } : {
     glow: 'rgba(0,102,255,0.12)',
-    mid: 'rgba(0,102,255,0.25)',
+    mid: 'rgba(0,102,255,0.20)',
     base: 'rgba(200,210,225,0.5)',
     gradient: ['#0066FF', '#0066FF', '#3385FF', '#0044aa'],
-    edge: 'rgba(0,102,255,0.3)',
-    dash: 'rgba(0,102,255,0.5)',
+    edge: 'rgba(0,102,255,0.25)',
+    dash: 'rgba(0,102,255,0.4)',
   };
 
   // ── Check if mobile ──────────────────────────────────────────────────────────
@@ -213,7 +214,10 @@ export default function JourneySection() {
   const titleFontSize = isMobile ? 13 : 11;
   const descFontSize = isMobile ? 11 : 6;
   const textXOffset = isMobile ? 30 : 30;
-  const textYOffset = isMobile ? -10 : -13;
+  // Card top position - where the card starts
+  const cardTopOffset = isMobile ? -14 : -12;
+  // Text inside card - pushed 2rem (32px) down from card top
+  const textYOffset = isMobile ? 18 : 16; // 2rem padding from card top
   const lineHeight = isMobile ? 16 : 11;
 
   const roadStrokeWidths = {
@@ -226,12 +230,34 @@ export default function JourneySection() {
     dashes: isMobile ? 1.5 : 1.5,
   };
 
+  // Get accent color based on theme
+  const accentColor = isDark ? GOLD : BLUE;
+
   return (
     <section
       className="py-4 md:py-16 overflow-hidden w-full"
-      style={{ backgroundColor: bgColor, fontFamily: "'Poppins', sans-serif", transition: 'background-color 0.6s ease' }}
+      style={{ 
+        backgroundColor: bgColor, 
+        fontFamily: "'Poppins', sans-serif", 
+        transition: 'background-color 0.6s ease',
+        position: 'relative',
+      }}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      {/* Subtle background gradient for light mode */}
+      {!isDark && (
+        <div style={{
+          position: 'absolute',
+          top: '-30%',
+          left: '-10%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(0, 102, 255, 0.03) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }} />
+      )}
+
+      <div className="w-full px-4 sm:px-6 lg:px-8 position-relative" style={{ position: 'relative', zIndex: 1 }}>
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -244,7 +270,7 @@ export default function JourneySection() {
             className="inline-flex mt-[0.5rem] items-center gap-2 px-3 py-1 rounded-full mb-1 mx-auto w-fit"
             style={{ backgroundColor: badgeBg }}
           >
-            <Rocket className="w-3.5 h-3.5" style={{ color: isDark ? GOLD : BLUE }} />
+            <Rocket className="w-3.5 h-3.5" style={{ color: accentColor }} />
             <span className="text-xs font-medium tracking-wide" style={{ color: textMuted }}>
               Our Journey
             </span>
@@ -255,7 +281,7 @@ export default function JourneySection() {
             style={{ color: textPrimary }}
           >
             The Story of{' '}
-            <span style={{ color: isDark ? GOLD : BLUE }}>Growth &amp; Innovation</span>
+            <span style={{ color: accentColor }}>Growth &amp; Innovation</span>
           </h2>
 
           <p
@@ -286,7 +312,12 @@ export default function JourneySection() {
 
                 <radialGradient id="circleFill" cx="50%" cy="40%" r="65%">
                   <stop offset="0%"   stopColor={circleFill} />
-                  <stop offset="100%" stopColor={isDark ? '#070502' : '#e0d8cc'} />
+                  <stop offset="100%" stopColor={isDark ? '#070502' : '#f0f4f9'} />
+                </radialGradient>
+
+                <radialGradient id="dotGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor={accentColor} stopOpacity="0.3" />
+                  <stop offset="100%" stopColor={accentColor} stopOpacity="0" />
                 </radialGradient>
 
                 <filter id="glowLg" x="-80%" y="-80%" width="260%" height="260%">
@@ -294,6 +325,9 @@ export default function JourneySection() {
                 </filter>
                 <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
                   <feGaussianBlur stdDeviation="2" />
+                </filter>
+                <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="rgba(0,0,0,0.06)" />
                 </filter>
               </defs>
 
@@ -388,20 +422,44 @@ export default function JourneySection() {
                 const xOffset = isRight ? (isMobile ? 35 : 40) : (isMobile ? -35 : -40);
                 const textX = isRight ? m.dotX + (isMobile ? 28 : 30) : m.dotX - (isMobile ? 28 : 30);
                 const textAnchor = isRight ? 'start' : 'end';
-                const accentColor = isDark ? GOLD : BLUE;
+                const dotAccent = isDark ? GOLD : BLUE;
+
+                // Card background for milestone text (light mode only)
+                const cardBg = isDark ? 'transparent' : 'rgba(255,255,255,0.9)';
+                const cardRadius = isMobile ? 6 : 4;
+
+                // Card dimensions
+                const cardWidth = isRight ? 160 : 150;
+                const cardHeight = isMobile ? 70 : 62;
+
+                // Card Y position (top of card)
+                const cardY = m.cy + cardTopOffset;
 
                 return (
                   <g key={m.id}>
-                    {/* Outer glow ring */}
+                    {/* Glow behind dot */}
+                    <circle
+                      cx={m.dotX}
+                      cy={m.cy}
+                      r={outerRadius + 12}
+                      fill="url(#dotGlow)"
+                      style={{
+                        opacity: isVisible ? 1 : 0,
+                        transition: 'opacity 0.6s ease',
+                      }}
+                    />
+
+                    {/* Outer ring */}
                     <circle
                       id={`dot-outer-${m.id}`}
                       cx={m.dotX}
                       cy={m.cy}
                       r={outerRadius}
-                      fill={accentColor}
-                      filter="url(#softGlow)"
+                      fill="none"
+                      stroke={dotAccent}
+                      strokeWidth={isMobile ? 3 : 2.5}
                       style={{
-                        opacity: isVisible ? 0.4 : 0,
+                        opacity: isVisible ? 0.6 : 0,
                         transition: 'opacity 0.4s ease',
                       }}
                     />
@@ -413,11 +471,12 @@ export default function JourneySection() {
                       cy={m.cy}
                       r={dotRadius}
                       fill="url(#circleFill)"
-                      stroke={accentColor}
-                      strokeWidth={isMobile ? 2.5 : 2.2}
+                      stroke={isDark ? dotAccent : '#e0e6f0'}
+                      strokeWidth={isMobile ? 2.5 : 2}
                       style={{
                         opacity: isVisible ? 1 : 0,
                         transition: 'opacity 0.4s ease 0.05s',
+                        boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                       }}
                     />
 
@@ -428,7 +487,7 @@ export default function JourneySection() {
                       textAnchor="middle"
                       fontSize={yearFontSize}
                       fontWeight={700}
-                      fill={isDark ? '#FFFFFF' : '#1F2937'}
+                      fill={isDark ? '#FFFFFF' : '#1A2332'}
                       fontFamily="Poppins, sans-serif"
                       style={{
                         opacity: isVisible ? 1 : 0,
@@ -438,7 +497,7 @@ export default function JourneySection() {
                       {m.year}
                     </text>
 
-                    {/* Title + description */}
+                    {/* Title + description with card background - TEXT PUSHED 2rem INSIDE CARD */}
                     <g
                       style={{
                         opacity: isVisible ? 1 : 0,
@@ -448,22 +507,42 @@ export default function JourneySection() {
                         transition: 'opacity 0.5s ease, transform 0.5s ease',
                       }}
                     >
+                      {/* Card background */}
+                      {!isDark && (
+                        <rect
+                          x={isRight ? textX - (isMobile ? 4 : 6) : textX - cardWidth + 10}
+                          y={cardY}
+                          width={cardWidth}
+                          height={cardHeight}
+                          rx={cardRadius}
+                          fill={cardBg}
+                          filter="url(#cardShadow)"
+                          style={{
+                            opacity: 0.6,
+                            transition: 'opacity 0.3s ease',
+                          }}
+                        />
+                      )}
+                      
+                      {/* Title - positioned 2rem (32px) from card top */}
                       <text
                         x={textX}
-                        y={m.cy + textYOffset}
+                        y={cardY + textYOffset}
                         fontSize={titleFontSize}
                         fontWeight={700}
-                        fill={accentColor}
+                        fill={isDark ? dotAccent : BLUE}
                         textAnchor={textAnchor}
                         fontFamily="Poppins, sans-serif"
                       >
                         {m.title}
                       </text>
+                      
+                      {/* Description - positioned below title */}
                       {m.desc.map((line, i) => (
                         <text
                           key={i}
                           x={textX}
-                          y={m.cy + textYOffset + (isMobile ? 18 : 13) + i * lineHeight}
+                          y={cardY + textYOffset + (isMobile ? 18 : 14) + i * lineHeight}
                           fontSize={descFontSize}
                           fill={textMuted}
                           textAnchor={textAnchor}

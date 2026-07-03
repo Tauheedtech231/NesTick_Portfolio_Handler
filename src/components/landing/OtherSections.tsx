@@ -49,8 +49,25 @@ export default function OtherSections({
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+  
   const getSectionBg = () => {
-    return theme === 'dark' ? '#0B0F19' : '#FFFFFF';
+    return isDark ? '#0B0F19' : '#F8FAFF';
+  };
+
+  const getTextColor = () => {
+    return isDark ? '#FFFFFF' : '#1F2937';
+  };
+
+  const getTextMuted = () => {
+    return isDark ? '#9CA3AF' : '#4B5563';
+  };
+
+  const getAccentColor = () => {
+    return isDark ? GOLD : BLUE;
   };
 
   return (
@@ -61,7 +78,7 @@ export default function OtherSections({
       {/* Packages Section - Independent */}
       <PackagesSection />
 
-      {/* About Section */}
+      {/* About Section - UPDATED with better contrast */}
       <section
         id="about"
         ref={aboutRef}
@@ -72,10 +89,27 @@ export default function OtherSections({
       >
         <div className="container mt-10 mx-auto max-w-6xl">
           <div className="text-center mb-12 md:mb-16">
+            <div 
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
+              style={{
+                backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+                border: 'none',
+              }}
+            >
+              <span className="text-xs font-medium"
+                style={{ 
+                  color: accentColor,
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                ✦ About Our System
+              </span>
+            </div>
+            
             <h2 className="text-3xl sm:text-4xl md:text-4xl font-bold mb-3 font-serif tracking-tight">
               <span className="relative inline-block"
                 style={{ 
-                  color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                  color: getTextColor(),
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -83,7 +117,7 @@ export default function OtherSections({
               </span>{' '}
               <span className="inline-block"
                 style={{ 
-                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  color: accentColor,
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
@@ -91,9 +125,9 @@ export default function OtherSections({
               </span>
             </h2>
             
-            <p className="text-lg md:text-xl max-w-4xl mx-auto font-light"
+            <p className="text-base md:text-lg max-w-4xl mx-auto font-light"
               style={{ 
-                color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                color: getTextMuted(),
                 fontFamily: "'Calibri Light', sans-serif",
               }}
             >
@@ -101,6 +135,13 @@ export default function OtherSections({
               providing a comprehensive platform to create, manage, and showcase student achievements professionally 
               across multiple colleges and departments.
             </p>
+
+            {/* Decorative divider */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <div className="h-px w-12" style={{ background: accentColor, opacity: 0.3 }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: accentColor, opacity: 0.5 }} />
+              <div className="h-px w-12" style={{ background: accentColor, opacity: 0.3 }} />
+            </div>
           </div>
 
           {/* How It Works - Desktop & Mobile */}

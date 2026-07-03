@@ -4,12 +4,17 @@
 import { motion } from 'framer-motion';
 import { Building2, Palette, Code2, LucideIcon, CheckCircle, TrendingUp, Megaphone, Target } from 'lucide-react';
 
-// FIXED: Color ko optional karo
+// ==========================================
+// BRAND COLORS - CONSISTENT WITH ALL SECTIONS
+// ==========================================
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
+
 interface BenefitItem {
   icon: LucideIcon;
   title: string;
   description: string;
-  color?: string; // ← OPTIONAL karo
+  color?: string;
 }
 
 interface PartnerWhyChooseProps {
@@ -30,15 +35,63 @@ export function PartnerWhyChoose({
   isInView, 
   categoryContent 
 }: PartnerWhyChooseProps) {
-  // REAL BLUE COLOR FROM TEMPLATES
-  const BLUE = '#0066FF';
-  const GOLD = '#E8CA5E';
+  // ==========================================
+  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // ==========================================
 
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getAccentColor = () => BLUE; // ← REAL BLUE
+  // 1️⃣ Card Background - Consistent with form card
+  const getCardBg = () => {
+    if (theme === 'dark') return 'rgba(15, 23, 42, 0.4)';
+    return 'rgba(255, 255, 255, 0.95)'; // Same as form card
+  };
+
+  const getCardShadow = () => {
+    if (theme === 'light') {
+      return '0 4px 24px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)';
+    }
+    return 'none';
+  };
+
+  const getCardBorder = () => {
+    if (theme === 'light') {
+      return '1px solid rgba(0,0,0,0.04)';
+    }
+    return 'none';
+  };
+
+  // 2️⃣ Text Colors - Better contrast
+  const getTextColor = () => {
+    return theme === 'dark' ? '#F1F5F9' : '#0F172A';
+  };
+
+  const getTextSecondary = () => {
+    return theme === 'dark' ? '#D1D5DB' : '#334155';
+  };
+
+  const getTextMuted = () => {
+    return theme === 'dark' ? '#94A3B8' : '#475569';
+  };
+
+  // 3️⃣ Accent Color - Brand Blue only
+  const getAccentColor = () => BLUE;
+
+  // 4️⃣ Button Text - White
   const getButtonText = () => '#FFFFFF';
-  const getIconBg = () => theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.08)';
+
+  // 5️⃣ Icon Background - Subtle
+  const getIconBg = () => {
+    return theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.06)';
+  };
+
+  // 6️⃣ Quote Background - Subtle
+  const getQuoteBg = () => {
+    return theme === 'dark' ? 'rgba(0, 102, 255, 0.06)' : 'rgba(0, 102, 255, 0.03)';
+  };
+
+  // 7️⃣ Border Color - Subtle
+  const getBorderColor = () => {
+    return theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  };
 
   const getIcon = () => {
     if (activeForm === 'designer') return Palette;
@@ -50,8 +103,6 @@ export function PartnerWhyChoose({
   };
 
   const Icon = getIcon();
-
-  // Ensure benefits data exists
   const benefitsList = categoryContent?.benefits || [];
 
   return (
@@ -59,17 +110,22 @@ export function PartnerWhyChoose({
       initial={{ opacity: 0, x: -50 }}
       animate={isInView ? { opacity: 1, x: 0 } : {}}
       transition={{ delay: 0.3, duration: 0.6 }}
-      className="rounded-xl md:rounded-2xl p-5 md:p-6 lg:p-8"
+      className="rounded-xl md:rounded-2xl p-5 md:p-8 transition-all duration-300"
       style={{
-        backgroundColor: 'transparent',
-        border: 'none',
+        backgroundColor: getCardBg(),
+        border: getCardBorder(),
+        boxShadow: getCardShadow(),
         fontFamily: "'Poppins', sans-serif",
       }}
     >
+      {/* ─── HEADER WITH ICON ─── */}
       <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6">
         <div
-          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: getAccentColor() }} // ← REAL BLUE
+          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:scale-105"
+          style={{ 
+            backgroundColor: getAccentColor(),
+            boxShadow: `0 4px 16px ${getAccentColor()}25`,
+          }}
         >
           <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color: getButtonText() }} />
         </div>
@@ -85,6 +141,7 @@ export function PartnerWhyChoose({
       </div>
 
       <div className="space-y-4 md:space-y-5">
+        {/* ─── DESCRIPTION ─── */}
         <p
           className="text-xs md:text-sm lg:text-base leading-relaxed"
           style={{ 
@@ -97,11 +154,10 @@ export function PartnerWhyChoose({
           {categoryContent?.description || ''}
         </p>
 
-        {/* Benefits as simple list with check icons */}
+        {/* ─── BENEFITS LIST ─── */}
         <div className="space-y-2 md:space-y-2.5">
           {benefitsList.length > 0 ? (
             benefitsList.map((benefit, idx) => {
-              // Use title as the text to display
               const benefitText = benefit.title || benefit.description || '';
               return (
                 <motion.div
@@ -111,23 +167,23 @@ export function PartnerWhyChoose({
                   transition={{ delay: 0.4 + (idx * 0.08), duration: 0.4 }}
                   className="flex items-start gap-2.5 md:gap-3 group cursor-pointer"
                   style={{
-                    padding: '6px 10px',
-                    borderRadius: '6px',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = getIconBg();
-                    e.currentTarget.style.transform = 'translateX(3px)';
+                    e.currentTarget.style.transform = 'translateX(4px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.transform = 'translateX(0px)';
                   }}
                 >
-                  {/* Check Icon - REAL BLUE */}
+                  {/* Check Icon - Brand Blue */}
                   <div
-                    className="flex-shrink-0 mt-0.5"
-                    style={{ color: getAccentColor() }} // ← REAL BLUE
+                    className="flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110"
+                    style={{ color: getAccentColor() }}
                   >
                     <CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   </div>
@@ -149,20 +205,22 @@ export function PartnerWhyChoose({
               );
             })
           ) : (
-            <p className="text-xs md:text-sm" style={{ color: getTextSecondary() }}>
+            <p className="text-xs md:text-sm" style={{ color: getTextMuted() }}>
               No benefits available
             </p>
           )}
         </div>
 
-        {/* Quote Box - REAL BLUE */}
+        {/* ─── QUOTE BOX - SUBTLE HIGHLIGHT ─── */}
         <div
-          className="p-4 md:p-5 rounded-xl"
+          className="p-4 md:p-5 rounded-xl transition-all duration-300 hover:shadow-md"
           style={{
-            backgroundColor: theme === 'dark' ? 'rgba(0, 102, 255, 0.08)' : 'rgba(0, 102, 255, 0.04)',
-            borderLeft: `3px solid ${getAccentColor()}`, // ← REAL BLUE
+            backgroundColor: getQuoteBg(),
+            borderLeft: `3px solid ${getAccentColor()}`,
             borderTopRightRadius: '10px',
             borderBottomRightRadius: '10px',
+            border: `1px solid ${theme === 'light' ? getBorderColor() : 'transparent'}`,
+            borderLeftWidth: '3px',
           }}
         >
           <p

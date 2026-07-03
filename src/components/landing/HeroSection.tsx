@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Compass, Globe2, Palette, X, Send, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 
 interface HeroSectionProps {
   scrollToSection: (sectionId: string) => void;
@@ -33,6 +34,7 @@ const designTypes = [
 export default function HeroSection({ scrollToSection, heroRef }: HeroSectionProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [parallaxRef, setParallaxRef] = useState<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
@@ -90,7 +92,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     return () => observer.disconnect();
   }, []);
   
-  // Simple parallax effect on mouse move
+  // Parallax effect on mouse move for image
   useEffect(() => {
     if (!parallaxRef) return;
     
@@ -98,11 +100,11 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
       
-      const xPercent = (clientX / innerWidth - 0.5) * 10;
-      const yPercent = (clientY / innerHeight - 0.5) * 5;
+      const xPercent = (clientX / innerWidth - 0.5) * 15;
+      const yPercent = (clientY / innerHeight - 0.5) * 10;
       
       if (parallaxRef) {
-        parallaxRef.style.transform = `translate(${xPercent}px, ${yPercent}px)`;
+        parallaxRef.style.transform = `translate(${xPercent}px, ${yPercent}px) scale(1.05)`;
       }
     };
     
@@ -162,7 +164,6 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           description: ''
         });
         
-        // Close modal after 3 seconds
         setTimeout(() => {
           setIsModalOpen(false);
           setSubmitSuccess(false);
@@ -193,6 +194,43 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     setSubmitSuccess(false);
   };
 
+  // Theme colors with better depth and contrast
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+  
+  // Light mode specific colors for better depth
+  const bgColor = isDark ? '#0B0F19' : '#F8FAFF';
+  const textColor = '#FFFFFF'; // Always white for hero text
+  const subtextColor = '#FFFFFF'; // Always white for description
+  
+  // Overlay - Different for light and dark mode
+  const overlayGradient = isDark 
+    ? 'rgba(11, 15, 25, 0.7)'
+    : 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%)'; // Light overlay in light mode
+  
+  // Badge styling
+  const badgeBg = isDark 
+    ? 'rgba(232, 202, 94, 0.15)' 
+    : 'rgba(255, 255, 255, 0.15)';
+  const badgeBorder = isDark 
+    ? 'rgba(232, 202, 94, 0.2)' 
+    : 'rgba(255, 255, 255, 0.15)';
+  const badgeColor = isDark ? GOLD : '#FFFFFF';
+  
+  // Button styling
+  // "Learn More" button - Gold in dark mode, Blue in light mode
+  const primaryBtnBg = isDark ? GOLD : BLUE;
+  const primaryBtnText = isDark ? '#1F4381' : '#FFFFFF';
+  
+  // "Your Design" button - Gold in both modes
+  const designBtnBg = isDark ? 'rgba(255,255,255,0.08)' : GOLD;
+  const designBtnText = isDark ? '#FFFFFF' : '#1F4381';
+  const designBtnBorder = isDark 
+    ? 'rgba(255,255,255,0.2)' 
+    : GOLD;
+
   return (
     <>
       <section
@@ -201,16 +239,20 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
         className="relative min-h-screen flex items-center justify-center overflow-hidden w-full"
         style={{ 
           fontFamily: "'Poppins', sans-serif",
-          backgroundColor: theme === 'dark' ? '#0B0F19' : '#FFFFFF',
+          backgroundColor: bgColor,
         }}
       >
-        {/* Video Background */}
+        {/* Background Image/Video */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <div 
             ref={(el) => setParallaxRef(el)}
-            className="absolute inset-0 w-full h-full transition-transform duration-300 ease-out will-change-transform"
+            className="absolute inset-0 w-full h-full transition-transform duration-200 ease-out will-change-transform"
+            style={{
+              transform: 'scale(1.05)',
+            }}
           >
-            <div className="absolute inset-0 w-full h-full">
+            {isDark ? (
+              // Dark mode: Video
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -221,36 +263,60 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 onLoadedData={() => setVideoLoaded(true)}
                 style={{
                   opacity: videoLoaded ? 1 : 0,
-                  transition: 'opacity 0.5s ease-in-out'
+                  transition: 'opacity 0.5s ease-in-out',
+                  width: '100%',
+                  height: '100%',
                 }}
               >
                 <source src="/v.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-              
-              {/* Fallback gradient */}
-              {!videoLoaded && (
-                <div 
-                  className="absolute inset-0 w-full h-full"
-                  style={{
-                    background: theme === 'dark' 
-                      ? 'linear-gradient(135deg, #0B0F19, #1F4381)'
-                      : 'linear-gradient(135deg, #FFFFFF, #e8edf5)'
-                  }}
+            ) : (
+              // Light mode: Image with parallax
+              <div className="absolute inset-0 w-full h-full">
+                <Image
+                  src="/hero3.jpg"
+                  alt="Hero background"
+                  fill
+                  className="object-cover"
+                  priority
+                  onLoadingComplete={() => setImageLoaded(true)}
                 />
-              )}
-            </div>
+              </div>
+            )}
+            
+            {/* Fallback gradient for dark mode when video not loaded */}
+            {isDark && !videoLoaded && (
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #0B0F19, #1F4381)'
+                }}
+              />
+            )}
           </div>
         </div>
 
-        {/* Overlay - Dark mode only */}
-        {theme === 'dark' && (
-          <div 
-            className="absolute inset-0 z-10"
-            style={{
-              background: 'rgba(11, 15, 25, 0.7)',
-            }}
-          />
+        {/* Overlay - Light overlay for light mode, dark for dark mode */}
+        <div 
+          className="absolute inset-0 z-10"
+          style={{
+            background: overlayGradient,
+          }}
+        />
+
+        {/* Subtle glow effect for light mode */}
+        {!isDark && (
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            <div 
+              className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-10"
+              style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)` }}
+            />
+            <div 
+              className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-3xl opacity-10"
+              style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)` }}
+            />
+          </div>
         )}
 
         {/* Main Content */}
@@ -259,21 +325,22 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             
             {/* ─── Premium Badge ─── */}
             <div 
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full mb-6 sm:mb-8 mt-8 sm:mt-18 transition-all duration-500 backdrop-blur-sm"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
-                border: 'none',
+                backgroundColor: badgeBg,
+                border: `1px solid ${badgeBorder}`,
+                backdropFilter: 'blur(8px)',
               }}
             >
               <Globe2 
                 className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+                style={{ color: badgeColor }}
               />
               <span 
                 className="text-[10px] sm:text-xs md:text-sm font-medium"
                 style={{
                   fontFamily: "'Poppins', sans-serif",
-                  color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  color: badgeColor,
                 }}
               >
                 Trusted by 500+ Educational Institutions
@@ -287,7 +354,8 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   className="block font-serif tracking-tight"
                   style={{ 
                     fontFamily: "'Poppins', sans-serif",
-                    color: '#FFFFFF', // ← Always white
+                    color: textColor,
+                    textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                   }}
                 >
                   Journey Through the
@@ -299,7 +367,8 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                      color: accentColor,
+                      textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                     }}
                   >
                     Galaxy of
@@ -308,7 +377,8 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                      color: accentColor,
+                      textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                     }}
                   >
                     College Portfolios
@@ -317,12 +387,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </h1>
             </div>
 
-            {/* ─── SUBHEADING - Always White ─── */}
+            {/* ─── SUBHEADING - Always White with subtle shadow ─── */}
             <p 
               className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed px-2 mb-8 sm:mb-10 font-light tracking-wide"
               style={{ 
                 fontFamily: "'Calibri Light', sans-serif",
-                color: '#FFFFFF', // ← Always white
+                color: subtextColor,
+                textShadow: '0 2px 20px rgba(0,0,0,0.4)',
               }}
             >
               Like the ancient libraries of Baghdad, we preserve and showcase educational excellence. 
@@ -333,50 +404,69 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             {/* ─── CTA Buttons ─── */}
             <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
               
-              {/* ── LEARN MORE BUTTON ── */}
-              <button
+              {/* ── LEARN MORE BUTTON - Gold in dark mode, Blue in light mode ── */}
+              <motion.button
                 onClick={handleLearn}
                 className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
-                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                  color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                  backgroundColor: primaryBtnBg,
+                  color: primaryBtnText,
                   borderRadius: '50px',
                   border: 'none',
+                  boxShadow: isDark 
+                    ? '0 4px 30px rgba(232,202,94,0.4)'
+                    : '0 4px 30px rgba(0,102,255,0.4)',
+                }}
+                whileHover={{
+                  boxShadow: isDark 
+                    ? '0 8px 50px rgba(232,202,94,0.6)'
+                    : '0 8px 50px rgba(0,102,255,0.6)',
                 }}
               >
                 <span>Learn More</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </motion.button>
               
-              {/* ── YOUR DESIGN BUTTON - Always White Text ── */}
-              <button
+              {/* ── YOUR DESIGN BUTTON - Gold in both modes ── */}
+              <motion.button
                 onClick={handleDesignClick}
                 className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
                 style={{ 
                   fontFamily: "'Poppins', sans-serif",
-                  backgroundColor: 'transparent',
-                  color: '#FFFFFF', // ← Always white
+                  backgroundColor: designBtnBg,
+                  color: designBtnText,
                   borderRadius: '50px',
-                  border: '2px solid',
-                  borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.3)',
+                  border: `2px solid ${designBtnBorder}`,
+                  backdropFilter: isDark ? 'blur(8px)' : 'none',
+                  boxShadow: isDark 
+                    ? 'none'
+                    : '0 4px 30px rgba(232,202,94,0.4)',
+                }}
+                whileHover={{
+                  boxShadow: isDark 
+                    ? '0 0 30px rgba(232,202,94,0.2)'
+                    : '0 8px 50px rgba(232,202,94,0.6)',
+                  backgroundColor: isDark 
+                    ? 'rgba(255,255,255,0.15)' 
+                    : GOLD,
                 }}
               >
                 <Palette className="w-4 h-4" />
                 <span>Your Design</span>
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
 
         {/* Scroll hint */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="flex flex-col items-center gap-1 opacity-50">
+          <div className="flex flex-col items-center gap-1 opacity-60">
             <span 
               className="text-[9px] uppercase tracking-wider"
               style={{ 
                 fontFamily: "'Poppins', sans-serif",
-                color: theme === 'dark' ? '#FFFFFF' : '#FFFFFF', // ← Always white
+                color: '#FFFFFF',
               }}
             >
               Scroll
@@ -384,13 +474,13 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             <div 
               className="w-4 h-6 rounded-full flex justify-center"
               style={{
-                border: `2px solid ${theme === 'dark' ? '#FFFFFF' : '#FFFFFF'}`,
+                border: `2px solid rgba(255,255,255,0.6)`,
               }}
             >
               <div 
                 className="w-0.5 h-1.5 rounded-full mt-1 animate-bounce"
                 style={{
-                  backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  backgroundColor: accentColor,
                 }}
               />
             </div>
@@ -417,8 +507,8 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[200] flex justify-center p-4 overflow-y-auto"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.9)' : 'rgba(0, 0, 0, 0.7)',
-              backdropFilter: 'blur(8px)',
+              backgroundColor: isDark ? 'rgba(11, 15, 25, 0.92)' : 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(12px)',
             }}
             onClick={closeModal}
           >
@@ -429,9 +519,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="relative rounded-2xl w-full max-w-2xl my-8 shadow-2xl overflow-hidden"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
                 border: '1px solid',
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.15)',
+                borderColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.1)',
+                boxShadow: isDark 
+                  ? '0 40px 80px rgba(0,0,0,0.5)' 
+                  : '0 40px 80px rgba(0,0,0,0.08)',
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -440,20 +533,20 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 className="px-6 py-5 flex items-center justify-between sticky top-0 z-10"
                 style={{
                   borderBottom: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
+                  borderColor: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                  backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
                 }}
               >
                 <div className="flex items-center gap-3">
                   <div 
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{
-                      backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+                      backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
                     }}
                   >
                     <Palette 
                       className="w-5 h-5"
-                      style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
+                      style={{ color: accentColor }}
                     />
                   </div>
                   <div>
@@ -461,7 +554,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="text-xl font-bold"
                       style={{ 
                         fontFamily: "'Poppins', sans-serif",
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: isDark ? '#FFFFFF' : '#1F2937',
                       }}
                     >
                       Your Design
@@ -470,7 +563,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="text-sm"
                       style={{ 
                         fontFamily: "'Calibri Light', sans-serif",
-                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        color: isDark ? '#9CA3AF' : '#6B7280',
                       }}
                     >
                       Share your creative vision with us
@@ -482,10 +575,10 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   className="p-2 rounded-full transition-colors"
                   style={{
                     backgroundColor: 'transparent',
-                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                    color: isDark ? '#9CA3AF' : '#6B7280',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.04)';
+                    e.currentTarget.style.backgroundColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.04)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
@@ -495,14 +588,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 </button>
               </div>
 
-              {/* Scrollable Form Content */}
+              {/* Scrollable Form Content - Keep existing form */}
               <div className="max-h-[70vh] overflow-y-auto">
                 {submitSuccess ? (
                   <div className="p-12 text-center">
                     <div 
                       className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4"
                       style={{
-                        backgroundColor: theme === 'dark' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.08)',
+                        backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.08)',
                       }}
                     >
                       <CheckCircle 
@@ -514,7 +607,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="text-xl font-bold mb-2"
                       style={{ 
                         fontFamily: "'Poppins', sans-serif",
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                        color: isDark ? '#FFFFFF' : '#1F2937',
                       }}
                     >
                       Request Submitted!
@@ -523,7 +616,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="text-sm"
                       style={{ 
                         fontFamily: "'Calibri Light', sans-serif",
-                        color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                        color: isDark ? '#9CA3AF' : '#6B7280',
                       }}
                     >
                       Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
@@ -537,7 +630,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#4B5563',
                           }}
                         >
                           Full Name *
@@ -550,15 +643,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
                             formErrors.name 
                               ? 'border-red-500' 
-                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                              : isDark ? 'border-gray-700' : 'border-gray-200'
                           }`}
                           style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#1F2937',
                             fontFamily: "'Calibri Light', sans-serif",
                             outline: 'none',
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                           }}
                           placeholder="Enter your full name"
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = accentColor;
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = isDark ? 'border-gray-700' : 'border-gray-200';
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+                          }}
                         />
                         {formErrors.name && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -572,7 +674,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#4B5563',
                           }}
                         >
                           Email Address *
@@ -585,15 +687,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
                             formErrors.email 
                               ? 'border-red-500' 
-                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                              : isDark ? 'border-gray-700' : 'border-gray-200'
                           }`}
                           style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#1F2937',
                             fontFamily: "'Calibri Light', sans-serif",
                             outline: 'none',
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                           }}
                           placeholder="you@example.com"
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = accentColor;
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = isDark ? 'border-gray-700' : 'border-gray-200';
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+                          }}
                         />
                         {formErrors.email && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -609,7 +720,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#4B5563',
                           }}
                         >
                           Phone Number *
@@ -622,15 +733,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
                             formErrors.phone 
                               ? 'border-red-500' 
-                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                              : isDark ? 'border-gray-700' : 'border-gray-200'
                           }`}
                           style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#1F2937',
                             fontFamily: "'Calibri Light', sans-serif",
                             outline: 'none',
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                           }}
                           placeholder="+92 300 1234567"
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = accentColor;
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = isDark ? 'border-gray-700' : 'border-gray-200';
+                            e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+                          }}
                         />
                         {formErrors.phone && (
                           <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -644,7 +764,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#4B5563',
                           }}
                         >
                           Design Type *
@@ -656,13 +776,20 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all ${
                             formErrors.designType 
                               ? 'border-red-500' 
-                              : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                              : isDark ? 'border-gray-700' : 'border-gray-200'
                           }`}
                           style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                            color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                            backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                            color: isDark ? '#FFFFFF' : '#1F2937',
                             fontFamily: "'Calibri Light', sans-serif",
                             outline: 'none',
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = accentColor;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = isDark ? 'border-gray-700' : 'border-gray-200';
                           }}
                         >
                           <option value="">Select design type</option>
@@ -683,7 +810,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         className="block text-sm font-medium mb-1.5"
                         style={{ 
                           fontFamily: "'Poppins', sans-serif",
-                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          color: isDark ? '#D1D5DB' : '#4B5563',
                         }}
                       >
                         What inspires you? (Optional)
@@ -695,13 +822,22 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         onChange={handleInputChange}
                         className="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                         style={{
-                          backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
-                          borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                          backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                          color: isDark ? '#FFFFFF' : '#1F2937',
+                          borderColor: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
                           fontFamily: "'Calibri Light', sans-serif",
                           outline: 'none',
+                          boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                         placeholder="e.g., Modern minimalism, Nature, Technology, Art Deco..."
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = accentColor;
+                          e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+                          e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+                        }}
                       />
                     </div>
 
@@ -710,7 +846,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         className="block text-sm font-medium mb-1.5"
                         style={{ 
                           fontFamily: "'Poppins', sans-serif",
-                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          color: isDark ? '#D1D5DB' : '#4B5563',
                         }}
                       >
                         Describe your design requirements *
@@ -723,15 +859,24 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 transition-all resize-none ${
                           formErrors.description 
                             ? 'border-red-500' 
-                            : theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                            : isDark ? 'border-gray-700' : 'border-gray-200'
                         }`}
                         style={{
-                          backgroundColor: theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#F9FAFB',
-                          color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                          backgroundColor: isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF',
+                          color: isDark ? '#FFFFFF' : '#1F2937',
                           fontFamily: "'Calibri Light', sans-serif",
                           outline: 'none',
+                          boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                         placeholder="Tell us about your vision, preferred colors, style, features you need, etc..."
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = accentColor;
+                          e.currentTarget.style.boxShadow = isDark ? 'none' : `0 0 0 3px ${accentColor}15`;
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = isDark ? 'border-gray-700' : 'border-gray-200';
+                          e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)';
+                        }}
                       />
                       {formErrors.description && (
                         <p className="text-red-500 text-xs mt-1" style={{ fontFamily: "'Calibri Light', sans-serif" }}>
@@ -743,12 +888,15 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95"
+                      className="w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl"
                       style={{
                         fontFamily: "'Poppins', sans-serif",
-                        backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                        color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                        backgroundColor: accentColor,
+                        color: isDark ? '#1F4381' : '#FFFFFF',
                         border: 'none',
+                        boxShadow: isDark 
+                          ? '0 4px 20px rgba(232,202,94,0.3)' 
+                          : '0 4px 24px rgba(0,102,255,0.25)',
                       }}
                     >
                       {isSubmitting ? (

@@ -41,30 +41,33 @@ export default function TeamSlider() {
 
   // ─── Theme Colors ────────────────────────────────────────────────────────────
   const colors = {
-    bg: isDark ? '#0B0F19' : '#f2f2f2',
-    textPrimary: isDark ? '#FFFFFF' : '#1a1a2e',
-    textSecondary: isDark ? '#9CA3AF' : '#6b7280',
-    accent: isDark ? '#E8CA5E' : '#0057FF',
-    accentLight: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 87, 255, 0.08)',
+    bg: isDark ? '#0B0F19' : '#F4F7FC',
+    textPrimary: isDark ? '#FFFFFF' : '#1A2332',
+    textSecondary: isDark ? '#9CA3AF' : '#6B7A8F',
+    accent: isDark ? '#E8CA5E' : '#0066FF',
+    accentLight: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
     avatarBg: isDark 
       ? 'linear-gradient(145deg, #1a1a2e 0%, #0B0F19 100%)' 
-      : 'linear-gradient(145deg, #ffffff 0%, #e6eeff 100%)',
-    avatarText: isDark ? '#E8CA5E' : '#0057FF',
-    avatarBorder: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.9)',
+      : 'linear-gradient(145deg, #ffffff 0%, #f0f4ff 100%)',
+    avatarText: isDark ? '#E8CA5E' : '#0066FF',
+    avatarBorder: isDark ? 'rgba(255,255,255,0.2)' : '#FFFFFF',
     avatarShadow: isDark 
       ? '0 6px 20px rgba(0,0,0,0.4), inset 0 -3px 12px rgba(0,0,0,0.2)' 
-      : '0 6px 20px rgba(0,0,0,0.12), inset 0 -3px 12px rgba(0,0,0,0.05)',
+      : '0 8px 30px rgba(0, 102, 255, 0.12), inset 0 -3px 12px rgba(0,0,0,0.03)',
     avatarShine: isDark 
       ? 'linear-gradient(145deg, rgba(255,255,255,0.05) 0%, transparent 60%)'
-      : 'linear-gradient(145deg, rgba(255,255,255,0.3) 0%, transparent 60%)',
-    roleBg: isDark ? 'rgba(232, 202, 94, 0.15)' : '#f0f4ff',
-    roleText: isDark ? '#E8CA5E' : '#0057FF',
-    lineColor: isDark ? '#E8CA5E' : '#0057FF',
-    border: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.15)',
-    skewBg: isDark ? '#E8CA5E' : '#0057FF',
+      : 'linear-gradient(145deg, rgba(255,255,255,0.4) 0%, transparent 60%)',
+    roleBg: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+    roleText: isDark ? '#E8CA5E' : '#0066FF',
+    lineColor: isDark ? '#E8CA5E' : '#0066FF',
+    border: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)',
+    skewBg: isDark ? '#E8CA5E' : '#0066FF',
     skewShadow: isDark 
       ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)'
-      : 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)',
+      : 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.08) 100%)',
+    cardBg: isDark ? 'transparent' : '#FFFFFF',
+    cardShadow: isDark ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.04)',
+    cardBorder: isDark ? 'none' : '1px solid rgba(0, 0, 0, 0.04)',
   };
 
   return (
@@ -110,7 +113,18 @@ export default function TeamSlider() {
             const leftPush = isMT ? '-3rem' : '-5rem';
             
             return (
-              <div key={member.initials} className="member flex w-full max-w-[250px] flex-col items-center">
+              <div 
+                key={member.initials} 
+                className="member flex w-full max-w-[250px] flex-col items-center"
+                style={{
+                  background: colors.cardBg,
+                  borderRadius: '24px',
+                  padding: '12px',
+                  boxShadow: colors.cardShadow,
+                  border: colors.cardBorder,
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 <div className="shape-wrapper relative h-[160px] w-full overflow-hidden rounded-[32px]">
                   {/* Skew Background */}
                   <div 
@@ -119,6 +133,7 @@ export default function TeamSlider() {
                       background: colors.skewBg,
                       transform: 'translateX(-50%) skewX(-29.9deg)',
                       transformOrigin: 'center',
+                      boxShadow: isDark ? 'none' : '0 8px 24px rgba(0, 102, 255, 0.15)',
                     }}
                   >
                     <div 
@@ -132,7 +147,11 @@ export default function TeamSlider() {
                   {/* Avatar Ring */}
                   <div 
                     className="avatar-ring absolute top-1/2 left-1/2 w-[80px] h-[80px] rounded-full border-2 pointer-events-none -translate-x-1/2 -translate-y-1/2 z-1"
-                    style={{ borderColor: colors.border }}
+                    style={{ 
+                      borderColor: colors.border,
+                      background: isDark ? 'transparent' : 'rgba(255,255,255,0.1)',
+                      backdropFilter: isDark ? 'none' : 'blur(10px)',
+                    }}
                   />
                   
                   {/* Avatar */}
@@ -146,7 +165,7 @@ export default function TeamSlider() {
                       fontWeight: 800,
                       color: colors.avatarText,
                       letterSpacing: '1px',
-                      textShadow: isDark ? '0 1px 3px rgba(232, 202, 94, 0.1)' : '0 1px 3px rgba(0, 87, 255, 0.1)',
+                      textShadow: isDark ? '0 1px 3px rgba(232, 202, 94, 0.1)' : '0 1px 3px rgba(0, 102, 255, 0.1)',
                       transform: 'translate(-50%, -50%)',
                     }}
                   >
@@ -214,6 +233,7 @@ export default function TeamSlider() {
           }
           .member {
             max-width: 260px !important;
+            padding: 16px !important;
           }
           .shape-wrapper {
             height: 190px !important;
@@ -251,7 +271,8 @@ export default function TeamSlider() {
             max-width: 280px !important;
           }
           .member {
-            max-width: 260px !important;
+            max-width: 280px !important;
+            padding: 16px !important;
           }
           .shape-wrapper {
             height: 200px !important;

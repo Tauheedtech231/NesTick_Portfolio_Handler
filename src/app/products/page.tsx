@@ -19,7 +19,7 @@ function ParticleNetwork({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
     if (!ctx) return;
 
     // Theme-based colors - Improved for light mode visibility
-    const dotColor = theme === 'dark' ? 'rgba(232, 202, 94, 0.6)' : 'rgba(0, 102, 255, 0.4)';
+    const dotColor = theme === 'dark' ? 'rgba(232, 202, 94, 0.6)' : 'rgba(0, 102, 255, 0.3)';
     const lineRGB = theme === 'dark' ? '232, 202, 94' : '0, 102, 255';
 
     let W = 0;
@@ -112,7 +112,7 @@ function ParticleNetwork({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
         inset: 0,
         pointerEvents: 'none',
         zIndex: 0,
-        opacity: theme === 'dark' ? 0.7 : 0.5,
+        opacity: theme === 'dark' ? 0.7 : 0.4,
       }}
     />
   );
@@ -426,19 +426,19 @@ export default function ProductShowcase() {
   };
 
   const getAccentLight = (color: string) => {
-    return theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.08)';
+    return theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.06)';
   };
 
   const getSectionBg = () => {
-    return theme === 'dark' ? '#0B0F19' : '#F8FAFF'; // Subtle off-white for light mode
+    return theme === 'dark' ? '#0B0F19' : '#F4F7FC'; // Soft blue-gray for light mode
   };
 
   const getTextColor = () => {
-    return theme === 'dark' ? '#FFFFFF' : '#1F2937'; // Darker for light mode
+    return theme === 'dark' ? '#FFFFFF' : '#1A2332';
   };
 
   const getTextMuted = () => {
-    return theme === 'dark' ? '#9CA3AF' : '#4B5563'; // Darker for light mode
+    return theme === 'dark' ? '#9CA3AF' : '#4A5B6E';
   };
 
   const getBorderColor = () => {
@@ -495,6 +495,7 @@ export default function ProductShowcase() {
         fontFamily: "'Poppins', sans-serif",
         overflow: 'hidden',
         minHeight: '100vh',
+        paddingTop: '2rem', // Added padding to prevent first product touching navbar
       }}>
         
         {/* Single Particle Network for entire page - 80 particles */}
@@ -508,14 +509,14 @@ export default function ProductShowcase() {
             className="absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl"
             style={{ 
               background: `radial-gradient(circle, ${GOLD}, transparent 70%)`,
-              opacity: theme === 'dark' ? 0.1 : 0.04,
+              opacity: theme === 'dark' ? 0.1 : 0.03,
             }}
           />
           <div 
             className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl"
             style={{ 
               background: `radial-gradient(circle, ${BLUE}, transparent 70%)`,
-              opacity: theme === 'dark' ? 0.1 : 0.04,
+              opacity: theme === 'dark' ? 0.1 : 0.03,
             }}
           />
         </div>
@@ -547,7 +548,7 @@ export default function ProductShowcase() {
                 <div className="w-full">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-8 items-stretch">
                     
-                    {/* Image - 4:3 aspect ratio */}
+                    {/* Image - 4:3 aspect ratio with white mode improvements */}
                     <div 
                       className={`${isLeft ? 'lg:order-1' : 'lg:order-2'} relative group flex ${isLeft ? 'justify-start' : 'justify-end'} transition-all duration-800 ease-out ${getImageAnimationClass(product.imagePosition, isSectionVisible)}`}
                       style={{
@@ -558,14 +559,14 @@ export default function ProductShowcase() {
                         className="absolute -inset-4 rounded-3xl blur-2xl transition-all duration-500 group-hover:opacity-100"
                         style={{
                           backgroundColor: accentLight,
-                          opacity: theme === 'dark' ? 0.4 : 0.2,
+                          opacity: theme === 'dark' ? 0.4 : 0.15,
                         }}
                       />
                       <div
                         className="relative w-full max-w-[90%] rounded-3xl overflow-hidden border transition-transform duration-300 hover:scale-[1.02]"
                         style={{
                           borderColor: getBorderColor(),
-                          boxShadow: theme === 'dark' ? 'none' : '0 4px 20px rgba(0,0,0,0.04)',
+                          boxShadow: theme === 'dark' ? 'none' : '0 8px 40px rgba(0,0,0,0.04)',
                           backgroundColor: theme === 'dark' ? 'rgba(26,26,46,0.5)' : '#FFFFFF',
                           backdropFilter: 'blur(10px)',
                           aspectRatio: '4/3',
@@ -627,7 +628,7 @@ export default function ProductShowcase() {
                           className="text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl cursor-default mt-3" 
                           style={{ 
                             color: getTextMuted(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                         >
                           {product.description}
@@ -641,7 +642,7 @@ export default function ProductShowcase() {
                               className="flex items-center gap-2 text-xs sm:text-sm cursor-default"
                               style={{ 
                                 color: getTextMuted(),
-                                fontFamily: "'Calibri Light', sans-serif",
+                                fontFamily: "'Inter', sans-serif",
                               }}
                             >
                               <span
@@ -668,7 +669,7 @@ export default function ProductShowcase() {
                               fontFamily: "'Poppins', sans-serif",
                               boxShadow: theme === 'dark' 
                                 ? `0 4px 20px rgba(0, 102, 255, 0.3)`
-                                : `0 4px 20px rgba(0, 102, 255, 0.25)`,
+                                : `0 4px 24px rgba(0, 102, 255, 0.2)`,
                             }}
                           >
                             {product.buttonText}
@@ -709,7 +710,7 @@ export default function ProductShowcase() {
                     <span
                       key={index}
                       style={{
-                        color: isM ? GOLD : (theme === 'dark' ? '#FFFFFF' : '#1F2937'),
+                        color: isM ? GOLD : (theme === 'dark' ? '#FFFFFF' : '#1A2332'),
                       }}
                     >
                       {char}
@@ -721,7 +722,7 @@ export default function ProductShowcase() {
                 className="block mt-3 sm:mt-4 text-xs sm:text-sm font-light tracking-[0.2em] uppercase cursor-default"
                 style={{ 
                   color: GOLD,
-                  fontFamily: "'Calibri Light', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   letterSpacing: '0.3em',
                 }}
               >
@@ -743,7 +744,7 @@ export default function ProductShowcase() {
                   marginTop: '1rem',
                   marginBottom: '3rem',
                   backdropFilter: 'blur(20px)',
-                  boxShadow: theme === 'dark' ? 'none' : '0 4px 30px rgba(0,0,0,0.04)',
+                  boxShadow: theme === 'dark' ? 'none' : '0 8px 40px rgba(0,0,0,0.04)',
                 }}
               >
                 <div className="max-w-4xl mx-auto w-full">
@@ -761,7 +762,7 @@ export default function ProductShowcase() {
                       className="text-sm sm:text-base max-w-2xl mx-auto cursor-default"
                       style={{ 
                         color: getTextMuted(),
-                        fontFamily: "'Calibri Light', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                       }}
                     >
                       Get a personalized demo and discover how NEEZAMIYA's enterprise solutions can revolutionize your educational institution.
@@ -793,7 +794,7 @@ export default function ProductShowcase() {
                             backgroundColor: getInputBg(),
                             borderColor: getBorderColor(),
                             color: getTextColor(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                           placeholder="John Doe"
                         />
@@ -821,7 +822,7 @@ export default function ProductShowcase() {
                             backgroundColor: getInputBg(),
                             borderColor: getBorderColor(),
                             color: getTextColor(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                           placeholder="john@institution.com"
                         />
@@ -851,7 +852,7 @@ export default function ProductShowcase() {
                             backgroundColor: getInputBg(),
                             borderColor: getBorderColor(),
                             color: getTextColor(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                           placeholder="+1 234 567 8900"
                         />
@@ -877,7 +878,7 @@ export default function ProductShowcase() {
                             backgroundColor: getInputBg(),
                             borderColor: getBorderColor(),
                             color: getTextColor(),
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                             zIndex: 10,
                             position: 'relative',
                           }}
@@ -905,7 +906,7 @@ export default function ProductShowcase() {
                           fontFamily: "'Poppins', sans-serif",
                           boxShadow: theme === 'dark' 
                             ? `0 4px 30px rgba(0, 102, 255, 0.3)`
-                            : `0 4px 30px rgba(0, 102, 255, 0.25)`,
+                            : `0 4px 30px rgba(0, 102, 255, 0.2)`,
                         }}
                       >
                         {formSubmitted ? '✓ Request Sent!' : 'Request a Demo'}
@@ -915,7 +916,7 @@ export default function ProductShowcase() {
                           className="mt-3 text-sm text-center"
                           style={{ 
                             color: BLUE,
-                            fontFamily: "'Calibri Light', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                           }}
                         >
                           Thank you! We'll be in touch shortly.

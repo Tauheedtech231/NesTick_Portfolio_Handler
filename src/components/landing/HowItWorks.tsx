@@ -159,14 +159,18 @@ export default function HowItWorks() {
         wireDim: 'rgba(232, 202, 94, 0)',
         pulseColor: 'rgba(232, 202, 94, 0.4)',
         doneColor: 'rgba(232, 202, 94, 0.2)',
+        cardShadow: 'none',
+        gpoShadow: '0 0 30px rgba(232,202,94,0.4),0 0 70px rgba(232,202,94,0.1)',
+        collegeShadow: '0 0 12px rgba(232,202,94,0.35)',
+        cardHoverShadow: '0 0 22px rgba(232,202,94,0.3)',
       };
     } else {
       return {
-        bg: '#FFFFFF',
+        bg: '#F8FAFF',
         cardBg: '#FFFFFF',
         cardBorder: 'rgba(0, 0, 0, 0.06)',
         text: '#1F2937',
-        textMuted: '#6B7280',
+        textMuted: '#4B5563',
         heading: '#1F2937',
         accent: '#0066FF',
         accentLight: 'rgba(0, 102, 255, 0.08)',
@@ -182,6 +186,10 @@ export default function HowItWorks() {
         wireDim: 'rgba(0, 102, 255, 0)',
         pulseColor: 'rgba(0, 102, 255, 0.3)',
         doneColor: 'rgba(0, 102, 255, 0.15)',
+        cardShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        gpoShadow: '0 0 30px rgba(0,102,255,0.25),0 0 70px rgba(0,102,255,0.08)',
+        collegeShadow: '0 0 12px rgba(0,102,255,0.2)',
+        cardHoverShadow: '0 0 22px rgba(0,102,255,0.2)',
       };
     }
   };
@@ -296,7 +304,7 @@ export default function HowItWorks() {
     // ── PSM Box ────────────────────────────────────────────────────────────
     const gpo = document.createElement("div");
     gpo.id = "hiw-gpo";
-    gpo.style.cssText = `position:absolute;left:${gpoX}px;top:${gpoY}px;width:${GPO_W}px;height:${GPO_H}px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;border:2px solid ${colors.gpoBorder};background:${colors.gpoBg};transition:border-color .4s,box-shadow .4s;font-family:'Poppins',sans-serif`;
+    gpo.style.cssText = `position:absolute;left:${gpoX}px;top:${gpoY}px;width:${GPO_W}px;height:${GPO_H}px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;border:2px solid ${colors.gpoBorder};background:${colors.gpoBg};transition:border-color .4s,box-shadow .4s;font-family:'Poppins',sans-serif;box-shadow:${colors.gpoShadow}`;
     gpo.innerHTML = `
       <div style="font-size:22px;font-weight:800;color:${colors.gpoText};letter-spacing:1px;font-family:'Poppins',sans-serif">PSM</div>
       <div style="font-size:10px;color:${theme === 'dark' ? 'rgba(232,202,94,0.5)' : 'rgba(0,102,255,0.5)'};font-family:'Calibri Light',sans-serif">System</div>
@@ -308,7 +316,7 @@ export default function HowItWorks() {
     COLLEGES.forEach((c, i) => {
       const d = document.createElement("div");
       d.id = "cn" + i;
-      d.style.cssText = `position:absolute;left:${colPos[i].x}px;top:${colPos[i].y}px;width:${COL_W}px;height:${COL_H}px;border-radius:10px;border:1px solid ${colors.collegeBorder};background:${colors.collegeBg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:border-color .3s,box-shadow .3s;font-family:'Poppins',sans-serif`;
+      d.style.cssText = `position:absolute;left:${colPos[i].x}px;top:${colPos[i].y}px;width:${COL_W}px;height:${COL_H}px;border-radius:10px;border:1px solid ${colors.collegeBorder};background:${colors.collegeBg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:border-color .3s,box-shadow .3s;font-family:'Poppins',sans-serif;box-shadow:${theme === 'dark' ? 'none' : '0 2px 8px rgba(0,0,0,0.02)'}`;
       d.innerHTML = `<span style="font-size:19px">🎓</span><span style="font-size:9px;color:${colors.collegeText};font-weight:600;font-family:'Poppins',sans-serif">${c}</span>`;
       canvas.appendChild(d);
     });
@@ -318,7 +326,7 @@ export default function HowItWorks() {
       const d = document.createElement("div");
       d.id = "sc" + i;
       
-      d.style.cssText = `position:absolute;left:${stepPos[i].x}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px);font-family:'Poppins',sans-serif`;
+      d.style.cssText = `position:absolute;left:${stepPos[i].x}px;top:${stepPos[i].y}px;width:${SW}px;height:${SH}px;border-radius:14px;border:1px solid ${colors.cardBorder};background:${colors.cardBg};padding:16px 14px 14px;text-align:center;opacity:0;transform:scale(.94);transition:opacity .45s ease,transform .45s ease,border-color .3s,box-shadow .3s;backdrop-filter:blur(4px);font-family:'Poppins',sans-serif;box-shadow:${colors.cardShadow}`;
       
       const details = s.details
         .map(
@@ -380,7 +388,7 @@ export default function HowItWorks() {
       const r = document.getElementById("hiw-gpo-ring");
       if (g) { 
         g.style.borderColor = colors.accent; 
-        g.style.boxShadow = `0 0 30px ${theme === 'dark' ? 'rgba(232,202,94,0.4)' : 'rgba(0,102,255,0.25)'},0 0 70px ${theme === 'dark' ? 'rgba(232,202,94,0.1)' : 'rgba(0,102,255,0.08)'}`; 
+        g.style.boxShadow = colors.gpoShadow;
       }
       if (r) { r.style.opacity = "1"; r.style.animation = "hiw-ring-pulse 1s ease-in-out infinite"; }
     }, 0);
@@ -478,7 +486,7 @@ export default function HowItWorks() {
         }
         .hiw-pulse {
           border-color: ${theme === 'dark' ? 'rgba(232,202,94,0.8)' : 'rgba(0,102,255,0.6)'} !important;
-          box-shadow: 0 0 22px ${theme === 'dark' ? 'rgba(232,202,94,0.3)' : 'rgba(0,102,255,0.2)'} !important;
+          box-shadow: ${theme === 'dark' ? '0 0 22px rgba(232,202,94,0.3)' : '0 0 22px rgba(0,102,255,0.2)'} !important;
         }
         .hiw-done {
           border-color: ${theme === 'dark' ? 'rgba(232,202,94,0.25)' : 'rgba(0,102,255,0.15)'} !important;
@@ -492,7 +500,7 @@ export default function HowItWorks() {
       <div className="w-full rounded-2xl px-5 pb-12"
         style={{ backgroundColor: colors.bg }}
       >
-        {/* Heading */}
+        {/* Heading - UPDATED with better contrast */}
         <div className="mb-7 text-center">
           <span className="text-[10px] font-bold uppercase tracking-[3px]"
             style={{ 
@@ -513,6 +521,14 @@ export default function HowItWorks() {
               Works
             </span>
           </h2>
+          <p className="text-sm mt-2 font-light"
+            style={{ 
+              color: colors.textMuted,
+              fontFamily: "'Calibri Light', sans-serif",
+            }}
+          >
+            From template selection to live publication — a seamless journey
+          </p>
         </div>
 
         {/* Canvas — JS draws everything inside here */}

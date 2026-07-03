@@ -49,16 +49,22 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import  ContactSection  from './ContactSection';
 
+// ==========================================
+// BRAND COLORS - CONSISTENT WITH ALL SECTIONS
+// ==========================================
+const GOLD = "#E8CA5E";
+const BLUE = "#0066FF";
+
 // 5 Partner Types - Only Business Developer is Gold, rest Blue
 const partnerTypes = [
-  { value: 'designer', label: 'Designer', icon: Palette, color: '#0066FF' },
-  { value: 'developer', label: 'Developer', icon: Code2, color: '#0066FF' },
-  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: '#E8CA5E' }, // ← GOLD
-  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: '#0066FF' },
-  { value: 'sales', label: 'Sales Person', icon: Target, color: '#0066FF' },
+  { value: 'designer', label: 'Designer', icon: Palette, color: BLUE },
+  { value: 'developer', label: 'Developer', icon: Code2, color: BLUE },
+  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: GOLD },
+  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: BLUE },
+  { value: 'sales', label: 'Sales Person', icon: Target, color: BLUE },
 ];
 
-// Benefits data for each partner type - Dynamic colors based on active tab
+// Benefits data for each partner type
 const partnerBenefitsMap = {
   designer: [
     { icon: Palette, title: "Creative Freedom", description: "Express your artistic vision without limits." },
@@ -372,60 +378,141 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     return () => observer.disconnect();
   }, []);
 
-  // INSAAN: FIXED - isBusinessDev helper with type assertion
+  // Helper to check if Business Dev (Gold)
   const isBusinessDev = (activeForm as string) === 'business_dev';
 
-  // Get accent color based on active form - FIXED
+  // Get accent color based on active form
   const getActiveColor = () => {
-    return isBusinessDev ? '#E8CA5E' : '#0066FF';
+    return isBusinessDev ? GOLD : BLUE;
   };
 
   const getActiveColorLight = () => {
     return isBusinessDev ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.15)';
   };
 
-  // Get shadow color for benefits cards hover - FIXED
+  // Get shadow color for benefits cards hover
   const getShadowColor = () => {
-    return isBusinessDev ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.3)';
+    return isBusinessDev ? 'rgba(232, 202, 94, 0.25)' : 'rgba(0, 102, 255, 0.25)';
   };
 
-  // Theme colors
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#FFFFFF';
-  const getCardBg = () => theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : 'rgba(255, 255, 255, 0.8)';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4B5563';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7280';
-  const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : 'rgba(249, 250, 251, 0.9)';
+  // ==========================================
+  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // ==========================================
 
-  // Button background based on active form - FIXED
+  // 1️⃣ Background - Gradient for depth (not flat)
+  const getBgColor = () => {
+    if (theme === 'dark') return '#0B0F19';
+    return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
+  };
+
+  // 2️⃣ Card Background - Clean with subtle depth
+  const getCardBg = () => {
+    if (theme === 'dark') return 'rgba(15, 23, 42, 0.6)';
+    return 'rgba(255, 255, 255, 0.92)';
+  };
+
+  // 3️⃣ Form Card Background - White with shadow for depth
+  const getFormCardBg = () => {
+    if (theme === 'dark') return 'rgba(15, 23, 42, 0.4)';
+    return 'rgba(255, 255, 255, 0.95)';
+  };
+
+  const getFormCardShadow = () => {
+    if (theme === 'light') {
+      return '0 4px 24px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)';
+    }
+    return 'none';
+  };
+
+  const getFormCardBorder = () => {
+    if (theme === 'light') {
+      return '1px solid rgba(0,0,0,0.04)';
+    }
+    return 'none';
+  };
+
+  // 4️⃣ Border - Subtle & refined
+  const getBorderColor = () => {
+    if (theme === 'dark') return 'rgba(30, 41, 59, 0.5)';
+    return 'rgba(0, 0, 0, 0.06)';
+  };
+
+  // 5️⃣ Text Colors - Better contrast for readability
+  const getTextColor = () => {
+    if (theme === 'dark') return '#F1F5F9';
+    return '#0F172A';
+  };
+
+  const getTextSecondary = () => {
+    if (theme === 'dark') return '#D1D5DB';
+    return '#334155';
+  };
+
+  const getTextMuted = () => {
+    if (theme === 'dark') return '#94A3B8';
+    return '#475569';
+  };
+
+  // 6️⃣ Input Background - Consistent with theme
+  const getInputBg = () => {
+    if (theme === 'dark') return 'rgba(11, 15, 25, 0.8)';
+    return 'rgba(249, 250, 251, 0.9)';
+  };
+
+  // 7️⃣ Button Background - Brand colors only
   const getButtonBg = () => {
-    return isBusinessDev ? '#E8CA5E' : '#0066FF';
+    return isBusinessDev ? GOLD : BLUE;
   };
 
   const getButtonText = () => '#FFFFFF';
 
-  // Shadow color for benefits - FIXED
+  // 8️⃣ Shadow for benefits cards
   const getShadowColorForBenefits = () => {
-    return isBusinessDev ? 'rgba(232, 202, 94, 0.25)' : 'rgba(0, 102, 255, 0.25)';
+    return isBusinessDev ? 'rgba(232, 202, 94, 0.20)' : 'rgba(0, 102, 255, 0.15)';
   };
 
+  // 9️⃣ Input Style - LARGER SIZES
   const getInputStyle = () => ({
     width: '100%',
-    padding: '0.5rem 0.75rem',
-    borderRadius: '0.5rem',
-    fontSize: '0.75rem',
+    padding: '0.75rem 1rem',
+    borderRadius: '0.75rem',
+    fontSize: '0.875rem',
     backgroundColor: getInputBg(),
     border: `1px solid ${getBorderColor()}`,
     color: getTextColor(),
     outline: 'none',
     transition: 'all 0.2s ease',
     fontFamily: "'Calibri Light', sans-serif",
+    boxShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.02)' : 'none',
   });
 
   const getInputHoverStyle = {
     borderColor: getActiveColor(),
+    boxShadow: `0 0 0 4px ${getActiveColor()}15`,
   };
+
+  // 🔟 Label Style
+  const getLabelStyle = () => ({
+    color: getTextMuted(),
+    fontFamily: "'Poppins', sans-serif",
+    fontSize: '0.75rem',
+    fontWeight: '500',
+    marginBottom: '0.5rem',
+    display: 'block',
+  });
+
+  // 1️⃣1️⃣ File Upload Style
+  const getFileUploadStyle = () => ({
+    borderColor: getBorderColor(),
+    backgroundColor: getInputBg(),
+    borderStyle: 'dashed',
+    borderWidth: '2px',
+    borderRadius: '0.75rem',
+    padding: '1rem',
+    textAlign: 'center' as const,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  });
 
   // Get category content for each partner type
   const getCategoryContent = () => {
@@ -879,8 +966,12 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
   return (
     <>
       <Navbar />
-      <section id="partner-section" ref={sectionRef} className="py-12 mt-10 md:py-20 px-4 sm:px-6 relative overflow-hidden cursor-pointer"
-        style={{ backgroundColor: getBgColor(), fontFamily: "'Poppins', sans-serif" }}
+      <section id="partner-section" ref={sectionRef} className="py-12 mt-10 md:py-20 px-4 sm:px-6 relative overflow-hidden"
+        style={{ 
+          background: getBgColor(), 
+          fontFamily: "'Poppins', sans-serif",
+          boxShadow: theme === 'light' ? 'inset 0 1px 0 rgba(255,255,255,0.8)' : 'none',
+        }}
       >
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header Section */}
@@ -890,13 +981,13 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             transition={{ duration: 0.6 }}
             className="text-center mt-5 md:mb-10"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit cursor-pointer"
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit"
               style={{
                 backgroundColor: getActiveColorLight(),
               }}
             >
               <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: getActiveColor() }} />
-              <span className="text-xs md:text-sm font-medium tracking-wide cursor-pointer"
+              <span className="text-xs md:text-sm font-medium tracking-wide"
                 style={{ 
                   color: getTextMuted(),
                   fontFamily: "'Poppins', sans-serif",
@@ -906,14 +997,14 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               </span>
             </div>
             
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight cursor-pointer">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 font-serif tracking-tight">
               <span style={{ color: getTextColor(), fontFamily: "'Poppins', sans-serif" }}>Become a </span>
               <span className="inline-block" style={{ color: getActiveColor(), fontFamily: "'Poppins', sans-serif" }}>
                 Partner
               </span>
             </h2>
             
-            <p className="text-sm md:text-base max-w-2xl mx-auto px-4 font-light tracking-wide cursor-pointer"
+            <p className="text-sm md:text-base max-w-2xl mx-auto px-4 font-light tracking-wide"
               style={{ 
                 color: getTextMuted(),
                 fontFamily: "'Calibri Light', sans-serif",
@@ -923,7 +1014,9 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             </p>
           </motion.div>
 
-          {/* Category Selection - Only Business Developer is Gold, rest Blue */}
+          {/* ==========================================
+              PARTNER BUTTONS - UPDATED FOR WHITE MODE
+              ========================================== */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -933,21 +1026,30 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             {partnerTypes.map((type) => {
               const Icon = type.icon;
               const isActive = activeForm === type.value;
-              const isYellow = type.color === '#E8CA5E';
+              const isGold = type.color === GOLD;
+              
               return (
                 <button
                   key={type.value}
                   onClick={() => setActiveForm(type.value as any)}
-                  className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                  className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? 'text-white shadow-lg'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      ? 'text-white shadow-lg scale-105'
+                      : theme === 'dark' 
+                        ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' 
+                        : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                   }`}
                   style={{
-                    backgroundColor: isActive ? (isYellow ? '#E8CA5E' : '#0066FF') : undefined,
+                    backgroundColor: isActive ? (isGold ? GOLD : BLUE) : undefined,
                     color: isActive ? '#FFFFFF' : undefined,
                     fontFamily: "'Poppins', sans-serif",
-                    boxShadow: isActive ? (isYellow ? '0 4px 20px rgba(232, 202, 94, 0.4)' : '0 4px 20px rgba(0, 102, 255, 0.4)') : undefined,
+                    boxShadow: isActive 
+                      ? (isGold 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.40)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.40)'
+                      ) 
+                      : undefined,
+                    border: !isActive && theme === 'light' ? '1px solid #e5e7eb' : 'none',
                   }}
                 >
                   <Icon className="w-4 h-4" />
@@ -957,7 +1059,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             })}
           </motion.div>
 
-          {/* Benefits Cards - Dynamic per partner type with hover shadow */}
+          {/* Benefits Cards */}
           <PartnerBenefitsCards 
             benefits={getCurrentBenefits()}
             theme={theme}
@@ -968,7 +1070,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
 
           {/* Form Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {/* Left Side - Why Choose - No color passed, stays as is */}
+            {/* Left Side - Why Choose */}
             <PartnerWhyChoose
               activeForm={activeForm}
               theme={theme}
@@ -976,25 +1078,26 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               categoryContent={categoryContent}
             />
 
-            {/* Right Side - Forms */}
+            {/* Right Side - Forms - UPDATED WITH WHITE MODE DEPTH */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="rounded-xl md:rounded-2xl p-5 md:p-8"
+              className="rounded-xl md:rounded-2xl p-5 md:p-8 transition-all duration-300"
               style={{
-                backgroundColor: 'transparent',
-                border: 'none',
+                backgroundColor: getFormCardBg(),
+                border: getFormCardBorder(),
+                boxShadow: getFormCardShadow(),
               }}
             >
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-2 md:gap-3">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center"
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: getActiveColor() }}
                   >
                     <FileText className="w-5 h-5 md:w-6 h-6" style={{ color: '#FFFFFF' }} />
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold font-serif tracking-tight cursor-pointer"
+                  <h3 className="text-lg md:text-xl font-bold font-serif tracking-tight"
                     style={{ 
                       color: getTextColor(),
                       fontFamily: "'Poppins', sans-serif",
@@ -1007,7 +1110,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     {activeForm === 'sales' && 'Sales Person Registration'}
                   </h3>
                 </div>
-                <div className="text-[10px] md:text-xs cursor-pointer"
+                <div className="text-[10px] md:text-xs"
                   style={{ 
                     color: getTextMuted(),
                     fontFamily: "'Calibri Light', sans-serif",
@@ -1017,14 +1120,17 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </div>
               </div>
 
-              {/* Designer Form */}
+              {/* ==========================================
+                  DESIGNER FORM - WITH LARGER INPUTS
+                  ========================================== */}
               {activeForm === 'designer' && (
-                <form onSubmit={handleDesignerSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <form onSubmit={handleDesignerSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Full Name *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       name="name"
@@ -1032,19 +1138,23 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       onChange={handleDesignerChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Email *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Email *
+                      </label>
                       <input
                         type="email"
                         name="email"
@@ -1052,17 +1162,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDesignerChange}
                         required
                         placeholder="designer@example.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Password *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Password *
+                      </label>
                       <input
                         type="password"
                         name="password"
@@ -1070,20 +1184,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDesignerChange}
                         required
                         placeholder="Create a password"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Phone *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Phone *
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -1091,43 +1209,51 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDesignerChange}
                         required
                         placeholder="+92 300 1234567"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Company (Optional)</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Company (Optional)
+                      </label>
                       <input
                         type="text"
                         name="company"
                         value={designerForm.company}
                         onChange={handleDesignerChange}
                         placeholder="Your company name"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Specialization *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Specialization *
+                      </label>
                       <select
                         name="specialization"
                         value={designerForm.specialization}
                         onChange={handleDesignerChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select specialization</option>
@@ -1137,16 +1263,17 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Experience *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Experience *
+                      </label>
                       <select
                         name="experience"
                         value={designerForm.experience}
                         onChange={handleDesignerChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select experience</option>
@@ -1158,29 +1285,34 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Portfolio Link (Optional)</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Portfolio Link (Optional)
+                    </label>
                     <input
                       type="url"
                       name="portfolio"
                       value={designerForm.portfolio}
                       onChange={handleDesignerChange}
                       placeholder="https://yourportfolio.com"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Upload CV/Resume (Optional - Max 20MB)</label>
-                    <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Upload CV/Resume (Optional - Max 20MB)
+                    </label>
+                    <div className="border-2 border-dashed rounded-lg p-4 text-center transition-colors hover:border-blue-500"
                       style={{
                         borderColor: getBorderColor(),
                         backgroundColor: getInputBg(),
@@ -1198,7 +1330,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
-                            <span className="text-xs" style={{ 
+                            <span className="text-sm" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Calibri Light', sans-serif",
                             }}>{designerForm.cvFileName}</span>
@@ -1206,15 +1338,15 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); removeFile('designer'); }}
-                            className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
+                            className="p-1 hover:bg-red-500/20 rounded"
                           >
-                            <X className="w-3.5 h-3.5 text-red-400" />
+                            <X className="w-4 h-4 text-red-400" />
                           </button>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-1">
-                          <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                          <p className="text-xs" style={{ 
+                          <Upload className="w-8 h-8" style={{ color: getTextMuted() }} />
+                          <p className="text-sm" style={{ 
                             color: getTextMuted(),
                             fontFamily: "'Calibri Light', sans-serif",
                           }}>Upload your CV/Resume</p>
@@ -1226,19 +1358,20 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mx-auto"
+                    className="px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      width: 'auto',
-                      minWidth: '180px',
-                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
+                      minWidth: '200px',
+                      boxShadow: isBusinessDev 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
                     }}
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -1247,23 +1380,25 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     ) : (
                       <>
                         Register as Designer
-                        <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Developer Form - Same structure as before, keep as is */}
+              {/* ==========================================
+                  DEVELOPER FORM - WITH LARGER INPUTS
+                  ========================================== */}
               {activeForm === 'developer' && (
-                <form onSubmit={handleDeveloperSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                  {/* All developer form fields - same as before */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <form onSubmit={handleDeveloperSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Full Name *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Full Name *
+                      </label>
                       <input
                         type="text"
                         name="name"
@@ -1271,17 +1406,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDeveloperChange}
                         required
                         placeholder="Enter your full name"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Email *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Email *
+                      </label>
                       <input
                         type="email"
                         name="email"
@@ -1289,20 +1428,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDeveloperChange}
                         required
                         placeholder="developer@example.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Password *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Password *
+                      </label>
                       <input
                         type="password"
                         name="password"
@@ -1310,17 +1453,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDeveloperChange}
                         required
                         placeholder="Create a password"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Phone *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Phone *
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -1328,63 +1475,75 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleDeveloperChange}
                         required
                         placeholder="+92 300 1234567"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Company (Optional)</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Company (Optional)
+                      </label>
                       <input
                         type="text"
                         name="companyName"
                         value={developerForm.companyName}
                         onChange={handleDeveloperChange}
                         placeholder="Your company/agency name"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Location (Optional)</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Location (Optional)
+                      </label>
                       <input
                         type="text"
                         name="location"
                         value={developerForm.location}
                         onChange={handleDeveloperChange}
                         placeholder="City, Country"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Specialization *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Specialization *
+                      </label>
                       <select
                         name="specialization"
                         value={developerForm.specialization}
                         onChange={handleDeveloperChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select specialization</option>
@@ -1394,16 +1553,17 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Experience *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Experience *
+                      </label>
                       <select
                         name="experience"
                         value={developerForm.experience}
                         onChange={handleDeveloperChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select experience</option>
@@ -1415,19 +1575,22 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Skills *</label>
-                    <div className="flex flex-wrap gap-2 p-3 rounded-lg border cursor-pointer" style={{ borderColor: getBorderColor(), backgroundColor: getInputBg() }}>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Skills *
+                    </label>
+                    <div className="flex flex-wrap gap-2 p-4 rounded-lg border" 
+                      style={{ borderColor: getBorderColor(), backgroundColor: getInputBg() }}
+                    >
                       {skillOptions.map((skill) => (
                         <label
                           key={skill}
-                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all ${
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm transition-all ${
                             developerForm.skills.includes(skill)
                               ? 'text-white'
-                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                          } cursor-pointer`}
+                              : theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
                           style={{
                             backgroundColor: developerForm.skills.includes(skill) ? getActiveColor() : undefined,
                             fontFamily: "'Calibri Light', sans-serif",
@@ -1447,65 +1610,78 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Portfolio/GitHub Link (Optional)</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Portfolio/GitHub Link (Optional)
+                    </label>
                     <input
                       type="url"
                       name="portfolio"
                       value={developerForm.portfolio}
                       onChange={handleDeveloperChange}
                       placeholder="https://github.com/yourusername"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Bio (Optional)</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Bio (Optional)
+                    </label>
                     <textarea
                       name="bio"
                       value={developerForm.bio}
                       onChange={handleDeveloperChange}
-                      rows={2}
+                      rows={3}
                       placeholder="Tell us about yourself..."
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all resize-none cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all resize-none"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Bank Account Details (Optional)</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Bank Account Details (Optional)
+                    </label>
                     <textarea
                       name="bankAccountDetails"
                       value={developerForm.bankAccountDetails}
                       onChange={handleDeveloperChange}
-                      rows={2}
+                      rows={3}
                       placeholder="Bank name, Account holder name, Account number, IBAN"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all resize-none cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all resize-none"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Upload CV/Resume (Optional - Max 20MB)</label>
-                    <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:border-blue-500 transition-colors"
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Upload CV/Resume (Optional - Max 20MB)
+                    </label>
+                    <div className="border-2 border-dashed rounded-lg p-4 text-center transition-colors hover:border-blue-500"
                       style={{
                         borderColor: getBorderColor(),
                         backgroundColor: getInputBg(),
@@ -1523,7 +1699,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
-                            <span className="text-xs" style={{ 
+                            <span className="text-sm" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Calibri Light', sans-serif",
                             }}>{developerForm.cvFileName}</span>
@@ -1531,15 +1707,15 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); removeFile('developer'); }}
-                            className="p-1 hover:bg-red-500/20 rounded cursor-pointer"
+                            className="p-1 hover:bg-red-500/20 rounded"
                           >
-                            <X className="w-3.5 h-3.5 text-red-400" />
+                            <X className="w-4 h-4 text-red-400" />
                           </button>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-1">
-                          <Upload className="w-6 h-6" style={{ color: getTextMuted() }} />
-                          <p className="text-xs" style={{ 
+                          <Upload className="w-8 h-8" style={{ color: getTextMuted() }} />
+                          <p className="text-sm" style={{ 
                             color: getTextMuted(),
                             fontFamily: "'Calibri Light', sans-serif",
                           }}>Upload your CV/Resume</p>
@@ -1551,19 +1727,20 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mx-auto"
+                    className="px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      width: 'auto',
-                      minWidth: '180px',
-                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
+                      minWidth: '200px',
+                      boxShadow: isBusinessDev 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
                     }}
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -1572,21 +1749,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     ) : (
                       <>
                         Register as Developer
-                        <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Business Developer Form */}
+              {/* ==========================================
+                  BUSINESS DEVELOPER FORM - WITH LARGER INPUTS
+                  ========================================== */}
               {activeForm === 'business_dev' && (
-                <form onSubmit={handleBusinessDevSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <form onSubmit={handleBusinessDevSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Full Name *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       name="name"
@@ -1594,19 +1774,23 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       onChange={handleBusinessDevChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Email *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Email *
+                      </label>
                       <input
                         type="email"
                         name="email"
@@ -1614,17 +1798,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleBusinessDevChange}
                         required
                         placeholder="bd@company.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Phone *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Phone *
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -1632,20 +1820,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleBusinessDevChange}
                         required
                         placeholder="+92 300 1234567"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Company *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Company *
+                      </label>
                       <input
                         type="text"
                         name="company"
@@ -1653,23 +1845,27 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleBusinessDevChange}
                         required
                         placeholder="Your company name"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Experience *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Experience *
+                      </label>
                       <select
                         name="experience"
                         value={businessDevForm.experience}
                         onChange={handleBusinessDevChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select experience</option>
@@ -1680,18 +1876,19 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Region *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Region *
+                      </label>
                       <select
                         name="region"
                         value={businessDevForm.region}
                         onChange={handleBusinessDevChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select region</option>
@@ -1701,59 +1898,68 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>LinkedIn (Optional)</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        LinkedIn (Optional)
+                      </label>
                       <input
                         type="url"
                         name="linkedin"
                         value={businessDevForm.linkedin}
                         onChange={handleBusinessDevChange}
                         placeholder="https://linkedin.com/in/yourprofile"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Message / Partnership Interest *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Message / Partnership Interest *
+                    </label>
                     <textarea
                       name="message"
                       value={businessDevForm.message}
                       onChange={handleBusinessDevChange}
                       required
-                      rows={3}
+                      rows={4}
                       placeholder="Tell us about your experience and how you can contribute..."
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all resize-none cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all resize-none"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mx-auto"
+                    className="px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      width: 'auto',
-                      minWidth: '180px',
-                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
+                      minWidth: '200px',
+                      boxShadow: isBusinessDev 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
                     }}
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -1762,21 +1968,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     ) : (
                       <>
                         Apply as Business Developer
-                        <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Marketing Agency Form - Keep as is */}
+              {/* ==========================================
+                  MARKETING AGENCY FORM - WITH LARGER INPUTS
+                  ========================================== */}
               {activeForm === 'marketing_agency' && (
-                <form onSubmit={handleMarketingSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <form onSubmit={handleMarketingSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Agency Name *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Agency Name *
+                    </label>
                     <input
                       type="text"
                       name="agencyName"
@@ -1784,18 +1993,22 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       onChange={handleMarketingChange}
                       required
                       placeholder="Your agency name"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Contact Person *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Contact Person *
+                    </label>
                     <input
                       type="text"
                       name="contactPerson"
@@ -1803,19 +2016,23 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       onChange={handleMarketingChange}
                       required
                       placeholder="Full name of contact person"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Email *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Email *
+                      </label>
                       <input
                         type="email"
                         name="email"
@@ -1823,17 +2040,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleMarketingChange}
                         required
                         placeholder="agency@company.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Phone *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Phone *
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -1841,43 +2062,51 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleMarketingChange}
                         required
                         placeholder="+92 300 1234567"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Website (Optional)</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Website (Optional)
+                      </label>
                       <input
                         type="url"
                         name="website"
                         value={marketingForm.website}
                         onChange={handleMarketingChange}
                         placeholder="https://youragency.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Team Size *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Team Size *
+                      </label>
                       <select
                         name="teamSize"
                         value={marketingForm.teamSize}
                         onChange={handleMarketingChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select team size</option>
@@ -1889,16 +2118,17 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Services Offered *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Services Offered *
+                    </label>
                     <select
                       name="services"
                       value={marketingForm.services}
                       onChange={handleMarketingChange}
                       required
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
                     >
                       <option value="">Select primary service</option>
@@ -1909,40 +2139,45 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Message / How Can We Partner? *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Message / How Can We Partner? *
+                    </label>
                     <textarea
                       name="message"
                       value={marketingForm.message}
                       onChange={handleMarketingChange}
                       required
-                      rows={3}
+                      rows={4}
                       placeholder="Tell us about your agency and how we can collaborate..."
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all resize-none cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all resize-none"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mx-auto"
+                    className="px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      width: 'auto',
-                      minWidth: '180px',
-                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
+                      minWidth: '200px',
+                      boxShadow: isBusinessDev 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
                     }}
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -1951,21 +2186,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     ) : (
                       <>
                         Register as Marketing Agency
-                        <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Sales Person Form - Keep as is */}
+              {/* ==========================================
+                  SALES FORM - WITH LARGER INPUTS
+                  ========================================== */}
               {activeForm === 'sales' && (
-                <form onSubmit={handleSalesSubmit} className="space-y-3 md:space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <form onSubmit={handleSalesSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Full Name *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       name="name"
@@ -1973,19 +2211,23 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       onChange={handleSalesChange}
                       required
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Email *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Email *
+                      </label>
                       <input
                         type="email"
                         name="email"
@@ -1993,17 +2235,21 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleSalesChange}
                         required
                         placeholder="sales@company.com"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Phone *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Phone *
+                      </label>
                       <input
                         type="tel"
                         name="phone"
@@ -2011,20 +2257,24 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleSalesChange}
                         required
                         placeholder="+92 300 1234567"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Company *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Company *
+                      </label>
                       <input
                         type="text"
                         name="company"
@@ -2032,23 +2282,27 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         onChange={handleSalesChange}
                         required
                         placeholder="Your company name"
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-text"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
-                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                        onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                        onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                          borderColor: getBorderColor(), 
+                          boxShadow: 'none' 
+                        })}
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Experience *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Experience *
+                      </label>
                       <select
                         name="experience"
                         value={salesForm.experience}
                         onChange={handleSalesChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select experience</option>
@@ -2059,18 +2313,19 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Region *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Region *
+                      </label>
                       <select
                         name="region"
                         value={salesForm.region}
                         onChange={handleSalesChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select region</option>
@@ -2080,16 +2335,17 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                        color: getTextMuted(),
-                        fontFamily: "'Poppins', sans-serif",
-                      }}>Monthly Sales Target (USD) *</label>
+                      <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                        style={getLabelStyle()}
+                      >
+                        Monthly Sales Target (USD) *
+                      </label>
                       <select
                         name="salesTarget"
                         value={salesForm.salesTarget}
                         onChange={handleSalesChange}
                         required
-                        className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all cursor-pointer"
+                        className="w-full rounded-lg focus:outline-none transition-all"
                         style={getInputStyle()}
                       >
                         <option value="">Select target</option>
@@ -2103,40 +2359,45 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                   </div>
 
                   <div>
-                    <label className="block text-[10px] md:text-xs font-medium mb-1 cursor-pointer" style={{ 
-                      color: getTextMuted(),
-                      fontFamily: "'Poppins', sans-serif",
-                    }}>Message / Why Sales? *</label>
+                    <label className="block text-xs md:text-sm font-medium mb-1.5" 
+                      style={getLabelStyle()}
+                    >
+                      Message / Why Sales? *
+                    </label>
                     <textarea
                       name="message"
                       value={salesForm.message}
                       onChange={handleSalesChange}
                       required
-                      rows={3}
+                      rows={4}
                       placeholder="Tell us about your sales experience and why you want to join..."
-                      className="w-full px-3 py-2 rounded-lg text-xs md:text-sm focus:outline-none transition-all resize-none cursor-text"
+                      className="w-full rounded-lg focus:outline-none transition-all resize-none"
                       style={getInputStyle()}
-                      onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getBorderColor() })}
+                      onFocus={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
+                      onBlur={(e) => Object.assign(e.currentTarget.style, { 
+                        borderColor: getBorderColor(), 
+                        boxShadow: 'none' 
+                      })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mx-auto"
+                    className="px-8 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95"
                     style={{
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      width: 'auto',
-                      minWidth: '180px',
-                      boxShadow: isBusinessDev ? '0 4px 20px rgba(232, 202, 94, 0.3)' : '0 4px 20px rgba(0, 102, 255, 0.3)',
+                      minWidth: '200px',
+                      boxShadow: isBusinessDev 
+                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
+                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
                     }}
                   >
                     {isSubmitting ? (
                       <>
-                        <svg className="animate-spin h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -2145,7 +2406,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                     ) : (
                       <>
                         Apply as Sales Person
-                        <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
                   </button>
@@ -2153,11 +2414,11 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               )}
 
               {submitStatus === 'error' && (
-                <div className="p-2 md:p-3 rounded-lg flex items-center gap-2 mt-3 cursor-pointer"
+                <div className="p-3 rounded-lg flex items-center gap-2 mt-3"
                   style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}
                 >
-                  <XCircle className="w-3.5 h-3.5 text-red-400" />
-                  <p className="text-red-400 text-[10px] md:text-xs" style={{ fontFamily: "'Calibri Light', sans-serif" }}>Failed to submit. Please try again.</p>
+                  <XCircle className="w-4 h-4 text-red-400" />
+                  <p className="text-red-400 text-sm" style={{ fontFamily: "'Calibri Light', sans-serif" }}>Failed to submit. Please try again.</p>
                 </div>
               )}
             </motion.div>
@@ -2171,12 +2432,13 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               style={{
                 backgroundColor: getCardBg(),
                 border: `1px solid ${getBorderColor()}`,
+                boxShadow: theme === 'light' ? '0 20px 60px rgba(0,0,0,0.10)' : '0 20px 60px rgba(0,0,0,0.30)',
               }}
             >
-              <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-3 md:mb-4">
-                <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+              <div className="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-3 md:mb-4">
+                <CheckCircle className="w-7 h-7 md:w-8 md:h-8 text-green-400" />
               </div>
-              <h3 className="text-lg md:text-xl font-bold mb-2 font-serif cursor-pointer"
+              <h3 className="text-lg md:text-xl font-bold mb-2 font-serif"
                 style={{ 
                   color: getTextColor(),
                   fontFamily: "'Poppins', sans-serif",
@@ -2184,7 +2446,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               >
                 Submission Successful!
               </h3>
-              <p className="text-xs md:text-sm mb-4 font-light cursor-pointer"
+              <p className="text-sm md:text-base mb-4 font-light"
                 style={{ 
                   color: getTextSecondary(),
                   fontFamily: "'Calibri Light', sans-serif",
@@ -2194,7 +2456,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
               </p>
               <button
                 onClick={() => setShowSuccessModal(false)}
-                className="px-5 py-2 md:px-6 md:py-2 rounded-lg font-semibold text-xs md:text-sm hover:scale-105 transition-transform cursor-pointer"
+                className="px-6 py-2.5 rounded-xl font-semibold text-sm hover:scale-105 transition-transform"
                 style={{
                   backgroundColor: getActiveColor(),
                   color: getButtonText(),

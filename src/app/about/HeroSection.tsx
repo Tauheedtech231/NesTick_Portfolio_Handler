@@ -18,7 +18,7 @@ function Stars({ theme }: { theme: 'light' | 'dark' }) {
     { x: "63%", y: "91%", r: 1.5, op: 0.7, color: theme === 'dark' ? "#4da6ff" : "#0066FF" },
     { x: "71%", y: "17%", r: 1.5, op: 0.6, color: theme === 'dark' ? "#4da6ff" : "#0066FF" },
     { x: "79%", y: "82%", r: 1,   op: 0.5, color: theme === 'dark' ? "#4da6ff" : "#0066FF" },
-    { x: "40%", y: "94%", r: 5,   op: 0.65, color: "#E8CA5E" }, // ← UPDATED: Gold
+    { x: "40%", y: "94%", r: 5,   op: 0.65, color: "#E8CA5E" },
   ];
   return (
     <>
@@ -93,10 +93,94 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
 
   const primaryColor = theme === 'dark' ? '#4da6ff' : '#0066FF';
   const primaryLight = theme === 'dark' ? 'rgba(77,166,255,0.30)' : 'rgba(0,102,255,0.20)';
-  const primaryGlow = theme === 'dark' ? 'rgba(77,166,255,0.09)' : 'rgba(0,102,255,0.06)';
-  const borderColor = theme === 'dark' ? 'rgba(77,166,255,0.12)' : 'rgba(0,102,255,0.15)';
+  const primaryGlow = theme === 'dark' ? 'rgba(77,166,255,0.09)' : 'rgba(0,102,255,0.12)';
+  const borderColor = theme === 'dark' ? 'rgba(77,166,255,0.12)' : 'rgba(0,102,255,0.30)';
   const bgColor = theme === 'dark' ? '#0a1535' : '#f0f4ff';
   const textColor = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+
+  // ─── RING COLORS - CLEARLY VISIBLE IN WHITE MODE ───
+  
+  // Ring 1 (Outer)
+  const getRing1Color = () => {
+    if (theme === 'dark') return 'rgba(77,166,255,0.05)';
+    return 'rgba(0,102,255,0.15)';
+  };
+
+  // Ring 2 (Main Orbit)
+  const getRing2Color = () => {
+    if (theme === 'dark') return borderColor;
+    return 'rgba(0,102,255,0.40)';
+  };
+
+  const getRing2Shadow = () => {
+    if (theme === 'dark') {
+      return isHovered ? "0 0 30px rgba(232,202,94,0.15)" : `0 0 18px ${primaryGlow}`;
+    }
+    return isHovered 
+      ? "0 0 50px rgba(232,202,94,0.25)"
+      : "0 0 30px rgba(0,102,255,0.15)";
+  };
+
+  // Ring 3 (Dashed Inner)
+  const getRing3Color = () => {
+    if (theme === 'dark') return 'rgba(255,255,255,0.10)';
+    return 'rgba(0,0,0,0.20)';
+  };
+
+  // Ring 4 (Gold Inner)
+  const getRing4Color = () => {
+    if (theme === 'dark') {
+      return isHovered ? 'rgba(232,202,94,0.6)' : 'rgba(232,202,94,0.32)';
+    }
+    return isHovered 
+      ? 'rgba(232,202,94,0.80)'
+      : 'rgba(232,202,94,0.60)';
+  };
+
+  const getRing4Shadow = () => {
+    if (theme === 'dark') {
+      return isHovered ? "0 0 25px rgba(232,202,94,0.25)" : "0 0 14px rgba(232,202,94,0.12)";
+    }
+    return isHovered 
+      ? "0 0 40px rgba(232,202,94,0.35)"
+      : "0 0 25px rgba(232,202,94,0.25)";
+  };
+
+  // ─── Orbit shadow ───
+  const getOrbitShadow = () => {
+    if (theme === 'dark') {
+      return isHovered
+        ? "0 0 60px rgba(232,202,94,0.15), inset 0 0 40px rgba(232,202,94,0.08)"
+        : `0 0 40px ${primaryGlow}, inset 0 0 30px ${primaryGlow}`;
+    }
+    return isHovered
+      ? "0 0 70px rgba(232,202,94,0.18), inset 0 0 50px rgba(232,202,94,0.08)"
+      : "0 0 50px rgba(0,102,255,0.08), inset 0 0 40px rgba(0,102,255,0.05)";
+  };
+
+  // ─── Center glow ───
+  const getCenterGlow = () => {
+    if (theme === 'dark') {
+      return isHovered
+        ? "radial-gradient(circle, rgba(232,202,94,0.35) 0%, rgba(232,202,94,0.05) 68%)"
+        : `radial-gradient(circle, ${primaryLight} 0%, transparent 68%)`;
+    }
+    return isHovered
+      ? "radial-gradient(circle, rgba(232,202,94,0.30) 0%, rgba(232,202,94,0.06) 68%)"
+      : "radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 68%)";
+  };
+
+  // ─── Planet background ───
+  const getPlanetBg = () => {
+    if (theme === 'dark') {
+      return isHovered
+        ? "radial-gradient(circle at 38% 35%, #f5c842 0%, #E8CA5E 35%, #c49b2a 70%, #7a5e0a 100%)"
+        : "radial-gradient(circle at 38% 35%, #6ab4ff 0%, #1a4a9e 35%, #091535 70%, #030918 100%)";
+    }
+    return isHovered
+      ? "radial-gradient(circle at 38% 35%, #f5c842 0%, #E8CA5E 35%, #c49b2a 70%, #7a5e0a 100%)"
+      : "radial-gradient(circle at 38% 35%, #7abfff 0%, #3b82f6 35%, #1a4a9e 70%, #0d1b3e 100%)";
+  };
 
   useEffect(() => {
     if (paused) return;
@@ -172,21 +256,25 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
     }}>
 
       {[
-        { size: 480, border: `1px solid ${theme === 'dark' ? 'rgba(77,166,255,0.05)' : 'rgba(0,102,255,0.05)'}`, shadow: "none" },
+        { 
+          size: 480, 
+          border: `2px solid ${getRing1Color()}`,
+          shadow: "none" 
+        },
         { 
           size: 376, 
-          border: `1px solid ${isHovered ? 'rgba(232,202,94,0.3)' : borderColor}`, // ← UPDATED: Gold
-          shadow: isHovered 
-            ? "0 0 30px rgba(232,202,94,0.15)" // ← UPDATED: Gold
-            : `0 0 18px ${primaryGlow}`,
+          border: `2px solid ${isHovered ? 'rgba(232,202,94,0.4)' : getRing2Color()}`,
+          shadow: getRing2Shadow(),
         },
-        { size: 260, border: `1px dashed ${theme === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`, shadow: "none" },
+        { 
+          size: 260, 
+          border: `2px dashed ${getRing3Color()}`,
+          shadow: "none" 
+        },
         { 
           size: 152, 
-          border: `1.2px solid ${isHovered ? 'rgba(232,202,94,0.6)' : 'rgba(232,202,94,0.32)'}`, // ← UPDATED: Gold
-          shadow: isHovered 
-            ? "0 0 25px rgba(232,202,94,0.25)" // ← UPDATED: Gold
-            : "0 0 14px rgba(232,202,94,0.12)", // ← UPDATED: Gold
+          border: `2px solid ${getRing4Color()}`,
+          shadow: getRing4Shadow(),
         },
       ].map(({ size, border, shadow }, i) => (
         <div key={i} style={{
@@ -214,9 +302,7 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
           marginTop: -188,
           marginLeft: -188,
           borderRadius: "50%",
-          boxShadow: isHovered
-            ? "0 0 60px rgba(232,202,94,0.15), inset 0 0 40px rgba(232,202,94,0.08)" // ← UPDATED: Gold
-            : `0 0 40px ${primaryGlow}, inset 0 0 30px ${primaryGlow}`,
+          boxShadow: getOrbitShadow(),
           pointerEvents: "auto",
           cursor: "pointer",
           transition: "box-shadow 0.6s ease",
@@ -232,11 +318,9 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         marginTop: -100,
         marginLeft: -100,
         borderRadius: "50%",
-        background: isHovered
-          ? "radial-gradient(circle, rgba(232,202,94,0.35) 0%, rgba(232,202,94,0.05) 68%)" // ← UPDATED: Gold
-          : `radial-gradient(circle, ${primaryLight} 0%, transparent 68%)`,
+        background: getCenterGlow(),
         transition: "opacity 0.6s ease, background 0.6s ease",
-        opacity: isHovered ? 1 : 0.65,
+        opacity: isHovered ? 1 : 0.7,
         pointerEvents: "none",
       }} />
 
@@ -254,11 +338,7 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
           marginTop: -70,
           marginLeft: -70,
           borderRadius: "50%",
-          background: isHovered
-            ? "radial-gradient(circle at 38% 35%, #f5c842 0%, #E8CA5E 35%, #c49b2a 70%, #7a5e0a 100%)" // ← UPDATED: Gold
-            : theme === 'dark'
-              ? "radial-gradient(circle at 38% 35%, #6ab4ff 0%, #1a4a9e 35%, #091535 70%, #030918 100%)"
-              : "radial-gradient(circle at 38% 35%, #7abfff 0%, #3b82f6 35%, #1a4a9e 70%, #0d1b3e 100%)",
+          background: getPlanetBg(),
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -278,14 +358,14 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         <svg style={{ position: "absolute", inset: 0, borderRadius: "50%" }} viewBox="0 0 116 116" fill="none">
           <path
             d="M 20 44 A 58 58 0 0 1 58 6"
-            stroke={isHovered ? "#E8CA5E" : primaryColor} // ← UPDATED: Gold
+            stroke={isHovered ? "#E8CA5E" : primaryColor}
             strokeWidth="3"
             strokeLinecap="round"
             style={{ transition: "stroke 0.6s ease" }}
           />
           <path
             d="M 20 44 A 58 58 0 0 0 58 110"
-            stroke={isHovered ? "rgba(232,202,94,0.6)" : `${primaryColor}33`} // ← UPDATED: Gold
+            stroke={isHovered ? "rgba(232,202,94,0.6)" : `${primaryColor}33`}
             strokeWidth="2"
             strokeLinecap="round"
             style={{ transition: "stroke 0.6s ease" }}
@@ -352,8 +432,8 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
                 borderRadius: "50%",
                 background: isHovered ? "#1a0d04" : bgColor,
                 border: isHovered
-                  ? "1px solid rgba(232,202,94,0.5)" // ← UPDATED: Gold
-                  : `1px solid ${borderColor}`,
+                  ? "2px solid rgba(232,202,94,0.6)"
+                  : `2px solid ${borderColor}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -362,17 +442,17 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLDivElement;
                 el.style.borderColor = isHovered
-                  ? "rgba(232,202,94,0.85)" // ← UPDATED: Gold
+                  ? "rgba(232,202,94,0.85)"
                   : borderColor;
                 el.style.boxShadow = isHovered
-                  ? "0 0 18px rgba(232,202,94,0.45)" // ← UPDATED: Gold
+                  ? "0 0 18px rgba(232,202,94,0.45)"
                   : `0 0 18px ${primaryGlow}`;
                 el.style.transform = "scale(1.12)";
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLDivElement;
                 el.style.borderColor = isHovered
-                  ? "rgba(232,202,94,0.5)" // ← UPDATED: Gold
+                  ? "rgba(232,202,94,0.6)"
                   : borderColor;
                 el.style.boxShadow = "none";
                 el.style.transform = "scale(1)";
@@ -387,7 +467,7 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
                   fontWeight: 600,
                   letterSpacing: "1.2px",
                   color: isHovered
-                    ? "rgba(232,202,94,0.7)" // ← UPDATED: Gold
+                    ? "rgba(232,202,94,0.7)"
                     : textColor,
                   lineHeight: 1.5,
                   whiteSpace: "nowrap",
@@ -399,6 +479,7 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         );
       })}
 
+      {/* ─── GOLD DOTS - CLEARLY VISIBLE ─── */}
       <div style={{
         position: "absolute",
         top: "50%",
@@ -407,10 +488,12 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         height: 7,
         marginTop: -3.5,
         borderRadius: "50%",
-        background: "#E8CA5E", // ← UPDATED: Gold
+        background: "#E8CA5E",
         boxShadow: isHovered
-          ? "0 0 12px rgba(232,202,94,0.9)" // ← UPDATED: Gold
-          : "0 0 8px rgba(232,202,94,0.8)", // ← UPDATED: Gold
+          ? "0 0 20px rgba(232,202,94,1)"
+          : theme === 'dark' 
+            ? "0 0 8px rgba(232,202,94,0.8)"
+            : "0 0 16px rgba(232,202,94,0.8)",
         pointerEvents: "none",
         transition: "box-shadow 0.6s ease",
       }} />
@@ -421,8 +504,8 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         width: 5,
         height: 5,
         borderRadius: "50%",
-        background: isHovered ? "#E8CA5E" : primaryColor, // ← UPDATED: Gold
-        opacity: isHovered ? 0.9 : 0.8,
+        background: isHovered ? "#E8CA5E" : primaryColor,
+        opacity: isHovered ? 0.9 : (theme === 'dark' ? 0.8 : 0.9),
         pointerEvents: "none",
         transition: "background 0.6s ease, opacity 0.6s ease",
       }} />
@@ -433,8 +516,8 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
         width: 4,
         height: 4,
         borderRadius: "50%",
-        background: isHovered ? "#E8CA5E" : primaryColor, // ← UPDATED: Gold
-        opacity: isHovered ? 0.7 : 0.55,
+        background: isHovered ? "#E8CA5E" : primaryColor,
+        opacity: isHovered ? 0.7 : (theme === 'dark' ? 0.55 : 0.7),
         pointerEvents: "none",
         transition: "background 0.6s ease, opacity 0.6s ease",
       }} />
@@ -447,7 +530,7 @@ function OrbitalDiagram({ theme }: { theme: 'light' | 'dark' }) {
           transform: "translateX(-50%)",
           fontSize: 8,
           letterSpacing: "2px",
-          color: "rgba(232,202,94,0.6)", // ← UPDATED: Gold
+          color: "rgba(232,202,94,0.6)",
           fontWeight: 600,
           whiteSpace: "nowrap",
           pointerEvents: "none",
@@ -485,22 +568,22 @@ export function HeroSection() {
     return () => observer.disconnect();
   }, []);
 
+  // ─── WHITE MODE BACKGROUND - WITH DEPTH ───
   const bgGradient = theme === 'dark'
     ? "radial-gradient(ellipse at 65% 50%, #0d1e4a 0%, #070c1e 55%, #03050d 100%)"
-    : "radial-gradient(ellipse at 65% 50%, #e8edf5 0%, #d5dde8 55%, #c5cfe0 100%)";
+    : "radial-gradient(ellipse at 65% 50%, #f0f4ff 0%, #e8edf5 55%, #dce3ef 100%)";
   
-  const textColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const textMuted = theme === 'dark' ? 'rgba(255,255,255,0.58)' : 'rgba(31,41,55,0.7)';
-  const textMutedLight = theme === 'dark' ? 'rgba(255,255,255,0.42)' : 'rgba(31,41,55,0.5)';
+  const textColor = theme === 'dark' ? '#FFFFFF' : '#0F172A';
+  const textMuted = theme === 'dark' ? 'rgba(255,255,255,0.58)' : 'rgba(15,23,42,0.65)';
+  const textMutedLight = theme === 'dark' ? 'rgba(255,255,255,0.42)' : 'rgba(15,23,42,0.5)';
   const primaryColor = theme === 'dark' ? '#4da6ff' : '#0066FF';
-  const accentColor = '#E8CA5E'; // ← UPDATED: Gold
-  const dividerColor = theme === 'dark' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.15)';
-  const btnBg = theme === 'dark' ? 'rgba(77,166,255,0.08)' : 'rgba(0,102,255,0.06)';
-  const btnBorder = theme === 'dark' ? 'rgba(77,166,255,0.35)' : 'rgba(0,102,255,0.25)';
-  const btnBorderDefault = theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
-  const btnTextColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
-  const btnIconBg = theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
-  const btnIconBorder = theme === 'dark' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.12)';
+  const accentColor = '#E8CA5E';
+  const dividerColor = theme === 'dark' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.12)';
+  const btnBg = theme === 'dark' ? 'rgba(77,166,255,0.08)' : 'rgba(0,102,255,0.05)';
+  const btnBorderDefault = theme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
+  const btnTextColor = theme === 'dark' ? '#FFFFFF' : '#0F172A';
+  const btnIconBg = theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)';
+  const btnIconBorder = theme === 'dark' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.08)';
 
   return (
     <>
@@ -523,21 +606,18 @@ export function HeroSection() {
         .hero-p        { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.36s both; }
         .hero-btn-wrap { animation: slideInLeft 0.7s cubic-bezier(0.22,1,0.36,1) 0.44s both; }
 
-        /* ── DESKTOP HIDE ON MOBILE ── */
         @media (max-width: 768px) {
           .desktop-hero {
             display: none !important;
           }
         }
 
-        /* ── MOBILE HIDE ON DESKTOP ── */
         @media (min-width: 769px) {
           .mobile-hero {
             display: none !important;
           }
         }
 
-        /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
           .hero-container {
             flex-direction: column !important;
@@ -689,7 +769,7 @@ export function HeroSection() {
                 alignItems: "center",
                 gap: 14,
                 background: btnHovered ? btnBg : "transparent",
-                border: `1px solid ${btnHovered ? accentColor : btnBorderDefault}`, // ← UPDATED: Gold
+                border: `1px solid ${btnHovered ? accentColor : btnBorderDefault}`,
                 borderRadius: 50,
                 cursor: "pointer",
                 padding: "10px 20px 10px 24px",
@@ -702,28 +782,28 @@ export function HeroSection() {
                 style={{ 
                   opacity: btnHovered ? 1 : 0,
                   background: theme === 'dark' 
-                    ? 'rgba(232,202,94,0.20)' // ← UPDATED: Gold
-                    : 'rgba(0,102,255,0.15)',
+                    ? 'rgba(232,202,94,0.20)'
+                    : 'rgba(0,102,255,0.12)',
                   filter: 'blur(20px)',
                 }} />
               <span className="absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 -z-10"
                 style={{ 
                   opacity: btnHovered ? 1 : 0,
                   background: theme === 'dark' 
-                    ? 'rgba(232,202,94,0.10)' // ← UPDATED: Gold
-                    : 'rgba(0,102,255,0.08)',
+                    ? 'rgba(232,202,94,0.10)'
+                    : 'rgba(0,102,255,0.06)',
                   filter: 'blur(30px)',
                 }} />
               <span className="absolute inset-[-4px] rounded-full border-2 opacity-0 transition-opacity duration-500 blur-sm"
                 style={{ 
                   opacity: btnHovered ? 1 : 0,
                   borderColor: theme === 'dark' 
-                    ? 'rgba(232,202,94,0.30)' // ← UPDATED: Gold
-                    : 'rgba(0,102,255,0.25)',
+                    ? 'rgba(232,202,94,0.30)'
+                    : 'rgba(0,102,255,0.20)',
                 }} />
 
               <span style={{
-                color: btnHovered ? accentColor : btnTextColor, // ← UPDATED: Gold
+                color: btnHovered ? accentColor : btnTextColor,
                 fontSize: 14,
                 fontWeight: 600,
                 fontFamily: "inherit",
@@ -736,8 +816,8 @@ export function HeroSection() {
                 width: 32,
                 height: 32,
                 borderRadius: "50%",
-                background: btnHovered ? (theme === 'dark' ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.10)') : btnIconBg, // ← UPDATED: Gold
-                border: `1px solid ${btnHovered ? accentColor : btnIconBorder}`, // ← UPDATED: Gold
+                background: btnHovered ? (theme === 'dark' ? 'rgba(232,202,94,0.15)' : 'rgba(0,102,255,0.08)') : btnIconBg,
+                border: `1px solid ${btnHovered ? accentColor : btnIconBorder}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -746,7 +826,7 @@ export function HeroSection() {
                 flexShrink: 0,
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                  stroke={btnHovered ? accentColor : (theme === 'dark' ? "white" : "#1F2937")} // ← UPDATED: Gold
+                  stroke={btnHovered ? accentColor : (theme === 'dark' ? "white" : "#0F172A")}
                   strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   style={{ transition: "stroke 0.25s" }}>
                   <line x1="5" y1="12" x2="19" y2="12" />

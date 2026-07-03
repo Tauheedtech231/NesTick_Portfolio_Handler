@@ -128,12 +128,28 @@ export default function TemplatesSection({
     return featuresMap[templateName] || defaultFeatures;
   };
 
+  // Theme-based colors for better contrast
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+  
+  const textColor = isDark ? '#FFFFFF' : '#1F2937';
+  const textMuted = isDark ? '#9CA3AF' : '#4B5563';
+  const textLight = isDark ? '#6B7280' : '#9CA3AF';
+  const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  const cardBg = isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF';
+  const sectionBg = isDark ? '#0B0F19' : '#F8FAFF';
+  const accentLight = isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
+  const shadowColor = isDark ? 'none' : '0 8px 32px rgba(0,0,0,0.06)';
+  const cardShadow = isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)';
+
   return (
     <section
       id="templates"
       className="py-12 px-4 sm:px-6 relative"
       style={{
-        backgroundColor: theme === 'dark' ? '#0B0F19' : '#F8FAFF', // Light mode: subtle off-white
+        backgroundColor: sectionBg,
         fontFamily: "'Poppins', sans-serif",
       }}
     >
@@ -146,22 +162,18 @@ export default function TemplatesSection({
           <div 
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto md:mx-0 w-fit transition-all duration-1000 ease-out will-change-transform"
             style={{
-              backgroundColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 100, 255, 0.08)',
+              backgroundColor: accentLight,
               border: 'none',
               opacity: headerInView ? 1 : 0,
               transform: headerInView ? 'translateX(0) scale(1)' : 'translateX(-120px) scale(0.8)',
               transitionDelay: '100ms',
             }}
           >
-            <Sparkles className="w-3.5 h-3.5"
-              style={{ color: theme === 'dark' ? '#E8CA5E' : '#0066FF' }}
-            />
-            <span className="text-xs font-medium"
-              style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
+            <Sparkles className="w-3.5 h-3.5" style={{ color: accentColor }} />
+            <span className="text-xs font-medium" style={{ 
+              color: accentColor,
+              fontFamily: "'Poppins', sans-serif",
+            }}>
               ✨ Ready-to-Use Portfolio Templates
             </span>
           </div>
@@ -170,7 +182,7 @@ export default function TemplatesSection({
             <span 
               className="relative inline-block transition-all duration-1000 ease-out will-change-transform"
               style={{ 
-                color: theme === 'dark' ? '#FFFFFF' : '#1F2937',
+                color: textColor,
                 opacity: headerInView ? 1 : 0,
                 transform: headerInView ? 'translateX(0)' : 'translateX(-150px)',
                 transitionDelay: '200ms',
@@ -182,7 +194,7 @@ export default function TemplatesSection({
             <span 
               className="inline-block transition-all duration-1000 ease-out will-change-transform"
               style={{ 
-                color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                color: accentColor,
                 opacity: headerInView ? 1 : 0,
                 transform: headerInView ? 'translateX(0)' : 'translateX(-120px)',
                 transitionDelay: '300ms',
@@ -196,7 +208,7 @@ export default function TemplatesSection({
           <p 
             className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light transition-all duration-1000 ease-out will-change-transform"
             style={{ 
-              color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker text for light mode
+              color: textMuted,
               opacity: headerInView ? 1 : 0,
               transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
               transitionDelay: '400ms',
@@ -213,8 +225,8 @@ export default function TemplatesSection({
           <div className="flex justify-center items-center py-12">
             <div className="w-8 h-8 border-2 rounded-full animate-spin"
               style={{
-                borderColor: theme === 'dark' ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.2)',
-                borderTopColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                borderColor: isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 100, 255, 0.2)',
+                borderTopColor: accentColor,
               }}
             />
           </div>
@@ -226,17 +238,17 @@ export default function TemplatesSection({
                 <div
                   key={template.id}
                   ref={el => addToRefs(el, templateCardsRef)}
-                  className="group relative rounded-[2rem] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  className="group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   style={{
-                    backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
+                    backgroundColor: cardBg,
                     border: '1px solid',
-                    borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
-                    boxShadow: theme === 'dark' ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                    borderColor: borderColor,
+                    boxShadow: cardShadow,
                     cursor: 'default',
                   }}
                 >
                   {/* Template Image - 16:9 Landscape */}
-                  <div className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
+                  <div className="relative w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                       <Image
                         src={template.image}
@@ -263,7 +275,7 @@ export default function TemplatesSection({
                       <span className={`text-[10px] font-medium text-white px-2 py-0.5 rounded-full backdrop-blur-sm ${
                         template.type === 'free' 
                           ? 'bg-green-500/80' 
-                          : (theme === 'dark' ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
+                          : (isDark ? 'bg-[#E8CA5E] text-[#1F4381]' : 'bg-[#0066FF] text-white')
                       }`}
                       style={{ fontFamily: "'Poppins', sans-serif" }}
                       >
@@ -279,10 +291,11 @@ export default function TemplatesSection({
                     >
                       <div className="px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 transform transition-all duration-300 group-hover:scale-105"
                         style={{
-                          backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                          color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                          backgroundColor: accentColor,
+                          color: isDark ? '#1F4381' : '#FFFFFF',
                           fontFamily: "'Poppins', sans-serif",
                           cursor: 'pointer',
+                          boxShadow: isDark ? '0 4px 20px rgba(232,202,94,0.3)' : '0 4px 20px rgba(0,102,255,0.25)',
                         }}
                       >
                         <Eye size={16} />
@@ -295,7 +308,7 @@ export default function TemplatesSection({
                   <div className="p-6 md:p-8 relative z-10 flex flex-col flex-grow">
                     <h3 className="text-xl font-bold mb-3 transition-colors duration-300"
                       style={{ 
-                        color: theme === 'dark' ? '#FFFFFF' : '#1F2937', // Darker for light mode
+                        color: textColor,
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -304,23 +317,23 @@ export default function TemplatesSection({
                     
                     <p className="leading-relaxed text-base mb-4 line-clamp-2"
                       style={{ 
-                        color: theme === 'dark' ? '#9CA3AF' : '#4B5563', // Darker for light mode
+                        color: textMuted,
                         fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
                       {template.description}
                     </p>
 
-                    {/* Buttons - Fully Rounded */}
+                    {/* Buttons - Fully Rounded with better styling */}
                     <div className="mt-auto pt-2 flex gap-2">
                       <button
                         onClick={() => handleDetailsClick(template)}
                         className="flex-1 py-2.5 px-3 rounded-full text-sm font-medium flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95"
                         style={{
-                          backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
+                          backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                           border: '1px solid',
-                          borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
-                          color: theme === 'dark' ? '#D1D5DB' : '#4B5563',
+                          borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+                          color: textMuted,
                           fontFamily: "'Poppins', sans-serif",
                           cursor: 'pointer',
                         }}
@@ -334,12 +347,15 @@ export default function TemplatesSection({
                         style={{
                           backgroundColor: template.type === 'free'
                             ? '#22C55E'
-                            : (theme === 'dark' ? '#E8CA5E' : '#0066FF'),
+                            : accentColor,
                           color: template.type === 'free'
                             ? '#FFFFFF'
-                            : (theme === 'dark' ? '#1F4381' : '#FFFFFF'),
+                            : (isDark ? '#1F4381' : '#FFFFFF'),
                           fontFamily: "'Poppins', sans-serif",
                           cursor: 'pointer',
+                          boxShadow: template.type === 'free'
+                            ? 'none'
+                            : (isDark ? '0 4px 16px rgba(232,202,94,0.25)' : '0 4px 16px rgba(0,102,255,0.2)'),
                         }}
                       >
                         <Sparkles size={14} />
@@ -351,18 +367,20 @@ export default function TemplatesSection({
               ))}
             </div>
 
-            {/* View More Button - Fully Rounded */}
+            {/* View More Button - Fully Rounded with shadow */}
             {!showAll && templates.length > 3 && (
               <div className="flex justify-center mt-12">
                 <button
                   onClick={handleViewMore}
                   className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
                   style={{
-                    backgroundColor: theme === 'dark' ? '#E8CA5E' : '#0066FF',
-                    color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
+                    backgroundColor: accentColor,
+                    color: isDark ? '#1F4381' : '#FFFFFF',
                     fontFamily: "'Poppins', sans-serif",
                     cursor: 'pointer',
-                    boxShadow: theme === 'dark' ? 'none' : '0 2px 12px rgba(0,102,255,0.25)',
+                    boxShadow: isDark 
+                      ? '0 4px 20px rgba(232,202,94,0.3)' 
+                      : '0 4px 24px rgba(0,102,255,0.25)',
                   }}
                 >
                   <span>View More Templates</span>
@@ -380,27 +398,33 @@ export default function TemplatesSection({
             ].map((template) => (
               <div
                 key={template.id}
-                className="rounded-[2rem] p-6 md:p-8 opacity-50 flex flex-col"
+                className="rounded-2xl p-6 md:p-8 opacity-50 flex flex-col"
                 style={{
-                  backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
+                  backgroundColor: cardBg,
                   border: '1px solid',
-                  borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
+                  borderColor: borderColor,
                 }}
               >
-                <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-gray-200 dark:bg-gray-700">
+                <div className="relative w-full rounded-xl overflow-hidden mb-4 bg-gray-100 dark:bg-gray-700">
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">No Preview</span>
+                      <span className="text-gray-400 text-sm">No Preview</span>
                     </div>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-500"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                <h3 className="text-xl font-bold mb-2"
+                  style={{ 
+                    color: textMuted,
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
                 >
                   {template.name}
                 </h3>
-                <p className="text-base text-gray-500"
-                  style={{ fontFamily: "'Calibri Light', sans-serif" }}
+                <p className="text-base"
+                  style={{ 
+                    color: textLight,
+                    fontFamily: "'Calibri Light', sans-serif",
+                  }}
                 >
                   {template.description}
                 </p>
