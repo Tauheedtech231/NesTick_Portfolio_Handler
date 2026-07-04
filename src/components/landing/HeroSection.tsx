@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Compass, Globe2, Palette, X, Send, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
+
 
 interface HeroSectionProps {
   scrollToSection: (sectionId: string) => void;
