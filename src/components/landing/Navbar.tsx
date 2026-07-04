@@ -62,7 +62,7 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          background: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+          background: theme === 'dark' ? '#E8CA5E' : '#7B3F00', // CHANGED: Chocolate in light mode
           color: theme === 'dark' ? '#1F4381' : '#FFFFFF',
           fontFamily: "'Poppins', sans-serif",
           padding: '8px 16px',
@@ -84,12 +84,12 @@ const LoginDropdown = ({ theme, onSelect }: { theme: 'light' | 'dark'; onSelect:
         <div className="absolute right-0 mt-2 w-56 sm:w-64 rounded-xl shadow-2xl border overflow-hidden z-[9999]"
           style={{
             backgroundColor: '#FFFFFF',
-            borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
+            borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(123, 63, 0, 0.2)', // CHANGED: Chocolate border
           }}
         >
           <div className="px-4 py-3 border-b"
             style={{
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.1)',
+              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(123, 63, 0, 0.1)', // CHANGED: Chocolate border
             }}
           >
             <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -321,6 +321,23 @@ export default function Navbar() {
     { name: 'About', path: '/about' },
   ];
 
+  // Theme-based colors
+  const isDark = theme === 'dark';
+  const GOLD = '#E8CA5E';
+  const CHOCOLATE = '#7B3F00';
+  const BLUE = '#0066FF';
+  
+  // Gold in dark mode, Chocolate in light mode
+  const accentColor = isDark ? GOLD : CHOCOLATE;
+  
+  // Full Black in light mode, Full White in dark mode
+  const navTextColor = isDark ? '#FFFFFF' : '#4a5a7a';
+  const navActiveColor = accentColor; // Gold in dark, Chocolate in light
+  const logoTextColor = isDark ? '#d8e6ff' : '#1a56db';
+  const menuTextColor = isDark ? '#FFFFFF' : '#1F2937';
+  const menuBgColor = isDark ? '#132248' : '#FFFFFF';
+  const borderColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+
   if (!mounted) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: '#132248' }}>
@@ -347,41 +364,49 @@ export default function Navbar() {
       <div 
         className="w-full max-w-[1300px] h-[70px] sm:h-[80px] rounded-[16px] sm:rounded-[20px] flex items-center relative overflow-visible"
         style={{
-          background: theme === 'dark' ? '#132248' : '#ffffff',
+          background: isDark ? '#132248' : '#ffffff',
           boxShadow: isScrolled ? '0 6px 40px rgba(0,0,0,0.5)' : '0 6px 40px rgba(0,0,0,0.5)',
           fontFamily: "'Poppins', sans-serif",
         }}
       >
-        {/* ① LOGO BLOCK - Full Rounded */}
+        {/* ① LOGO BLOCK - LARGER LOGO & PSM */}
         <div 
-          className="h-full rounded-l-[16px] sm:rounded-l-[20px] flex items-center gap-2 sm:gap-3 flex-shrink-0"
+          className="h-full rounded-l-[16px] sm:rounded-l-[20px] flex items-center gap-3 sm:gap-4 flex-shrink-0"
           style={{
             background: 'transparent',
-            padding: '0 10px 0 10px',
+            padding: '0 12px 0 12px',
           }}
         >
-          {/* Logo Image - Full Rounded (Circle) */}
+          {/* Logo Image - LARGER (FULL ROUNDED) */}
           <div 
-            className="w-[40px] h-[40px] sm:w-[52px] sm:h-[52px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:scale-105 transition-transform duration-200"
+            className="w-[48px] h-[48px] sm:w-[60px] sm:h-[60px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:scale-105 transition-transform duration-200"
             onClick={handleLogoClick}
           >
             <Image
               src="/logo.jpg"
               alt="Logo"
-              width={46}
-              height={46}
-              className="rounded-full sm:w-[46px] sm:h-[46px] object-cover" // ← FULL ROUNDED
+              width={56}
+              height={56}
+              className="rounded-full sm:w-[56px] sm:h-[56px] object-cover"
             />
           </div>
+          
+          {/* PSM Text - LARGER (NO PORTFOLIO SUBTITLE) */}
           <div className="flex flex-col leading-[1.2] cursor-pointer" onClick={handleLogoClick}>
-            <span className="text-[11px] sm:text-[15px] font-semibold" style={{ color: theme === 'dark' ? '#d8e6ff' : '#1a56db' }}>PSM</span> {/* ← CHANGED to PSM */}
-            <span className="text-[12px] sm:text-[16px] font-bold" style={{ color: '#E8CA5E' }}>
-             
+            <span 
+              className="text-[14px] sm:text-[20px] font-bold tracking-wide"
+              style={{ 
+                color: logoTextColor,
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              PSM
             </span>
+            {/* REMOVED: "PORTFOLIO" subtitle */}
           </div>
         </div>
 
-        {/* ② S-CURVE DIVIDER - Now Hidden */}
+        {/* ② S-CURVE DIVIDER - Hidden */}
         <div className="hidden"></div>
 
         {/* ③ NAV LINKS */}
@@ -394,7 +419,7 @@ export default function Navbar() {
                 onClick={() => handleNavigation(item.path)}
                 className="relative h-full flex items-center whitespace-nowrap text-[11px] lg:text-[13px] font-medium tracking-[0.6px] px-2 lg:px-5 cursor-pointer"
                 style={{
-                  color: isActive ? '#E8CA5E' : (theme === 'dark' ? '#9ab0d4' : '#4a5a7a'),
+                  color: isActive ? navActiveColor : navTextColor,
                   fontWeight: isActive ? '600' : '500',
                   fontFamily: "'Poppins', sans-serif",
                 }}
@@ -402,7 +427,7 @@ export default function Navbar() {
                 {item.name}
                 {isActive && (
                   <span className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-md"
-                    style={{ background: '#E8CA5E' }} />
+                    style={{ background: navActiveColor }} />
                 )}
               </button>
             );
@@ -416,7 +441,7 @@ export default function Navbar() {
               transform: translateY(-50%);
               width: 1px;
               height: 20px;
-              background: ${theme === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'};
+              background: ${borderColor};
             }
           `}</style>
         </div>
@@ -428,12 +453,12 @@ export default function Navbar() {
             onClick={toggleTheme}
             className="w-[34px] h-[34px] sm:w-[42px] sm:h-[42px] rounded-full border-2 flex items-center justify-center cursor-pointer"
             style={{
-              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
+              borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(123, 63, 0, 0.3)', // CHANGED: Chocolate border
               background: 'transparent',
-              color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+              color: accentColor, // Gold in dark, Chocolate in light
             }}
           >
-            {theme === 'dark' ? (
+            {isDark ? (
               <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
             ) : (
               <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -449,7 +474,7 @@ export default function Navbar() {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-1 sm:gap-2 cursor-pointer"
                 style={{
-                  background: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                  background: accentColor, // Gold in dark, Chocolate in light
                   borderRadius: '28px',
                   padding: '4px 10px 4px 4px',
                 }}
@@ -457,20 +482,20 @@ export default function Navbar() {
                 <div 
                   className="w-[28px] h-[28px] sm:w-[34px] sm:h-[34px] rounded-full flex items-center justify-center text-[10px] sm:text-sm font-bold flex-shrink-0"
                   style={{
-                    background: theme === 'dark' ? '#132248' : '#ffffff',
+                    background: isDark ? '#132248' : '#ffffff',
                     border: '2px solid rgba(255,255,255,0.4)',
-                    color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+                    color: accentColor, // Gold in dark, Chocolate in light
                   }}
                 >
                   {getUserInitial()}
                 </div>
                 <span 
                   className="text-[10px] sm:text-[12.5px] font-semibold max-w-[80px] sm:max-w-[130px] overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }}
+                  style={{ color: isDark ? '#1F4381' : '#FFFFFF' }}
                 >
                   {getUserName()}
                 </span>
-                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ${isDropdownOpen ? 'rotate-180' : ''}`} style={{ color: theme === 'dark' ? '#1F4381' : '#FFFFFF' }} />
+                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 ${isDropdownOpen ? 'rotate-180' : ''}`} style={{ color: isDark ? '#1F4381' : '#FFFFFF' }} />
               </div>
 
               {/* User Dropdown */}
@@ -478,12 +503,12 @@ export default function Navbar() {
                 <div className="absolute right-0 mt-2 w-56 sm:w-64 rounded-xl shadow-2xl border overflow-hidden z-[9999]"
                   style={{
                     backgroundColor: '#FFFFFF',
-                    borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
+                    borderColor: isDark ? 'rgba(0,0,0,0.1)' : 'rgba(123, 63, 0, 0.2)', // CHANGED: Chocolate border
                   }}
                 >
                   <div className="px-4 py-3 border-b"
                     style={{
-                      borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.1)',
+                      borderColor: isDark ? 'rgba(0,0,0,0.1)' : 'rgba(123, 63, 0, 0.1)', // CHANGED: Chocolate border
                     }}
                   >
                     <p className="text-sm font-semibold text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -536,9 +561,9 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden w-[34px] h-[34px] sm:w-[42px] sm:h-[42px] rounded-full border-2 flex items-center justify-center cursor-pointer"
             style={{
-              borderColor: theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(26, 86, 219, 0.3)',
+              borderColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(123, 63, 0, 0.3)', // CHANGED: Chocolate border
               background: 'transparent',
-              color: theme === 'dark' ? '#E8CA5E' : '#0066FF',
+              color: accentColor, // Gold in dark, Chocolate in light
             }}
           >
             {isMobileMenuOpen ? (
@@ -562,8 +587,8 @@ export default function Navbar() {
         >
           <div className="rounded-xl shadow-2xl border overflow-hidden"
             style={{
-              backgroundColor: '#FFFFFF',
-              borderColor: theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(26, 86, 219, 0.2)',
+              backgroundColor: menuBgColor,
+              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(123, 63, 0, 0.2)', // CHANGED: Chocolate border
             }}
           >
             <div className="px-4 py-4 space-y-2">
@@ -576,7 +601,7 @@ export default function Navbar() {
                     className={`block w-full text-left font-medium text-sm py-2.5 px-3 rounded-lg cursor-pointer ${
                       isActive 
                         ? 'text-[#E8CA5E] bg-[#E8CA5E]/10'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        : isDark ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
                     }`}
                     style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
@@ -588,7 +613,7 @@ export default function Navbar() {
 
             {/* Mobile Menu - Login/User Section */}
             {user ? (
-              <div className="border-t border-gray-100 px-4 py-4 space-y-2">
+              <div className={`border-t ${isDark ? 'border-white/10' : 'border-gray-100'} px-4 py-4 space-y-2`}>
                 <button
                   onClick={() => {
                     handleDashboardRedirect();
@@ -596,8 +621,8 @@ export default function Navbar() {
                   }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm rounded-lg font-semibold cursor-pointer"
                   style={{
-                    background: '#E8CA5E',
-                    color: '#1F4381',
+                    background: accentColor, // Gold in dark, Chocolate in light
+                    color: isDark ? '#1F4381' : '#FFFFFF',
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
@@ -622,7 +647,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <div className="border-t border-gray-100 px-4 py-4 space-y-2">
+              <div className={`border-t ${isDark ? 'border-white/10' : 'border-gray-100'} px-4 py-4 space-y-2`}>
                 <button
                   onClick={() => {
                     router.push('/auth/login');

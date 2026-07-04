@@ -134,9 +134,10 @@ export default function TemplatesSection({
   const BLUE = '#0066FF';
   const accentColor = isDark ? GOLD : BLUE;
   
+  // CHANGED: Full Black in light mode, Full White in dark mode
   const textColor = isDark ? '#FFFFFF' : '#1F2937';
-  const textMuted = isDark ? '#9CA3AF' : '#4B5563';
-  const textLight = isDark ? '#6B7280' : '#9CA3AF';
+  const textMuted = isDark ? '#FFFFFF' : '#000000'; // CHANGED: White in dark, Black in light
+  const textLight = isDark ? '#FFFFFF' : '#000000'; // CHANGED: White in dark, Black in light
   const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   const cardBg = isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF';
   const sectionBg = isDark ? '#0B0F19' : '#F8FAFF';
@@ -208,7 +209,7 @@ export default function TemplatesSection({
           <p 
             className="text-lg md:text-xl max-w-2xl mx-auto md:mx-0 leading-relaxed font-light transition-all duration-1000 ease-out will-change-transform"
             style={{ 
-              color: textMuted,
+              color: textMuted, // White in dark, Black in light
               opacity: headerInView ? 1 : 0,
               transform: headerInView ? 'translateX(0)' : 'translateX(-100px)',
               transitionDelay: '400ms',
@@ -315,9 +316,10 @@ export default function TemplatesSection({
                       {template.name}
                     </h3>
                     
+                    {/* CHANGED: Full Black in light mode, Full White in dark mode */}
                     <p className="leading-relaxed text-base mb-4 line-clamp-2"
                       style={{ 
-                        color: textMuted,
+                        color: isDark ? '#FFFFFF' : '#000000', // Full White in dark, Full Black in light
                         fontFamily: "'Calibri Light', sans-serif",
                       }}
                     >
@@ -333,7 +335,7 @@ export default function TemplatesSection({
                           backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)',
                           border: '1px solid',
                           borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
-                          color: textMuted,
+                          color: isDark ? '#FFFFFF' : '#000000', // Full White in dark, Full Black in light
                           fontFamily: "'Poppins', sans-serif",
                           cursor: 'pointer',
                         }}
@@ -414,7 +416,7 @@ export default function TemplatesSection({
                 </div>
                 <h3 className="text-xl font-bold mb-2"
                   style={{ 
-                    color: textMuted,
+                    color: isDark ? '#FFFFFF' : '#1F2937',
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
@@ -422,7 +424,7 @@ export default function TemplatesSection({
                 </h3>
                 <p className="text-base"
                   style={{ 
-                    color: textLight,
+                    color: isDark ? '#FFFFFF' : '#000000', // Full White in dark, Full Black in light
                     fontFamily: "'Calibri Light', sans-serif",
                   }}
                 >

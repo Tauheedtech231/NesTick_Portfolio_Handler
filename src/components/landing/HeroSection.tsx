@@ -33,10 +33,11 @@ const designTypes = [
 
 export default function HeroSection({ scrollToSection, heroRef }: HeroSectionProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [darkVideoLoaded, setDarkVideoLoaded] = useState(false);
+  const [lightVideoLoaded, setLightVideoLoaded] = useState(false);
   const [parallaxRef, setParallaxRef] = useState<HTMLDivElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const darkVideoRef = useRef<HTMLVideoElement>(null);
+  const lightVideoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
   
   // Modal states
@@ -62,14 +63,23 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     setSubmitSuccess(false);
   };
   
-  // Auto-play video when loaded
+  // Auto-play dark video when loaded
   useEffect(() => {
-    if (videoRef.current && videoLoaded) {
-      videoRef.current.play().catch(error => {
-        console.log('Video autoplay failed:', error);
+    if (darkVideoRef.current && darkVideoLoaded) {
+      darkVideoRef.current.play().catch(error => {
+        console.log('Dark video autoplay failed:', error);
       });
     }
-  }, [videoLoaded]);
+  }, [darkVideoLoaded]);
+  
+  // Auto-play light video when loaded
+  useEffect(() => {
+    if (lightVideoRef.current && lightVideoLoaded) {
+      lightVideoRef.current.play().catch(error => {
+        console.log('Light video autoplay failed:', error);
+      });
+    }
+  }, [lightVideoLoaded]);
   
   // Detect theme changes
   useEffect(() => {
@@ -92,7 +102,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
     return () => observer.disconnect();
   }, []);
   
-  // Parallax effect on mouse move for image
+  // Parallax effect on mouse move for video
   useEffect(() => {
     if (!parallaxRef) return;
     
@@ -197,8 +207,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
   // Theme colors with better depth and contrast
   const isDark = theme === 'dark';
   const GOLD = '#E8CA5E';
+  const CHOCOLATE = '#7B3F00'; // Rich chocolate brown for light mode
   const BLUE = '#0066FF';
-  const accentColor = isDark ? GOLD : BLUE;
+  
+  // Heading color: Gold in dark mode, BLUE in light mode (UNCHANGED - keep BLUE)
+  const headingColor = isDark ? GOLD : BLUE;
+  
+  // Accent color for elements that were GOLD: Gold in dark mode, CHOCOLATE in light mode
+  const accentColor = isDark ? GOLD : CHOCOLATE;
   
   // Light mode specific colors for better depth
   const bgColor = isDark ? '#0B0F19' : '#F8FAFF';
@@ -220,16 +236,16 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
   const badgeColor = isDark ? GOLD : '#FFFFFF';
   
   // Button styling
-  // "Learn More" button - Gold in dark mode, Blue in light mode
+  // "Learn More" button - Gold in dark mode, Blue in light mode (UNCHANGED)
   const primaryBtnBg = isDark ? GOLD : BLUE;
   const primaryBtnText = isDark ? '#1F4381' : '#FFFFFF';
   
-  // "Your Design" button - Gold in both modes
-  const designBtnBg = isDark ? 'rgba(255,255,255,0.08)' : GOLD;
-  const designBtnText = isDark ? '#FFFFFF' : '#1F4381';
+  // "Your Design" button - Gold in dark mode, Chocolate in light mode (CHANGED)
+  const designBtnBg = isDark ? 'rgba(255,255,255,0.08)' : CHOCOLATE;
+  const designBtnText = isDark ? '#FFFFFF' : '#FFFFFF';
   const designBtnBorder = isDark 
     ? 'rgba(255,255,255,0.2)' 
-    : GOLD;
+    : CHOCOLATE;
 
   return (
     <>
@@ -242,7 +258,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           backgroundColor: bgColor,
         }}
       >
-        {/* Background Image/Video */}
+        {/* Background Video */}
         <div className="absolute inset-0 z-0 w-full h-full">
           <div 
             ref={(el) => setParallaxRef(el)}
@@ -251,46 +267,65 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               transform: 'scale(1.05)',
             }}
           >
-            {isDark ? (
-              // Dark mode: Video
-              <video
-                ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                loop
-                muted
-                playsInline
-                autoPlay
-                onLoadedData={() => setVideoLoaded(true)}
-                style={{
-                  opacity: videoLoaded ? 1 : 0,
-                  transition: 'opacity 0.5s ease-in-out',
-                  width: '100%',
-                  height: '100%',
-                }}
-              >
-                <source src="/v.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              // Light mode: Image with parallax
-              <div className="absolute inset-0 w-full h-full">
-                <Image
-                  src="/hero3.jpg"
-                  alt="Hero background"
-                  fill
-                  className="object-cover"
-                  priority
-                  onLoadingComplete={() => setImageLoaded(true)}
-                />
-              </div>
-            )}
+            {/* Always render both videos and show/hide based on theme */}
+            {/* Dark Mode Video */}
+            <video
+              ref={darkVideoRef}
+              className="absolute inset-0 w-full h-full object-cover"
+              loop
+              muted
+              playsInline
+              autoPlay
+              onLoadedData={() => setDarkVideoLoaded(true)}
+              style={{
+                opacity: isDark && darkVideoLoaded ? 1 : 0,
+                transition: 'opacity 0.5s ease-in-out',
+                width: '100%',
+                height: '100%',
+                display: isDark ? 'block' : 'none',
+              }}
+            >
+              <source src="/v.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            
+            {/* Light Mode Video */}
+            <video
+              ref={lightVideoRef}
+              className="absolute inset-0 w-full h-full object-cover"
+              loop
+              muted
+              playsInline
+              autoPlay
+              onLoadedData={() => setLightVideoLoaded(true)}
+              style={{
+                opacity: !isDark && lightVideoLoaded ? 1 : 0,
+                transition: 'opacity 0.5s ease-in-out',
+                width: '100%',
+                height: '100%',
+                display: !isDark ? 'block' : 'none',
+              }}
+            >
+              <source src="/white.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
             
             {/* Fallback gradient for dark mode when video not loaded */}
-            {isDark && !videoLoaded && (
+            {isDark && !darkVideoLoaded && (
               <div 
                 className="absolute inset-0 w-full h-full"
                 style={{
                   background: 'linear-gradient(135deg, #0B0F19, #1F4381)'
+                }}
+              />
+            )}
+            
+            {/* Fallback gradient for light mode when video not loaded */}
+            {!isDark && !lightVideoLoaded && (
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #F8FAFF, #E8EEF8)'
                 }}
               />
             )}
@@ -305,16 +340,16 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
           }}
         />
 
-        {/* Subtle glow effect for light mode */}
+        {/* Subtle glow effect for light mode - Using Chocolate Brown (CHANGED - was Gold) */}
         {!isDark && (
           <div className="absolute inset-0 z-10 pointer-events-none">
             <div 
               className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-10"
-              style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)` }}
+              style={{ background: `radial-gradient(circle, ${CHOCOLATE}, transparent 70%)` }}
             />
             <div 
               className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-3xl opacity-10"
-              style={{ background: `radial-gradient(circle, ${GOLD}, transparent 70%)` }}
+              style={{ background: `radial-gradient(circle, ${CHOCOLATE}, transparent 70%)` }}
             />
           </div>
         )}
@@ -347,7 +382,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               </span>
             </div>
 
-            {/* ─── HEADINGS ─── */}
+            {/* ─── HEADINGS - Updated Education Focus ─── */}
             <div className="mb-5 sm:mb-7">
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3] mb-3 sm:mb-4 max-w-5xl">
                 <span 
@@ -358,7 +393,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                   }}
                 >
-                  Journey Through the
+                  Empowering Educational
                 </span>
               </h1>
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-5xl font-bold leading-[1.2] sm:leading-[1.3]">
@@ -367,21 +402,21 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: accentColor,
+                      color: headingColor,
                       textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                     }}
                   >
-                    Galaxy of
+                    Excellence Through
                   </span>{' '}
                   <span 
                     className="font-serif" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif",
-                      color: accentColor,
+                      color: headingColor,
                       textShadow: '0 2px 30px rgba(0,0,0,0.3)',
                     }}
                   >
-                    College Portfolios
+                    Digital Portfolios
                   </span>
                 </span>
               </h1>
@@ -428,7 +463,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </motion.button>
               
-              {/* ── YOUR DESIGN BUTTON - Gold in both modes ── */}
+              {/* ── YOUR DESIGN BUTTON - Gold in dark mode, Chocolate in light mode ── */}
               <motion.button
                 onClick={handleDesignClick}
                 className="group relative inline-flex items-center gap-2 px-8 sm:px-10 py-3.5 sm:py-4 font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer"
@@ -441,15 +476,15 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   backdropFilter: isDark ? 'blur(8px)' : 'none',
                   boxShadow: isDark 
                     ? 'none'
-                    : '0 4px 30px rgba(232,202,94,0.4)',
+                    : '0 4px 30px rgba(123,63,0,0.3)',
                 }}
                 whileHover={{
                   boxShadow: isDark 
                     ? '0 0 30px rgba(232,202,94,0.2)'
-                    : '0 8px 50px rgba(232,202,94,0.6)',
+                    : '0 8px 50px rgba(123,63,0,0.4)',
                   backgroundColor: isDark 
                     ? 'rgba(255,255,255,0.15)' 
-                    : GOLD,
+                    : '#8B4513', // Slightly lighter chocolate on hover
                 }}
               >
                 <Palette className="w-4 h-4" />
@@ -480,7 +515,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               <div 
                 className="w-0.5 h-1.5 rounded-full mt-1 animate-bounce"
                 style={{
-                  backgroundColor: accentColor,
+                  backgroundColor: accentColor, // Chocolate in light mode (was Gold)
                 }}
               />
             </div>
@@ -521,7 +556,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
               style={{
                 backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : '#FFFFFF',
                 border: '1px solid',
-                borderColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.1)',
+                borderColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(123, 63, 0, 0.1)', // Chocolate in light mode
                 boxShadow: isDark 
                   ? '0 40px 80px rgba(0,0,0,0.5)' 
                   : '0 40px 80px rgba(0,0,0,0.08)',
@@ -541,12 +576,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   <div 
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
                     style={{
-                      backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+                      backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(123, 63, 0, 0.08)', // Chocolate in light mode
                     }}
                   >
                     <Palette 
                       className="w-5 h-5"
-                      style={{ color: accentColor }}
+                      style={{ color: accentColor }} // Chocolate in light mode
                     />
                   </div>
                   <div>
@@ -559,11 +594,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                     >
                       Your Design
                     </h2>
+                    {/* Description text - Full black in light mode */}
                     <p 
                       className="text-sm"
                       style={{ 
                         fontFamily: "'Calibri Light', sans-serif",
-                        color: isDark ? '#9CA3AF' : '#6B7280',
+                        color: isDark ? '#9CA3AF' : '#000000', // Full black in light mode
                       }}
                     >
                       Share your creative vision with us
@@ -588,7 +624,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                 </button>
               </div>
 
-              {/* Scrollable Form Content - Keep existing form */}
+              {/* Scrollable Form Content */}
               <div className="max-h-[70vh] overflow-y-auto">
                 {submitSuccess ? (
                   <div className="p-12 text-center">
@@ -616,7 +652,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="text-sm"
                       style={{ 
                         fontFamily: "'Calibri Light', sans-serif",
-                        color: isDark ? '#9CA3AF' : '#6B7280',
+                        color: isDark ? '#9CA3AF' : '#000000', // Full black in light mode
                       }}
                     >
                       Thank you for sharing your design ideas. Our team will review and contact you within 24 hours.
@@ -624,13 +660,14 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    {/* Form fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label 
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: isDark ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                           }}
                         >
                           Full Name *
@@ -674,7 +711,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: isDark ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                           }}
                         >
                           Email Address *
@@ -720,7 +757,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: isDark ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                           }}
                         >
                           Phone Number *
@@ -764,7 +801,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                           className="block text-sm font-medium mb-1.5"
                           style={{ 
                             fontFamily: "'Poppins', sans-serif",
-                            color: isDark ? '#D1D5DB' : '#4B5563',
+                            color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                           }}
                         >
                           Design Type *
@@ -810,7 +847,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         className="block text-sm font-medium mb-1.5"
                         style={{ 
                           fontFamily: "'Poppins', sans-serif",
-                          color: isDark ? '#D1D5DB' : '#4B5563',
+                          color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                         }}
                       >
                         What inspires you? (Optional)
@@ -846,7 +883,7 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                         className="block text-sm font-medium mb-1.5"
                         style={{ 
                           fontFamily: "'Poppins', sans-serif",
-                          color: isDark ? '#D1D5DB' : '#4B5563',
+                          color: isDark ? '#D1D5DB' : '#000000', // Full black in light mode
                         }}
                       >
                         Describe your design requirements *
@@ -891,12 +928,12 @@ export default function HeroSection({ scrollToSection, heroRef }: HeroSectionPro
                       className="w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-xl"
                       style={{
                         fontFamily: "'Poppins', sans-serif",
-                        backgroundColor: accentColor,
+                        backgroundColor: accentColor, // Chocolate in light mode
                         color: isDark ? '#1F4381' : '#FFFFFF',
                         border: 'none',
                         boxShadow: isDark 
                           ? '0 4px 20px rgba(232,202,94,0.3)' 
-                          : '0 4px 24px rgba(0,102,255,0.25)',
+                          : '0 4px 24px rgba(123,63,0,0.25)',
                       }}
                     >
                       {isSubmitting ? (

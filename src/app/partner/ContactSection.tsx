@@ -21,6 +21,7 @@ import {
 // BRAND COLORS - Consistent with PartnerSection
 // ==========================================
 const GOLD = "#E8CA5E";
+const CHOCOLATE = "#7B3F00";
 const BLUE = "#0066FF";
 
 interface ContactFormData {
@@ -64,85 +65,96 @@ export default function ContactSection() {
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+
   // ==========================================
-  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // THEME COLORS WITH DEPTH
   // ==========================================
 
   // 1️⃣ Background - Gradient for depth (not flat)
   const getBgColor = () => {
-    if (theme === 'dark') return '#0B0F19';
-    // Light theme: subtle gradient for visual depth
+    if (isDark) return '#0B0F19';
     return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
   };
 
   // 2️⃣ Card Background - Clean with subtle depth
   const getCardBg = () => {
-    if (theme === 'dark') return 'rgba(15, 23, 42, 0.6)';
+    if (isDark) return 'rgba(15, 23, 42, 0.6)';
     return 'rgba(255, 255, 255, 0.92)';
   };
 
   // 3️⃣ Border - Subtle & refined
   const getBorderColor = () => {
-    if (theme === 'dark') return 'rgba(30, 41, 59, 0.5)';
+    if (isDark) return 'rgba(30, 41, 59, 0.5)';
     return 'rgba(0, 0, 0, 0.06)';
   };
 
   // 4️⃣ Text Colors - Better contrast for readability
   const getTextColor = () => {
-    if (theme === 'dark') return '#F1F5F9';
-    return '#0F172A'; // Darker for better contrast
+    if (isDark) return '#F1F5F9';
+    return '#0F172A';
   };
 
   const getTextSecondary = () => {
-    if (theme === 'dark') return '#D1D5DB';
+    if (isDark) return '#D1D5DB';
     return '#334155';
   };
 
   const getTextMuted = () => {
-    if (theme === 'dark') return '#94A3B8';
-    return '#475569'; // Better readability
+    if (isDark) return '#94A3B8';
+    return '#475569';
   };
 
   // 5️⃣ Input Background - Consistent with theme
   const getInputBg = () => {
-    if (theme === 'dark') return 'rgba(11, 15, 25, 0.8)';
+    if (isDark) return 'rgba(11, 15, 25, 0.8)';
     return 'rgba(249, 250, 251, 0.9)';
   };
 
-  // 6️⃣ Button - Brand colors (Blue in light, Gold in dark)
+  // 6️⃣ Button - Gold in dark, Chocolate in light ✅
   const getButtonBg = () => {
-    return theme === 'dark' ? GOLD : BLUE;
+    return isDark ? GOLD : CHOCOLATE;
   };
 
   const getButtonText = () => {
-    return theme === 'dark' ? '#1F4381' : '#FFFFFF';
+    return isDark ? '#1F4381' : '#FFFFFF';
   };
 
-  // 7️⃣ Accent Color - Consistent Gold
-  const getAccentColor = () => GOLD;
+  // 7️⃣ Accent Color - Gold in dark, Chocolate in light ✅
+  const getAccentColor = () => {
+    return isDark ? GOLD : CHOCOLATE;
+  };
 
   // 8️⃣ Icon Background
   const getIconBg = () => {
-    if (theme === 'dark') return '#1F2937';
+    if (isDark) return '#1F2937';
     return '#f1f5f9';
   };
 
-  const getIconBorder = () => GOLD;
-  const getIconColor = () => theme === 'dark' ? '#FFFFFF' : '#0F172A';
+  const getIconBorder = () => {
+    return isDark ? GOLD : CHOCOLATE;
+  };
+
+  const getIconColor = () => {
+    return isDark ? '#FFFFFF' : '#0F172A';
+  };
 
   // 9️⃣ Curve & Line Colors
   const getCurveColor = () => {
-    if (theme === 'dark') return 'rgba(148, 163, 184, 0.3)';
+    if (isDark) return 'rgba(148, 163, 184, 0.3)';
     return 'rgba(0, 0, 0, 0.15)';
   };
 
   const getCenterLineColor = () => {
-    if (theme === 'dark') return 'rgba(148, 163, 184, 0.3)';
+    if (isDark) return 'rgba(148, 163, 184, 0.3)';
     return 'rgba(0, 0, 0, 0.15)';
   };
 
-  // 🔟 Arrow Circle
-  const getArrowCircleBg = () => GOLD;
+  // 🔟 Arrow Circle - Gold in dark, Chocolate in light ✅
+  const getArrowCircleBg = () => {
+    return isDark ? GOLD : CHOCOLATE;
+  };
+
   const getArrowColor = () => '#FFFFFF';
 
   // 1️⃣1️⃣ Input Style - Larger & refined
@@ -157,7 +169,7 @@ export default function ContactSection() {
     outline: 'none',
     transition: 'all 0.3s ease',
     fontFamily: "'Calibri Light', sans-serif",
-    boxShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.02)' : 'none',
+    boxShadow: isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
   });
 
   const getTextareaStyle = () => ({
@@ -173,10 +185,10 @@ export default function ContactSection() {
     fontFamily: "'Calibri Light', sans-serif",
     resize: 'none' as const,
     minHeight: '140px',
-    boxShadow: theme === 'light' ? '0 1px 2px rgba(0,0,0,0.02)' : 'none',
+    boxShadow: isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
   });
 
-  // 1️⃣2️⃣ Focus Style
+  // 1️⃣2️⃣ Focus Style - Uses accent color
   const getFocusStyle = () => ({
     borderColor: getAccentColor(),
     boxShadow: `0 0 0 4px ${getAccentColor()}15`,
@@ -244,7 +256,7 @@ export default function ContactSection() {
       style={{ 
         background: getBgColor(), 
         fontFamily: "'Poppins', sans-serif",
-        boxShadow: theme === 'light' ? 'inset 0 1px 0 rgba(255,255,255,0.8)' : 'none',
+        boxShadow: isDark ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.8)',
       }}
     >
       <div className="max-w-6xl mx-auto">
@@ -256,9 +268,9 @@ export default function ContactSection() {
           style={{
             backgroundColor: getCardBg(),
             border: `1px solid ${getBorderColor()}`,
-            boxShadow: theme === 'light' 
-              ? '0 4px 24px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)' 
-              : '0 4px 24px rgba(0,0,0,0.2)',
+            boxShadow: isDark 
+              ? '0 4px 24px rgba(0,0,0,0.2)' 
+              : '0 4px 24px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
           }}
         >
           <div className="flex flex-col md:flex-row relative">
@@ -340,7 +352,7 @@ export default function ContactSection() {
                   />
                 </svg>
                 
-                {/* Top Dot - GOLD */}
+                {/* Top Dot - Accent Color */}
                 <div 
                   className="absolute w-3 h-3 rounded-full"
                   style={{ 
@@ -350,7 +362,7 @@ export default function ContactSection() {
                   }}
                 />
                 
-                {/* Middle Dot - GOLD */}
+                {/* Middle Dot - Accent Color */}
                 <div 
                   className="absolute w-3 h-3 rounded-full"
                   style={{ 
@@ -361,7 +373,7 @@ export default function ContactSection() {
                   }}
                 />
                 
-                {/* Bottom Dot - GOLD */}
+                {/* Bottom Dot - Accent Color */}
                 <div 
                   className="absolute w-3 h-3 rounded-full"
                   style={{ 
@@ -389,7 +401,7 @@ export default function ContactSection() {
                         style={{
                           backgroundColor: getIconBg(),
                           border: `2px solid ${getIconBorder()}`,
-                          boxShadow: theme === 'light' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                          boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)',
                         }}
                       >
                         <item.icon 
@@ -588,9 +600,9 @@ export default function ContactSection() {
                       backgroundColor: getButtonBg(),
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
-                      boxShadow: theme === 'light' 
-                        ? '0 4px 16px rgba(0, 102, 255, 0.25)' 
-                        : '0 4px 16px rgba(232, 202, 94, 0.25)',
+                      boxShadow: isDark 
+                        ? '0 4px 16px rgba(232, 202, 94, 0.25)' 
+                        : '0 4px 16px rgba(123, 63, 0, 0.25)',
                     }}
                   >
                     {isSubmitting ? (
@@ -617,9 +629,9 @@ export default function ContactSection() {
             style={{
               backgroundColor: getCardBg(),
               border: `1px solid ${getBorderColor()}`,
-              boxShadow: theme === 'light' 
-                ? '0 20px 60px rgba(0,0,0,0.10)' 
-                : '0 20px 60px rgba(0,0,0,0.30)',
+              boxShadow: isDark 
+                ? '0 20px 60px rgba(0,0,0,0.30)' 
+                : '0 20px 60px rgba(0,0,0,0.10)',
             }}
           >
             <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-3 md:mb-4">

@@ -80,13 +80,17 @@ export default function TemplatesGrid({
 
   // Theme-based colors for better contrast
   const isDark = theme === 'dark';
-  const textColor = isDark ? '#FFFFFF' : '#1F2937';
-  const textMuted = isDark ? '#9CA3AF' : '#4B5563';
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const accentColor = isDark ? GOLD : BLUE;
+  
+  // ✅ FULL BLACK in light mode, FULL WHITE in dark mode
+  const textColor = isDark ? '#FFFFFF' : '#000000';
+  const textMuted = isDark ? '#FFFFFF' : '#000000';
   const textLight = isDark ? '#6B7280' : '#9CA3AF';
   const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   const cardBg = isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF';
   const inputBg = isDark ? '#0F172A' : '#FFFFFF';
-  const accentColor = isDark ? '#E8CA5E' : '#0066FF';
   const accentLight = isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)';
   const sectionBg = isDark ? 'transparent' : '#F8FAFF';
 
@@ -155,6 +159,7 @@ export default function TemplatesGrid({
             </span>
           </h2>
           
+          {/* ✅ FULL BLACK in light, FULL WHITE in dark */}
           <p 
             className="text-base md:text-lg max-w-2xl mx-auto md:mx-0 leading-relaxed font-light"
             style={{ 
@@ -376,6 +381,7 @@ export default function TemplatesGrid({
                     {template.name}
                   </h3>
                   
+                  {/* ✅ FULL BLACK in light, FULL WHITE in dark */}
                   <p className="leading-relaxed text-base mb-4 line-clamp-2"
                     style={{ 
                       color: textMuted,

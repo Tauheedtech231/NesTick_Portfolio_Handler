@@ -45,7 +45,7 @@ const GOLD = "#E8CA5E";
 const BLUE = "#0066FF";
 const FILL = "#0f1e38", FILL_HOVER = "#1a3060", INNER_FILL = "#07101e", BG = "#0B0F19";
 const LIGHT_BG = "#F8FAFF", LIGHT_FILL = "#f0f4ff", LIGHT_FILL_HOVER = "#dce6ff";
-const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#4B5563"; // Darker for better contrast
+const LIGHT_INNER_FILL = "#f8faff", LIGHT_DESC = "#4B5563";
 
 const OUTER_R = 320, STRIP_OUTER = 320, STRIP_INNER = 294;
 const SEG_OUTER = 278, SEG_INNER = 130, INNER_CIRCLE_R = 116;
@@ -210,7 +210,8 @@ function SegPaths({
 function InfoPanel({ seg, visible, theme, isMobile }: { seg: Segment; visible: boolean; theme: string; isMobile: boolean }) {
   const { displayed, done } = useTypewriter(seg.description);
   const titleColor = theme === "dark" ? GOLD : BLUE;
-  const descColor  = theme === "dark" ? "#D1D5DB" : "#4B5563"; // Darker for light mode
+  // Description text - WHITE in both modes
+  const descColor  = "#FFFFFF"; // Always white
   const dotColor   = theme === "dark" ? GOLD : BLUE;
 
   const titleFontSize = isMobile ? 16 : 22;
@@ -413,22 +414,19 @@ export default function FeaturesSection() {
   const handleClick = useCallback((seg: Segment) => {
     if (animating || activeSeg || isOpeningRef.current) return;
 
-    // ✅ Check if wheel is visible
     if (wheelRef.current) {
       const rect = wheelRef.current.getBoundingClientRect();
       const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
       
-      // If wheel is not fully visible, scroll to it first
       if (!isVisible) {
         const scrollY = window.scrollY;
-        const targetY = rect.top + scrollY - 100; // 100px top margin
+        const targetY = rect.top + scrollY - 100;
         
         window.scrollTo({
           top: targetY,
           behavior: 'smooth'
         });
         
-        // Wait for scroll to complete then open
         setTimeout(() => {
           openSegment(seg);
         }, 600);
@@ -437,7 +435,6 @@ export default function FeaturesSection() {
       }
     }
 
-    // Wheel is visible, open immediately
     openSegment(seg);
   }, [animating, activeSeg, openSegment]);
 
@@ -504,9 +501,9 @@ export default function FeaturesSection() {
   const segFillHov  = isDark ? FILL_HOVER : LIGHT_FILL_HOVER;
   const innerFill   = isDark ? INNER_FILL : LIGHT_INNER_FILL;
   const textColor   = isDark ? GOLD       : BLUE;
-  const heading1    = isDark ? "#FFFFFF"  : "#1F2937"; // Darker for light mode
+  const heading1    = isDark ? "#FFFFFF"  : "#1F2937";
   const heading2    = isDark ? GOLD       : BLUE;
-  const subColor    = isDark ? "#9CA3AF"  : "#4B5563"; // Darker for light mode
+  const subColor    = isDark ? "#9CA3AF"  : "#4B5563";
 
   const wheelMaxWidth = isMobile ? 320 : 520;
 
@@ -524,16 +521,39 @@ export default function FeaturesSection() {
         }}
       >
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: isMobile ? 16 : 40 }}>
-          <h2 style={{ fontFamily: "'Poppins',Arial,sans-serif", fontSize: isMobile ? "clamp(18px,5vw,24px)" : "clamp(22px,3.5vw,34px)", fontWeight: 700, letterSpacing: "-0.3px", margin: 0 }}>
-            <span style={{ color: heading1 }}>Comprehensive</span>{" "}
-            <span style={{ color: heading2 }}>System Features</span>
-          </h2>
-          <p style={{ marginTop: isMobile ? 2 : 8, fontSize: isMobile ? 10 : 13, color: subColor, fontFamily: "Arial,sans-serif", letterSpacing: 1 }}>
-            Explore our powerful platform capabilities
-          </p>
-          <div style={{ margin: "6px auto 0", height: 2, width: isMobile ? 80 : 160, backgroundColor: heading2, opacity: 0.6 }} />
-        </div>
+     {/* Header */}
+<div style={{ textAlign: "center", marginBottom: isMobile ? 16 : 40 }}>
+  <h2 style={{ 
+    fontFamily: "'Poppins',Arial,sans-serif", 
+    fontSize: isMobile ? "clamp(18px,5vw,24px)" : "clamp(22px,3.5vw,34px)", 
+    fontWeight: 700, 
+    letterSpacing: "-0.3px", 
+    margin: 0 
+  }}>
+    <span style={{ color: heading1 }}>Comprehensive</span>{" "}
+    <span style={{ color: heading2 }}>System Features</span>
+  </h2>
+  
+  {/* ✅ UPDATED: Full Black in light, Full White in dark */}
+  <p style={{ 
+    marginTop: isMobile ? 2 : 8, 
+    fontSize: isMobile ? 10 : 13, 
+    color: isDark ? '#FFFFFF' : '#000000',
+    fontFamily: "'Poppins',Arial,sans-serif", 
+    letterSpacing: 1,
+    fontWeight: 500,
+  }}>
+    Explore our powerful platform capabilities
+  </p>
+  
+  <div style={{ 
+    margin: "6px auto 0", 
+    height: 2, 
+    width: isMobile ? 80 : 160, 
+    backgroundColor: heading2, 
+    opacity: 0.6 
+  }} />
+</div>
 
         {/* Wheel Container */}
         <div
@@ -586,13 +606,13 @@ export default function FeaturesSection() {
           </svg>
         </div>
 
-        {/* Dim overlay - UPDATED with better light mode opacity */}
+        {/* Dim overlay - INCREASED DARK OVERLAY for both modes */}
         {activeSeg && (
           <div
             onClick={handleClose}
             style={{
               position: "absolute", inset: 0, zIndex: 10,
-              backgroundColor: isDark ? "rgba(11, 15, 25, 0.92)" : "rgba(0, 0, 0, 0.85)",
+              backgroundColor: isDark ? "rgba(0, 0, 0, 0.95)" : "rgba(0, 0, 0, 0.92)", // Increased opacity
               opacity: overlayVisible ? 1 : 0,
               transition: "opacity 0.45s ease",
               pointerEvents: animating ? "none" : "auto",
@@ -600,7 +620,7 @@ export default function FeaturesSection() {
           />
         )}
 
-        {/* Info panel */}
+        {/* Info panel - WHITE TEXT in both modes */}
         {activeSeg && (
           <div
             onClick={(e) => e.stopPropagation()}

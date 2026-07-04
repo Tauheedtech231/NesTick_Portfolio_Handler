@@ -1,3 +1,4 @@
+
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
@@ -5,15 +6,18 @@ import { useEffect, useState } from 'react';
 import { 
   Home, Eye, Layout, User, 
   Mail, Phone, Globe, Shield, 
-  Quote, Compass, MessageCircle
+  Quote, Compass, MessageCircle,
+  Briefcase, BookOpen, Users, 
+  Brain, Layers
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 // ==========================================
-// BRAND COLORS - SIRF SUBTLE HIGHLIGHTS
+// BRAND COLORS
 // ==========================================
 const GOLD = "#E8CA5E";
+const CHOCOLATE = "#7B3F00";
 const BLUE = "#0066FF";
 
 export default function Footer() {
@@ -37,20 +41,19 @@ export default function Footer() {
     return () => observer.disconnect();
   }, []);
 
-  const navLinks = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Vision', path: '/vision', icon: Eye },
-    { name: 'Templates', path: '/templates', icon: Layout },
-    { name: 'About', path: '/about', icon: User },
-  ];
-
-  if (!theme) return null;
-
   const isDark = theme === 'dark';
 
+  // ✅ ALL 5 PRODUCTS ADDED BACK
+  const products = [
+    { name: 'Portfolio Site Management', icon: Briefcase },
+    { name: 'Admission Automation System', icon: BookOpen },
+    { name: 'Parent Teacher Management System', icon: Users },
+    { name: 'AI Exam Generator', icon: Brain },
+    { name: 'Learning Resource Management', icon: Layers },
+  ];
+
   // ==========================================
-  // WHITE MODE - FULL WHITE WITH SHADOW
-  // BLACK MODE - AS IS
+  // THEME-BASED COLORS
   // ==========================================
 
   // 1️⃣ Background - FULL WHITE in white mode
@@ -60,29 +63,28 @@ export default function Footer() {
               radial-gradient(ellipse at 85% 15%, rgba(20,80,150,0.15), transparent 50%),
               linear-gradient(180deg, #090920 0%, #0d0d2b 40%, #10102f 100%)`;
     }
-    // White mode: FULL WHITE background
     return `#FFFFFF`;
   };
 
-  // 2️⃣ Text Colors - Better contrast in white mode
+  // 2️⃣ Text Colors - Full Black in light, Full White in dark
   const getTextColor = () => {
-    return isDark ? '#F1F5F9' : '#0F172A';
+    return isDark ? '#FFFFFF' : '#000000';
   };
 
   const getTextMuted = () => {
-    return isDark ? 'rgba(255,255,255,0.55)' : 'rgba(15,23,42,0.55)';
+    return isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
   };
 
   const getTextLight = () => {
-    return isDark ? 'rgba(255,255,255,0.35)' : 'rgba(15,23,42,0.35)';
+    return isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
   };
 
-  // 3️⃣ Borders - Subtle
+  // 3️⃣ Borders
   const getBorderColor = () => {
-    return isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    return isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   };
 
-  // 4️⃣ Card/Quote Background - White mode with shadow
+  // 4️⃣ Card/Quote Background
   const getQuoteBg = () => {
     return isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.9)';
   };
@@ -91,9 +93,9 @@ export default function Footer() {
     return isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)';
   };
 
-  // 5️⃣ Icon Container - Minimal
+  // 5️⃣ Icon Container - Gold in dark, Chocolate in light
   const getIconBg = () => {
-    return isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.8)';
+    return isDark ? 'rgba(255,255,255,0.04)' : 'rgba(123,63,0,0.06)';
   };
 
   const getIconShadow = () => {
@@ -102,7 +104,7 @@ export default function Footer() {
 
   // 6️⃣ Link Colors
   const getLinkColor = () => {
-    return isDark ? 'rgba(255,255,255,0.60)' : 'rgba(15,23,42,0.55)';
+    return isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.65)';
   };
 
   // 7️⃣ Logo Border
@@ -114,19 +116,29 @@ export default function Footer() {
     return isDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)';
   };
 
-  // 8️⃣ Wave Fill - More visible in white mode
+  // 8️⃣ Wave Fill - MUCH DARKER in light mode
   const getWaveFill = () => {
-    return isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+    return isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.12)';
   };
 
-  // 9️⃣ Wave Shadow - REMOVED
-  const getWaveShadow = () => {
-    return 'none'; // Shadow completely removed
+  // 9️⃣ Accent Color - Gold in dark, Chocolate in light
+  const getAccentColor = () => {
+    return isDark ? GOLD : CHOCOLATE;
   };
 
-  // 🔟 Gold Ring Opacity - More visible in white mode
+  // 🔟 Ring Opacity
   const getRingOpacity = () => {
     return isDark ? '0.06' : '0.08';
+  };
+
+  // 1️⃣1️⃣ Product link hover color
+  const getProductHoverColor = () => {
+    return isDark ? GOLD : CHOCOLATE;
+  };
+
+  // 1️⃣2️⃣ Quote icon color
+  const getQuoteIconColor = () => {
+    return isDark ? GOLD : CHOCOLATE;
   };
 
   return (
@@ -138,7 +150,7 @@ export default function Footer() {
         borderTop: isDark ? `1px solid ${getBorderColor()}` : 'none',
       }}
     >
-      {/* ─── DECORATIVE RINGS - SUBTLE ─── */}
+      {/* ─── DECORATIVE RINGS ─── */}
       <svg 
         className="absolute bottom-[-60px] left-[-60px] w-[200px] h-[200px] pointer-events-none z-0"
         viewBox="0 0 260 260"
@@ -154,8 +166,9 @@ export default function Footer() {
         {/* ── COL 1: Brand ── */}
         <div className="col-brand">
           <div className="flex items-center gap-3 mb-1">
+            {/* LARGER LOGO */}
             <div 
-              className="w-[52px] h-[52px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105"
+              className="w-[64px] h-[64px] rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105"
               style={{
                 background: '#fff',
                 border: `2px solid ${getLogoBorder()}`,
@@ -165,34 +178,35 @@ export default function Footer() {
               <Image
                 src="/logo.jpg"
                 alt="Logo"
-                width={52}
-                height={52}
+                width={64}
+                height={64}
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
             <div>
-              <div className="text-[22px] font-bold transition-colors duration-300 cursor-pointer"
+              {/* PSM only - REMOVED PORTFOLIO SYSTEM */}
+              <div className="text-[28px] font-bold transition-colors duration-300 cursor-pointer"
                 style={{ 
                   color: getTextColor(),
                   fontFamily: "'Inter', sans-serif",
                   lineHeight: '1.1',
                 }}
               >
-                Portfolio Handler
+                PSM
               </div>
             </div>
           </div>
           
-          {/* Gold Accent Line - SUBTLE HIGHLIGHT */}
-          <div 
+          {/* ✅ REMOVED: Accent Line under logo */}
+          {/* <div 
             className="h-[2px] w-[90px] rounded-[2px] mt-1 mb-3"
             style={{
-              background: `linear-gradient(to right, ${GOLD}, ${GOLD})`,
+              background: `linear-gradient(to right, ${getAccentColor()}, ${getAccentColor()})`,
             }}
-          />
+          /> */}
 
           <p 
-            className="text-[13px] leading-[1.65] max-w-[280px] transition-colors duration-300"
+            className="text-[14px] leading-[1.65] max-w-[280px] transition-colors duration-300"
             style={{ 
               color: getTextMuted(),
               fontFamily: "'Inter', sans-serif",
@@ -201,7 +215,7 @@ export default function Footer() {
             Empowering educational institutions with modern portfolio management solutions.
           </p>
 
-          {/* ── QUOTE - WHITE MODE WITH SHADOW ── */}
+          {/* ── QUOTE - EXPANDED TEXT ── */}
           <div 
             className="mt-4 flex items-start gap-2.5 max-w-[280px] cursor-pointer transition-all duration-300 hover:shadow-md"
             style={{
@@ -212,7 +226,7 @@ export default function Footer() {
               boxShadow: getQuoteShadow(),
             }}
           >
-            <Quote className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: GOLD }} />
+            <Quote className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: getQuoteIconColor() }} />
             <p 
               className="text-[12px] leading-[1.6] italic transition-colors duration-300"
               style={{ 
@@ -220,49 +234,41 @@ export default function Footer() {
                 fontFamily: "'Inter', sans-serif",
               }}
             >
-              "Building the future of education, one portfolio at a time."
+              "Empowering the next generation of learners through innovative portfolio solutions, 
+              transforming educational experiences one institution at a time."
             </p>
           </div>
         </div>
 
-        {/* ── COL 2: Quick Links ── */}
-        <div className="col-links md:px-6">
+        {/* ── COL 2: Products ── */}
+        <div className="col-products md:px-6">
           <div className="flex items-center gap-3 mb-1.5">
-            <div 
-              className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
-              style={{ 
-                background: getIconBg(),
-                border: `1px solid ${getBorderColor()}`,
-                boxShadow: getIconShadow(),
-              }}
-            >
-              <Compass className="w-[18px] h-[18px]" style={{ color: GOLD }} />
-            </div>
-            <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
+            
+            <div className="text-[20px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
                 color: getTextColor(),
                 fontFamily: "'Inter', sans-serif",
               }}
             >
-              Quick Links
+              Products
             </div>
           </div>
           
-          {/* Gold Accent Line - SUBTLE */}
-          <div 
+          {/* ✅ REMOVED: Accent Line under Products */}
+          {/* <div 
             className="h-[2px] w-[70px] rounded-[2px] mb-4"
             style={{
-              background: `linear-gradient(to right, ${GOLD}, ${GOLD})`,
+              background: `linear-gradient(to right, ${getAccentColor()}, ${getAccentColor()})`,
             }}
-          />
+          /> */}
 
           <ul className="flex flex-col gap-3">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
+            {products.map((product) => {
+              const Icon = product.icon;
               return (
-                <li key={item.name}>
+                <li key={product.name}>
                   <Link
-                    href={item.path}
+                    href="#"
                     className="flex items-center gap-3 text-[14px] transition-all duration-200 cursor-pointer group"
                     style={{
                       color: getLinkColor(),
@@ -270,7 +276,7 @@ export default function Footer() {
                       textDecoration: 'none',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = GOLD;
+                      e.currentTarget.style.color = getProductHoverColor();
                       e.currentTarget.style.transform = 'translateX(4px)';
                     }}
                     onMouseLeave={(e) => {
@@ -278,12 +284,19 @@ export default function Footer() {
                       e.currentTarget.style.transform = 'translateX(0px)';
                     }}
                   >
-                    <span className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-[15px] h-[15px] transition-colors duration-200" style={{ 
-                        color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.20)'
+                    {/* ROUNDED ICON CONTAINER - Chocolate in light mode */}
+                    <span 
+                      className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-110"
+                      style={{ 
+                        background: getIconBg(),
+                        border: `1px solid ${getBorderColor()}`,
+                      }}
+                    >
+                      <Icon className="w-[14px] h-[14px] transition-colors duration-200" style={{ 
+                        color: getAccentColor() // Chocolate in light, Gold in dark
                       }} />
                     </span>
-                    {item.name}
+                    {product.name}
                   </Link>
                 </li>
               );
@@ -294,17 +307,8 @@ export default function Footer() {
         {/* ── COL 3: Get in Touch ── */}
         <div className="col-contact md:px-4">
           <div className="flex items-center gap-3 mb-1.5">
-            <div 
-              className="w-[38px] h-[38px] rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
-              style={{ 
-                background: getIconBg(),
-                border: `1px solid ${getBorderColor()}`,
-                boxShadow: getIconShadow(),
-              }}
-            >
-              <MessageCircle className="w-[18px] h-[18px]" style={{ color: GOLD }} />
-            </div>
-            <div className="text-[18px] font-bold transition-colors duration-300 cursor-pointer"
+          
+            <div className="text-[20px] font-bold transition-colors duration-300 cursor-pointer"
               style={{ 
                 color: getTextColor(),
                 fontFamily: "'Inter', sans-serif",
@@ -314,13 +318,13 @@ export default function Footer() {
             </div>
           </div>
           
-          {/* Gold Accent Line - SUBTLE */}
-          <div 
+          {/* ✅ REMOVED: Accent Line under Get in Touch */}
+          {/* <div 
             className="h-[2px] w-[70px] rounded-[2px] mb-4"
             style={{
-              background: `linear-gradient(to right, ${GOLD}, ${GOLD})`,
+              background: `linear-gradient(to right, ${getAccentColor()}, ${getAccentColor()})`,
             }}
-          />
+          /> */}
 
           <div className="flex flex-col gap-3.5">
             <div className="flex items-center gap-3 cursor-pointer group">
@@ -332,9 +336,9 @@ export default function Footer() {
                   boxShadow: getIconShadow(),
                 }}
               >
-                <Mail className="w-[15px] h-[15px]" style={{ color: GOLD }} />
+                <Mail className="w-[15px] h-[15px]" style={{ color: getAccentColor() }} />
               </div>
-              <span className="text-[13px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
+              <span className="text-[14px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
                 color: getLinkColor(),
               }}>
                 neezamiya@gmail.com
@@ -350,12 +354,31 @@ export default function Footer() {
                   boxShadow: getIconShadow(),
                 }}
               >
-                <Phone className="w-[15px] h-[15px]" style={{ color: GOLD }} />
+                <Phone className="w-[15px] h-[15px]" style={{ color: getAccentColor() }} />
               </div>
-              <span className="text-[13px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
+              <span className="text-[14px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
                 color: getLinkColor(),
               }}>
                 03237594869
+              </span>
+            </div>
+
+            {/* SECOND PHONE NUMBER */}
+            <div className="flex items-center gap-3 cursor-pointer group">
+              <div 
+                className="w-[34px] h-[34px] rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md"
+                style={{ 
+                  background: getIconBg(),
+                  border: `1px solid ${getBorderColor()}`,
+                  boxShadow: getIconShadow(),
+                }}
+              >
+                <Phone className="w-[15px] h-[15px]" style={{ color: getAccentColor() }} />
+              </div>
+              <span className="text-[14px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
+                color: getLinkColor(),
+              }}>
+                03193236529
               </span>
             </div>
             
@@ -368,12 +391,12 @@ export default function Footer() {
                   boxShadow: getIconShadow(),
                 }}
               >
-                <Globe className="w-[15px] h-[15px]" style={{ color: GOLD }} />
+                <Globe className="w-[15px] h-[15px]" style={{ color: getAccentColor() }} />
               </div>
-              <span className="text-[13px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
+              <span className="text-[14px] transition-colors duration-300 group-hover:text-[#E8CA5E]" style={{ 
                 color: getLinkColor(),
               }}>
-                nesticktech.com
+                https://neezamiya.com/
               </span>
             </div>
           </div>
@@ -381,14 +404,14 @@ export default function Footer() {
 
       </div>
 
-      {/* ─── WAVE SECTION - SHADOW REMOVED ─── */}
+      {/* ─── WAVE SECTION - MUCH DARKER ─── */}
       <div 
         className="relative w-full h-[100px] z-10"
         style={{
-          boxShadow: 'none', // Shadow completely removed
+          boxShadow: 'none',
         }}
       >
-        {/* Wave SVG - More visible in white mode */}
+        {/* Wave SVG - Much darker in light mode */}
         <svg className="absolute bottom-0 left-0 w-full h-full" viewBox="0 0 1200 100" preserveAspectRatio="none">
           <path d="M0,35 C150,65 300,15 450,35 C600,65 750,15 900,32 C1000,45 1050,35 1200,30 L1200,100 L0,100 Z"
                 fill={getWaveFill()}/>
@@ -396,21 +419,21 @@ export default function Footer() {
 
         {/* Left Text */}
         <div className="absolute left-6 sm:left-8 bottom-4 z-[5]">
-          <span className="text-[11px] flex items-center gap-1.5" style={{ 
+          <span className="text-[12px] flex items-center gap-1.5" style={{ 
             color: getTextLight()
           }}>
-            <Shield className="w-3 h-3" style={{ color: GOLD }} />
-            © {currentYear} All Rights Reserved. Neezamiya
+            <Shield className="w-3 h-3" style={{ color: getAccentColor() }} />
+            © {currentYear} All Rights Reserved. PSM
           </span>
         </div>
 
         {/* Right Text */}
         <div className="absolute right-6 sm:right-8 bottom-4 z-[5]">
-          <span className="text-[11px] flex items-center gap-1" style={{ 
+          <span className="text-[12px] flex items-center gap-1" style={{ 
             color: getTextLight()
           }}>
             Powered by{' '}
-            <span className="font-semibold transition-colors duration-300 hover:opacity-80 cursor-pointer" style={{ color: GOLD }}>
+            <span className="font-semibold transition-colors duration-300 hover:opacity-80 cursor-pointer" style={{ color: getAccentColor() }}>
               Nestick Tech
             </span>
           </span>

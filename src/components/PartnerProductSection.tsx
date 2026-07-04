@@ -366,8 +366,9 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
-      const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+      // ✅ Full Black in light mode, White in dark mode
+      const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
+      const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       
       const isHovered = hoveredBox === boxIndex;
@@ -404,8 +405,8 @@ export default function SocialProofBar() {
       context.fillText(label, cx, cy + (labelOffY || 0));
       context.fillStyle = valColor;
       context.font = `bold ${valSize}px Arial,sans-serif`;
-      context.shadowColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)';
-      context.shadowBlur = 3;
+      context.shadowColor = 'transparent';
+      context.shadowBlur = 0;
       context.fillText(val, cx, cy + (valOffY || 0));
       context.restore();
       
@@ -506,8 +507,9 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
-      const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+      // ✅ Full Black in light mode, White in dark mode
+      const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
+      const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
       const isHovered = hoveredBox === 1;
       const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
@@ -537,6 +539,8 @@ export default function SocialProofBar() {
       context.fillText("Templates", TP.cx, TP.cy - 28);
       context.fillStyle = valColor;
       context.font = `bold 30px Arial,sans-serif`;
+      context.shadowColor = 'transparent';
+      context.shadowBlur = 0;
       context.fillText(countersStarted ? "15+" : "0", TP.cx, (TP.cy + 12));
       context.restore();
       iDocs(TP.cx, TP.cy, 0.85, -8);
@@ -547,7 +551,8 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      const textColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+      // ✅ Full Black in light mode, White in dark mode
+      const textColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
       const twP_rounded = octPts(TW.cx, TW.cy, TWr);
       const twPi_rounded = octPts(TW.cx, TW.cy, TWri);
@@ -573,8 +578,8 @@ export default function SocialProofBar() {
       context.textAlign = "center";
       context.fillStyle = textColor;
       context.font = "bold 26px Arial,sans-serif";
-      context.shadowColor = theme === 'dark' ? 'rgba(160,220,255,0.2)' : 'rgba(59,130,246,0.06)';
-      context.shadowBlur = 6;
+      context.shadowColor = 'transparent';
+      context.shadowBlur = 0;
       context.fillText("TRUSTED", TW.cx, TW.cy - 4);
       context.fillText("WORLDWIDE", TW.cx, TW.cy + 36);
       context.restore();
@@ -585,8 +590,9 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
-      const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+      // ✅ Full Black in light mode, White in dark mode
+      const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
+      const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
       const isHovered = hoveredBox === 2;
       const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
@@ -616,6 +622,8 @@ export default function SocialProofBar() {
       context.fillText("Active Users", AU.cx, (AU.cy - 28));
       context.fillStyle = valColor;
       context.font = `bold 28px Arial,sans-serif`;
+      context.shadowColor = 'transparent';
+      context.shadowBlur = 0;
       context.fillText(countersStarted ? "1500+" : "0", AU.cx, (AU.cy + 10));
       context.restore();
       iPeople(AU.cx, AU.cy - 10, 0.85, 12);
@@ -626,8 +634,9 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      const labelColor = theme === 'dark' ? '#93C5FD' : '#4B5563';
-      const valColor = theme === 'dark' ? '#FFFFFF' : '#1F2937';
+      // ✅ Full Black in light mode, White in dark mode
+      const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
+      const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
       const isHovered = hoveredBox === 3;
       const glowIntensity = isHovered ? 50 : (theme === 'dark' ? 16 : 6);
@@ -657,6 +666,8 @@ export default function SocialProofBar() {
       context.fillText("Success Rate", SR.cx, SR.cy - 26);
       context.fillStyle = valColor;
       context.font = `bold 32px Arial,sans-serif`;
+      context.shadowColor = 'transparent';
+      context.shadowBlur = 0;
       context.fillText(countersStarted ? "97%" : "0%", SR.cx, SR.cy + 16);
       context.restore();
       iArrow(SR.cx, SR.cy, 0.85);
@@ -729,18 +740,20 @@ export default function SocialProofBar() {
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       >
-        <canvas
-          ref={canvasRef}
-          className="w-full h-auto"
-          style={{
-            borderRadius: "12px",
-            display: "block",
-            width: "100%",
-            maxWidth: "100%",
-            margin: "0 auto",
-            cursor: "pointer",
-          }}
-        />
+        <div className="w-full flex justify-center">
+          <canvas
+            ref={canvasRef}
+            className="w-full max-w-full"
+            style={{
+              borderRadius: "12px",
+              display: "block",
+              width: "100%",
+              maxWidth: "100%",
+              margin: "0 auto",
+              cursor: "pointer",
+            }}
+          />
+        </div>
       </motion.div>
 
       <div className="block md:hidden">

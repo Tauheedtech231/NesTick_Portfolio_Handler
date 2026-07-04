@@ -53,13 +53,14 @@ import  ContactSection  from './ContactSection';
 // BRAND COLORS - CONSISTENT WITH ALL SECTIONS
 // ==========================================
 const GOLD = "#E8CA5E";
+const CHOCOLATE = "#7B3F00";
 const BLUE = "#0066FF";
 
-// 5 Partner Types - Only Business Developer is Gold, rest Blue
+// 5 Partner Types - Business Developer uses Chocolate in light mode
 const partnerTypes = [
   { value: 'designer', label: 'Designer', icon: Palette, color: BLUE },
   { value: 'developer', label: 'Developer', icon: Code2, color: BLUE },
-  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: GOLD },
+  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: CHOCOLATE },
   { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: BLUE },
   { value: 'sales', label: 'Sales Person', icon: Target, color: BLUE },
 ];
@@ -378,40 +379,47 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     return () => observer.disconnect();
   }, []);
 
-  // Helper to check if Business Dev (Gold)
+  const isDark = theme === 'dark';
+
+  // Helper to check if Business Dev
   const isBusinessDev = (activeForm as string) === 'business_dev';
 
-  // Get accent color based on active form
+  // ✅ Get active color based on selected tab
   const getActiveColor = () => {
-    return isBusinessDev ? GOLD : BLUE;
+    if (isBusinessDev) {
+      return isDark ? GOLD : CHOCOLATE; // Gold in dark, Chocolate in light
+    }
+    return BLUE; // Blue for all other types in both modes
   };
 
   const getActiveColorLight = () => {
-    return isBusinessDev ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.15)';
+    const color = getActiveColor();
+    return isDark ? `${color}20` : `${color}15`;
   };
 
   // Get shadow color for benefits cards hover
   const getShadowColor = () => {
-    return isBusinessDev ? 'rgba(232, 202, 94, 0.25)' : 'rgba(0, 102, 255, 0.25)';
+    const color = getActiveColor();
+    return isDark ? `${color}40` : `${color}25`;
   };
 
   // ==========================================
-  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // THEME COLORS WITH DEPTH
   // ==========================================
 
-  // 1️⃣ Background - Gradient for depth (not flat)
+  // 1️⃣ Background
   const getBgColor = () => {
     if (theme === 'dark') return '#0B0F19';
     return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
   };
 
-  // 2️⃣ Card Background - Clean with subtle depth
+  // 2️⃣ Card Background
   const getCardBg = () => {
     if (theme === 'dark') return 'rgba(15, 23, 42, 0.6)';
     return 'rgba(255, 255, 255, 0.92)';
   };
 
-  // 3️⃣ Form Card Background - White with shadow for depth
+  // 3️⃣ Form Card Background
   const getFormCardBg = () => {
     if (theme === 'dark') return 'rgba(15, 23, 42, 0.4)';
     return 'rgba(255, 255, 255, 0.95)';
@@ -431,13 +439,13 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     return 'none';
   };
 
-  // 4️⃣ Border - Subtle & refined
+  // 4️⃣ Border
   const getBorderColor = () => {
     if (theme === 'dark') return 'rgba(30, 41, 59, 0.5)';
     return 'rgba(0, 0, 0, 0.06)';
   };
 
-  // 5️⃣ Text Colors - Better contrast for readability
+  // 5️⃣ Text Colors
   const getTextColor = () => {
     if (theme === 'dark') return '#F1F5F9';
     return '#0F172A';
@@ -453,25 +461,26 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     return '#475569';
   };
 
-  // 6️⃣ Input Background - Consistent with theme
+  // 6️⃣ Input Background
   const getInputBg = () => {
     if (theme === 'dark') return 'rgba(11, 15, 25, 0.8)';
     return 'rgba(249, 250, 251, 0.9)';
   };
 
-  // 7️⃣ Button Background - Brand colors only
+  // 7️⃣ Button Background - Uses active color
   const getButtonBg = () => {
-    return isBusinessDev ? GOLD : BLUE;
+    return getActiveColor();
   };
 
   const getButtonText = () => '#FFFFFF';
 
   // 8️⃣ Shadow for benefits cards
   const getShadowColorForBenefits = () => {
-    return isBusinessDev ? 'rgba(232, 202, 94, 0.20)' : 'rgba(0, 102, 255, 0.15)';
+    const color = getActiveColor();
+    return isDark ? `${color}40` : `${color}25`;
   };
 
-  // 9️⃣ Input Style - LARGER SIZES
+  // 9️⃣ Input Style
   const getInputStyle = () => ({
     width: '100%',
     padding: '0.75rem 1rem',
@@ -953,7 +962,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
     }
   };
 
-  // Get partner benefits with dynamic colors
+  // Get partner benefits with dynamic colors - uses active color
   const getCurrentBenefits = () => {
     const benefits = partnerBenefitsMap[activeForm] || partnerBenefitsMap.designer;
     const activeColor = getActiveColor();
@@ -1014,9 +1023,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             </p>
           </motion.div>
 
-          {/* ==========================================
-              PARTNER BUTTONS - UPDATED FOR WHITE MODE
-              ========================================== */}
+          {/* Partner Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -1026,7 +1033,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             {partnerTypes.map((type) => {
               const Icon = type.icon;
               const isActive = activeForm === type.value;
-              const isGold = type.color === GOLD;
+              const activeColor = getActiveColor();
               
               return (
                 <button
@@ -1040,14 +1047,11 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                         : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                   }`}
                   style={{
-                    backgroundColor: isActive ? (isGold ? GOLD : BLUE) : undefined,
+                    backgroundColor: isActive ? activeColor : undefined,
                     color: isActive ? '#FFFFFF' : undefined,
                     fontFamily: "'Poppins', sans-serif",
                     boxShadow: isActive 
-                      ? (isGold 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.40)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.40)'
-                      ) 
+                      ? `0 4px 24px ${activeColor}40`
                       : undefined,
                     border: !isActive && theme === 'light' ? '1px solid #e5e7eb' : 'none',
                   }}
@@ -1059,7 +1063,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
             })}
           </motion.div>
 
-          {/* Benefits Cards */}
+          {/* Benefits Cards - Passes active color */}
           <PartnerBenefitsCards 
             benefits={getCurrentBenefits()}
             theme={theme}
@@ -1070,15 +1074,16 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
 
           {/* Form Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {/* Left Side - Why Choose */}
+            {/* Left Side - Why Choose - Passes active color */}
             <PartnerWhyChoose
               activeForm={activeForm}
               theme={theme}
               isInView={isInView}
               categoryContent={categoryContent}
+              activeColor={getActiveColor()} // ✅ Pass active color
             />
 
-            {/* Right Side - Forms - UPDATED WITH WHITE MODE DEPTH */}
+            {/* Right Side - Forms */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -1120,9 +1125,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </div>
               </div>
 
-              {/* ==========================================
-                  DESIGNER FORM - WITH LARGER INPUTS
-                  ========================================== */}
+              {/* Designer Form */}
               {activeForm === 'designer' && (
                 <form onSubmit={handleDesignerSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -1364,9 +1367,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
                       minWidth: '200px',
-                      boxShadow: isBusinessDev 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
+                      boxShadow: `0 4px 24px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1387,9 +1388,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* ==========================================
-                  DEVELOPER FORM - WITH LARGER INPUTS
-                  ========================================== */}
+              {/* Developer Form */}
               {activeForm === 'developer' && (
                 <form onSubmit={handleDeveloperSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1733,9 +1732,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
                       minWidth: '200px',
-                      boxShadow: isBusinessDev 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
+                      boxShadow: `0 4px 24px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1756,9 +1753,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* ==========================================
-                  BUSINESS DEVELOPER FORM - WITH LARGER INPUTS
-                  ========================================== */}
+              {/* Business Developer Form */}
               {activeForm === 'business_dev' && (
                 <form onSubmit={handleBusinessDevSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -1952,9 +1947,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
                       minWidth: '200px',
-                      boxShadow: isBusinessDev 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
+                      boxShadow: `0 4px 24px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1975,9 +1968,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* ==========================================
-                  MARKETING AGENCY FORM - WITH LARGER INPUTS
-                  ========================================== */}
+              {/* Marketing Agency Form */}
               {activeForm === 'marketing_agency' && (
                 <form onSubmit={handleMarketingSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -2170,9 +2161,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
                       minWidth: '200px',
-                      boxShadow: isBusinessDev 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
+                      boxShadow: `0 4px 24px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -2193,9 +2182,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                 </form>
               )}
 
-              {/* ==========================================
-                  SALES FORM - WITH LARGER INPUTS
-                  ========================================== */}
+              {/* Sales Form */}
               {activeForm === 'sales' && (
                 <form onSubmit={handleSalesSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -2390,9 +2377,7 @@ export default function PartnerSection({ onPartnerSubmit }: PartnerSectionProps)
                       color: getButtonText(),
                       fontFamily: "'Poppins', sans-serif",
                       minWidth: '200px',
-                      boxShadow: isBusinessDev 
-                        ? '0 4px 24px rgba(232, 202, 94, 0.35)' 
-                        : '0 4px 24px rgba(0, 102, 255, 0.35)',
+                      boxShadow: `0 4px 24px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (

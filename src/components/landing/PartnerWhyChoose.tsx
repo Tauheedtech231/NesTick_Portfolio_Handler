@@ -27,22 +27,24 @@ interface PartnerWhyChooseProps {
     benefits: BenefitItem[];
     quote: string;
   };
+  activeColor?: string; // ✅ Added: Active color from parent
 }
 
 export function PartnerWhyChoose({ 
   activeForm, 
   theme, 
   isInView, 
-  categoryContent 
+  categoryContent,
+  activeColor = BLUE // Default to BLUE if not provided
 }: PartnerWhyChooseProps) {
   // ==========================================
-  // DESIGNER CHANGES: THEME COLORS WITH DEPTH
+  // THEME COLORS WITH DEPTH
   // ==========================================
 
   // 1️⃣ Card Background - Consistent with form card
   const getCardBg = () => {
     if (theme === 'dark') return 'rgba(15, 23, 42, 0.4)';
-    return 'rgba(255, 255, 255, 0.95)'; // Same as form card
+    return 'rgba(255, 255, 255, 0.95)';
   };
 
   const getCardShadow = () => {
@@ -72,20 +74,22 @@ export function PartnerWhyChoose({
     return theme === 'dark' ? '#94A3B8' : '#475569';
   };
 
-  // 3️⃣ Accent Color - Brand Blue only
-  const getAccentColor = () => BLUE;
+  // 3️⃣ Accent Color - Uses activeColor from parent ✅
+  const getAccentColor = () => activeColor;
 
   // 4️⃣ Button Text - White
   const getButtonText = () => '#FFFFFF';
 
-  // 5️⃣ Icon Background - Subtle
+  // 5️⃣ Icon Background - Uses active color
   const getIconBg = () => {
-    return theme === 'dark' ? 'rgba(0, 102, 255, 0.12)' : 'rgba(0, 102, 255, 0.06)';
+    const color = getAccentColor();
+    return theme === 'dark' ? `${color}20` : `${color}10`;
   };
 
-  // 6️⃣ Quote Background - Subtle
+  // 6️⃣ Quote Background - Uses active color
   const getQuoteBg = () => {
-    return theme === 'dark' ? 'rgba(0, 102, 255, 0.06)' : 'rgba(0, 102, 255, 0.03)';
+    const color = getAccentColor();
+    return theme === 'dark' ? `${color}15` : `${color}06`;
   };
 
   // 7️⃣ Border Color - Subtle
@@ -124,7 +128,7 @@ export function PartnerWhyChoose({
           className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:scale-105"
           style={{ 
             backgroundColor: getAccentColor(),
-            boxShadow: `0 4px 16px ${getAccentColor()}25`,
+            boxShadow: `0 4px 16px ${getAccentColor()}30`,
           }}
         >
           <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color: getButtonText() }} />
@@ -180,7 +184,7 @@ export function PartnerWhyChoose({
                     e.currentTarget.style.transform = 'translateX(0px)';
                   }}
                 >
-                  {/* Check Icon - Brand Blue */}
+                  {/* Check Icon - Uses active color ✅ */}
                   <div
                     className="flex-shrink-0 mt-0.5 transition-all duration-300 group-hover:scale-110"
                     style={{ color: getAccentColor() }}
@@ -211,7 +215,7 @@ export function PartnerWhyChoose({
           )}
         </div>
 
-        {/* ─── QUOTE BOX - SUBTLE HIGHLIGHT ─── */}
+        {/* ─── QUOTE BOX - Uses active color ✅ ─── */}
         <div
           className="p-4 md:p-5 rounded-xl transition-all duration-300 hover:shadow-md"
           style={{

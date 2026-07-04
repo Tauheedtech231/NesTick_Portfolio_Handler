@@ -76,11 +76,10 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
     return () => clearTimeout(timer);
   }, []);
 
-  // Get colors based on theme - OPTIMIZED FOR BETTER CONTRAST
+  // Get colors based on theme
   const getColors = () => {
     if (theme === 'dark') {
       return {
-        // Dark mode: subtle overlay
         overlay: 'linear-gradient(180deg, rgba(11, 15, 25, 0.7) 0%, rgba(11, 15, 25, 0.3) 100%)',
         badgeBg: 'rgba(232, 202, 94, 0.15)',
         badgeBorder: 'rgba(232, 202, 94, 0.2)',
@@ -95,29 +94,28 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         newBadgeBg: '#E8CA5E',
         newBadgeText: '#1F4381',
         particleColor: '#3B82F6',
-        // Your Design button specific
         designButtonBg: 'rgba(255,255,255,0.1)',
         designButtonText: '#FFFFFF',
         designButtonBorder: '#E8CA5E',
       };
     } else {
       return {
-        // LIGHT MODE: Darker overlay for better text readability on images
-        overlay: 'linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%)',
-        badgeBg: 'rgba(255, 255, 255, 0.15)',
-        badgeBorder: 'rgba(255, 255, 255, 0.2)',
-        badgeColor: '#FFFFFF',
-        headingColor: '#FFFFFF',
+        overlay: 'none',
+        // ✅ CHANGED: Badge - Black text with white background
+        badgeBg: 'rgba(255, 255, 255, 0.9)',
+        badgeBorder: 'rgba(0, 0, 0, 0.1)',
+        badgeColor: '#000000', // Black text
+        // ✅ CHANGED: "Beautiful" word - Black
+        headingColor: '#000000',
         headingAccent: '#0066FF',
-        textColor: '#F3F4F6',
-        buttonBg: '#0066FF',
+        textColor: '#000000',
+        buttonBg: '#7B3F00',
         buttonText: '#FFFFFF',
         borderColor: '#0066FF',
         pulseColor: 'rgba(0, 102, 255, 0.4)',
         newBadgeBg: '#0066FF',
         newBadgeText: '#FFFFFF',
         particleColor: '#60A5FA',
-        // Your Design button specific - SOLID WHITE for visibility
         designButtonBg: 'rgba(255,255,255,0.9)',
         designButtonText: '#0066FF',
         designButtonBorder: '#0066FF',
@@ -137,13 +135,15 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
         <ParticleNetwork theme={theme} />
       </div>
       
-      {/* Overlay gradient - Darker in light mode for better text readability */}
-      <div 
-        className="absolute inset-0 z-1"
-        style={{
-          background: colors.overlay,
-        }}
-      />
+      {/* Overlay - Only in dark mode */}
+      {theme === 'dark' && (
+        <div 
+          className="absolute inset-0 z-1"
+          style={{
+            background: colors.overlay,
+          }}
+        />
+      )}
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 w-full">
         <motion.div
@@ -152,6 +152,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
           animate="visible"
           className="text-center max-w-4xl mx-auto flex flex-col justify-center"
         >
+          {/* ✅ Badge - Black text in light mode */}
           <motion.div 
             variants={fromBottomVariants} 
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 mx-auto w-fit cursor-pointer"
@@ -179,11 +180,12 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
             variants={fromLeftVariants} 
             className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold mb-2 font-serif tracking-tight cursor-default leading-tight"
           >
+            {/* ✅ "Beautiful" - Black in light mode */}
             <span className="relative inline-block cursor-default"
               style={{ 
                 color: colors.headingColor,
                 fontFamily: "'Poppins', sans-serif",
-                textShadow: theme === 'light' ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+                textShadow: 'none',
               }}
             >
               Beautiful
@@ -192,7 +194,7 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               style={{ 
                 color: colors.headingAccent,
                 fontFamily: "'Poppins', sans-serif",
-                textShadow: theme === 'light' ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+                textShadow: 'none',
               }}
             >
               Portfolio Templates
@@ -205,60 +207,45 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
             style={{ 
               color: colors.textColor,
               fontFamily: "'Calibri Light', sans-serif",
-              textShadow: theme === 'light' ? '0 1px 12px rgba(0,0,0,0.4)' : 'none',
+              textShadow: 'none',
             }}
           >
             Professionally designed templates for every academic discipline. 
             Fully customizable to match your institution's brand and requirements.
           </motion.p>
 
-          {/* Two CTA Buttons - Full Rounded with Proper Gap */}
+          {/* Two CTA Buttons */}
           <motion.div 
             variants={fromBottomVariants} 
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-2"
           >
-            {/* Browse Templates Button - Full Rounded */}
             <button
               onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
-              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
               style={{
                 backgroundColor: colors.buttonBg,
                 color: colors.buttonText,
                 fontFamily: "'Poppins', sans-serif",
-                boxShadow: theme === 'light' ? '0 4px 20px rgba(0,102,255,0.3)' : '0 4px 20px rgba(232,202,94,0.3)',
+                boxShadow: 'none',
               }}
             >
               <span>Browse Templates</span>
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform cursor-pointer" />
             </button>
             
-            {/* Your Design Button - Full Rounded with SOLID BACKGROUND in light mode */}
             <motion.button
               onClick={onDesignClick}
-              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 relative"
+              className="group inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95 relative"
               style={{
                 backgroundColor: colors.designButtonBg,
                 color: colors.designButtonText,
                 border: `2px solid ${colors.designButtonBorder}`,
                 fontFamily: "'Poppins', sans-serif",
-                textShadow: theme === 'light' ? '0 1px 4px rgba(0,0,0,0.05)' : 'none',
-                boxShadow: theme === 'light' 
-                  ? '0 4px 20px rgba(0,102,255,0.15)' 
-                  : '0 4px 20px rgba(232,202,94,0.15)',
+                textShadow: 'none',
+                boxShadow: 'none',
               }}
               animate={isPulsing ? {
                 scale: [1, 1.05, 1],
-                boxShadow: theme === 'light' 
-                  ? [
-                      `0 0 0 0 rgba(0,102,255,0.3)`,
-                      `0 0 0 15px rgba(0,102,255,0)`,
-                      `0 0 0 0 rgba(0,102,255,0)`
-                    ]
-                  : [
-                      `0 0 0 0 rgba(232,202,94,0.3)`,
-                      `0 0 0 15px rgba(232,202,94,0)`,
-                      `0 0 0 0 rgba(232,202,94,0)`
-                    ]
               } : {}}
               transition={{
                 duration: 2,
@@ -270,7 +257,6 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
               <span>Your Design</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform cursor-pointer" />
               
-              {/* Pulsing ring effect */}
               {isPulsing && (
                 <span 
                   className="absolute -inset-1 rounded-full animate-ping opacity-40"
@@ -281,7 +267,6 @@ export default function HeroSection({ theme, onDesignClick }: HeroSectionProps) 
                 />
               )}
               
-              {/* Small badge to attract attention */}
               {isPulsing && (
                 <span className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-[8px] font-bold animate-bounce"
                   style={{

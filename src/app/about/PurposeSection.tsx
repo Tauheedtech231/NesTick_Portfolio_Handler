@@ -177,34 +177,20 @@ const PurposeCard: React.FC<{
   data: CardData; 
   isInView: boolean; 
   theme: 'light' | 'dark';
-  direction: 'left' | 'right';
-}> = ({ data, isInView, theme, direction }) => {
+}> = ({ data, isInView, theme }) => {
   const textColor = theme === 'dark' ? '#fff' : '#1A2332';
-  const bodyColor = theme === 'dark' ? '#7a8daa' : '#4A5B6E';
+  const bodyColor = theme === 'dark' ? '#FFFFFF' : '#000000'; // Full White in dark, Full Black in light
   const bgColor = theme === 'dark' ? 'transparent' : '#FFFFFF';
   const shadowColor = theme === 'dark' ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.06)';
   const borderColor = theme === 'dark' ? 'none' : '1px solid rgba(0, 0, 0, 0.04)';
 
-  const initialX = direction === 'left' ? -120 : 120;
-  const delay = direction === 'left' ? 0.2 : 0.3;
-
-  // Border radius based on direction - only round outer edges
-  let borderRadius = '0px';
-  if (theme === 'light') {
-    if (direction === 'left') {
-      borderRadius = '16px 0 0 16px'; // Round left side only
-    } else {
-      borderRadius = '0 16px 16px 0'; // Round right side only
-    }
-  }
-
   return (
     <motion.div
-      initial={{ opacity: 0, x: initialX }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: initialX }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
       transition={{ 
         duration: 0.8,
-        delay: delay,
+        delay: 0.2,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
       style={{
@@ -214,7 +200,7 @@ const PurposeCard: React.FC<{
         padding: theme === 'light' ? "32px 28px" : "0 20px",
         width: "100%",
         background: bgColor,
-        borderRadius: borderRadius,
+        borderRadius: "16px",
         boxShadow: theme === 'light' ? shadowColor : 'none',
         border: theme === 'light' ? borderColor : 'none',
         transition: "all 0.3s ease",
@@ -281,7 +267,7 @@ const PurposeCard: React.FC<{
           color: bodyColor,
           lineHeight: 1.7,
           fontWeight: 400,
-          maxWidth: "480px",
+          maxWidth: "100%",
           transition: "color 0.3s ease",
           width: "100%",
         }}
@@ -323,32 +309,35 @@ export function PurposeSection() {
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+
+  // ✅ Gold in dark, Chocolate in light
+  const accentColor = isDark ? "#E8CA5E" : "#7B3F00";
+  const blueColor = "#0066FF";
+
   const missionData: CardData = {
     label: "Our Mission",
     title: "Empowering\nEducation",
     body: "To empower educational institutions with cutting-edge portfolio management technology that simplifies administration, enhances student visibility, and creates lasting digital legacies for academic achievements.",
-    accentColor: "#E8CA5E",
-    labelColor: "#E8CA5E",
-    icon: <TargetIcon color="#c49b2a" />,
+    accentColor: accentColor, // ✅ Chocolate in light
+    labelColor: accentColor, // ✅ Chocolate in light
+    icon: <TargetIcon color={isDark ? "#c49b2a" : "#5a2d00"} />,
   };
 
   const visionData: CardData = {
     label: "Our Vision",
     title: "Shaping\nthe Future",
     body: "To become the global standard for educational portfolio management, connecting institutions, students, and opportunities through innovative technology that showcases potential and celebrates achievement.",
-    accentColor: "#0066FF",
-    labelColor: "#0066FF",
-    icon: <EyeIcon color="#0066FF" />,
+    accentColor: blueColor, // ✅ Blue stays Blue
+    labelColor: blueColor, // ✅ Blue stays Blue
+    icon: <EyeIcon color={blueColor} />,
   };
 
   // Theme-based colors
-  const bgColor = theme === 'dark' ? "#0B0F19" : "#F4F7FC";
-  const textColor = theme === 'dark' ? '#fff' : '#1A2332';
-  const mutedColor = theme === 'dark' ? '#8899bb' : '#6B7A8F';
-  const centerDotColor = theme === 'dark' ? '#E8CA5E' : '#0066FF';
-  const centerLineColor = theme === 'dark' 
-    ? "linear-gradient(to bottom, transparent 0%, #2a4080 20%, #E8CA5E 50%, #2a4080 80%, transparent 100%)"
-    : "linear-gradient(to bottom, transparent 0%, #d1d9e8 20%, #0066FF 50%, #d1d9e8 80%, transparent 100%)";
+  const bgColor = isDark ? "#0B0F19" : "#F4F7FC";
+  const textColor = isDark ? '#fff' : '#1A2332';
+  const mutedColor = isDark ? '#8899bb' : '#6B7A8F';
+  const centerDotColor = accentColor; // ✅ Chocolate in light
 
   // Header animation
   const headerVariants: Variants = {
@@ -369,7 +358,7 @@ export function PurposeSection() {
       style={{
         background: bgColor,
         minHeight: "450px",
-        padding: theme === 'light' ? "60px 20px 70px" : "40px 20px 50px",
+        padding: isDark ? "40px 20px 50px" : "60px 20px 70px",
         marginTop: "4rem", 
         fontFamily: "'Inter', sans-serif",
         position: "relative",
@@ -380,7 +369,7 @@ export function PurposeSection() {
       }}
     >
       {/* Subtle background gradient for light mode */}
-      {theme === 'light' && (
+      {!isDark && (
         <div style={{
           position: "absolute",
           top: "-50%",
@@ -443,7 +432,7 @@ export function PurposeSection() {
           margin: 0,
           transition: "color 0.3s ease",
         }}>
-          Purpose & <span style={{ color: theme === 'dark' ? "#E8CA5E" : "#0066FF" }}>Impact</span>
+          Purpose & <span style={{ color: accentColor }}>Impact</span>
         </h1>
       </motion.div>
 
@@ -465,7 +454,7 @@ export function PurposeSection() {
         <div style={{ 
           width: "26px", 
           height: "2.5px", 
-          background: theme === 'dark' ? "#E8CA5E" : "#0066FF", 
+          background: accentColor, 
           borderRadius: "2px",
           opacity: 0.6,
         }} />
@@ -480,21 +469,21 @@ export function PurposeSection() {
         <div style={{ 
           width: "26px", 
           height: "2.5px", 
-          background: theme === 'dark' ? "#5b9bff" : "#0066FF", 
+          background: blueColor, 
           borderRadius: "2px",
           opacity: 0.6,
         }} />
       </motion.div>
 
-      {/* Mission & Vision - Responsive Grid */}
+      {/* ─── MISSION & VISION - ONE DIV, FULL WIDTH ─── */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1px 1fr",
-          gap: "0",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "40px",
           maxWidth: "1100px",
           margin: "0 auto",
-          alignItems: "start",
+          alignItems: "stretch",
           position: "relative",
           zIndex: 1,
         }}
@@ -504,50 +493,12 @@ export function PurposeSection() {
           data={missionData} 
           isInView={isInView} 
           theme={theme} 
-          direction="left"
         />
-
-        {/* Center Line with Glowing Dot */}
-        <div
-          style={{
-            background: centerLineColor,
-            position: "relative",
-            alignSelf: "stretch",
-            width: "2px",
-            margin: "0 auto",
-            transition: "background 0.6s ease",
-          }}
-          className="center-line"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
-            transition={{ 
-              duration: 0.6,
-              delay: 0.5,
-              ease: [0.25, 0.46, 0.45, 0.94]
-            }}
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "12px",
-              height: "12px",
-              borderRadius: "50%",
-              background: centerDotColor,
-              boxShadow: `0 0 20px 5px ${centerDotColor}60`,
-              transition: "background 0.3s ease, box-shadow 0.3s ease",
-            }}
-            className="center-dot"
-          />
-        </div>
 
         <PurposeCard 
           data={visionData} 
           isInView={isInView} 
           theme={theme} 
-          direction="right"
         />
       </div>
 
@@ -556,15 +507,8 @@ export function PurposeSection() {
         @media (max-width: 1024px) {
           .purpose-grid {
             grid-template-columns: 1fr !important;
-            gap: 40px !important;
+            gap: 30px !important;
           }
-          .center-line {
-            display: none !important;
-          }
-          .center-dot {
-            display: none !important;
-          }
-          /* On mobile, both cards should have full rounded corners */
           .purpose-grid > div {
             border-radius: 16px !important;
           }
@@ -572,10 +516,10 @@ export function PurposeSection() {
 
         @media (max-width: 640px) {
           .purpose-grid {
-            gap: 30px !important;
+            gap: 20px !important;
           }
           .purpose-grid > div {
-            padding: 0 10px !important;
+            padding: 20px 16px !important;
           }
           .purpose-grid > div > div:first-child {
             flex-direction: column !important;
@@ -599,7 +543,7 @@ export function PurposeSection() {
             margin-top: 0.5rem !important;
           }
           .purpose-grid > div {
-            padding: 0 6px !important;
+            padding: 16px 12px !important;
           }
           .purpose-grid > div > div:first-child h3 {
             font-size: 16px !important;

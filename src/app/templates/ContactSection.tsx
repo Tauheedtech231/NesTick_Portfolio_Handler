@@ -118,8 +118,8 @@ export default function ContactSection() {
   const colors = {
     bg: isDark ? '#0B0F19' : '#F4F7FC',
     textPrimary: isDark ? '#FFFFFF' : '#1A2332',
-    textSecondary: isDark ? '#9CA3AF' : '#4A5B6E',
-    textMuted: isDark ? '#6B7280' : '#6B7A8F',
+    textSecondary: isDark ? '#FFFFFF' : '#000000',
+    textMuted: isDark ? '#9CA3AF' : '#4A5B6E',
     cardBg: isDark ? 'rgba(15, 23, 42, 0.8)' : '#FFFFFF',
     border: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)',
     accent: isDark ? GOLD : BLUE,
@@ -203,7 +203,6 @@ export default function ContactSection() {
       setSendState("idle");
       setValues({});
       
-      // Focus first field after form opens
       setTimeout(() => {
         inputRefs.current["fname"]?.focus();
       }, 400);
@@ -246,7 +245,7 @@ export default function ContactSection() {
   return (
     <section
       ref={sectionRef}
-      className={`${inter.variable} ${fraunces.variable} relative max-w-[1360px] mx-auto px-3 sm:px-8 md:px-16 pt-6 sm:pt-12 pb-8 sm:pb-16 md:pb-24 overflow-visible transition-all duration-700 ease-in-out`}
+      className={`${inter.variable} ${fraunces.variable} relative w-full max-w-full px-0 py-6 sm:py-12 pb-8 sm:pb-16 md:pb-24 overflow-visible transition-all duration-700 ease-in-out`}
       style={{ 
         fontFamily: "var(--font-inter), sans-serif", 
         background: colors.sectionBg, 
@@ -257,22 +256,27 @@ export default function ContactSection() {
       }}
       onKeyDown={handleKeyDown}
     >
-      {/* Eyebrow */}
-      <div className="flex items-center gap-3 text-[10px] sm:text-[13px] font-semibold tracking-[0.16em] uppercase mb-3 sm:mb-5 md:mb-7 transition-colors duration-300">
-        <span className="w-5 sm:w-6 h-px inline-block" style={{ background: colors.accent }} />
-        <span style={{ color: colors.accent }}>Say hello</span>
+      <div className="px-3 sm:px-8 md:px-16">
+        {/* Eyebrow */}
+        <div className="flex items-center gap-3 text-[10px] sm:text-[13px] font-semibold tracking-[0.16em] uppercase mb-3 sm:mb-5 md:mb-7 transition-colors duration-300">
+          <span className="w-5 sm:w-6 h-px inline-block" style={{ background: colors.accent }} />
+          <span style={{ color: colors.accent }}>Say hello</span>
+        </div>
       </div>
 
-      {/* Main card */}
+      {/* Main card - Full width with NO gap on edges */}
       <div 
-        className="rounded-[20px] sm:rounded-[24px] md:rounded-[32px] border px-3 sm:px-7 md:px-14 py-4 sm:py-6 md:py-12 transition-all duration-300"
+        className="rounded-[20px] sm:rounded-[24px] md:rounded-[32px] border px-3 sm:px-7 md:px-14 py-4 sm:py-6 md:py-12 transition-all duration-300 w-full mx-0"
         style={{
           background: colors.cardBg,
           borderColor: colors.border,
           boxShadow: colors.shadow,
+          borderRadius: '0', // No rounded corners on left/right
+          borderLeft: 'none',
+          borderRight: 'none',
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] items-center gap-6 lg:gap-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] items-center gap-6 lg:gap-0 w-full">
           {/* ---------------- LEFT ---------------- */}
           <div className="relative z-[3] pr-0 lg:pr-14 ml-15 sm:ml-0 md:-mt-6">
             <h1
@@ -281,7 +285,7 @@ export default function ContactSection() {
                 fontFamily: "var(--font-fraunces), serif", 
                 fontWeight: 500, 
                 color: colors.textPrimary,
-                fontStyle: 'normal', // Removed italic
+                fontStyle: 'normal',
               }}
             >
               Let&rsquo;s start
@@ -462,7 +466,7 @@ export default function ContactSection() {
                     </div>
                   </div>
 
-                  {/* FORM SCREEN - ALL FIELDS VISIBLE AT ONCE */}
+                  {/* FORM SCREEN */}
                   <div
                     className={`absolute inset-0 rounded-[26px] sm:rounded-[30px] md:rounded-[36px] flex flex-col z-30 overflow-hidden transition-transform duration-700 ease-out ${
                       formOpen ? "translate-y-0" : "translate-y-full"
@@ -506,7 +510,7 @@ export default function ContactSection() {
                       </button>
                     </div>
 
-                    {/* Form Body - ALL FIELDS VISIBLE AT ONCE */}
+                    {/* Form Body */}
                     <form
                       onSubmit={handleSubmit}
                       className="flex-1 px-3 sm:px-[22px] pt-2 sm:pt-3 pb-2 sm:pb-3 flex flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -575,7 +579,7 @@ export default function ContactSection() {
                         ))}
                       </div>
 
-                      {/* Submit Button - Always visible when form is open */}
+                      {/* Submit Button */}
                       <div className="flex-shrink-0 mt-1.5 sm:mt-2">
                         <button
                           type="submit"

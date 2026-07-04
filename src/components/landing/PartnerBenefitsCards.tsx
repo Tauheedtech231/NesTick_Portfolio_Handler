@@ -101,8 +101,8 @@ export function PartnerBenefitsCards({
   benefits, 
   theme, 
   isInView,
-  activeColor = '#2563EB', // Changed to brand blue
-  shadowColor = 'rgba(37, 99, 235, 0.15)' // Lighter, subtle shadow
+  activeColor = '#0066FF', // Brand Blue
+  shadowColor = 'rgba(0, 102, 255, 0.15)'
 }: PartnerBenefitsCardsProps) {
   const BENEFITS = benefits || DEFAULT_BENEFITS;
   const areaRef = useRef<HTMLDivElement>(null);
@@ -139,35 +139,31 @@ export function PartnerBenefitsCards({
     return () => window.removeEventListener("resize", recalculate);
   }, [recalculate]);
 
-  // ===== DESIGNER CHANGES START HERE =====
+  // ===== THEME COLORS =====
 
   // 1️⃣ Light Theme - Depth & Contrast with gradients
   const getBgColor = () => {
     if (theme === 'dark') return '#0B0F19';
-    // Light theme: subtle gradient for depth instead of flat #F5F5F5
     return 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)';
   };
 
   // 2️⃣ Card Background - Clean white with subtle gradient
   const getCardBg = () => {
     if (theme === 'dark') return 'rgba(15, 23, 42, 0.85)';
-    // Light theme: pure white with subtle gradient for premium feel
     return 'rgba(255, 255, 255, 0.95)';
   };
 
   // 3️⃣ Card Border - Subtle & refined
   const getBorderColor = () => {
     if (theme === 'dark') return 'rgba(30, 41, 59, 0.4)';
-    // Light theme: very subtle border
     return 'rgba(0, 0, 0, 0.06)';
   };
 
-  // 4️⃣ Card Shadow - Layered shadows for depth (not flat)
+  // 4️⃣ Card Shadow - Layered shadows for depth
   const getCardShadow = () => {
     if (theme === 'dark') {
       return '0 4px 24px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)';
     }
-    // Light theme: multi-layered shadows for depth
     return '0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(37, 99, 235, 0.06), 0 2px 8px rgba(0,0,0,0.04)';
   };
 
@@ -176,24 +172,39 @@ export function PartnerBenefitsCards({
     if (theme === 'dark') {
       return '0 8px 40px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2)';
     }
-    // Light theme: elevated shadow on hover
     return '0 8px 40px rgba(37, 99, 235, 0.10), 0 4px 16px rgba(0,0,0,0.06)';
   };
 
   // 6️⃣ Text Colors - Better contrast
   const getTextColor = () => {
     if (theme === 'dark') return '#F1F5F9';
-    // Light theme: darker for better contrast
     return '#0F172A';
   };
 
   const getTextMuted = () => {
     if (theme === 'dark') return '#94A3B8';
-    // Light theme: slate color for better readability
     return '#475569';
   };
 
-  // 7️⃣ Card Dimensions
+  // ✅ 7️⃣ Icon Color - Uses activeColor for both modes
+  const getIconColor = () => {
+    // In dark mode, use a slightly lighter version for better visibility
+    if (theme === 'dark') {
+      // If activeColor is a hex, make it lighter
+      return activeColor;
+    }
+    return activeColor;
+  };
+
+  // ✅ 8️⃣ Icon Background - Subtle glow
+  const getIconBg = () => {
+    if (theme === 'dark') {
+      return `${activeColor}15`;
+    }
+    return `${activeColor}08`;
+  };
+
+  // 9️⃣ Card Dimensions
   const getCardDimensions = () => {
     if (isMobile) {
       return { width: 110, height: 130 };
@@ -259,7 +270,6 @@ export function PartnerBenefitsCards({
       className="w-full rounded-xl px-5 pt-6 pb-10 relative overflow-visible"
       style={{ 
         background: getBgColor(),
-        // Subtle inner shadow for depth
         boxShadow: theme === 'light' ? 'inset 0 1px 0 rgba(255,255,255,0.8)' : 'none'
       }}
     >
@@ -295,10 +305,8 @@ export function PartnerBenefitsCards({
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  // 8️⃣ Multi-layered shadow for depth
                   boxShadow: getCardShadow(),
                 }}
-                // 9️⃣ Hover styles using CSS custom properties
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = getCardHoverShadow();
                   e.currentTarget.style.borderColor = theme === 'light' ? 'rgba(37, 99, 235, 0.15)' : 'rgba(37, 99, 235, 0.3)';
@@ -308,7 +316,7 @@ export function PartnerBenefitsCards({
                   e.currentTarget.style.borderColor = getBorderColor();
                 }}
               >
-                {/* 🔟 Subtle gradient glow - only on hover */}
+                {/* Subtle gradient glow - only on hover */}
                 <div 
                   className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
@@ -317,11 +325,11 @@ export function PartnerBenefitsCards({
                   }}
                 />
 
-                {/* Icon with brand color */}
+                {/* ✅ Icon with active color - properly handled for both modes */}
                 <div 
                   className="relative z-10 mb-1.5 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    color: theme === 'light' ? activeColor : '#60A5FA',
+                    color: getIconColor(), // Uses activeColor
                   }}
                 >
                   {benefit.icon && <benefit.icon size={isMobile ? 20 : 28} strokeWidth={1.8} />}

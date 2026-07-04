@@ -129,8 +129,9 @@ export default function PortalArchitecture() {
     return isDark ? '#FFFFFF' : '#1F2937';
   };
 
+  // ✅ CHANGED: Full Black in light, Full White in dark
   const getTextSecondary = () => {
-    return isDark ? '#9CA3AF' : '#4B5563';
+    return isDark ? '#FFFFFF' : '#000000';
   };
 
   const getCardShadow = () => {
@@ -271,7 +272,8 @@ export default function PortalArchitecture() {
             </span>
           </h3>
           
-          <p className="max-w-3xl mx-auto font-light"
+          {/* ✅ CHANGED: Full Black in light, Full White in dark - Larger font */}
+          <p className="max-w-3xl mx-auto font-light text-base md:text-lg"
             style={{ 
               color: getTextSecondary(),
               fontFamily: "'Calibri Light', sans-serif",
@@ -352,8 +354,8 @@ export default function PortalArchitecture() {
                 style={{ backgroundColor: colors.accent, opacity: 0.6 }}
               />
 
-              {/* Description */}
-              <p className="text-sm text-center leading-relaxed mb-4 max-w-[220px]"
+              {/* ✅ CHANGED: Description - Full Black in light, Full White in dark - Larger font */}
+              <p className="text-base text-center leading-relaxed mb-4 max-w-[220px]"
                 style={{ 
                   color: getTextSecondary(),
                   fontFamily: "'Calibri Light', sans-serif",

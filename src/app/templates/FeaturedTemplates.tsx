@@ -41,23 +41,24 @@ export default function FeaturedTemplates({
 
   const isDark = theme === 'dark';
   
+  // Colors
+  const GOLD = '#E8CA5E';
+  const BLUE = '#0066FF';
+  const CHOCOLATE = '#7B3F00';
+  
   // Light mode: Clean white, Dark mode: Dark background
   const bgColor = isDark ? '#0B0F19' : '#FFFFFF';
   const bgSecondary = isDark ? '#0B0F19' : '#F8F9FA';
   
-  const textPrimary = isDark ? '#FFFFFF' : '#1F2937';
-  const textSecondary = isDark ? '#9CA3AF' : '#6B7280';
-  const textMuted = isDark ? '#6B7280' : '#9CA3AF';
+  // ✅ FULL BLACK in light, FULL WHITE in dark
+  const textPrimary = isDark ? '#FFFFFF' : '#000000';
+  const textSecondary = isDark ? '#FFFFFF' : '#000000';
+  const textMuted = isDark ? '#9CA3AF' : '#6B7280';
   
-  const goldColor = '#E8CA5E';
-  const blueColor = '#0066FF';
-  
-  // Light mode: Subtle borders, Dark mode: Slightly visible
+  const accentColor = isDark ? GOLD : CHOCOLATE; // Chocolate in light mode for tabs
   const borderColor = isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
   const borderLight = isDark ? 'rgba(30, 41, 59, 0.3)' : 'rgba(0, 0, 0, 0.04)';
-  
-  // Light mode: Very subtle accent
-  const accentLight = isDark ? 'rgba(232, 202, 94, 0.12)' : 'rgba(0, 102, 255, 0.06)';
+  const accentLight = isDark ? 'rgba(232, 202, 94, 0.12)' : 'rgba(123, 63, 0, 0.06)';
 
   const isImageLeft = currentIndex % 2 === 0;
 
@@ -113,7 +114,7 @@ export default function FeaturedTemplates({
           <span
             className="text-[8px] md:text-[9px] font-semibold tracking-[1.5px] uppercase px-3 py-1 rounded-full border"
             style={{
-              color: isDark ? goldColor : blueColor,
+              color: isDark ? GOLD : BLUE,
               borderColor: isDark ? 'rgba(232, 202, 94, 0.3)' : 'rgba(0, 102, 255, 0.2)',
               backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(0, 102, 255, 0.06)',
             }}
@@ -132,6 +133,7 @@ export default function FeaturedTemplates({
           {currentTemplate.name}
         </h2>
 
+        {/* ✅ FULL BLACK in light, FULL WHITE in dark */}
         <p className="text-xs md:text-sm leading-relaxed mb-4 md:mb-5 max-w-md" style={{ color: textSecondary }}>
           {currentTemplate.description}
         </p>
@@ -146,13 +148,13 @@ export default function FeaturedTemplates({
             <div key={i} className="flex items-start gap-2.5">
               <span
                 className="text-[8px] md:text-[10px] mt-0.5"
-                style={{ color: isDark ? goldColor : blueColor }}
+                style={{ color: isDark ? GOLD : BLUE }}
               >
                 ●
               </span>
               <span
                 className="text-[11px] md:text-[12.5px]"
-                style={{ color: isDark ? '#D1D5DB' : '#4B5563' }}
+                style={{ color: textSecondary }}
               >
                 {feature}
               </span>
@@ -188,7 +190,7 @@ export default function FeaturedTemplates({
               <div
                 key={i}
                 className="flex items-center gap-1.5 text-[9px] md:text-[10.5px]"
-                style={{ color: isDark ? '#9CA3AF' : '#6B7280' }}
+                style={{ color: textSecondary }}
               >
                 <span
                   className="text-[7px] md:text-[8px]"
@@ -206,7 +208,7 @@ export default function FeaturedTemplates({
           onClick={() => onBuyNowClick(currentTemplate)}
           className="px-6 md:px-8 py-2.5 md:py-3 rounded-full text-xs md:text-sm font-semibold transition-all hover:scale-105 active:scale-95 w-fit cursor-pointer shadow-lg"
           style={{
-            backgroundColor: isDark ? goldColor : blueColor,
+            backgroundColor: isDark ? GOLD : BLUE,
             color: isDark ? '#1F4381' : '#FFFFFF',
             boxShadow: isDark 
               ? '0 4px 20px rgba(232,202,94,0.3)'
@@ -240,7 +242,7 @@ export default function FeaturedTemplates({
       >
         <div
           className="text-base md:text-lg"
-          style={{ color: goldColor }}
+          style={{ color: GOLD }}
         >
           ★
         </div>
@@ -255,7 +257,7 @@ export default function FeaturedTemplates({
         <div
           className="text-[6px] md:text-[7px] font-bold tracking-[2px] uppercase leading-none"
           style={{
-            color: isDark ? goldColor : blueColor,
+            color: isDark ? GOLD : BLUE,
             writingMode: 'vertical-rl',
             letterSpacing: '2px',
           }}
@@ -326,7 +328,7 @@ export default function FeaturedTemplates({
             }`}
             style={{
               backgroundColor: index === currentIndex
-                ? goldColor
+                ? (isDark ? GOLD : CHOCOLATE)
                 : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'),
             }}
           />
@@ -347,7 +349,7 @@ export default function FeaturedTemplates({
               }`}
               style={{
                 backgroundColor: index === currentIndex
-                  ? goldColor
+                  ? (isDark ? GOLD : CHOCOLATE)
                   : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.12)'),
               }}
             />
@@ -385,13 +387,13 @@ export default function FeaturedTemplates({
                   index === currentIndex
                     ? isDark
                       ? 'rgba(232, 202, 94, 0.1)'
-                      : 'rgba(0, 102, 255, 0.06)'
+                      : 'rgba(123, 63, 0, 0.06)' // Chocolate tint
                     : 'transparent',
                 borderColor:
                   index === currentIndex
                     ? isDark
                       ? '#E8CA5E'
-                      : '#0066FF'
+                      : '#7B3F00' // Chocolate border
                     : 'transparent',
                 borderWidth: '1px',
               }}
@@ -403,7 +405,7 @@ export default function FeaturedTemplates({
                     index === currentIndex
                       ? isDark
                         ? 'rgba(232, 202, 94, 0.15)'
-                        : 'rgba(0, 102, 255, 0.08)'
+                        : 'rgba(123, 63, 0, 0.08)' // Chocolate tint
                       : isDark
                       ? 'rgba(30, 41, 59, 0.5)'
                       : 'rgba(0,0,0,0.04)',
@@ -411,14 +413,14 @@ export default function FeaturedTemplates({
                     index === currentIndex
                       ? isDark
                         ? 'rgba(232, 202, 94, 0.3)'
-                        : 'rgba(0, 102, 255, 0.2)'
+                        : 'rgba(123, 63, 0, 0.2)' // Chocolate border
                       : isDark
                       ? 'rgba(30, 41, 59, 0.3)'
                       : 'rgba(0,0,0,0.06)'
                   }`,
                   color:
                     index === currentIndex
-                      ? isDark ? goldColor : blueColor
+                      ? isDark ? GOLD : CHOCOLATE // Chocolate text in light
                       : isDark
                       ? '#9CA3AF'
                       : '#6B7280',
@@ -440,7 +442,7 @@ export default function FeaturedTemplates({
                       index === currentIndex
                         ? isDark
                           ? '#FFFFFF'
-                          : '#1F2937'
+                          : '#000000' // Full Black in light
                         : isDark
                         ? '#9CA3AF'
                         : '#6B7280',
@@ -468,8 +470,8 @@ export default function FeaturedTemplates({
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-medium"
               style={{
-                backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(232, 202, 94, 0.06)',
-                color: isDark ? goldColor : blueColor,
+                backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(0, 102, 255, 0.06)',
+                color: isDark ? GOLD : BLUE,
                 border: `1px solid ${isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)'}`,
               }}
             >
@@ -480,7 +482,7 @@ export default function FeaturedTemplates({
             className="text-[8px] md:text-[10px] font-medium px-2.5 md:px-3 py-1 md:py-1.5 rounded-full"
             style={{
               backgroundColor: isDark ? 'rgba(232, 202, 94, 0.1)' : 'rgba(0, 102, 255, 0.06)',
-              color: isDark ? goldColor : blueColor,
+              color: isDark ? GOLD : BLUE,
               border: `1px solid ${isDark ? 'rgba(232, 202, 94, 0.2)' : 'rgba(0, 102, 255, 0.15)'}`,
             }}
           >
@@ -518,7 +520,7 @@ export default function FeaturedTemplates({
             label: '4.9', 
             sub: 'Rating',
             icon: '★',
-            color: goldColor
+            color: GOLD
           },
           { 
             label: '98%', 
@@ -530,13 +532,13 @@ export default function FeaturedTemplates({
             label: 'May 12', 
             sub: 'Updated',
             icon: '→',
-            color: isDark ? '#E8CA5E' : '#0066FF'
+            color: isDark ? GOLD : BLUE
           },
           { 
             label: '1,200+', 
             sub: 'Customers',
             icon: '●',
-            color: isDark ? '#E8CA5E' : '#0066FF'
+            color: isDark ? GOLD : BLUE
           },
         ].map((stat, i) => (
           <div
@@ -554,13 +556,13 @@ export default function FeaturedTemplates({
             </div>
             <div
               className="text-[11px] md:text-[13px] font-bold mt-0.5"
-              style={{ color: isDark ? '#FFFFFF' : '#1F2937' }}
+              style={{ color: textPrimary }}
             >
               {stat.label}
             </div>
             <div
               className="text-[8px] md:text-[9.5px]"
-              style={{ color: isDark ? '#6B7280' : '#9CA3AF' }}
+              style={{ color: textMuted }}
             >
               {stat.sub}
             </div>

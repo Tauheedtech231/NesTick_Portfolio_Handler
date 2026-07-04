@@ -117,8 +117,14 @@ export default function PackagesSection() {
 
   const isDark = theme === 'dark';
   const GOLD = '#E8CA5E';
+  const CHOCOLATE = '#7B3F00'; // Added for icon shadows in light mode
   const BLUE = '#0066FF';
+  
+  // Accent: Gold in dark, Blue in light (unchanged)
   const accentColor = isDark ? GOLD : BLUE;
+  
+  // Icon shadow color: Gold shadow in dark, Chocolate shadow in light
+  const iconShadowColor = isDark ? 'rgba(232, 202, 94, 0.4)' : 'rgba(123, 63, 0, 0.25)';
   
   const getSectionBg = () => {
     return isDark ? '#0B0F19' : '#F8FAFF';
@@ -148,11 +154,12 @@ export default function PackagesSection() {
     return isDark ? '#FFFFFF' : '#1F2937';
   };
 
+  // ✅ CHANGED: Full Black in light, Full White in dark
   const getTextMuted = () => {
-    return isDark ? '#9CA3AF' : '#4B5563';
+    return isDark ? '#FFFFFF' : '#000000';
   };
 
-  // 3D Icon Component with Continuous Floating
+  // 3D Icon Component with Continuous Floating - UPDATED for Chocolate shadow
   const ThreeDIcon = ({ icon: Icon, gradient, shadowColor }: any) => {
     return (
       <motion.div 
@@ -166,11 +173,11 @@ export default function PackagesSection() {
           ease: "easeInOut",
         }}
       >
-        {/* 3D Shadow/Depth Effect */}
+        {/* 3D Shadow/Depth Effect - UPDATED: Chocolate in light mode */}
         <div 
           className="absolute inset-0 rounded-full blur-md transition-all duration-300 group-hover:blur-lg group-hover:scale-110"
           style={{ 
-            background: `radial-gradient(ellipse, ${shadowColor}, transparent)`,
+            background: `radial-gradient(ellipse, ${isDark ? shadowColor : 'rgba(123, 63, 0, 0.25)'}, transparent)`,
             transform: 'translateY(4px) rotateX(5deg)',
           }}
         />
@@ -180,7 +187,7 @@ export default function PackagesSection() {
           className="relative w-full h-full rounded-full flex items-center justify-center cursor-pointer"
           style={{
             background: `linear-gradient(135deg, ${gradient})`,
-            boxShadow: `0 8px 32px ${shadowColor}`,
+            boxShadow: `0 8px 32px ${isDark ? shadowColor : 'rgba(123, 63, 0, 0.2)'}`,
             transform: 'perspective(400px) rotateX(8deg) rotateY(-5deg)',
             transformStyle: 'preserve-3d',
           }}
@@ -188,7 +195,7 @@ export default function PackagesSection() {
             rotateX: 0,
             rotateY: 0,
             scale: 1.05,
-            boxShadow: `0 12px 40px ${shadowColor}`,
+            boxShadow: `0 12px 40px ${isDark ? shadowColor : 'rgba(123, 63, 0, 0.3)'}`,
             transition: { duration: 0.3, ease: "easeOut" }
           }}
           whileTap={{
@@ -297,6 +304,7 @@ export default function PackagesSection() {
               </span>
             </h2>
             
+            {/* ✅ CHANGED: Full Black in light, Full White in dark */}
             <p className="text-lg md:text-xl font-light"
               style={{ 
                 color: getTextMuted(),
@@ -390,6 +398,7 @@ export default function PackagesSection() {
                       {pkg.price}
                     </span>
                   </div>
+                  {/* ✅ CHANGED: Full Black in light, Full White in dark */}
                   <p className="text-sm"
                     style={{ 
                       color: getTextMuted(),
@@ -417,8 +426,9 @@ export default function PackagesSection() {
                           )}
                         </div>
                         <FeatureIcon className="w-3.5 h-3.5" style={{ color: feature.included ? accentColor : '#6B7280' }} />
+                        {/* ✅ CHANGED: Full Black in light, Full White in dark */}
                         <span style={{ 
-                          color: feature.included ? (isDark ? '#D1D5DB' : '#4B5563') : '#6B7280',
+                          color: feature.included ? (isDark ? '#FFFFFF' : '#000000') : '#6B7280',
                           fontFamily: "'Calibri Light', sans-serif",
                         }}>
                           {feature.text}

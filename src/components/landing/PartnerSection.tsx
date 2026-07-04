@@ -47,56 +47,63 @@ import { PartnerWhyChoose } from '@/components/landing/PartnerWhyChoose';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 
-// 5 Partner Types - UPDATED: Business Dev = Gold, rest = Blue
+// ==========================================
+// BRAND COLORS
+// ==========================================
+const GOLD = "#E8CA5E";
+const CHOCOLATE = "#7B3F00";
+const BLUE = "#0066FF";
+
+// 5 Partner Types - Business Dev uses Chocolate in light mode
 const partnerTypes = [
-  { value: 'designer', label: 'Designer', icon: Palette, color: '#0066FF' },
-  { value: 'developer', label: 'Developer', icon: Code2, color: '#0066FF' },
-  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: '#E8CA5E' },
-  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: '#0066FF' },
-  { value: 'sales', label: 'Sales Person', icon: Target, color: '#0066FF' },
+  { value: 'designer', label: 'Designer', icon: Palette, color: BLUE },
+  { value: 'developer', label: 'Developer', icon: Code2, color: BLUE },
+  { value: 'business_dev', label: 'Business Developer', icon: TrendingUp, color: CHOCOLATE },
+  { value: 'marketing_agency', label: 'Marketing Agency', icon: Megaphone, color: BLUE },
+  { value: 'sales', label: 'Sales Person', icon: Target, color: BLUE },
 ];
 
 // ─── BENEFITS DATA ──────────────────────────────────────────
 const partnerBenefitsMap = {
   designer: [
-    { icon: Palette, title: "Creative Freedom", description: "Express your artistic vision without limits.", color: "#0066FF" },
-    { icon: Award, title: "60% Revenue Share", description: "Earn competitive commissions on every sale.", color: "#E8CA5E" },
-    { icon: Globe, title: "Global Exposure", description: "Showcase your work to institutions worldwide.", color: "#0066FF" },
-    { icon: Users, title: "Direct Client Access", description: "Connect and collaborate with clients directly.", color: "#E8CA5E" },
-    { icon: Star, title: "Featured Spotlight", description: "Get highlighted as a top designer.", color: "#0066FF" },
-    { icon: Rocket, title: "Early Access", description: "Be the first to try new design tools.", color: "#E8CA5E" },
+    { icon: Palette, title: "Creative Freedom", description: "Express your artistic vision without limits.", color: BLUE },
+    { icon: Award, title: "60% Revenue Share", description: "Earn competitive commissions on every sale.", color: GOLD },
+    { icon: Globe, title: "Global Exposure", description: "Showcase your work to institutions worldwide.", color: BLUE },
+    { icon: Users, title: "Direct Client Access", description: "Connect and collaborate with clients directly.", color: GOLD },
+    { icon: Star, title: "Featured Spotlight", description: "Get highlighted as a top designer.", color: BLUE },
+    { icon: Rocket, title: "Early Access", description: "Be the first to try new design tools.", color: GOLD },
   ],
   developer: [
-    { icon: Code2, title: "70% Revenue Share", description: "Highest commission rate on template sales.", color: "#0066FF" },
-    { icon: Clock, title: "Flexible Schedule", description: "Work on your own terms and timeline.", color: "#E8CA5E" },
-    { icon: Globe, title: "Global Clients", description: "Access to international client base.", color: "#0066FF" },
-    { icon: Shield, title: "Technical Support", description: "Dedicated mentorship and support team.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Early Payments", description: "Get paid faster with milestone bonuses.", color: "#0066FF" },
-    { icon: Users, title: "Developer Community", description: "Join 100+ experienced developers.", color: "#E8CA5E" },
+    { icon: Code2, title: "70% Revenue Share", description: "Highest commission rate on template sales.", color: BLUE },
+    { icon: Clock, title: "Flexible Schedule", description: "Work on your own terms and timeline.", color: GOLD },
+    { icon: Globe, title: "Global Clients", description: "Access to international client base.", color: BLUE },
+    { icon: Shield, title: "Technical Support", description: "Dedicated mentorship and support team.", color: GOLD },
+    { icon: DollarSign, title: "Early Payments", description: "Get paid faster with milestone bonuses.", color: BLUE },
+    { icon: Users, title: "Developer Community", description: "Join 100+ experienced developers.", color: GOLD },
   ],
   business_dev: [
-    { icon: Handshake, title: "Strategic Partnership", description: "Build long-term business relationships.", color: "#0066FF" },
-    { icon: TrendingUp, title: "Growth Potential", description: "Access to 500+ educational institutions.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Attractive Commission", description: "Earn recurring revenue from referrals.", color: "#0066FF" },
-    { icon: Users, title: "Wide Network", description: "Connect with industry leaders and influencers.", color: "#E8CA5E" },
-    { icon: Award, title: "Industry Recognition", description: "Become a trusted partner in EdTech.", color: "#0066FF" },
-    { icon: Rocket, title: "Co-creation", description: "Shape the future of educational technology.", color: "#E8CA5E" },
+    { icon: Handshake, title: "Strategic Partnership", description: "Build long-term business relationships.", color: BLUE },
+    { icon: TrendingUp, title: "Growth Potential", description: "Access to 500+ educational institutions.", color: GOLD },
+    { icon: DollarSign, title: "Attractive Commission", description: "Earn recurring revenue from referrals.", color: BLUE },
+    { icon: Users, title: "Wide Network", description: "Connect with industry leaders and influencers.", color: GOLD },
+    { icon: Award, title: "Industry Recognition", description: "Become a trusted partner in EdTech.", color: BLUE },
+    { icon: Rocket, title: "Co-creation", description: "Shape the future of educational technology.", color: GOLD },
   ],
   marketing_agency: [
-    { icon: Megaphone, title: "Marketing Reach", description: "Access to a growing market of institutions.", color: "#0066FF" },
-    { icon: Users, title: "Client Base", description: "Connect with schools, colleges, and universities.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Lucrative Commissions", description: "Earn competitive referral commissions.", color: "#0066FF" },
-    { icon: Globe, title: "Global Presence", description: "Expand your agency's footprint worldwide.", color: "#E8CA5E" },
-    { icon: Shield, title: "Priority Support", description: "Get dedicated account management.", color: "#0066FF" },
-    { icon: Award, title: "Agency Recognition", description: "Be featured as a preferred marketing partner.", color: "#E8CA5E" },
+    { icon: Megaphone, title: "Marketing Reach", description: "Access to a growing market of institutions.", color: BLUE },
+    { icon: Users, title: "Client Base", description: "Connect with schools, colleges, and universities.", color: GOLD },
+    { icon: DollarSign, title: "Lucrative Commissions", description: "Earn competitive referral commissions.", color: BLUE },
+    { icon: Globe, title: "Global Presence", description: "Expand your agency's footprint worldwide.", color: GOLD },
+    { icon: Shield, title: "Priority Support", description: "Get dedicated account management.", color: BLUE },
+    { icon: Award, title: "Agency Recognition", description: "Be featured as a preferred marketing partner.", color: GOLD },
   ],
   sales: [
-    { icon: Target, title: "Sales Commission", description: "Earn up to 40% commission on sales.", color: "#0066FF" },
-    { icon: Users, title: "Lead Generation", description: "Access to quality leads and prospects.", color: "#E8CA5E" },
-    { icon: DollarSign, title: "Recurring Income", description: "Build a steady stream of recurring revenue.", color: "#0066FF" },
-    { icon: Award, title: "Performance Bonuses", description: "Earn additional bonuses for top performance.", color: "#E8CA5E" },
-    { icon: Rocket, title: "Fast Track Growth", description: "Rapid career advancement opportunities.", color: "#0066FF" },
-    { icon: Globe, title: "Global Opportunities", description: "Work with institutions across the world.", color: "#E8CA5E" },
+    { icon: Target, title: "Sales Commission", description: "Earn up to 40% commission on sales.", color: BLUE },
+    { icon: Users, title: "Lead Generation", description: "Access to quality leads and prospects.", color: GOLD },
+    { icon: DollarSign, title: "Recurring Income", description: "Build a steady stream of recurring revenue.", color: BLUE },
+    { icon: Award, title: "Performance Bonuses", description: "Earn additional bonuses for top performance.", color: GOLD },
+    { icon: Rocket, title: "Fast Track Growth", description: "Rapid career advancement opportunities.", color: BLUE },
+    { icon: Globe, title: "Global Opportunities", description: "Work with institutions across the world.", color: GOLD },
   ],
 };
 
@@ -370,22 +377,42 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
     return () => observer.disconnect();
   }, []);
 
+  const isDark = theme === 'dark';
+
+  // ✅ Get active color based on selected tab and theme
+  const getActiveColor = () => {
+    const isBusinessDev = activeForm === 'business_dev';
+    if (isBusinessDev) {
+      return isDark ? GOLD : CHOCOLATE; // Gold in dark, Chocolate in light
+    }
+    return BLUE; // Blue for all other types
+  };
+
+  // ✅ Get accent color for tab buttons
+  const getTabAccentColor = (typeValue: string) => {
+    const isBusinessDev = typeValue === 'business_dev';
+    if (isBusinessDev) {
+      return isDark ? GOLD : CHOCOLATE;
+    }
+    return BLUE;
+  };
+
   // Theme colors - UPDATED for white mode
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F4F7FC';
-  const getCardBg = () => theme === 'dark' ? 'rgba(15, 23, 42, 0.4)' : '#FFFFFF';
-  const getBorderColor = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
-  const getTextColor = () => theme === 'dark' ? '#FFFFFF' : '#1A2332';
-  const getTextSecondary = () => theme === 'dark' ? '#D1D5DB' : '#4A5B6E';
-  const getTextMuted = () => theme === 'dark' ? '#9CA3AF' : '#6B7A8F';
-  const getAccentColor = () => '#0066FF';
-  const getAccentYellow = () => '#E8CA5E';
-  const getInputBg = () => theme === 'dark' ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF';
-  const getInputBorder = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : '#E5E7EB';
-  const getButtonBg = () => '#0066FF';
+  const getBgColor = () => isDark ? '#0B0F19' : '#F4F7FC';
+  const getCardBg = () => isDark ? 'rgba(15, 23, 42, 0.4)' : '#FFFFFF';
+  const getBorderColor = () => isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(0, 0, 0, 0.06)';
+  const getTextColor = () => isDark ? '#FFFFFF' : '#1A2332';
+  const getTextSecondary = () => isDark ? '#D1D5DB' : '#4A5B6E';
+  const getTextMuted = () => isDark ? '#9CA3AF' : '#6B7A8F';
+  const getAccentColor = () => BLUE;
+  const getAccentYellow = () => isDark ? GOLD : CHOCOLATE; // ✅ Gold in dark, Chocolate in light
+  const getInputBg = () => isDark ? 'rgba(11, 15, 25, 0.8)' : '#FFFFFF';
+  const getInputBorder = () => isDark ? 'rgba(30, 41, 59, 0.5)' : '#E5E7EB';
+  const getButtonBg = () => BLUE;
   const getButtonText = () => '#FFFFFF';
-  const getTabBg = () => theme === 'dark' ? 'rgba(30, 41, 59, 0.3)' : '#FFFFFF';
-  const getTabText = () => theme === 'dark' ? '#9CA3AF' : '#4A5B6E';
-  const getShadow = () => theme === 'dark' ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.06)';
+  const getTabBg = () => isDark ? 'rgba(30, 41, 59, 0.3)' : '#FFFFFF';
+  const getTabText = () => isDark ? '#9CA3AF' : '#4A5B6E';
+  const getShadow = () => isDark ? 'none' : '0 4px 24px rgba(0, 0, 0, 0.06)';
 
   const getInputStyle = () => ({
     width: '100%',
@@ -398,12 +425,12 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
     outline: 'none',
     transition: 'all 0.2s ease',
     fontFamily: "'Inter', sans-serif",
-    boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none',
+    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
   });
 
   const getInputHoverStyle = {
     borderColor: getAccentColor(),
-    boxShadow: theme === 'light' ? '0 4px 12px rgba(0, 102, 255, 0.08)' : 'none',
+    boxShadow: isDark ? 'none' : '0 4px 12px rgba(0, 102, 255, 0.08)',
   };
 
   // Get category content for each partner type
@@ -524,7 +551,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
     });
   };
 
-  // Submit handlers (unchanged - keep your existing API calls)
+  // Submit handlers
   const handleDesignerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -850,6 +877,8 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
     return partnerBenefitsMap[activeForm] || partnerBenefitsMap.designer;
   };
 
+  const activeColor = getActiveColor();
+
   return (
     <>
       <Navbar />
@@ -866,7 +895,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 mx-auto w-fit cursor-pointer"
               style={{
-                backgroundColor: theme === 'dark' ? 'rgba(0, 102, 255, 0.15)' : 'rgba(0, 102, 255, 0.08)',
+                backgroundColor: isDark ? 'rgba(0, 102, 255, 0.15)' : 'rgba(0, 102, 255, 0.08)',
               }}
             >
               <Handshake className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: getAccentColor() }} />
@@ -897,7 +926,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
             </p>
           </motion.div>
 
-          {/* Category Selection - 5 Tabs - UPDATED: White background for tabs */}
+          {/* Category Selection - 5 Tabs - UPDATED with active colors */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -908,7 +937,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
               const Icon = type.icon;
               const isActive = activeForm === type.value;
               const isGold = type.value === 'business_dev';
-              const accentColor = isGold ? '#E8CA5E' : '#0066FF';
+              const accentColor = isGold ? (isDark ? GOLD : CHOCOLATE) : BLUE;
               
               return (
                 <button
@@ -916,25 +945,25 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   onClick={() => setActiveForm(type.value as any)}
                   className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? 'shadow-lg scale-105'
+                      ? 'shadow-lg scale-105 text-white'
                       : 'hover:scale-102'
                   }`}
                   style={{
-                    backgroundColor: isActive ? accentColor : (theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : '#FFFFFF'),
-                    color: isActive ? '#FFFFFF' : (theme === 'dark' ? '#9CA3AF' : '#4A5B6E'),
-                    border: theme === 'light' && !isActive ? '1.5px solid #E5E7EB' : 'none',
-                    boxShadow: theme === 'light' && isActive ? `0 8px 24px ${accentColor}40` : (theme === 'light' ? '0 2px 8px rgba(0,0,0,0.04)' : 'none'),
+                    backgroundColor: isActive ? accentColor : (isDark ? 'rgba(30, 41, 59, 0.4)' : '#FFFFFF'),
+                    color: isActive ? '#FFFFFF' : (isDark ? '#9CA3AF' : '#4A5B6E'),
+                    border: isDark ? (isActive ? 'none' : 'none') : (isActive ? 'none' : '1.5px solid #E5E7EB'),
+                    boxShadow: isActive ? `0 8px 24px ${accentColor}40` : 'none',
                     fontFamily: "'Inter', sans-serif",
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.6)' : '#F9FAFB';
+                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(30, 41, 59, 0.6)' : '#F9FAFB';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : '#FFFFFF';
+                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(30, 41, 59, 0.4)' : '#FFFFFF';
                     }
                   }}
                 >
@@ -947,15 +976,16 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
 
           {/* Form Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {/* Left Side - Why Choose */}
+            {/* Left Side - Why Choose - Pass active color */}
             <PartnerWhyChoose
               activeForm={activeForm}
               theme={theme}
               isInView={isInView}
               categoryContent={categoryContent}
+              activeColor={activeColor}
             />
 
-            {/* Right Side - Forms - UPDATED: Card style */}
+            {/* Right Side - Forms */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -963,7 +993,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
               className="rounded-xl md:rounded-2xl p-5 md:p-8"
               style={{
                 backgroundColor: getCardBg(),
-                border: theme === 'light' ? '1px solid rgba(0, 0, 0, 0.06)' : '1px solid rgba(30, 41, 59, 0.3)',
+                border: isDark ? '1px solid rgba(30, 41, 59, 0.3)' : '1px solid rgba(0, 0, 0, 0.06)',
                 boxShadow: getShadow(),
                 transition: 'all 0.3s ease',
               }}
@@ -971,7 +1001,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: getAccentColor() }}
+                    style={{ backgroundColor: activeColor }}
                   >
                     <FileText className="w-5 h-5 md:w-6 h-6" style={{ color: '#FFFFFF' }} />
                   </div>
@@ -1017,7 +1047,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1037,7 +1067,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1055,7 +1085,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1076,7 +1106,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1093,7 +1123,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1153,7 +1183,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1179,7 +1209,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       {designerForm.cvFileName ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4" style={{ color: getAccentColor() }} />
+                            <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
                             <span className="text-sm" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Inter', sans-serif",
@@ -1209,12 +1239,12 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: getButtonBg(),
-                      color: getButtonText(),
+                      backgroundColor: getActiveColor(),
+                      color: '#FFFFFF',
                       fontFamily: "'Inter', sans-serif",
-                      boxShadow: '0 4px 16px rgba(0, 102, 255, 0.3)',
+                      boxShadow: `0 4px 16px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1228,7 +1258,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     ) : (
                       <>
                         Register as Designer
-                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </button>
@@ -1254,7 +1284,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1272,7 +1302,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1293,7 +1323,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1311,7 +1341,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1331,7 +1361,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1348,7 +1378,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1409,10 +1439,10 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                           } cursor-pointer`}
                           style={{
-                            backgroundColor: developerForm.skills.includes(skill) ? getAccentColor() : (theme === 'dark' ? 'rgba(30, 41, 59, 0.6)' : '#F3F4F6'),
-                            color: developerForm.skills.includes(skill) ? '#FFFFFF' : (theme === 'dark' ? '#9CA3AF' : '#4A5B6E'),
+                            backgroundColor: developerForm.skills.includes(skill) ? getActiveColor() : (isDark ? 'rgba(30, 41, 59, 0.6)' : '#F3F4F6'),
+                            color: developerForm.skills.includes(skill) ? '#FFFFFF' : (isDark ? '#9CA3AF' : '#4A5B6E'),
                             fontFamily: "'Inter', sans-serif",
-                            border: theme === 'light' && !developerForm.skills.includes(skill) ? '1px solid #E5E7EB' : 'none',
+                            border: !isDark && !developerForm.skills.includes(skill) ? '1px solid #E5E7EB' : 'none',
                           }}
                         >
                           <input
@@ -1442,7 +1472,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1460,7 +1490,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all resize-none cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1478,7 +1508,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all resize-none cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1504,7 +1534,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       {developerForm.cvFileName ? (
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4" style={{ color: getAccentColor() }} />
+                            <FileText className="w-4 h-4" style={{ color: getActiveColor() }} />
                             <span className="text-sm" style={{ 
                               color: getTextColor(),
                               fontFamily: "'Inter', sans-serif",
@@ -1534,12 +1564,12 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: getButtonBg(),
-                      color: getButtonText(),
+                      backgroundColor: getActiveColor(),
+                      color: '#FFFFFF',
                       fontFamily: "'Inter', sans-serif",
-                      boxShadow: '0 4px 16px rgba(0, 102, 255, 0.3)',
+                      boxShadow: `0 4px 16px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1553,14 +1583,14 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     ) : (
                       <>
                         Register as Developer
-                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </button>
                 </form>
               )}
 
-              {/* Business Developer Form - GOLD BUTTON */}
+              {/* Business Developer Form - Uses active color (Chocolate in light) */}
               {activeForm === 'business_dev' && (
                 <form onSubmit={handleBusinessDevSubmit} className="space-y-4 md:space-y-5 max-h-[600px] overflow-y-auto pr-2">
                   <div>
@@ -1578,7 +1608,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1598,7 +1628,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1616,7 +1646,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1637,7 +1667,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1695,7 +1725,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1715,19 +1745,19 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all resize-none cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: getAccentYellow(),
-                      color: '#1F4381',
+                      backgroundColor: getActiveColor(),
+                      color: isDark ? '#1F4381' : '#FFFFFF',
                       fontFamily: "'Inter', sans-serif",
-                      boxShadow: '0 4px 16px rgba(232, 202, 94, 0.3)',
+                      boxShadow: `0 4px 16px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1741,7 +1771,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     ) : (
                       <>
                         Apply as Business Developer
-                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </button>
@@ -1766,7 +1796,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1785,7 +1815,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1805,7 +1835,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1823,7 +1853,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -1843,7 +1873,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1902,19 +1932,19 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all resize-none cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: getButtonBg(),
-                      color: getButtonText(),
+                      backgroundColor: getActiveColor(),
+                      color: '#FFFFFF',
                       fontFamily: "'Inter', sans-serif",
-                      boxShadow: '0 4px 16px rgba(0, 102, 255, 0.3)',
+                      boxShadow: `0 4px 16px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -1928,7 +1958,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     ) : (
                       <>
                         Register as Marketing Agency
-                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </button>
@@ -1953,7 +1983,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
@@ -1973,7 +2003,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -1991,7 +2021,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                   </div>
@@ -2012,7 +2042,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                         className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all cursor-text"
                         style={getInputStyle()}
                         onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                       />
                     </div>
                     <div>
@@ -2094,19 +2124,19 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                       className="w-full px-4 py-3 rounded-xl text-sm md:text-base focus:outline-none transition-all resize-none cursor-text"
                       style={getInputStyle()}
                       onMouseEnter={(e) => Object.assign(e.currentTarget.style, getInputHoverStyle)}
-                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: theme === 'light' ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' })}
+                      onMouseLeave={(e) => Object.assign(e.currentTarget.style, { borderColor: getInputBorder(), boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' })}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3.5 rounded-xl font-semibold text-sm md:text-base transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     style={{
-                      backgroundColor: getButtonBg(),
-                      color: getButtonText(),
+                      backgroundColor: getActiveColor(),
+                      color: '#FFFFFF',
                       fontFamily: "'Inter', sans-serif",
-                      boxShadow: '0 4px 16px rgba(0, 102, 255, 0.3)',
+                      boxShadow: `0 4px 16px ${getActiveColor()}40`,
                     }}
                   >
                     {isSubmitting ? (
@@ -2120,7 +2150,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                     ) : (
                       <>
                         Apply as Sales Person
-                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </button>
@@ -2139,14 +2169,14 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
           </div>
         </div>
 
-        {/* Success Modal - UPDATED styling */}
+        {/* Success Modal */}
         {showSuccessModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
             <div className="rounded-xl md:rounded-2xl p-6 md:p-8 max-w-md w-full mx-4 text-center animate-scaleIn"
               style={{
                 backgroundColor: getCardBg(),
                 border: `1px solid ${getBorderColor()}`,
-                boxShadow: theme === 'light' ? '0 20px 60px rgba(0,0,0,0.15)' : 'none',
+                boxShadow: isDark ? 'none' : '0 20px 60px rgba(0,0,0,0.15)',
               }}
             >
               <div className="w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center mb-4">
@@ -2172,10 +2202,10 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
                 onClick={() => setShowSuccessModal(false)}
                 className="px-6 py-2.5 rounded-xl font-semibold text-sm hover:scale-105 transition-transform cursor-pointer"
                 style={{
-                  backgroundColor: getButtonBg(),
-                  color: getButtonText(),
+                  backgroundColor: getActiveColor(),
+                  color: '#FFFFFF',
                   fontFamily: "'Inter', sans-serif",
-                  boxShadow: '0 4px 16px rgba(0, 102, 255, 0.3)',
+                  boxShadow: `0 4px 16px ${getActiveColor()}40`,
                 }}
               >
                 Close
