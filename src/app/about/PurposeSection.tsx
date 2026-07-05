@@ -59,14 +59,14 @@ export function PurposeSection() {
 
   return (
     <section
-      className="relative w-full overflow-hidden py-8"
+      className="relative w-full overflow-hidden py-8 sm:py-15"
       style={{
         background: bgGradient,
         fontFamily: "'Segoe UI', Arial, sans-serif",
         minHeight: '100vh',
       }}
     >
-      <div className="relative max-w-[1280px] mx-auto px-4" style={{ height: '720px' }}>
+      <div className="relative max-w-[1280px] mx-auto px-4" style={{ height: '500px' }}>
         {/* Decorative dot grids */}
         <div className="absolute top-5 left-5 grid grid-cols-4 gap-1.5">
           {Array.from({ length: 16 }).map((_, i) => (

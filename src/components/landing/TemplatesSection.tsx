@@ -43,25 +43,48 @@ export default function TemplatesSection({
     rootMargin: '-50px 0px',
   });
 
-  // Detect theme changes
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => {
+    // Initial theme check
+    checkTheme();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
-    };
-    
-    checkTheme();
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkTheme();
-        }
-      });
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   const displayedTemplates = showAll ? templates : templates.slice(0, 3);

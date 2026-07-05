@@ -27,7 +27,7 @@ const portals = [
     features: ["College Management", "Template Approval", "System Analytics", "Global Settings"],
     icon: Crown,
     color: "gold",
-    tag: "Primary Control",
+    tag: null,
     gradient: "from-amber-400 via-amber-500 to-amber-600",
     shadowColor: "rgba(245, 158, 11, 0.4)",
   },
@@ -46,24 +46,48 @@ const portals = [
 export default function PortalArchitecture() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => {
+    // Initial theme check
+    checkTheme();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
-    };
-    
-    checkTheme();
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkTheme();
-        }
-      });
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   const isDark = theme === 'dark';
@@ -138,7 +162,7 @@ export default function PortalArchitecture() {
     return isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.04)';
   };
 
-  // 3D Icon Component - Fixed: No scale on hover
+  // 3D Icon Component
   const ThreeDIcon = ({ icon: Icon, gradient, shadowColor }: any) => {
     return (
       <motion.div 
@@ -233,7 +257,7 @@ export default function PortalArchitecture() {
 
   return (
     <div className="mt-10">
-      {/* Header - UPDATED with better contrast */}
+      {/* Header */}
       <div className="text-center mb-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -272,7 +296,7 @@ export default function PortalArchitecture() {
             </span>
           </h3>
           
-          {/* ✅ CHANGED: Full Black in light, Full White in dark - Larger font */}
+          {/* ✅ CHANGED: Full Black in light, Full White in dark */}
           <p className="max-w-3xl mx-auto font-light text-base md:text-lg"
             style={{ 
               color: getTextSecondary(),
@@ -291,7 +315,7 @@ export default function PortalArchitecture() {
         </motion.div>
       </div>
       
-      {/* Cards Grid - UPDATED with better light mode styling */}
+      {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
         {portals.map((portal, index) => {
           const colors = getColors(portal.color);
@@ -354,8 +378,8 @@ export default function PortalArchitecture() {
                 style={{ backgroundColor: colors.accent, opacity: 0.6 }}
               />
 
-              {/* ✅ CHANGED: Description - Full Black in light, Full White in dark - Larger font */}
-              <p className="text-base text-center leading-relaxed mb-4 max-w-[220px]"
+              {/* ✅ CHANGED: Full Black in light, Full White in dark */}
+              <p className="text-base text-center leading-relaxed mb-4 w-full"
                 style={{ 
                   color: getTextSecondary(),
                   fontFamily: "'Calibri Light', sans-serif",
@@ -388,19 +412,6 @@ export default function PortalArchitecture() {
                   </li>
                 ))}
               </ul>
-
-              {/* Center badge - UPDATED */}
-              {isCenter && (
-                <div className="mt-4 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-[0.1em]"
-                  style={{
-                    backgroundColor: isDark ? 'rgba(232, 202, 94, 0.15)' : 'rgba(0, 102, 255, 0.08)',
-                    color: accentColor,
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  ★ Primary Portal
-                </div>
-              )}
             </motion.div>
           );
         })}

@@ -29,24 +29,48 @@ export default function OtherSections({
 }: OtherSectionsProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => {
+    // Initial theme check
+    checkTheme();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
-    };
-    
-    checkTheme();
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkTheme();
-        }
-      });
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   const isDark = theme === 'dark';
@@ -63,7 +87,7 @@ export default function OtherSections({
   };
 
   const getTextMuted = () => {
-    return isDark ? '#9CA3AF' : '#4B5563';
+    return isDark ? '#FFFFFF' : '#000000'; // ✅ Full White in dark, Full Black in light
   };
 
   const getAccentColor = () => {
@@ -125,6 +149,7 @@ export default function OtherSections({
               </span>
             </h2>
             
+            {/* ✅ UPDATED: Full Black in light, Full White in dark */}
             <p className="text-base md:text-lg max-w-4xl mx-auto font-light"
               style={{ 
                 color: getTextMuted(),

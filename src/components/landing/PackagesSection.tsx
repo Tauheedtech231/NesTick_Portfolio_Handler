@@ -95,35 +95,56 @@ const packages = [
 export default function PackagesSection() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => {
+    // Initial theme check
+    checkTheme();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
-    };
-    
-    checkTheme();
-    
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkTheme();
-        }
-      });
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   const isDark = theme === 'dark';
   const GOLD = '#E8CA5E';
-  const CHOCOLATE = '#7B3F00'; // Added for icon shadows in light mode
+  const CHOCOLATE = '#7B3F00';
   const BLUE = '#0066FF';
   
-  // Accent: Gold in dark, Blue in light (unchanged)
   const accentColor = isDark ? GOLD : BLUE;
-  
-  // Icon shadow color: Gold shadow in dark, Chocolate shadow in light
   const iconShadowColor = isDark ? 'rgba(232, 202, 94, 0.4)' : 'rgba(123, 63, 0, 0.25)';
   
   const getSectionBg = () => {
@@ -159,7 +180,7 @@ export default function PackagesSection() {
     return isDark ? '#FFFFFF' : '#000000';
   };
 
-  // 3D Icon Component with Continuous Floating - UPDATED for Chocolate shadow
+  // 3D Icon Component with Continuous Floating
   const ThreeDIcon = ({ icon: Icon, gradient, shadowColor }: any) => {
     return (
       <motion.div 
@@ -173,7 +194,7 @@ export default function PackagesSection() {
           ease: "easeInOut",
         }}
       >
-        {/* 3D Shadow/Depth Effect - UPDATED: Chocolate in light mode */}
+        {/* 3D Shadow/Depth Effect */}
         <div 
           className="absolute inset-0 rounded-full blur-md transition-all duration-300 group-hover:blur-lg group-hover:scale-110"
           style={{ 
@@ -321,7 +342,6 @@ export default function PackagesSection() {
             const Icon = pkg.icon;
             const isPopular = pkg.popular;
             
-            // Determine shadow based on theme
             const getShadow = (isHover: boolean = false) => {
               if (isHover) {
                 return isDark

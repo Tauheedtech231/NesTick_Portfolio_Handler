@@ -12,12 +12,48 @@ export default function SocialProofBar() {
   const [countersStarted, setCountersStarted] = useState(false);
   const [hoveredBox, setHoveredBox] = useState<number | null>(null);
 
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    // Initial theme check
     checkTheme();
-    const observer = new MutationObserver(() => checkTheme());
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    });
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -26,7 +62,7 @@ export default function SocialProofBar() {
     }
   }, [isInView, countersStarted]);
 
-  // Main drawing function
+  // Main drawing function - SAME AS BEFORE
   const drawCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -34,10 +70,10 @@ export default function SocialProofBar() {
     if (!ctx) return;
 
     const context = ctx;
-    // Make canvas responsive - use container width
+    
     const container = canvas.parentElement;
     const containerWidth = container ? container.clientWidth : 1200;
-    // Calculate height based on aspect ratio (1200:480 = 2.5:1)
+    
     const aspectRatio = 1200 / 480;
     const W = containerWidth;
     const H = W / aspectRatio;
@@ -46,66 +82,51 @@ export default function SocialProofBar() {
     canvas.height = H;
     canvas.style.width = "100%";
     canvas.style.height = "auto";
-    canvas.style.borderRadius = "12px";
-    canvas.style.cursor = "pointer";
+    canvas.style.display = "block";
+    canvas.style.margin = "0 auto";
 
-    // ── FLAT BACKGROUND with subtle gradient for depth ──
+    // ── FLAT BACKGROUND ──
     if (theme === 'dark') {
       context.fillStyle = '#0B0F19';
       context.fillRect(0, 0, W, H);
     } else {
-      // Light mode: subtle gradient for depth
-      const gradient = context.createLinearGradient(0, 0, 0, H);
-      gradient.addColorStop(0, '#F8FAFF');
-      gradient.addColorStop(0.5, '#F4F7FC');
-      gradient.addColorStop(1, '#EEF2F7');
-      context.fillStyle = gradient;
+      context.fillStyle = '#F8FAFF';
       context.fillRect(0, 0, W, H);
-      
-      // Subtle decorative dots for light mode depth
-      context.fillStyle = 'rgba(59, 130, 246, 0.03)';
-      for (let i = 0; i < 30; i++) {
-        const x = Math.random() * W;
-        const y = Math.random() * H;
-        context.beginPath();
-        context.arc(x, y, 1 + Math.random() * 2, 0, Math.PI * 2);
-        context.fill();
-      }
     }
 
-    // ── MAP DOTS ──
-    (function () {
-      const dotColor = theme === 'dark' ? 'rgba(45,110,158,0.15)' : 'rgba(59,130,246,0.06)';
-      context.fillStyle = dotColor;
-      function d(x: number, y: number) {
-        context.beginPath();
-        context.arc(x, y, 2.2, 0, Math.PI * 2);
-        context.fill();
-      }
-      const tl = [
-        [22, 38], [48, 38], [74, 38], [100, 38], [126, 38], [152, 38], [178, 38],
-        [22, 64], [48, 64], [74, 64], [100, 64], [126, 64], [152, 64],
-        [22, 90], [48, 90], [74, 90], [100, 90], [126, 90],
-        [22, 116], [48, 116], [74, 116], [100, 116],
-        [22, 142], [48, 142], [74, 142]
-      ];
-      tl.forEach((p) => d(p[0], p[1]));
-      for (let r = 0; r < 6; r++)
-        for (let c = 0; c < 16; c++)
-          if ((r + c) % 2 === 0 || r < 3) d(660 + c * 30, 34 + r * 28);
-      for (let r = 0; r < 5; r++)
-        for (let c = 0; c < 16; c++) if ((r + c) % 2 === 0) d(670 + c * 28, 340 + r * 28);
-      [[22, 348], [48, 348], [22, 374], [48, 374], [74, 374], [22, 400]].forEach((p) => d(p[0], p[1]));
-    })();
+    // ── SCALE FACTOR ──
+    const scale = W / 1200;
+    
+    // ── CENTER OFFSET ──
+    const centerOffset = (W - 1200 * scale) / 2 - 25;
 
     // ── HELPERS ──
     function hexPts(cx: number, cy: number, r: number) {
       const p: [number, number][] = [];
       for (let i = 0; i < 6; i++) {
         const a = (i * Math.PI) / 3;
-        p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+        p.push([
+          cx * scale + r * scale * Math.cos(a) + centerOffset,
+          cy * scale + r * scale * Math.sin(a)
+        ]);
       }
       return p;
+    }
+
+    function octPts(cx: number, cy: number, r: number) {
+      const p: [number, number][] = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (i * Math.PI) / 4 - Math.PI / 8;
+        p.push([
+          cx * scale + r * scale * Math.cos(a) + centerOffset,
+          cy * scale + r * scale * Math.sin(a)
+        ]);
+      }
+      return p;
+    }
+
+    function mid(a: [number, number], b: [number, number]): [number, number] {
+      return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
     }
 
     function roundPolygon(ctxParam: CanvasRenderingContext2D, pts: [number, number][], radius: number) {
@@ -123,8 +144,8 @@ export default function SocialProofBar() {
         
         if (len1 === 0 || len2 === 0) continue;
         
-        const r1 = Math.min(radius, len1/2);
-        const r2 = Math.min(radius, len2/2);
+        const r1 = Math.min(radius * scale, len1/2);
+        const r2 = Math.min(radius * scale, len2/2);
         
         const cx1 = p1[0] - (dx1/len1) * r1;
         const cy1 = p1[1] - (dy1/len1) * r1;
@@ -140,19 +161,6 @@ export default function SocialProofBar() {
       ctxParam.closePath();
     }
 
-    function octPts(cx: number, cy: number, r: number) {
-      const p: [number, number][] = [];
-      for (let i = 0; i < 8; i++) {
-        const a = (i * Math.PI) / 4 - Math.PI / 8;
-        p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
-      }
-      return p;
-    }
-
-    function mid(a: [number, number], b: [number, number]): [number, number] {
-      return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-    }
-
     function polyRounded(
       pts: [number, number][],
       fill: string | null,
@@ -165,7 +173,7 @@ export default function SocialProofBar() {
       context.save();
       if (gc) {
         context.shadowColor = gc;
-        context.shadowBlur = gb || 22;
+        context.shadowBlur = gb * scale || 22 * scale;
       }
       roundPolygon(context, pts, radius);
       if (fill) {
@@ -174,13 +182,13 @@ export default function SocialProofBar() {
       }
       if (sc) {
         context.strokeStyle = sc;
-        context.lineWidth = sw;
+        context.lineWidth = sw * scale;
         context.stroke();
       }
       context.restore();
     }
 
-    // ── GLOW CURVE LINE - Improved for light mode ──
+    // ── GLOW CURVE LINE ──
     function gCurve(
       x1: number,
       y1: number,
@@ -200,10 +208,10 @@ export default function SocialProofBar() {
       const alphaMultiplier = theme === 'dark' ? 1 : 0.6;
       
       for (let pass = 0; pass < 3; pass++) {
-        const width = [9, 3.5, 1.6][pass];
+        const width = [9 * scale, 3.5 * scale, 1.6 * scale][pass];
         context.save();
         context.shadowColor = shadowColor;
-        context.shadowBlur = glowIntensity[pass];
+        context.shadowBlur = glowIntensity[pass] * scale;
         context.lineCap = "round";
         for (let i = 0; i < steps; i++) {
           const t0 = i / steps,
@@ -231,46 +239,48 @@ export default function SocialProofBar() {
       }
     }
 
-    // ── ICONS with better visibility in light mode ──
-    function iHandshake(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
+    // ── ICONS ──
+    function iHandshake(cx: number, cy: number, scaleFactor: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 44 + offsetY;
+      const scx = cx * scale + centerOffset, scy = cy * scale;
+      const y0 = scy + 44 * scale + offsetY * scale;
       context.save();
-      context.translate(cx, cy);
-      context.scale(scale, scale);
-      context.translate(-cx, -cy);
+      context.translate(scx, scy);
+      context.scale(scaleFactor * scale, scaleFactor * scale);
+      context.translate(-scx, -scy);
       context.strokeStyle = color;
       context.lineWidth = 1.8;
       context.lineCap = "round";
       context.lineJoin = "round";
       context.shadowColor = color;
-      context.shadowBlur = theme === 'dark' ? 6 : 4;
+      context.shadowBlur = (theme === 'dark' ? 6 : 4);
       context.beginPath();
-      context.moveTo(cx - 22, y0 + 5);
-      context.lineTo(cx - 11, y0 - 1);
-      context.quadraticCurveTo(cx, y0 - 10, cx + 11, y0 - 1);
-      context.lineTo(cx + 22, y0 + 5);
+      context.moveTo(scx - 22, y0 + 5);
+      context.lineTo(scx - 11, y0 - 1);
+      context.quadraticCurveTo(scx, y0 - 10, scx + 11, y0 - 1);
+      context.lineTo(scx + 22, y0 + 5);
       context.stroke();
       context.beginPath();
-      context.moveTo(cx - 11, y0 - 1);
-      context.quadraticCurveTo(cx, y0 + 10, cx + 11, y0 - 1);
+      context.moveTo(scx - 11, y0 - 1);
+      context.quadraticCurveTo(scx, y0 + 10, scx + 11, y0 - 1);
       context.stroke();
       context.restore();
     }
 
-    function iDocs(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
+    function iDocs(cx: number, cy: number, scaleFactor: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
+      const scx = cx * scale + centerOffset, scy = cy * scale;
       context.save();
-      context.translate(cx, cy);
-      context.scale(scale, scale);
-      context.translate(-cx, -cy);
+      context.translate(scx, scy);
+      context.scale(scaleFactor * scale, scaleFactor * scale);
+      context.translate(-scx, -scy);
       context.strokeStyle = color;
       context.lineWidth = 1.5;
       context.lineCap = "round";
       context.shadowColor = color;
-      context.shadowBlur = theme === 'dark' ? 5 : 3;
-      const bx = cx - 12,
-        by = cy + 24 + offsetY;
+      context.shadowBlur = (theme === 'dark' ? 5 : 3);
+      const bx = scx - 12,
+        by = scy + 24 + offsetY;
       context.strokeRect(bx + 7, by + 5, 18, 20);
       const fillColor = theme === 'dark' ? '#0b1d38' : '#F0F4FF';
       context.fillStyle = fillColor;
@@ -285,65 +295,67 @@ export default function SocialProofBar() {
       context.restore();
     }
 
-    function iPeople(cx: number, cy: number, scale: number = 1, offsetY: number = 0) {
+    function iPeople(cx: number, cy: number, scaleFactor: number = 1, offsetY: number = 0) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 24 + offsetY;
+      const scx = cx * scale + centerOffset, scy = cy * scale;
+      const y0 = scy + 24 * scale + offsetY * scale;
       context.save();
-      context.translate(cx, cy);
-      context.scale(scale, scale);
-      context.translate(-cx, -cy);
+      context.translate(scx, scy);
+      context.scale(scaleFactor * scale, scaleFactor * scale);
+      context.translate(-scx, -scy);
       context.strokeStyle = color;
       context.lineWidth = 1.5;
       context.lineCap = "round";
       context.shadowColor = color;
-      context.shadowBlur = theme === 'dark' ? 5 : 3;
+      context.shadowBlur = (theme === 'dark' ? 5 : 3);
       context.beginPath();
-      context.arc(cx - 16, y0, 5.5, 0, Math.PI * 2);
+      context.arc(scx - 16, y0, 5.5, 0, Math.PI * 2);
       context.stroke();
       context.beginPath();
-      context.arc(cx, y0 - 2, 6, 0, Math.PI * 2);
+      context.arc(scx, y0 - 2, 6, 0, Math.PI * 2);
       context.stroke();
       context.beginPath();
-      context.arc(cx + 16, y0, 5.5, 0, Math.PI * 2);
+      context.arc(scx + 16, y0, 5.5, 0, Math.PI * 2);
       context.stroke();
       context.beginPath();
-      context.moveTo(cx - 24, y0 + 19);
-      context.quadraticCurveTo(cx - 16, y0 + 10, cx - 8, y0 + 14);
+      context.moveTo(scx - 24, y0 + 19);
+      context.quadraticCurveTo(scx - 16, y0 + 10, scx - 8, y0 + 14);
       context.stroke();
       context.beginPath();
-      context.moveTo(cx - 10, y0 + 19);
-      context.quadraticCurveTo(cx, y0 + 10, cx + 10, y0 + 19);
+      context.moveTo(scx - 10, y0 + 19);
+      context.quadraticCurveTo(scx, y0 + 10, scx + 10, y0 + 19);
       context.stroke();
       context.beginPath();
-      context.moveTo(cx + 8, y0 + 14);
-      context.quadraticCurveTo(cx + 16, y0 + 10, cx + 24, y0 + 19);
+      context.moveTo(scx + 8, y0 + 14);
+      context.quadraticCurveTo(scx + 16, y0 + 10, scx + 24, y0 + 19);
       context.stroke();
       context.restore();
     }
 
-    function iArrow(cx: number, cy: number, scale: number = 1) {
+    function iArrow(cx: number, cy: number, scaleFactor: number = 1) {
       const color = theme === 'dark' ? '#5bc9fb' : '#3B82F6';
-      const y0 = cy + 40;
+      const scx = cx * scale + centerOffset, scy = cy * scale;
+      const y0 = scy + 40 * scale;
       context.save();
-      context.translate(cx, cy);
-      context.scale(scale, scale);
-      context.translate(-cx, -cy);
+      context.translate(scx, scy);
+      context.scale(scaleFactor * scale, scaleFactor * scale);
+      context.translate(-scx, -scy);
       context.strokeStyle = color;
       context.lineWidth = 2;
       context.lineCap = "round";
       context.lineJoin = "round";
       context.shadowColor = color;
-      context.shadowBlur = theme === 'dark' ? 7 : 4;
+      context.shadowBlur = (theme === 'dark' ? 7 : 4);
       context.beginPath();
-      context.moveTo(cx - 19, y0 + 8);
-      context.lineTo(cx - 6, y0 - 5);
-      context.lineTo(cx + 4, y0 + 4);
-      context.lineTo(cx + 19, y0 - 14);
+      context.moveTo(scx - 19, y0 + 8);
+      context.lineTo(scx - 6, y0 - 5);
+      context.lineTo(scx + 4, y0 + 4);
+      context.lineTo(scx + 19, y0 - 14);
       context.stroke();
       context.beginPath();
-      context.moveTo(cx + 10, y0 - 14);
-      context.lineTo(cx + 19, y0 - 14);
-      context.lineTo(cx + 19, y0 - 6);
+      context.moveTo(scx + 10, y0 - 14);
+      context.lineTo(scx + 19, y0 - 14);
+      context.lineTo(scx + 19, y0 - 6);
       context.stroke();
       context.restore();
     }
@@ -366,7 +378,6 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      // ✅ Full Black in light mode, White in dark mode
       const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       const shadowColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
@@ -380,18 +391,17 @@ export default function SocialProofBar() {
       
       polyRounded(op, fillColor, strokeColor, theme === 'dark' ? 1.5 : 1, shadowColor, glowIntensity * shadowOpacity, 12);
       
-      // Light mode: subtle card shadow for depth
       if (theme === 'light') {
         context.save();
         context.shadowColor = 'rgba(0,0,0,0.06)';
-        context.shadowBlur = 16;
+        context.shadowBlur = 16 * scale;
         context.shadowOffsetX = 0;
-        context.shadowOffsetY = 4;
+        context.shadowOffsetY = 4 * scale;
         roundPolygon(context, op, 12);
         context.fillStyle = 'transparent';
         context.fill();
         context.strokeStyle = 'rgba(0,0,0,0.06)';
-        context.lineWidth = 1;
+        context.lineWidth = 1 * scale;
         context.stroke();
         context.restore();
       }
@@ -401,20 +411,20 @@ export default function SocialProofBar() {
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `${labelSize}px Arial,sans-serif`;
-      context.fillText(label, cx, cy + (labelOffY || 0));
+      context.font = `${labelSize * scale}px Arial,sans-serif`;
+      context.fillText(label, cx * scale + centerOffset, cy * scale + labelOffY * scale);
       context.fillStyle = valColor;
-      context.font = `bold ${valSize}px Arial,sans-serif`;
+      context.font = `bold ${valSize * scale}px Arial,sans-serif`;
       context.shadowColor = 'transparent';
       context.shadowBlur = 0;
-      context.fillText(val, cx, cy + (valOffY || 0));
+      context.fillText(val, cx * scale + centerOffset, cy * scale + valOffY * scale);
       context.restore();
       
       icon(cx, cy, 0.85, iconOffsetY);
     }
 
     // ══════════════════════════════════
-    //  LAYOUT - Smaller boxes
+    //  LAYOUT
     // ══════════════════════════════════
 
     const R = 72;
@@ -426,25 +436,26 @@ export default function SocialProofBar() {
     const TW = { cx: 510 + offsetX, cy: 230 + BOTTOM_PUSH };
     const TWr = 125,
       TWri = 108;
+    
     const twP = octPts(TW.cx, TW.cy, TWr);
     const twPi = octPts(TW.cx, TW.cy, TWri);
     
     const twLMOriginal = mid(twP[4], twP[5]);
     const twLM: [number, number] = [
       twLMOriginal[0],
-      twLMOriginal[1] + 30
+      twLMOriginal[1] + 30 * scale
     ];
     
     const twUpperEdge = mid(twP[6], twP[7]);
     
     const twActiveUsersPoint: [number, number] = [
-      twUpperEdge[0] + 20,
-      twUpperEdge[1] + 40
+      twUpperEdge[0] + 20 * scale,
+      twUpperEdge[1] + 40 * scale
     ];
     
     const twTemplatesPoint: [number, number] = [
-      twUpperEdge[0] - 20,
-      twUpperEdge[1] + 155
+      twUpperEdge[0] - 20 * scale,
+      twUpperEdge[1] + 155 * scale
     ];
 
     // CLIENTS - Box 0
@@ -460,7 +471,7 @@ export default function SocialProofBar() {
     const tpTopOffset = mid(tpTopLeft, tpTopRight);
     const tpStartPoint: [number, number] = [
       tpTopOffset[0],
-      tpTopOffset[1] + 32
+      tpTopOffset[1] + 32 * scale
     ];
 
     // ACTIVE USERS - Box 2
@@ -478,19 +489,19 @@ export default function SocialProofBar() {
       const x1 = clRight[0], y1 = clRight[1];
       const x2 = srLeft[0], y2 = srLeft[1];
       const cx = twLM[0], cy = twLM[1];
-      gCurve(x1, y1, x2, y2, cx - 30, y1 + 10, cx + 30, y2 - 10);
+      gCurve(x1, y1, x2, y2, cx - 30 * scale, y1 + 10 * scale, cx + 30 * scale, y2 - 10 * scale);
     }
 
     {
       const x1 = tpStartPoint[0], y1 = tpStartPoint[1];
       const x2 = twTemplatesPoint[0], y2 = twTemplatesPoint[1];
-      gCurve(x1, y1, x2, y2, x1 + 40, y1 - 10, x2 - 30, y2 + 15);
+      gCurve(x1, y1, x2, y2, x1 + 40 * scale, y1 - 10 * scale, x2 - 30 * scale, y2 + 15 * scale);
     }
 
     {
       const x1 = twActiveUsersPoint[0], y1 = twActiveUsersPoint[1];
       const x2 = auLeft[0], y2 = auLeft[1];
-      gCurve(x1, y1, x2, y2, x1 + 50, y1 - 20, x2 - 60, y2 - 10);
+      gCurve(x1, y1, x2, y2, x1 + 50 * scale, y1 - 20 * scale, x2 - 60 * scale, y2 - 10 * scale);
     }
 
     // ── DRAW BOXES ──
@@ -507,7 +518,6 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      // ✅ Full Black in light mode, White in dark mode
       const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
@@ -522,11 +532,11 @@ export default function SocialProofBar() {
       if (theme === 'light') {
         context.save();
         context.shadowColor = 'rgba(0,0,0,0.06)';
-        context.shadowBlur = 16;
-        context.shadowOffsetY = 4;
+        context.shadowBlur = 16 * scale;
+        context.shadowOffsetY = 4 * scale;
         roundPolygon(context, tpP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
-        context.lineWidth = 1;
+        context.lineWidth = 1 * scale;
         context.stroke();
         context.restore();
       }
@@ -535,13 +545,13 @@ export default function SocialProofBar() {
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `13px Arial,sans-serif`;
-      context.fillText("Templates", TP.cx, TP.cy - 28);
+      context.font = `${13 * scale}px Arial,sans-serif`;
+      context.fillText("Templates", TP.cx * scale + centerOffset, TP.cy * scale - 28 * scale);
       context.fillStyle = valColor;
-      context.font = `bold 30px Arial,sans-serif`;
+      context.font = `bold ${30 * scale}px Arial,sans-serif`;
       context.shadowColor = 'transparent';
       context.shadowBlur = 0;
-      context.fillText(countersStarted ? "15+" : "0", TP.cx, (TP.cy + 12));
+      context.fillText(countersStarted ? "15+" : "0", TP.cx * scale + centerOffset, TP.cy * scale + 12 * scale);
       context.restore();
       iDocs(TP.cx, TP.cy, 0.85, -8);
     }
@@ -551,7 +561,6 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      // ✅ Full Black in light mode, White in dark mode
       const textColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
       const twP_rounded = octPts(TW.cx, TW.cy, TWr);
@@ -564,11 +573,11 @@ export default function SocialProofBar() {
       if (theme === 'light') {
         context.save();
         context.shadowColor = 'rgba(0,0,0,0.06)';
-        context.shadowBlur = 20;
-        context.shadowOffsetY = 4;
+        context.shadowBlur = 20 * scale;
+        context.shadowOffsetY = 4 * scale;
         roundPolygon(context, twP_rounded, 14);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
-        context.lineWidth = 1;
+        context.lineWidth = 1 * scale;
         context.stroke();
         context.restore();
       }
@@ -577,11 +586,11 @@ export default function SocialProofBar() {
       context.save();
       context.textAlign = "center";
       context.fillStyle = textColor;
-      context.font = "bold 26px Arial,sans-serif";
+      context.font = `bold ${26 * scale}px Arial,sans-serif`;
       context.shadowColor = 'transparent';
       context.shadowBlur = 0;
-      context.fillText("TRUSTED", TW.cx, TW.cy - 4);
-      context.fillText("WORLDWIDE", TW.cx, TW.cy + 36);
+      context.fillText("TRUSTED", TW.cx * scale + centerOffset, TW.cy * scale - 4 * scale);
+      context.fillText("WORLDWIDE", TW.cx * scale + centerOffset, TW.cy * scale + 36 * scale);
       context.restore();
     }
 
@@ -590,7 +599,6 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      // ✅ Full Black in light mode, White in dark mode
       const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
@@ -605,11 +613,11 @@ export default function SocialProofBar() {
       if (theme === 'light') {
         context.save();
         context.shadowColor = 'rgba(0,0,0,0.06)';
-        context.shadowBlur = 16;
-        context.shadowOffsetY = 4;
+        context.shadowBlur = 16 * scale;
+        context.shadowOffsetY = 4 * scale;
         roundPolygon(context, auP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
-        context.lineWidth = 1;
+        context.lineWidth = 1 * scale;
         context.stroke();
         context.restore();
       }
@@ -618,15 +626,15 @@ export default function SocialProofBar() {
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `12px Arial,sans-serif`;
-      context.fillText("Active Users", AU.cx, (AU.cy - 28));
+      context.font = `${12 * scale}px Arial,sans-serif`;
+      context.fillText("Active Users", AU.cx * scale + centerOffset, AU.cy * scale - 28 * scale);
       context.fillStyle = valColor;
-      context.font = `bold 28px Arial,sans-serif`;
+      context.font = `bold ${28 * scale}px Arial,sans-serif`;
       context.shadowColor = 'transparent';
       context.shadowBlur = 0;
-      context.fillText(countersStarted ? "1500+" : "0", AU.cx, (AU.cy + 10));
+      context.fillText(countersStarted ? "1500+" : "0", AU.cx * scale + centerOffset, AU.cy * scale + 10 * scale);
       context.restore();
-      iPeople(AU.cx, AU.cy - 10, 0.85, 12);
+      iPeople(AU.cx, AU.cy, 0.85, 12);
     }
 
     // 4. SUCCESS RATE (Box 3)
@@ -634,7 +642,6 @@ export default function SocialProofBar() {
       const fillColor = theme === 'dark' ? '#0F172A' : '#FFFFFF';
       const strokeColor = theme === 'dark' ? '#3B82F6' : '#3B82F6';
       const innerStroke = theme === 'dark' ? 'rgba(96,165,250,0.9)' : 'rgba(59,130,246,0.7)';
-      // ✅ Full Black in light mode, White in dark mode
       const labelColor = theme === 'dark' ? '#93C5FD' : '#000000';
       const valColor = theme === 'dark' ? '#FFFFFF' : '#000000';
       
@@ -649,11 +656,11 @@ export default function SocialProofBar() {
       if (theme === 'light') {
         context.save();
         context.shadowColor = 'rgba(0,0,0,0.06)';
-        context.shadowBlur = 16;
-        context.shadowOffsetY = 4;
+        context.shadowBlur = 16 * scale;
+        context.shadowOffsetY = 4 * scale;
         roundPolygon(context, srP_rounded, 12);
         context.strokeStyle = 'rgba(0,0,0,0.06)';
-        context.lineWidth = 1;
+        context.lineWidth = 1 * scale;
         context.stroke();
         context.restore();
       }
@@ -662,22 +669,39 @@ export default function SocialProofBar() {
       context.save();
       context.textAlign = "center";
       context.fillStyle = labelColor;
-      context.font = `13px Arial,sans-serif`;
-      context.fillText("Success Rate", SR.cx, SR.cy - 26);
+      context.font = `${13 * scale}px Arial,sans-serif`;
+      context.fillText("Success Rate", SR.cx * scale + centerOffset, SR.cy * scale - 26 * scale);
       context.fillStyle = valColor;
-      context.font = `bold 32px Arial,sans-serif`;
+      context.font = `bold ${32 * scale}px Arial,sans-serif`;
       context.shadowColor = 'transparent';
       context.shadowBlur = 0;
-      context.fillText(countersStarted ? "97%" : "0%", SR.cx, SR.cy + 16);
+      context.fillText(countersStarted ? "97%" : "0%", SR.cx * scale + centerOffset, SR.cy * scale + 16 * scale);
       context.restore();
       iArrow(SR.cx, SR.cy, 0.85);
     }
   };
 
-  // Redraw when hover changes
+  // Redraw when dependencies change
   useEffect(() => {
     drawCanvas();
   }, [theme, isInView, countersStarted, hoveredBox]);
+
+  // Resize handler with debounce
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        drawCanvas();
+      }, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   // Mouse event handlers
   useEffect(() => {
@@ -692,13 +716,15 @@ export default function SocialProofBar() {
       const mouseX = (e.clientX - rect.left) * scaleX;
       const mouseY = (e.clientY - rect.top) * scaleY;
       
+      const scale = canvas.width / 1200;
       const offsetX = 120;
       const BOTTOM_PUSH = 10;
+      const centerOffset = (canvas.width - 1200 * scale) / 2 - 25;
       const boxes = [
-        { cx: 100 + offsetX, cy: 218 + BOTTOM_PUSH, R: 72, index: 0 },
-        { cx: 240 + offsetX, cy: 318 + BOTTOM_PUSH, R: 72, index: 1 },
-        { cx: 780 + offsetX, cy: 142 + BOTTOM_PUSH, R: 72, index: 2 },
-        { cx: 920 + offsetX, cy: 245 + BOTTOM_PUSH, R: 72, index: 3 },
+        { cx: (100 + offsetX) * scale + centerOffset, cy: (218 + BOTTOM_PUSH) * scale, R: 72 * scale, index: 0 },
+        { cx: (240 + offsetX) * scale + centerOffset, cy: (318 + BOTTOM_PUSH) * scale, R: 72 * scale, index: 1 },
+        { cx: (780 + offsetX) * scale + centerOffset, cy: (142 + BOTTOM_PUSH) * scale, R: 72 * scale, index: 2 },
+        { cx: (920 + offsetX) * scale + centerOffset, cy: (245 + BOTTOM_PUSH) * scale, R: 72 * scale, index: 3 },
       ];
       
       let foundIndex: number | null = null;
@@ -728,14 +754,15 @@ export default function SocialProofBar() {
     };
   }, []);
 
-  const getBgColor = () => theme === 'dark' ? '#0B0F19' : '#F8FAFF';
-
   return (
     <>
       <motion.div
         ref={sectionRef}
         className="relative w-full overflow-hidden hidden md:block"
-        style={{ backgroundColor: getBgColor() }}
+        style={{ 
+          backgroundColor: theme === 'dark' ? '#0B0F19' : '#F8FAFF',
+          width: '100%',
+        }}
         initial={{ opacity: 0, y: 60 }}
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -743,12 +770,11 @@ export default function SocialProofBar() {
         <div className="w-full flex justify-center">
           <canvas
             ref={canvasRef}
-            className="w-full max-w-full"
+            className="w-full"
             style={{
-              borderRadius: "12px",
               display: "block",
               width: "100%",
-              maxWidth: "100%",
+              maxWidth: "1200px",
               margin: "0 auto",
               cursor: "pointer",
             }}

@@ -83,7 +83,7 @@ export default function ContactSection() {
 
   return (
     <section 
-      className="py-6 -mt-8 px-4 sm:px-6 relative overflow-hidden"
+      className="py-6 -mt-15  px-4 sm:px-6 relative overflow-hidden"
       style={{
         background: colors.sectionBg,
         fontFamily: "'Inter', sans-serif",

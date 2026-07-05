@@ -291,13 +291,48 @@ export default function FeaturesSection() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // ── Theme detection ─────────────────────────────────────────────────────────
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const check = () => setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(document.documentElement, { attributes: true });
-    return () => obs.disconnect();
+    // Initial theme check
+    checkTheme();
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    });
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   // ── Wheel entrance ──────────────────────────────────────────────────────────
@@ -494,7 +529,7 @@ export default function FeaturesSection() {
     return () => window.removeEventListener("keydown", f);
   }, [handleClose]);
 
-  // ── Theme-aware colors - UPDATED ONLY COLORS ──────────────────────────────
+  // ── Theme-aware colors ──────────────────────────────────────────────────────
   const isDark      = theme === "dark";
   const bgColor     = isDark ? BG         : LIGHT_BG;
   const segFill     = isDark ? FILL       : LIGHT_FILL;
@@ -521,39 +556,38 @@ export default function FeaturesSection() {
         }}
       >
         {/* Header */}
-     {/* Header */}
-<div style={{ textAlign: "center", marginBottom: isMobile ? 16 : 40 }}>
-  <h2 style={{ 
-    fontFamily: "'Poppins',Arial,sans-serif", 
-    fontSize: isMobile ? "clamp(18px,5vw,24px)" : "clamp(22px,3.5vw,34px)", 
-    fontWeight: 700, 
-    letterSpacing: "-0.3px", 
-    margin: 0 
-  }}>
-    <span style={{ color: heading1 }}>Comprehensive</span>{" "}
-    <span style={{ color: heading2 }}>System Features</span>
-  </h2>
-  
-  {/* ✅ UPDATED: Full Black in light, Full White in dark */}
-  <p style={{ 
-    marginTop: isMobile ? 2 : 8, 
-    fontSize: isMobile ? 10 : 13, 
-    color: isDark ? '#FFFFFF' : '#000000',
-    fontFamily: "'Poppins',Arial,sans-serif", 
-    letterSpacing: 1,
-    fontWeight: 500,
-  }}>
-    Explore our powerful platform capabilities
-  </p>
-  
-  <div style={{ 
-    margin: "6px auto 0", 
-    height: 2, 
-    width: isMobile ? 80 : 160, 
-    backgroundColor: heading2, 
-    opacity: 0.6 
-  }} />
-</div>
+        <div style={{ textAlign: "center", marginBottom: isMobile ? 16 : 40 }}>
+          <h2 style={{ 
+            fontFamily: "'Poppins',Arial,sans-serif", 
+            fontSize: isMobile ? "clamp(18px,5vw,24px)" : "clamp(22px,3.5vw,34px)", 
+            fontWeight: 700, 
+            letterSpacing: "-0.3px", 
+            margin: 0 
+          }}>
+            <span style={{ color: heading1 }}>Comprehensive</span>{" "}
+            <span style={{ color: heading2 }}>System Features</span>
+          </h2>
+          
+          {/* ✅ UPDATED: Full Black in light, Full White in dark */}
+          <p style={{ 
+            marginTop: isMobile ? 2 : 8, 
+            fontSize: isMobile ? 10 : 13, 
+            color: isDark ? '#FFFFFF' : '#000000',
+            fontFamily: "'Poppins',Arial,sans-serif", 
+            letterSpacing: 1,
+            fontWeight: 500,
+          }}>
+            Explore our powerful platform capabilities
+          </p>
+          
+          <div style={{ 
+            margin: "6px auto 0", 
+            height: 2, 
+            width: isMobile ? 80 : 160, 
+            backgroundColor: heading2, 
+            opacity: 0.6 
+          }} />
+        </div>
 
         {/* Wheel Container */}
         <div

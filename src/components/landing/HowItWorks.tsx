@@ -118,22 +118,48 @@ export default function HowItWorks() {
   const typeTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Detect theme
+  // ─── FIXED: Theme detection with immediate update ──────────────────────────
+  const checkTheme = () => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = prefersDark ? 'dark' : 'light';
+      setTheme(defaultTheme);
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark');
+    }
+  };
+
   useEffect(() => {
-    const checkTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setTheme(isDark ? 'dark' : 'light');
-    };
-    
+    // Initial theme check
     checkTheme();
-    
+
+    // Listen for localStorage changes from navbar
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue as 'light' | 'dark' | null;
+        if (newTheme) {
+          setTheme(newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      }
+    };
+
+    // Listen for class changes on document element (as fallback)
     const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+
+    window.addEventListener('storage', handleStorageChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      observer.disconnect();
+    };
   }, []);
 
   const getThemeColors = () => {
@@ -267,10 +293,10 @@ export default function HowItWorks() {
       : 600;
 
     // ─── LARGER SIZES ──────────────────────────────────────────────────────
-    const GPO_W = 170, GPO_H = 150; // Increased from 150, 135
-    const COL_W = 100,  COL_H = 72;  // Increased from 90, 65
-    const SW = 180,    SH = 220;     // Increased from 150, 195
-    const H = 520;                   // Increased from 480
+    const GPO_W = 170, GPO_H = 150;
+    const COL_W = 100,  COL_H = 72;
+    const SW = 180,    SH = 220;
+    const H = 520;
     
     canvas.style.height = `${H}px`;
 
@@ -285,7 +311,6 @@ export default function HowItWorks() {
       { x: W * 0.22, y: H * 0.78 },
     ];
 
-    // Calculate last card position - right edge with 0.1rem gap
     const gapFromRight = 1.6;
     const lastCardX = W - SW - gapFromRight;
 

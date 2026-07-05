@@ -882,7 +882,7 @@ export function PartnerSection({ onPartnerSubmit }: PartnerSectionProps) {
   return (
     <>
       <Navbar />
-      <section id="partner-section" ref={sectionRef} className=" -mt-10 px-4 sm:px-6 relative overflow-hidden cursor-pointer"
+      <section id="partner-section" ref={sectionRef} className=" -mt-3 px-4 sm:px-6 relative overflow-hidden cursor-pointer"
         style={{ backgroundColor: getBgColor(), fontFamily: "'Inter', sans-serif" }}
       >
         <div className="max-w-7xl mx-auto relative z-10">
