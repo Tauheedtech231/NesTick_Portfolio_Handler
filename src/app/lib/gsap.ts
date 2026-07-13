@@ -88,13 +88,25 @@ export interface CollegeData {
 }
 
 export type SectionType = 
-  | 'dashboard'   // ✅ added dashboard
-  | 'about' 
-  | 'faculty' 
-  | 'events' 
-  | 'gallery' 
-  | 'courses' 
-  | 'contact' 
+  | 'dashboard'
+  | 'about'
+  | 'faculty'
+  | 'events'
+  | 'gallery'
+  | 'courses'
+  | 'contact'
+  | 'hero'
+  | 'navbar'
+  | 'scholarships'
+  | 'programs'
+  | 'footer'
+  | 'stats'
+  | 'admission'
+  | 'affiliations'
+  | 'formmanager'
+  | 'aboutcourses'
+  | 'scholarshipstats'
+  | 'programsstats'
   | 'flexible';
 
 export interface SectionConfig {

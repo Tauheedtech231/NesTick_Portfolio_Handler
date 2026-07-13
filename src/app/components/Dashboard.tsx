@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx (FULLY UPDATED - ALL SECTIONS GET PROPS)
+// app/dashboard/page.tsx
 
 'use client';
 
@@ -8,12 +8,23 @@ import { gsap } from 'gsap';
 import { CollegeData, SectionType } from '@/app/lib/gsap';
 import { PortalLayout } from '@/app/components/layout/PortalLayout';
 import { PreviewPane } from '@/app/components/PreviewModal';
-import  {AboutSection}  from '@/app/components/sections/AboutSection';
+import { AboutSection } from '@/app/components/sections/AboutSection';
 import { FacultySection } from '@/app/components/sections/FacultySection';
 import { EventsSection } from '@/app/components/sections/EventsSection';
 import { GallerySection } from '@/app/components/sections/GallerySection';
 import { CoursesSection } from '@/app/components/sections/CoursesSection';
 import { ContactSection } from '@/app/components/sections/ContactSection';
+import { HeroSection } from '@/app/components/sections/HeroSection';
+import { NavbarSection } from '@/app/components/sections/NavbarSection';
+import { ScholarshipsSection } from '@/app/components/sections/ScholarshipsSection';
+import { FooterSection } from '@/app/components/sections/FooterSection';
+import { StatsSection } from '@/app/components/sections/StatsSection';
+import { AdmissionSection } from '@/app/components/sections/AdmissionSection';
+import { AffiliationsSection } from '@/app/components/sections/AffilationsSections';
+import { FormManagerSection } from '@/app/components/sections/FormManagerSection';
+import { AboutCoursesHandler } from '@/app/components/sections/AboutCoursesHandler';
+import { ScholarshipStatsHandler } from '@/app/components/sections/ScholarshipStatsHandler';
+import { ProgramsStatsHandler } from '@/app/components/sections/ProgramsStatsHandler';
 /* eslint-disable */
 
 import { 
@@ -34,7 +45,8 @@ import {
   BarChart3,
   PieChart,
   Zap,
-  Sparkles
+  Sparkles,
+  FormInput
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -139,7 +151,7 @@ const AuthChecker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
-/* ========== BEAUTIFUL STATS CARDS ========== */
+/* ========== STATS CARDS ========== */
 const StatsCards: React.FC = () => {
   const stats = [
     {
@@ -153,7 +165,6 @@ const StatsCards: React.FC = () => {
       textColor: 'text-blue-600 dark:text-blue-400',
       borderColor: 'border-blue-200 dark:border-blue-800',
       iconBg: 'bg-blue-100 dark:bg-blue-800',
-      chart: '↑',
       period: 'vs last month'
     },
     {
@@ -167,7 +178,6 @@ const StatsCards: React.FC = () => {
       textColor: 'text-purple-600 dark:text-purple-400',
       borderColor: 'border-purple-200 dark:border-purple-800',
       iconBg: 'bg-purple-100 dark:bg-purple-800',
-      chart: '↑',
       period: 'vs last month'
     },
     {
@@ -181,7 +191,6 @@ const StatsCards: React.FC = () => {
       textColor: 'text-green-600 dark:text-green-400',
       borderColor: 'border-green-200 dark:border-green-800',
       iconBg: 'bg-green-100 dark:bg-green-800',
-      chart: '↑',
       period: 'vs last month'
     },
     {
@@ -195,25 +204,20 @@ const StatsCards: React.FC = () => {
       textColor: 'text-orange-600 dark:text-orange-400',
       borderColor: 'border-orange-200 dark:border-orange-800',
       iconBg: 'bg-orange-100 dark:bg-orange-800',
-      chart: '↑',
       period: 'vs last year'
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat, index) => {
+      {stats.map((stat) => {
         const Icon = stat.icon;
-        
         return (
           <div
             key={stat.id}
             className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
           >
-            {/* Background decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-100 to-transparent dark:from-gray-800 dark:to-transparent rounded-bl-full opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
-            
-            {/* Animated sparkle effect */}
             <Sparkles className="absolute top-4 right-4 w-4 h-4 text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             <div className="relative z-10">
@@ -232,17 +236,11 @@ const StatsCards: React.FC = () => {
                 </span>
               </div>
               
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                {stat.title}
-              </h3>
-              
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{stat.title}</h3>
               <div className="flex items-baseline justify-between">
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {stat.value}
-                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
                 <Activity className="w-5 h-5 text-gray-300 dark:text-gray-600" />
               </div>
-              
               <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                 <p className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
                   <Clock className="w-3 h-3" />
@@ -251,12 +249,8 @@ const StatsCards: React.FC = () => {
               </div>
             </div>
             
-            {/* Progress bar animation */}
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 dark:bg-gray-800">
-              <div 
-                className={cn("h-full bg-gradient-to-r", stat.color)} 
-                style={{ width: `${Math.random() * 40 + 60}%` }}
-              ></div>
+              <div className={cn("h-full bg-gradient-to-r", stat.color)} style={{ width: `${Math.random() * 40 + 60}%` }}></div>
             </div>
           </div>
         );
@@ -279,10 +273,7 @@ const QuickStats: React.FC = () => {
       {quickStats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <div
-            key={index}
-            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:shadow-md transition-all duration-300"
-          >
+          <div key={index} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-3">
               <div className={cn("p-2 rounded-lg", stat.bg)}>
                 <Icon className={cn("w-4 h-4", stat.color)} />
@@ -336,34 +327,22 @@ const AnnouncementsSection: React.FC<{ announcements: Announcement[] }> = ({ ann
             )}
           >
             <div className="flex items-start justify-between mb-3">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base leading-tight">
-                {announcement.title}
-              </h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base leading-tight">{announcement.title}</h4>
               {index === 0 && (
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-sm flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  New
+                  <Sparkles className="w-3 h-3" /> New
                 </span>
               )}
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
-              {announcement.message}
-            </p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">{announcement.message}</p>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                {new Date(announcement.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
+                {new Date(announcement.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                {new Date(announcement.createdAt).toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+                {new Date(announcement.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           </div>
@@ -380,7 +359,6 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
   collegeDetails 
 }) => (
   <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 relative overflow-hidden">
-    {/* Background decoration */}
     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-100 to-transparent dark:from-gray-800 dark:to-transparent rounded-bl-full opacity-50"></div>
     
     <div className="relative z-10">
@@ -388,15 +366,9 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
         <div className="flex items-center gap-4">
           <div className={cn(
             "p-3 rounded-xl",
-            status === 'active' 
-              ? 'bg-gradient-to-br from-green-500 to-emerald-500' 
-              : 'bg-gradient-to-br from-gray-500 to-gray-600'
+            status === 'active' ? 'bg-gradient-to-br from-green-500 to-emerald-500' : 'bg-gradient-to-br from-gray-500 to-gray-600'
           )}>
-            {status === 'active' ? (
-              <Zap className="w-6 h-6 text-white" />
-            ) : (
-              <Lock className="w-6 h-6 text-white" />
-            )}
+            {status === 'active' ? <Zap className="w-6 h-6 text-white" /> : <Lock className="w-6 h-6 text-white" />}
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{collegeName}</h2>
@@ -407,20 +379,17 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
             </p>
           </div>
         </div>
-        <div
-          className={cn(
-            'px-4 py-2 rounded-full text-sm font-medium border-2 flex items-center gap-2',
-            status === 'active'
-              ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
-              : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
-          )}
-        >
+        <div className={cn(
+          'px-4 py-2 rounded-full text-sm font-medium border-2 flex items-center gap-2',
+          status === 'active'
+            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+            : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+        )}>
           {status === 'active' ? <Activity className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           {status === 'active' ? 'Active' : 'Inactive'}
         </div>
       </div>
 
-      {/* College Details */}
       {collegeDetails && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {collegeDetails.email && (
@@ -458,12 +427,7 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
           </div>
           <p className="text-red-600 dark:text-red-300 text-sm mt-2 leading-relaxed">
             Your college portal is currently locked. Please contact{' '}
-            <a
-              href="https://nesticktech.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold underline hover:text-red-800 dark:hover:text-red-200 transition-colors"
-            >
+            <a href="https://nesticktech.com" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-red-800 dark:hover:text-red-200 transition-colors">
               nesticktech.com
             </a>{' '}
             to enable access.
@@ -474,7 +438,7 @@ const StatusCard: React.FC<{ status: 'active' | 'inactive'; collegeName: string;
   </div>
 );
 
-/* Section Components - All receive props */
+/* Section Components */
 const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
   dashboard: () => null,
   about: AboutSection,
@@ -483,6 +447,18 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
   gallery: GallerySection,
   courses: CoursesSection,
   contact: ContactSection,
+  hero: HeroSection,
+  navbar: NavbarSection,
+  scholarships: ScholarshipsSection,
+  programs: CoursesSection,
+  footer: FooterSection,
+  stats: StatsSection,
+  admission: AdmissionSection,
+  affiliations: AffiliationsSection,
+  formmanager: FormManagerSection,
+  aboutcourses: AboutCoursesHandler,
+  scholarshipstats: ScholarshipStatsHandler,
+  programsstats: ProgramsStatsHandler,
   flexible: () => (
     <div className="text-gray-500 dark:text-gray-500 text-center py-16">
       <Grid3X3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -491,8 +467,55 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
   ),
 };
 
+const normalizeSectionKey = (section: string): SectionType => {
+  const normalized = section.toLowerCase().trim().replace(/[\s&/]+/g, '_').replace(/[^a-z0-9_]+/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+
+  const aliases: Record<string, SectionType> = {
+    dashboard: 'dashboard',
+    about: 'about',
+    about_us: 'about',
+    faculty: 'faculty',
+    faculty_members: 'faculty',
+    events: 'events',
+    gallery: 'gallery',
+    courses: 'courses',
+    programs: 'programs',
+    contact: 'contact',
+    contact_us: 'contact',
+    hero: 'hero',
+    hero_section: 'hero',
+    navbar: 'navbar',
+    navigation_bar: 'navbar',
+    scholarships: 'scholarships',
+    scholarships_financial_aid: 'scholarships',
+    footer: 'footer',
+    footer_section: 'footer',
+    stats: 'stats',
+    statistics: 'stats',
+    admission: 'admission',
+    admissions: 'admission',
+    affiliations: 'affiliations',
+    accreditation: 'affiliations',
+    formmanager: 'formmanager',
+    form_manager: 'formmanager',
+    forms: 'formmanager',
+    aboutcourses: 'aboutcourses',
+    about_courses: 'aboutcourses',
+    about_course: 'aboutcourses',
+    scholarshipstats: 'scholarshipstats',
+    scholarship_stat: 'scholarshipstats',
+    scholarship_stats: 'scholarshipstats',
+    programsstats: 'programsstats',
+    program_stats: 'programsstats',
+    programs_stat: 'programsstats',
+    flexible: 'flexible',
+  };
+
+  return aliases[normalized] || 'dashboard';
+};
+
 function DashboardContent({ initialData }: DashboardProps) {
-  const [activeSection, setActiveSection] = useState<SectionType>('about');
+  const [activeSection, setActiveSection] = useState<SectionType>('hero');
   const [collegeData, setCollegeData] = useState<CollegeData>(initialData);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -519,15 +542,12 @@ function DashboardContent({ initialData }: DashboardProps) {
       } catch (error) {
         console.error('Error parsing auth_college:', error);
         setIsLoading(false);
-        return;
       }
     } else {
       setIsLoading(false);
-      return;
     }
   }, []);
 
-  // Fetch real data from API
   useEffect(() => {
     async function fetchDashboardData() {
       if (!currentCollegeId) return;
@@ -540,10 +560,7 @@ function DashboardContent({ initialData }: DashboardProps) {
         const data = await response.json();
         
         if (data.success) {
-          console.log('Dashboard data:', data);
-          
           setCollegeDetails(data.college);
-          
           setCollegeData(prev => ({
             ...prev,
             college: {
@@ -560,13 +577,8 @@ function DashboardContent({ initialData }: DashboardProps) {
               template_name: data.college.template_name
             }
           }));
-          
           setAnnouncements(data.announcements);
-          
-          localStorage.setItem('college_data', JSON.stringify({
-            college: data.college,
-            announcements: data.announcements
-          }));
+          localStorage.setItem('college_data', JSON.stringify({ college: data.college, announcements: data.announcements }));
         } else {
           setError(data.error || 'Failed to load dashboard data');
           loadFromLocalStorage();
@@ -586,10 +598,7 @@ function DashboardContent({ initialData }: DashboardProps) {
         try {
           const cachedData = JSON.parse(cached);
           setCollegeDetails(cachedData.college);
-          setCollegeData(prev => ({ 
-            ...prev, 
-            college: { ...prev.college, ...cachedData.college } 
-          }));
+          setCollegeData(prev => ({ ...prev, college: { ...prev.college, ...cachedData.college } }));
           setAnnouncements(cachedData.announcements || []);
         } catch (e) {
           console.error('Error parsing cached data:', e);
@@ -625,14 +634,13 @@ function DashboardContent({ initialData }: DashboardProps) {
         id: currentCollegeId,
         name: updated.college.name,
         status: (updated.college as any).status,
-        modules: { ...updated.college as any  }.modules,
+        modules: { ...updated.college as any }.modules,
       });
 
       return updated;
     });
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -647,7 +655,6 @@ function DashboardContent({ initialData }: DashboardProps) {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -657,10 +664,7 @@ function DashboardContent({ initialData }: DashboardProps) {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">Something went wrong</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
-          >
+          <button onClick={() => window.location.reload()} className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium">
             Try Again
           </button>
         </div>
@@ -677,10 +681,7 @@ function DashboardContent({ initialData }: DashboardProps) {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">College Not Found</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">Unable to load college information.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
-          >
+          <button onClick={() => window.location.reload()} className="px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium">
             Retry
           </button>
         </div>
@@ -702,12 +703,7 @@ function DashboardContent({ initialData }: DashboardProps) {
           <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
             Your college portal is currently locked. Please contact administration to enable access.
           </p>
-          <a
-            href="https://nesticktech.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
-          >
+          <a href="https://nesticktech.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 text-white dark:text-gray-900 rounded-xl hover:shadow-lg transition-all duration-300 font-medium">
             Contact Support
           </a>
         </div>
@@ -716,61 +712,77 @@ function DashboardContent({ initialData }: DashboardProps) {
   }
 
   const ActiveComponent = sectionComponents[activeSection];
-  const sectionData =
-    activeSection === 'about'
-      ? collegeData.college
-      : activeSection === 'contact'
-      ? collegeData.college?.contact
-      : (collegeData as any)[activeSection];
+  const sectionData = activeSection === 'about' ? collegeData.college : activeSection === 'contact' ? collegeData.college?.contact : (collegeData as any)[activeSection];
 
-  // ✅ ALL SECTIONS receive college and templateId props
+  const handleSectionChange = (section: SectionType | string) => {
+    setActiveSection(normalizeSectionKey(section));
+  };
+
   return (
     <PortalLayout
       logo={collegeData.college?.logo || ''}
       onPreview={() => setIsPreviewOpen(true)}
       activeSection={activeSection}
-      onSectionChange={(s) => setActiveSection(s)}
+      onSectionChange={(s) => handleSectionChange(s)}
     >
       {activeSection === 'dashboard' ? (
         <div className="space-y-8">
-          <StatusCard 
-            status={collegeStatus} 
-            collegeName={collegeName} 
-            collegeDetails={collegeDetails}
-          />
+          <StatusCard status={collegeStatus} collegeName={collegeName} collegeDetails={collegeDetails} />
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-gray-500" />
-              College Overview
+              <BarChart3 className="w-5 h-5 text-gray-500" /> College Overview
             </h3>
             <StatsCards />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-gray-500" />
-              Quick Insights
+              <PieChart className="w-5 h-5 text-gray-500" /> Quick Insights
             </h3>
             <QuickStats />
           </div>
           <AnnouncementsSection announcements={announcements} />
         </div>
       ) : activeSection === 'about' ? (
-        <AboutSection 
-          college={collegeData.college}
-          templateId={collegeDetails?.template_id}
-        />
+        <AboutSection college={collegeData.college} templateId={collegeDetails?.template_id} />
       ) : activeSection === 'gallery' ? (
-        <GallerySection 
-          college={collegeData.college}
-          templateId={collegeDetails?.template_id}
-        />
-      ) : (
+        <GallerySection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'hero' ? (
+        <HeroSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'navbar' ? (
+        <NavbarSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'scholarships' ? (
+        <ScholarshipsSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'programs' ? (
+        <CoursesSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'courses' ? (
+        <CoursesSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'footer' ? (
+        <FooterSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'stats' ? (
+        <StatsSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'admission' ? (
+        <AdmissionSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'affiliations' ? (
+        <AffiliationsSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'formmanager' ? (
+        <FormManagerSection college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'aboutcourses' ? (
+        <AboutCoursesHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'scholarshipstats' ? (
+        <ScholarshipStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'programsstats' ? (
+        <ProgramsStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : ActiveComponent ? (
         <ActiveComponent 
           data={sectionData} 
           onUpdate={(data: any) => updateSectionData(activeSection, data)}
           college={collegeData.college}
           templateId={collegeDetails?.template_id}
         />
+      ) : (
+        <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
+          This section is not available yet.
+        </div>
       )}
 
       <PreviewPane isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} data={collegeData} />

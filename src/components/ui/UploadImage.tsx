@@ -11,7 +11,7 @@ interface UploadImageProps {
   onChange: (value: string) => void;
   onRemove?: () => void;
   className?: string;
-  aspectRatio?: 'square' | 'video' | 'banner';
+  aspectRatio?: 'square' | 'video' | 'banner' | 'portrait';
   disabled?: boolean; // ✅ Added disabled prop
 }
 
@@ -44,6 +44,7 @@ export function UploadImage({
     square: 'aspect-square',
     video: 'aspect-video',
     banner: 'aspect-[21/9]',
+    portrait: 'aspect-[3/4]',
   };
 
   // Auto-remove alerts after their duration

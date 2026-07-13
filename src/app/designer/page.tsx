@@ -122,8 +122,8 @@ export default function DesignerDashboard() {
         <p className="text-blue-100">Here&lsquo;s what&lsquo;s happening with your designs today.</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* Stats Cards - Only 2 cards now */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -158,39 +158,6 @@ export default function DesignerDashboard() {
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalEarnings}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">Total Earnings</p>
           <p className="text-xs text-green-600 mt-2">+${stats.monthlyEarnings} this month</p>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Download size={20} className="text-purple-600 dark:text-purple-400" />
-            </div>
-            <Star size={16} className="text-yellow-500" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalDownloads}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total Downloads</p>
-          <p className="text-xs text-purple-600 mt-2">{stats.totalLikes} likes received</p>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <Users size={20} className="text-yellow-600 dark:text-yellow-400" />
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">0</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Unique Customers</p>
-          <p className="text-xs text-yellow-600 mt-2">Coming soon</p>
         </motion.div>
       </div>
 

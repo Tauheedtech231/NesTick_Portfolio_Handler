@@ -1,4 +1,4 @@
-// app/components/sections/AboutSection.tsx (COMPLETELY FIXED)
+// app/components/sections/AboutSection.tsx (UPDATED)
 
 'use client';
 
@@ -20,27 +20,28 @@ interface AboutSectionProps {
   templateId?: number;
 }
 
-// Complete data structure matching live template (without video)
 interface AboutFormData {
-  // Basic Info
-  name: string;
-  tagline: string;
-  shortDescription: string;
-  longDescription: string;
+  // Hero Section
+  heroTitle: string;
+  heroSubtitle: string;
+  heroImage: string;
+  
+  // History Section
+  historyTitle: string;
+  historyDescription: string;
+  historyImage: string;
   establishedYear: string;
+  heritageTitle: string;
+  heritageDescription: string;
   
-  // Story (array of paragraphs)
-  story: string[];
-  
-  // Mission & Vision
-  mission: string;
+  // Vision & Mission
   vision: string;
+  mission: string;
+  guidingTitle: string;
+  guidingSubtitle: string;
   
-  // Philosophy
-  philosophy: {
-    heading: string;
-    points: string[];
-  };
+  // Story
+  story: string[];
   
   // Values
   values: Array<{
@@ -50,36 +51,10 @@ interface AboutFormData {
     icon: string;
   }>;
   
-  // Approach
-  approach: {
-    heading: string;
-    description: string;
-    aspects: Array<{
-      title: string;
-      description: string;
-    }>;
-  };
-  
-  // Why Choose Us
-  whyChooseUs: {
-    intro: string;
-    points: Array<{
-      title: string;
-      description: string;
-      icon: string;
-    }>;
-  };
-  
   // Stats
   stats: Array<{ id: number; value: number; suffix: string; label: string }>;
-  highlights: Array<{ id: number; text: string }>;
-  
-  // Images
-  logo?: string;
-  coverImage?: string;
 }
 
-// Icon mapping for values and whyChooseUs
 const iconMap: Record<string, any> = {
   compass: FiCompass,
   seedling: FaSeedling,
@@ -100,31 +75,33 @@ const getIconComponent = (iconName: string) => {
 };
 
 const defaultFormData: AboutFormData = {
-  name: '',
-  tagline: 'Where thoughtful education shapes meaningful futures',
-  shortDescription: 'For more than a decade, we\'ve quietly cultivated an environment where education transcends routine learning—where students discover not just knowledge, but purpose.',
-  longDescription: '',
-  establishedYear: '2010',
+  // Hero Section
+  heroTitle: 'About Nestick College',
+  heroSubtitle: 'Shaping futures through excellence in education, innovation, and character building since 1985',
+  heroImage: '',
   
+  // History Section
+  historyTitle: 'Since 1985',
+  historyDescription: 'Established in 1985, Nestick College has been at the forefront of educational excellence for nearly four decades. What began as a small institution with just 200 students has grown into a premier educational hub serving over 10,000 students annually.',
+  historyImage: '',
+  establishedYear: '1985',
+  heritageTitle: 'Prestigious Heritage',
+  heritageDescription: 'Our campus blends historic architecture with modern facilities.',
+  
+  // Vision & Mission
+  vision: 'To be a globally recognized institution that empowers students to become innovative leaders, critical thinkers, and responsible citizens who drive positive change in an interconnected world.',
+  mission: 'To provide transformative education through innovative curricula, world-class faculty, and state-of-the-art facilities that foster intellectual growth, ethical values, and lifelong learning.',
+  guidingTitle: 'Our Guiding',
+  guidingSubtitle: 'Principles',
+  
+  // Story
   story: [
     'What began as a modest initiative with three classrooms has gradually evolved into a respected learning community.',
     'Along the way, we\'ve learned that meaningful education isn\'t about scaling rapidly, but about deepening connections.',
     'The core intention remains unchanged: to create spaces where learning feels relevant, rigorous, and remarkably human.'
   ],
   
-  mission: 'To nurture curious minds through education that values depth over breadth, understanding over memorization, and personal growth alongside academic achievement.',
-  vision: 'To create a learning community where education adapts to human needs, not institutional requirements.',
-  
-  philosophy: {
-    heading: 'Our educational philosophy is simple but deliberate:',
-    points: [
-      'Learning should feel like discovery, not consumption',
-      'Depth in a few areas matters more than surface exposure to many',
-      'Practical application grounds theoretical understanding',
-      'Mentorship amplifies independent learning'
-    ]
-  },
-  
+  // Values
   values: [
     { id: 1, title: 'Thoughtful Engagement', description: 'We prioritize meaningful dialogue over passive reception.', icon: 'compass' },
     { id: 2, title: 'Practical Wisdom', description: 'Knowledge finds its worth in application.', icon: 'seedling' },
@@ -132,44 +109,13 @@ const defaultFormData: AboutFormData = {
     { id: 4, title: 'Sustainable Growth', description: 'We measure success in long-term impact.', icon: 'mountain' }
   ],
   
-  approach: {
-    heading: 'How We Approach Education',
-    description: 'Rather than following trends, we\'ve developed approaches that align with how people actually learn.',
-    aspects: [
-      { title: 'Blended Rhythm', description: 'Alternating intensive study with reflective practice.' },
-      { title: 'Contextual Projects', description: 'Assignments rooted in actual challenges.' },
-      { title: 'Iterative Feedback', description: 'Continuous, constructive dialogue.' },
-      { title: 'Cross-disciplinary Threads', description: 'Connecting concepts across traditional boundaries.' }
-    ]
-  },
-  
-  whyChooseUs: {
-    intro: 'While many institutions promise results, we focus on the journey.',
-    points: [
-      { title: 'Faculty who prioritize presence', description: 'Educators first, experts second.', icon: 'users' },
-      { title: 'Curriculum with breathing room', description: 'Space to think is built into the schedule.', icon: 'book' },
-      { title: 'Assessment as dialogue', description: 'Feedback through conversation, not just grades.', icon: 'target' },
-      { title: 'Community as curriculum', description: 'Learning happens in relationship.', icon: 'heart' },
-      { title: 'Long-term partnership', description: 'Our relationship doesn\'t end at graduation.', icon: 'shield' }
-    ]
-  },
-  
+  // Stats
   stats: [
     { id: 1, value: 15, suffix: '+', label: 'Years Experience' },
     { id: 2, value: 5000, suffix: '+', label: 'Professionals' },
     { id: 3, value: 98, suffix: '%', label: 'Success Rate' },
     { id: 4, value: 50, suffix: '+', label: 'Industry Partners' }
-  ],
-  
-  highlights: [
-    { id: 1, text: 'NEBOSH Certification Programs' },
-    { id: 2, text: 'IOSH Managing Safely' },
-    { id: 3, text: 'OSHA Standards Training' },
-    { id: 4, text: 'Fire Safety Training' }
-  ],
-  
-  logo: undefined,
-  coverImage: undefined
+  ]
 };
 
 export function AboutSection({ college, templateId }: AboutSectionProps) {
@@ -180,29 +126,23 @@ export function AboutSection({ college, templateId }: AboutSectionProps) {
   const [formData, setFormData] = useState<AboutFormData>(defaultFormData);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
-const getActiveTemplateId = () => {
-  return templateId || (college as any).template_id || 1;
-};
+  const getActiveTemplateId = () => {
+    return templateId || (college as any).template_id || 1;
+  };
 
-  // ✅ Get college ID from props
   const getCollegeId = () => {
     return parseInt((college as any).id);
   };
 
-  // ✅ Load fresh data from database with no cache
+  // Load from database
   const loadFromDatabase = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoading(true);
     
     try {
       const activeTemplateId = getActiveTemplateId();
       const collegeId = getCollegeId();
-      
-      // ✅ Add timestamp to prevent caching
       const timestamp = Date.now();
       const url = `/api/sections?template_id=${activeTemplateId}&section_name=About&college_id=${collegeId}&_=${timestamp}`;
-      
-      console.log('🔄 [AboutSection] Fetching fresh data from:', url);
-      console.log('🏫 [AboutSection] For College ID:', collegeId);
       
       const response = await fetch(url, {
         cache: 'no-store',
@@ -212,107 +152,41 @@ const getActiveTemplateId = () => {
         }
       });
       
-      console.log(`📡 [AboutSection] API Response Status: ${response.status}`);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('📦 [AboutSection] Raw API Response:', JSON.stringify(data, null, 2));
-        
         if (data.sections && data.sections.length > 0) {
           const dbContent = data.sections[0].content;
-          const updatedAt = data.sections[0].updated_at;
-          
-          console.log('💾 [AboutSection] Database Content:', dbContent);
-          console.log('🕐 [AboutSection] Last Updated:', updatedAt);
-          
-          setLastUpdated(updatedAt);
+          setLastUpdated(data.sections[0].updated_at);
           
           if (dbContent && Object.keys(dbContent).length > 0) {
-            // Merge database content with defaults
-            const newFormData = {
+            setFormData({
               ...defaultFormData,
               ...dbContent,
-              stats: dbContent.stats || defaultFormData.stats,
               values: dbContent.values || defaultFormData.values,
-              approach: dbContent.approach || defaultFormData.approach,
-              philosophy: dbContent.philosophy || defaultFormData.philosophy,
-              whyChooseUs: dbContent.whyChooseUs || defaultFormData.whyChooseUs,
               story: dbContent.story || defaultFormData.story,
-              highlights: dbContent.highlights || defaultFormData.highlights
-            };
-            
-            console.log('✅ [AboutSection] Form Data Updated from DB');
-            console.log('📝 [AboutSection] Name:', newFormData.name);
-            console.log('📝 [AboutSection] Mission:', newFormData.mission?.substring(0, 50) + '...');
-            
-            setFormData(newFormData);
-          } else {
-            console.log('⚠️ [AboutSection] No content in database, using defaults');
-            setFormData(defaultFormData);
+              stats: dbContent.stats || defaultFormData.stats
+            });
           }
-        } else {
-          console.log('⚠️ [AboutSection] No sections found, using defaults');
-          setFormData(defaultFormData);
         }
-      } else {
-        console.error('❌ [AboutSection] API Error:', response.status, response.statusText);
-        setFormData(defaultFormData);
       }
     } catch (error) {
-      console.error('❌ [AboutSection] Failed to load:', error);
-      setFormData(defaultFormData);
+      console.error('Failed to load about data:', error);
     } finally {
       if (showLoading) setIsLoading(false);
     }
   }, [templateId, college.template_id, college.id]);
 
-  // Load data on mount and when dependencies change
   useEffect(() => {
-    console.log('🔄 [AboutSection] useEffect triggered - Loading fresh data');
     loadFromDatabase(true);
   }, [loadFromDatabase]);
 
-  // ✅ Save to database with college_id
+  // Save to database
   const handleSave = async () => {
     setIsSaving(true);
-    console.log('💾 [AboutSection] Starting save operation...');
     
     try {
       const activeTemplateId = getActiveTemplateId();
       const collegeId = getCollegeId();
-      
-      console.log('🏫 [AboutSection] Saving for College ID:', collegeId);
-      
-      const contentToSave = {
-        name: formData.name,
-        tagline: formData.tagline,
-        shortDescription: formData.shortDescription,
-        longDescription: formData.longDescription,
-        establishedYear: formData.establishedYear,
-        story: formData.story,
-        mission: formData.mission,
-        vision: formData.vision,
-        philosophy: formData.philosophy,
-        values: formData.values,
-        approach: formData.approach,
-        whyChooseUs: formData.whyChooseUs,
-        stats: formData.stats,
-        highlights: formData.highlights,
-        logo: formData.logo,
-        coverImage: formData.coverImage
-      };
-      
-      console.log('📤 [AboutSection] Saving content:', {
-        template_id: activeTemplateId,
-        section_name: "About",
-        college_id: collegeId,
-        content: {
-          name: contentToSave.name,
-          mission_preview: contentToSave.mission?.substring(0, 50) + '...',
-          stats_count: contentToSave.stats?.length,
-          values_count: contentToSave.values?.length
-        }
-      });
       
       const response = await fetch('/api/sections', {
         method: 'POST',
@@ -320,33 +194,21 @@ const getActiveTemplateId = () => {
         body: JSON.stringify({
           template_id: activeTemplateId,
           section_name: "About",
-          college_id: collegeId,  // ✅ IMPORTANT: college_id passed here!
-          content: contentToSave
+          college_id: collegeId,
+          content: formData
         })
       });
       
-      console.log(`📡 [AboutSection] Save API Response Status: ${response.status}`);
-      
       if (response.ok) {
-        const result = await response.json();
-        console.log('✅ [AboutSection] Save successful:', result);
-        
         setShowSuccessPopup(true);
         setIsEditing(false);
-        
-        // ✅ Reload fresh data after save
-        console.log('🔄 [AboutSection] Reloading fresh data after save...');
         await loadFromDatabase(false);
-        
-        // Hide popup after 3 seconds
         setTimeout(() => setShowSuccessPopup(false), 3000);
       } else {
-        const error = await response.json();
-        console.error('❌ [AboutSection] Save failed:', error);
-        alert('Failed to save changes: ' + (error.error || error.message));
+        alert('Failed to save changes');
       }
     } catch (error) {
-      console.error('❌ [AboutSection] Error saving:', error);
+      console.error('Error saving:', error);
       alert('Failed to save changes. Please try again.');
     } finally {
       setIsSaving(false);
@@ -355,11 +217,10 @@ const getActiveTemplateId = () => {
 
   // Manual refresh handler
   const handleRefresh = async () => {
-    console.log('🔄 [AboutSection] Manual refresh triggered');
     await loadFromDatabase(true);
   };
 
-  // Array handlers
+  // Story handlers
   const addStoryParagraph = () => {
     setFormData(prev => ({ ...prev, story: [...prev.story, 'New paragraph...'] }));
   };
@@ -374,26 +235,7 @@ const getActiveTemplateId = () => {
     setFormData(prev => ({ ...prev, story: prev.story.filter((_, i) => i !== index) }));
   };
 
-  const addPhilosophyPoint = () => {
-    setFormData(prev => ({
-      ...prev,
-      philosophy: { ...prev.philosophy, points: [...prev.philosophy.points, 'New philosophy point...'] }
-    }));
-  };
-
-  const updatePhilosophyPoint = (index: number, value: string) => {
-    const newPoints = [...formData.philosophy.points];
-    newPoints[index] = value;
-    setFormData(prev => ({ ...prev, philosophy: { ...prev.philosophy, points: newPoints } }));
-  };
-
-  const removePhilosophyPoint = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      philosophy: { ...prev.philosophy, points: prev.philosophy.points.filter((_, i) => i !== index) }
-    }));
-  };
-
+  // Value handlers
   const addValue = () => {
     const newId = Math.max(...formData.values.map(v => v.id), 0) + 1;
     setFormData(prev => ({
@@ -412,52 +254,10 @@ const getActiveTemplateId = () => {
     setFormData(prev => ({ ...prev, values: prev.values.filter((_, i) => i !== index) }));
   };
 
-  const addApproachAspect = () => {
-    setFormData(prev => ({
-      ...prev,
-      approach: { ...prev.approach, aspects: [...prev.approach.aspects, { title: 'New Aspect', description: 'Description' }] }
-    }));
-  };
-
-  const updateApproachAspect = (index: number, field: string, value: string) => {
-    const newAspects = [...formData.approach.aspects];
-    newAspects[index] = { ...newAspects[index], [field]: value };
-    setFormData(prev => ({ ...prev, approach: { ...prev.approach, aspects: newAspects } }));
-  };
-
-  const removeApproachAspect = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      approach: { ...prev.approach, aspects: prev.approach.aspects.filter((_, i) => i !== index) }
-    }));
-  };
-
-  const addWhyChooseUsPoint = () => {
-    setFormData(prev => ({
-      ...prev,
-      whyChooseUs: {
-        ...prev.whyChooseUs,
-        points: [...prev.whyChooseUs.points, { title: 'New Feature', description: 'Description', icon: 'star' }]
-      }
-    }));
-  };
-
-  const updateWhyChooseUsPoint = (index: number, field: string, value: string) => {
-    const newPoints = [...formData.whyChooseUs.points];
-    newPoints[index] = { ...newPoints[index], [field]: value };
-    setFormData(prev => ({ ...prev, whyChooseUs: { ...prev.whyChooseUs, points: newPoints } }));
-  };
-
-  const removeWhyChooseUsPoint = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      whyChooseUs: { ...prev.whyChooseUs, points: prev.whyChooseUs.points.filter((_, i) => i !== index) }
-    }));
-  };
-
-  const handleImageChange = (key: 'logo' | 'coverImage', fileOrString: File | string) => {
+  // Image handlers - only upload, no URL paste
+  const handleImageChange = (key: 'heroImage' | 'historyImage', fileOrString: File | string) => {
+    // If it's a string (URL), ignore it - we only allow upload
     if (typeof fileOrString === 'string') {
-      setFormData(prev => ({ ...prev, [key]: fileOrString }));
       return;
     }
     const reader = new FileReader();
@@ -494,11 +294,11 @@ const getActiveTemplateId = () => {
       )}
 
       <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
-        {/* Header with Refresh Button */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About Section</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage complete about page content</p>
+            <p className="text-gray-600 dark:text-gray-400">Manage about page content</p>
             <div className="flex items-center gap-3 mt-1">
               <p className="text-xs text-teal-600 dark:text-teal-400">Template ID: {getActiveTemplateId()}</p>
               <p className="text-xs text-blue-600 dark:text-blue-400">College ID: {getCollegeId()}</p>
@@ -513,7 +313,7 @@ const getActiveTemplateId = () => {
             </Button>
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
-                <FiEdit2 className="w-4 h-4 mr-2" /> Edit All Content
+                <FiEdit2 className="w-4 h-4 mr-2" /> Edit Content
               </Button>
             ) : (
               <>
@@ -536,37 +336,72 @@ const getActiveTemplateId = () => {
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  You can modify all about page content. Changes will be saved to database and reflected on live template.
+                  Upload images directly from your computer. URL paste is not allowed.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Rest of the UI sections - same as before */}
         <div className="space-y-8">
-          {/* Basic Info Section */}
+          {/* ===== HERO SECTION ===== */}
           <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Hero Section</h3>
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Institute Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Title</label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  value={formData.heroTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heroTitle: e.target.value }))}
                   disabled={!isEditing}
                   className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
-                  placeholder="Institute Name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tagline</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Subtitle</label>
                 <input
                   type="text"
-                  value={formData.tagline}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tagline: e.target.value }))}
+                  value={formData.heroSubtitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heroSubtitle: e.target.value }))}
                   disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Image (Upload Only)</label>
+                <UploadImage
+                  value={formData.heroImage}
+                  onChange={(file) => handleImageChange('heroImage', file)}
+                  onRemove={() => setFormData(prev => ({ ...prev, heroImage: '' }))}
+                  aspectRatio="banner"
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ===== HISTORY SECTION ===== */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">History Section</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">History Title (e.g. Since 1985)</label>
+                <input
+                  type="text"
+                  value={formData.historyTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, historyTitle: e.target.value }))}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">History Description</label>
+                <textarea
+                  value={formData.historyDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, historyDescription: e.target.value }))}
+                  disabled={!isEditing}
+                  rows={4}
                   className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
                 />
               </div>
@@ -580,39 +415,32 @@ const getActiveTemplateId = () => {
                   className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
                 />
               </div>
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>
-              <textarea
-                value={formData.shortDescription}
-                onChange={(e) => setFormData(prev => ({ ...prev, shortDescription: e.target.value }))}
-                disabled={!isEditing}
-                rows={3}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
-              />
-            </div>
-          </div>
-
-          {/* Images Section */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Images</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
-                <UploadImage
-                  value={formData.logo}
-                  onChange={(file) => handleImageChange('logo', file)}
-                  onRemove={() => handleImageChange('logo', '')}
-                  aspectRatio="square"
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heritage Title</label>
+                <input
+                  type="text"
+                  value={formData.heritageTitle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heritageTitle: e.target.value }))}
                   disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heritage Description</label>
+                <input
+                  type="text"
+                  value={formData.heritageDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, heritageDescription: e.target.value }))}
+                  disabled={!isEditing}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">History Image (Upload Only)</label>
                 <UploadImage
-                  value={formData.coverImage}
-                  onChange={(file) => handleImageChange('coverImage', file)}
-                  onRemove={() => handleImageChange('coverImage', '')}
+                  value={formData.historyImage}
+                  onChange={(file) => handleImageChange('historyImage', file)}
+                  onRemove={() => setFormData(prev => ({ ...prev, historyImage: '' }))}
                   aspectRatio="banner"
                   disabled={!isEditing}
                 />
@@ -620,10 +448,59 @@ const getActiveTemplateId = () => {
             </div>
           </div>
 
-          {/* Story Section */}
+          {/* ===== VISION & MISSION ===== */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vision & Mission</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vision</label>
+                <textarea
+                  value={formData.vision}
+                  onChange={(e) => setFormData(prev => ({ ...prev, vision: e.target.value }))}
+                  disabled={!isEditing}
+                  rows={3}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mission</label>
+                <textarea
+                  value={formData.mission}
+                  onChange={(e) => setFormData(prev => ({ ...prev, mission: e.target.value }))}
+                  disabled={!isEditing}
+                  rows={3}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Guiding Title</label>
+                  <input
+                    type="text"
+                    value={formData.guidingTitle}
+                    onChange={(e) => setFormData(prev => ({ ...prev, guidingTitle: e.target.value }))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Guiding Subtitle</label>
+                  <input
+                    type="text"
+                    value={formData.guidingSubtitle}
+                    onChange={(e) => setFormData(prev => ({ ...prev, guidingSubtitle: e.target.value }))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== STORY ===== */}
           <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Story (Paragraphs)</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Story</h3>
               {isEditing && (
                 <Button size="sm" onClick={addStoryParagraph} className="bg-teal-600">
                   <FiPlus className="w-3 h-3 mr-1" /> Add Paragraph
@@ -651,83 +528,8 @@ const getActiveTemplateId = () => {
             </div>
           </div>
 
-          {/* Mission & Vision */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Mission</h3>
-              <textarea
-                value={formData.mission}
-                onChange={(e) => setFormData(prev => ({ ...prev, mission: e.target.value }))}
-                disabled={!isEditing}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
-                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
-              />
-            </div>
-            <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vision</h3>
-              <textarea
-                value={formData.vision}
-                onChange={(e) => setFormData(prev => ({ ...prev, vision: e.target.value }))}
-                disabled={!isEditing}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
-                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
-              />
-            </div>
-          </div>
-
-          {/* Philosophy */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Philosophy</h3>
-              {isEditing && (
-                <Button size="sm" onClick={addPhilosophyPoint} className="bg-teal-600">
-                  <FiPlus className="w-3 h-3 mr-1" /> Add Point
-                </Button>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Heading</label>
-              <input
-                type="text"
-                value={formData.philosophy.heading}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  philosophy: { ...prev.philosophy, heading: e.target.value }
-                }))}
-                disabled={!isEditing}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
-                           disabled:bg-gray-100 dark:disabled:bg-gray-700"
-              />
-            </div>
-            <div className="space-y-3">
-              {formData.philosophy.points.map((point, index) => (
-                <div key={index} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={point}
-                    onChange={(e) => updatePhilosophyPoint(index, e.target.value)}
-                    disabled={!isEditing}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-900 text-gray-900 dark:text-white 
-                               disabled:bg-gray-100 dark:disabled:bg-gray-700"
-                  />
-                  {isEditing && (
-                    <Button variant="ghost" size="sm" onClick={() => removePhilosophyPoint(index)} className="text-red-500">
-                      <FiTrash2 />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Values */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          {/* ===== VALUES ===== */}
+          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Core Values</h3>
               {isEditing && (
@@ -777,133 +579,6 @@ const getActiveTemplateId = () => {
                       <option value="shield">Shield</option>
                       <option value="star">Star</option>
                       <option value="heart">Heart</option>
-                    </select>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Approach */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Approach</h3>
-              {isEditing && (
-                <Button size="sm" onClick={addApproachAspect} className="bg-teal-600">
-                  <FiPlus className="w-3 h-3 mr-1" /> Add Aspect
-                </Button>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-              <textarea
-                value={formData.approach.description}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  approach: { ...prev.approach, description: e.target.value }
-                }))}
-                disabled={!isEditing}
-                rows={2}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600"
-              />
-            </div>
-            <div className="space-y-4">
-              {formData.approach.aspects.map((aspect, index) => (
-                <div key={index} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">Aspect {index + 1}</span>
-                    {isEditing && (
-                      <Button variant="ghost" size="sm" onClick={() => removeApproachAspect(index)} className="text-red-500">
-                        <FiTrash2 />
-                      </Button>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      value={aspect.title}
-                      onChange={(e) => updateApproachAspect(index, 'title', e.target.value)}
-                      disabled={!isEditing}
-                      placeholder="Title"
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    />
-                    <textarea
-                      value={aspect.description}
-                      onChange={(e) => updateApproachAspect(index, 'description', e.target.value)}
-                      disabled={!isEditing}
-                      rows={2}
-                      placeholder="Description"
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Why Choose Us */}
-          <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Why Choose Us</h3>
-              {isEditing && (
-                <Button size="sm" onClick={addWhyChooseUsPoint} className="bg-teal-600">
-                  <FiPlus className="w-3 h-3 mr-1" /> Add Point
-                </Button>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Intro Text</label>
-              <textarea
-                value={formData.whyChooseUs.intro}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  whyChooseUs: { ...prev.whyChooseUs, intro: e.target.value }
-                }))}
-                disabled={!isEditing}
-                rows={2}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-900 dark:text-white dark:border-gray-600"
-              />
-            </div>
-            <div className="space-y-4">
-              {formData.whyChooseUs.points.map((point, index) => (
-                <div key={index} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="flex justify-between mb-3">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">Point {index + 1}</span>
-                    {isEditing && (
-                      <Button variant="ghost" size="sm" onClick={() => removeWhyChooseUsPoint(index)} className="text-red-500">
-                        <FiTrash2 />
-                      </Button>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      value={point.title}
-                      onChange={(e) => updateWhyChooseUsPoint(index, 'title', e.target.value)}
-                      disabled={!isEditing}
-                      placeholder="Title"
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    />
-                    <textarea
-                      value={point.description}
-                      onChange={(e) => updateWhyChooseUsPoint(index, 'description', e.target.value)}
-                      disabled={!isEditing}
-                      rows={2}
-                      placeholder="Description"
-                      className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    />
-                    <select
-                      value={point.icon}
-                      onChange={(e) => updateWhyChooseUsPoint(index, 'icon', e.target.value)}
-                      disabled={!isEditing}
-                      className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    >
-                      <option value="users">Users</option>
-                      <option value="book">Book</option>
-                      <option value="target">Target</option>
-                      <option value="heart">Heart</option>
-                      <option value="shield">Shield</option>
-                      <option value="star">Star</option>
                     </select>
                   </div>
                 </div>

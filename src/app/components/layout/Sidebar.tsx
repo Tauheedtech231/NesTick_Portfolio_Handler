@@ -4,20 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { SectionType } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
 import {
-  FiHome,
-  FiUsers,
-  FiCalendar,
-  FiImage,
-  FiBook,
-  FiMail,
   FiChevronLeft,
   FiChevronRight,
   FiSearch,
-  FiInfo,
-  FiBriefcase,
-  FiAward,
-  FiStar,
-  FiMapPin
 } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 /* eslint-disable */
@@ -27,26 +16,6 @@ interface SidebarProps {
   onPreview: () => void;
   modules?: string[];
 }
-
-// Dynamic icon mapping based on section name
-const getIconForSection = (sectionName: string) => {
-  const iconMap: Record<string, any> = {
-    'dashboard': FiImage,
-    'about': FiHome,
-    'faculty': FiUsers,
-    'events': FiCalendar,
-    'gallery': FiImage,
-    'courses': FiBook,
-    'contact': FiMail,
-    'hero': FiStar,
-    'services': FiBriefcase,
-    'testimonials': FiAward,
-    'location': FiMapPin,
-    'info': FiInfo
-  };
-  
-  return iconMap[sectionName.toLowerCase()] || FiInfo;
-};
 
 export function Sidebar({ activeSection, onSectionChange, onPreview, modules = [] }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -188,7 +157,6 @@ export function Sidebar({ activeSection, onSectionChange, onPreview, modules = [
                 : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
             )}
           >
-            <FiImage size={20} className="transition-transform duration-300 group-hover:scale-110" />
             {!isCollapsed && <span>Dashboard</span>}
           </button>
         </nav>
@@ -252,11 +220,10 @@ export function Sidebar({ activeSection, onSectionChange, onPreview, modules = [
         </div>
       )}
 
-      {/* Navigation - Dynamic sections from API */}
+      {/* Navigation - Dynamic sections from API with no icons */}
       <nav className="flex-1 flex flex-col gap-1 px-4 items-start overflow-y-auto py-4">
         {filteredSections.length > 0 ? (
           filteredSections.map((section, index) => {
-            const Icon = getIconForSection(section.id);
             const isActive = activeSection === section.id;
 
             return (
@@ -275,15 +242,6 @@ export function Sidebar({ activeSection, onSectionChange, onPreview, modules = [
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white hover:shadow-sm'
                 )}
               >
-                <Icon
-                  size={20}
-                  className={cn(
-                    'transition-all duration-300 flex-shrink-0',
-                    isActive
-                      ? 'scale-110 text-gray-900 dark:text-white'
-                      : 'group-hover:scale-110 group-hover:rotate-6 text-gray-600 dark:text-gray-300'
-                  )}
-                />
                 {!isCollapsed && (
                   <span className="truncate transition-all duration-300">
                     {section.name}
