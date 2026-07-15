@@ -71,14 +71,6 @@ const statusColors: Record<string, string> = {
   fee_pending: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
 };
 
-const statusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'fee_pending', label: 'Fee Pending' },
-];
-
 export function FormManagerSection({ college, templateId }: FormManagerSectionProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [fields, setFields] = useState<FormField[]>([]);
@@ -215,13 +207,6 @@ export function FormManagerSection({ college, templateId }: FormManagerSectionPr
       await callAPI('delete_field', { fieldId });
       setLoadingAction(null);
     }
-  };
-
-  // Update application status with loading
-  const handleStatusUpdate = async (applicationId: string, status: string) => {
-    setLoadingAction({ type: 'status', id: parseInt(applicationId) });
-    await callAPI('update_application_status', { applicationId, status });
-    setLoadingAction(null);
   };
 
   // Group fields by section
@@ -516,7 +501,7 @@ export function FormManagerSection({ college, templateId }: FormManagerSectionPr
         </div>
       )}
 
-      {/* ===== APPLICATIONS TAB ===== */}
+      {/* ===== APPLICATIONS TAB - READ ONLY ===== */}
       {activeTab === 'applications' && (
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Student Applications</h3>
@@ -534,52 +519,29 @@ export function FormManagerSection({ college, templateId }: FormManagerSectionPr
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {applications.map((app) => {
-                  const isActionLoading = loadingAction?.id === app.id;
-                  const isStatusUpdating = loadingAction?.type === 'status' && loadingAction.id === app.id;
-                  
-                  return (
-                    <tr key={app.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150">
-                      <td className="px-4 py-3 font-mono text-xs text-teal-600 dark:text-teal-400 font-medium">{app.application_id}</td>
-                      <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{app.student_name}</td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{app.student_email}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status] || statusColors.pending}`}>
-                          {app.status.replace('_', ' ').toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">
-                        {new Date(app.applied_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={app.status}
-                            onChange={(e) => handleStatusUpdate(app.application_id, e.target.value)}
-                            className="px-2 py-1 border rounded-lg text-xs dark:bg-gray-800 dark:text-white cursor-pointer hover:border-teal-500 transition-colors duration-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isStatusUpdating}
-                          >
-                            {statusOptions.map(opt => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                          <button
-                            onClick={() => setViewingApp(app)}
-                            className="text-blue-500 hover:text-blue-700 transition-colors duration-200 p-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
-                          >
-                            <FiEye className="w-4 h-4" />
-                          </button>
-                          {isStatusUpdating && (
-                            <div className="flex items-center gap-1 text-teal-600">
-                              <FiLoader className="w-3 h-3 animate-spin" />
-                              <span className="text-xs">Updating...</span>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {applications.map((app) => (
+                  <tr key={app.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150">
+                    <td className="px-4 py-3 font-mono text-xs text-teal-600 dark:text-teal-400 font-medium">{app.application_id}</td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">{app.student_name}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{app.student_email}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status] || statusColors.pending}`}>
+                        {app.status.replace('_', ' ').toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs">
+                      {new Date(app.applied_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => setViewingApp(app)}
+                        className="text-blue-500 hover:text-blue-700 transition-colors duration-200 p-1 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
+                      >
+                        <FiEye className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -593,7 +555,7 @@ export function FormManagerSection({ college, templateId }: FormManagerSectionPr
         </div>
       )}
 
-      {/* View Application Modal */}
+      {/* View Application Modal - Read Only */}
       {viewingApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setViewingApp(null)} />
@@ -646,7 +608,7 @@ export function FormManagerSection({ college, templateId }: FormManagerSectionPr
               <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
                 <h4 className="font-semibold mb-2 text-sm text-gray-900 dark:text-white">Form Data</h4>
                 <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-xs overflow-auto max-h-60">
-                  <pre className="text-gray-800 dark:text-gray-200 font-mono">
+                  <pre className="text-gray-800 dark:text-gray-200 font-mono whitespace-pre-wrap break-words">
                     {JSON.stringify(viewingApp.form_data, null, 2)}
                   </pre>
                 </div>

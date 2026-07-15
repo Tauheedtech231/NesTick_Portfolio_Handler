@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, User, Menu, X, LayoutDashboard } from 'lucide-react';
+import { LogOut, Menu, X, ExternalLink, Globe } from 'lucide-react';
 import { ThemeToggleProfessional } from './ThemeToggleProfessional';
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +22,35 @@ interface AuthCollege {
 export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
+  const [collegeId, setCollegeId] = useState<string>('');
+  const [liveSiteUrl, setLiveSiteUrl] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // ✅ Fetch college website from internal API
+  const fetchCollegeWebsite = async (id: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/colleges/website?college_id=${id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📦 [Header] API Response:', data);
+        
+        if (data.success && data.data?.website) {
+          setLiveSiteUrl(data.data.website);
+        } else {
+          console.log('⚠️ No website found for this college');
+        }
+      } else {
+        console.error('❌ API error:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching college website:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = () => {
@@ -37,6 +65,10 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
           } else {
             setIsAuthenticated(true);
             setUserName(authData.name || authData.email);
+            setCollegeId(authData.collegeId);
+            if (authData.collegeId) {
+              fetchCollegeWebsite(authData.collegeId);
+            }
           }
         } catch {
           localStorage.removeItem('auth_college');
@@ -59,6 +91,7 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
     localStorage.removeItem('auth_college');
     setIsAuthenticated(false);
     setUserName('');
+    setLiveSiteUrl('');
     window.location.href = '/College_Portfolio_Handler/login';
   };
 
@@ -66,9 +99,10 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
     window.open('/College_Portfolio_Handler/login', '_blank');
   };
 
-  // ✅ Logo click handler - redirect to home
-  const handleLogoClick = () => {
-    router.push('/');
+  const handleLiveSiteClick = () => {
+    if (liveSiteUrl) {
+      window.open(liveSiteUrl, '_blank');
+    }
   };
 
   return (
@@ -84,7 +118,7 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
       className="sticky top-0 z-50 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 shadow-lg shadow-gray-200/20 dark:shadow-gray-800/20"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
-        {/* Left: Mobile Menu Button Only */}
+        {/* Left: Mobile Menu Button + Live Site Button */}
         <div className="flex items-center gap-2">
           {toggleSidebar && (
             <motion.button
@@ -102,43 +136,37 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
             </motion.button>
           )}
 
-          {/* Professional Logo/Brand with Animation - Clickable */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ 
-              type: "spring",
-              stiffness: 200,
-              damping: 15,
-              delay: 0.1
-            }}
-            className="flex items-center gap-3 cursor-pointer"
-            onClick={handleLogoClick}
-          >
-            <motion.div
+          {/* ✅ Live Site Button - Only this on left */}
+          {isAuthenticated && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.25, duration: 0.3 }}
               whileHover={{ 
                 scale: 1.05,
-                rotate: [-2, 2, -2, 0],
-                transition: { duration: 0.3 }
+                boxShadow: "0 10px 25px -5px rgba(13, 148, 136, 0.3)"
               }}
-              className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 flex items-center justify-center shadow-lg shadow-gray-900/20 dark:shadow-white/10"
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLiveSiteClick}
+              disabled={!liveSiteUrl}
+              className={`px-3 py-2 rounded-xl font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
+                liveSiteUrl 
+                  ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 shadow-md shadow-teal-600/20 hover:shadow-teal-600/40' 
+                  : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+              }`}
             >
-              <LayoutDashboard className="w-5 h-5 text-white dark:text-gray-900" />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="hidden sm:block"
-            >
-              <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight">
-                Dashboard
-              </h1>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium -mt-0.5">
-                College Management
-              </p>
-            </motion.div>
-          </motion.div>
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">{liveSiteUrl ? 'Live Site' : 'No Site'}</span>
+              {liveSiteUrl && <ExternalLink className="w-3 h-3" />}
+            </motion.button>
+          )}
+
+          {/* Loading state for live site button */}
+          {isAuthenticated && loading && (
+            <div className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse">
+              <span className="text-sm text-gray-400">Loading...</span>
+            </div>
+          )}
         </div>
 
         {/* Right: Theme Toggle + Auth with Animations */}
@@ -161,8 +189,6 @@ export function Header({ collegeName, isSidebarOpen, toggleSidebar }: HeaderProp
               transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
               className="flex items-center gap-2"
             >
-            
-
               {/* Sign Out Button */}
               <motion.button
                 whileHover={{ 
