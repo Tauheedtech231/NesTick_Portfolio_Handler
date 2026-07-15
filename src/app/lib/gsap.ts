@@ -107,6 +107,8 @@ export type SectionType =
   | 'aboutcourses'
   | 'scholarshipstats'
   | 'programsstats'
+  | 'aboutstats'
+  | 'facultystats'
   | 'flexible';
 
 export interface SectionConfig {
