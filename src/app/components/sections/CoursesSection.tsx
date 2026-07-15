@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -7,7 +8,7 @@ import { UploadImage } from '@/components/ui/UploadImage';
 import { 
   FiEdit2, FiSave, FiX, FiPlus, FiTrash2, FiBook, 
   FiClock, FiUser, FiAward, FiRefreshCw, FiCheck,
-  FiBriefcase, FiUsers, FiCalendar, FiSearch
+  FiBriefcase, FiUsers, FiCalendar, FiSearch, FiImage
 } from 'react-icons/fi';
 import { FaCertificate, FaCalendarAlt, FaShieldAlt } from 'react-icons/fa';
 
@@ -284,7 +285,6 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
       duration: '2 Years',
       level: newLevels[levelIndex].id
     });
-    // Update count label
     newLevels[levelIndex].countLabel = `${newLevels[levelIndex].programs.length} Programs`;
     setCoursesData(prev => ({ ...prev, levels: newLevels }));
   };
@@ -327,7 +327,21 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
     }));
   };
 
-  const handleImageUpload = (levelIndex: number, programIndex: number, fileOrString: File | string) => {
+  // ✅ Hero Image Handler
+  const handleHeroImageChange = (fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      setCoursesData(prev => ({ ...prev, heroImage: fileOrString }));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCoursesData(prev => ({ ...prev, heroImage: reader.result as string }));
+    };
+    reader.readAsDataURL(fileOrString);
+  };
+
+  // Program Image Handler
+  const handleProgramImageUpload = (levelIndex: number, programIndex: number, fileOrString: File | string) => {
     if (typeof fileOrString === 'string') {
       updateProgram(levelIndex, programIndex, 'image', fileOrString);
       return;
@@ -339,12 +353,43 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
     reader.readAsDataURL(fileOrString);
   };
 
+  // ✅ Render Image Preview
+  const renderImagePreview = (image: string, label: string) => {
+    if (!image) return null;
+    return (
+      <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
+        <div className="flex items-center gap-2 mb-2">
+          <FiImage className="w-3.5 h-3.5 text-teal-500 cursor-pointer" />
+          <p className="text-xs text-gray-500 dark:text-gray-400 cursor-pointer">
+            {label} - Preview
+          </p>
+          <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full cursor-pointer">
+            ✓ Uploaded
+          </span>
+        </div>
+        <div className="relative rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 shadow-md">
+          <img 
+            src={image} 
+            alt={label} 
+            className="w-full aspect-[16/9] object-cover"
+          />
+          <div className="absolute top-0 left-0 right-0 h-6 bg-gray-800/80 flex items-center px-3 gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <span className="text-[8px] text-white/60 ml-2">Image Preview</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading programs...</p>
+          <p className="text-gray-500 dark:text-gray-400 cursor-pointer">Loading programs...</p>
         </div>
       </div>
     );
@@ -353,12 +398,12 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
   return (
     <>
       {showSuccessPopup && (
-        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right-4 duration-300">
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right-4 duration-300 cursor-pointer">
           <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
             <FiCheck className="w-5 h-5" />
             <div>
-              <p className="font-medium">Programs Saved Successfully!</p>
-              <p className="text-sm text-green-100">Data refreshed from database.</p>
+              <p className="font-medium cursor-pointer">Programs Saved Successfully!</p>
+              <p className="text-sm text-green-100 cursor-pointer">Data refreshed from database.</p>
             </div>
           </div>
         </div>
@@ -368,30 +413,30 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Programs Section</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage programs content</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white cursor-pointer">Programs Section</h2>
+            <p className="text-gray-600 dark:text-gray-400 cursor-pointer">Manage programs content</p>
             <div className="flex items-center gap-3 mt-1">
-              <p className="text-xs text-teal-600 dark:text-teal-400">Template ID: {getActiveTemplateId()}</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">College ID: {getCollegeId()}</p>
+              <p className="text-xs text-teal-600 dark:text-teal-400 cursor-pointer">Template ID: {getActiveTemplateId()}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400 cursor-pointer">College ID: {getCollegeId()}</p>
               {lastUpdated && (
-                <p className="text-xs text-gray-400">Last updated: {new Date(lastUpdated).toLocaleString()}</p>
+                <p className="text-xs text-gray-400 cursor-pointer">Last updated: {new Date(lastUpdated).toLocaleString()}</p>
               )}
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" onClick={() => loadFromDatabase(true)}>
+            <Button variant="outline" className="gap-2 cursor-pointer" onClick={() => loadFromDatabase(true)}>
               <FiRefreshCw className="w-4 h-4" /> Refresh
             </Button>
             {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
+              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
                 <FiEdit2 className="w-4 h-4 mr-2" /> Edit Programs
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="cursor-pointer">
                   <FiX className="w-4 h-4 mr-2" /> Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
                   <FiSave className="w-4 h-4 mr-2" />
                   {isSaving ? 'Saving...' : 'Save All Changes'}
                 </Button>
@@ -403,10 +448,10 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
         {isEditing && (
           <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
             <div className="flex items-start gap-3">
-              <FiBook className="w-5 h-5 text-blue-600 mt-0.5" />
+              <FiBook className="w-5 h-5 text-blue-600 mt-0.5 cursor-pointer" />
               <div>
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100 cursor-pointer">Edit Mode Active</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300 cursor-pointer">
                   Modify programs content. Changes will be saved to database.
                 </p>
               </div>
@@ -414,39 +459,41 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
           </div>
         )}
 
-        {/* Hero Settings */}
+        {/* ✅ Hero Settings with Upload + Preview */}
         <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Hero Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 cursor-pointer">Hero Settings</h3>
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Title</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Hero Title</label>
               <input
                 type="text"
                 value={coursesData.heroTitle}
                 onChange={(e) => setCoursesData(prev => ({ ...prev, heroTitle: e.target.value }))}
                 disabled={!isEditing}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Subtitle</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Hero Subtitle</label>
               <input
                 type="text"
                 value={coursesData.heroSubtitle}
                 onChange={(e) => setCoursesData(prev => ({ ...prev, heroSubtitle: e.target.value }))}
                 disabled={!isEditing}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Image URL</label>
-              <input
-                type="text"
-                value={coursesData.heroImage}
-                onChange={(e) => setCoursesData(prev => ({ ...prev, heroImage: e.target.value }))}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Hero Image</label>
+              <UploadImage
+                value={coursesData.heroImage || ''}
+                onChange={handleHeroImageChange}
+                onRemove={() => handleHeroImageChange('')}
+                aspectRatio="banner"
                 disabled={!isEditing}
-                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
               />
+              {/* ✅ Hero Image Preview */}
+              {coursesData.heroImage && renderImagePreview(coursesData.heroImage, 'Hero Image')}
             </div>
           </div>
         </div>
@@ -454,9 +501,9 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
         {/* Highlights */}
         <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Highlights</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white cursor-pointer">Highlights</h3>
             {isEditing && (
-              <Button size="sm" onClick={addHighlight} className="bg-teal-600">
+              <Button size="sm" onClick={addHighlight} className="bg-teal-600 cursor-pointer">
                 <FiPlus className="w-3 h-3 mr-1" /> Add Highlight
               </Button>
             )}
@@ -465,9 +512,9 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
             {coursesData.highlights.map((highlight, index) => (
               <div key={highlight.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="font-medium">Highlight {index + 1}</span>
+                  <span className="font-medium cursor-pointer">Highlight {index + 1}</span>
                   {isEditing && (
-                    <Button variant="ghost" size="sm" onClick={() => removeHighlight(index)} className="text-red-500">
+                    <Button variant="ghost" size="sm" onClick={() => removeHighlight(index)} className="text-red-500 cursor-pointer">
                       <FiTrash2 />
                     </Button>
                   )}
@@ -477,7 +524,7 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
                     value={highlight.icon}
                     onChange={(e) => updateHighlight(index, 'icon', e.target.value)}
                     disabled={!isEditing}
-                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white cursor-pointer"
                   >
                     <option value="FaCertificate">Certificate</option>
                     <option value="FaCalendarAlt">Calendar</option>
@@ -489,7 +536,7 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
                     onChange={(e) => updateHighlight(index, 'title', e.target.value)}
                     disabled={!isEditing}
                     placeholder="Title"
-                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white cursor-text"
                   />
                   <input
                     type="text"
@@ -497,7 +544,7 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
                     onChange={(e) => updateHighlight(index, 'description', e.target.value)}
                     disabled={!isEditing}
                     placeholder="Description"
-                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white"
+                    className="px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white cursor-text"
                   />
                 </div>
               </div>
@@ -508,9 +555,9 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
         {/* Levels and Programs */}
         <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Program Levels</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white cursor-pointer">Program Levels</h3>
             {isEditing && (
-              <Button size="sm" onClick={addLevel} className="bg-teal-600">
+              <Button size="sm" onClick={addLevel} className="bg-teal-600 cursor-pointer">
                 <FiPlus className="w-3 h-3 mr-1" /> Add Level
               </Button>
             )}
@@ -520,9 +567,9 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
             {coursesData.levels.map((level, levelIndex) => (
               <div key={level.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200">
                 <div className="flex justify-between items-center mb-3">
-                  <span className="font-medium">Level #{levelIndex + 1}</span>
+                  <span className="font-medium cursor-pointer">Level #{levelIndex + 1}</span>
                   {isEditing && (
-                    <Button variant="ghost" size="sm" onClick={() => removeLevel(levelIndex)} className="text-red-500">
+                    <Button variant="ghost" size="sm" onClick={() => removeLevel(levelIndex)} className="text-red-500 cursor-pointer">
                       <FiTrash2 />
                     </Button>
                   )}
@@ -530,32 +577,32 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">Level Label</label>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Level Label</label>
                     <input
                       type="text"
                       value={level.label}
                       onChange={(e) => updateLevel(levelIndex, 'label', e.target.value)}
                       disabled={!isEditing}
-                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">Count Label</label>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Count Label</label>
                     <input
                       type="text"
                       value={level.countLabel}
                       onChange={(e) => updateLevel(levelIndex, 'countLabel', e.target.value)}
                       disabled={!isEditing}
-                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                     />
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Programs</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">Programs</h4>
                     {isEditing && (
-                      <Button size="sm" variant="outline" onClick={() => addProgram(levelIndex)} className="text-teal-600">
+                      <Button size="sm" variant="outline" onClick={() => addProgram(levelIndex)} className="text-teal-600 cursor-pointer">
                         <FiPlus className="w-3 h-3 mr-1" /> Add Program
                       </Button>
                     )}
@@ -565,63 +612,65 @@ export function CoursesSection({ college, templateId }: CoursesSectionProps) {
                     {level.programs.map((program, programIndex) => (
                       <div key={program.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Program #{programIndex + 1}</span>
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Program #{programIndex + 1}</span>
                           {isEditing && (
-                            <Button variant="ghost" size="sm" onClick={() => removeProgram(levelIndex, programIndex)} className="text-red-500">
+                            <Button variant="ghost" size="sm" onClick={() => removeProgram(levelIndex, programIndex)} className="text-red-500 cursor-pointer">
                               <FiTrash2 className="w-3 h-3" />
                             </Button>
                           )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           <div>
-                            <label className="block text-xs text-gray-500 dark:text-gray-400">Name</label>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 cursor-pointer">Name</label>
                             <input
                               type="text"
                               value={program.name}
                               onChange={(e) => updateProgram(levelIndex, programIndex, 'name', e.target.value)}
                               disabled={!isEditing}
-                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 dark:text-gray-400">Full Name</label>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 cursor-pointer">Full Name</label>
                             <input
                               type="text"
                               value={program.full}
                               onChange={(e) => updateProgram(levelIndex, programIndex, 'full', e.target.value)}
                               disabled={!isEditing}
-                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 dark:text-gray-400">Duration</label>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 cursor-pointer">Duration</label>
                             <input
                               type="text"
                               value={program.duration}
                               onChange={(e) => updateProgram(levelIndex, programIndex, 'duration', e.target.value)}
                               disabled={!isEditing}
-                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 dark:text-gray-400">Level</label>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 cursor-pointer">Level</label>
                             <input
                               type="text"
                               value={program.level || ''}
                               onChange={(e) => updateProgram(levelIndex, programIndex, 'level', e.target.value)}
                               disabled={!isEditing}
-                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                              className="w-full px-2 py-1 border rounded text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
                             />
                           </div>
                           <div className="md:col-span-2">
-                            <label className="block text-xs text-gray-500 dark:text-gray-400">Program Image</label>
+                            <label className="block text-xs text-gray-500 dark:text-gray-400 cursor-pointer">Program Image</label>
                             <UploadImage
                               value={program.image || ''}
-                              onChange={(file) => handleImageUpload(levelIndex, programIndex, file)}
-                              onRemove={() => handleImageUpload(levelIndex, programIndex, '')}
+                              onChange={(file) => handleProgramImageUpload(levelIndex, programIndex, file)}
+                              onRemove={() => handleProgramImageUpload(levelIndex, programIndex, '')}
                               aspectRatio="video"
                               disabled={!isEditing}
                             />
+                            {/* ✅ Program Image Preview */}
+                            {program.image && renderImagePreview(program.image, program.name)}
                           </div>
                         </div>
                       </div>

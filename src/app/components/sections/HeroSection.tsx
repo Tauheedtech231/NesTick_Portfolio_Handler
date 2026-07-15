@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { 
   FiEdit2, FiSave, FiX, FiInfo, FiPlus, FiTrash2, FiCheck,
-  FiRefreshCw
+  FiRefreshCw, FiImage, FiMonitor, FiSmartphone
 } from 'react-icons/fi';
 
 interface HeroSectionProps {
@@ -23,7 +23,8 @@ interface SlideData {
   desc: string;
   cta: string;
   ctaLink: string;
-  image: string;
+  desktopImage: string;
+  mobileImage: string;
 }
 
 interface HeroFormData {
@@ -38,11 +39,12 @@ const defaultFormData: HeroFormData = {
   slides: [
     {
       eyebrow: 'Welcome To',
-      title: 'Aspire College',
+      title: 'Nestick College',
       desc: 'Leading educational institution in Pakistan...',
       cta: 'Get Started',
       ctaLink: '/admission',
-      image: ''
+      desktopImage: '',
+      mobileImage: ''
     },
     {
       eyebrow: 'Our Programs',
@@ -50,7 +52,8 @@ const defaultFormData: HeroFormData = {
       desc: 'Explore our diverse range of academic programs...',
       cta: 'View Programs',
       ctaLink: '/programs',
-      image: ''
+      desktopImage: '',
+      mobileImage: ''
     },
     {
       eyebrow: 'Campus Life',
@@ -58,7 +61,8 @@ const defaultFormData: HeroFormData = {
       desc: 'Experience vibrant campus life...',
       cta: 'Explore Campus',
       ctaLink: '/student-life',
-      image: ''
+      desktopImage: '',
+      mobileImage: ''
     }
   ],
   bgColor: '#F8FAFC',
@@ -83,7 +87,7 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
     return parseInt((college as any).id);
   };
 
-  // ✅ Load from database
+  // ✅ Load from database - WITH BACKWARD COMPATIBILITY
   const loadFromDatabase = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoading(true);
     
@@ -92,6 +96,8 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
       const collegeId = getCollegeId();
       const timestamp = Date.now();
       const url = `/api/sections?template_id=${activeTemplateId}&section_name=Hero&college_id=${collegeId}&_=${timestamp}`;
+      
+      console.log('🔄 [Hero] Loading from:', url);
       
       const response = await fetch(url, {
         cache: 'no-store',
@@ -103,15 +109,37 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('📦 [Hero] API Response:', data);
+        
         if (data.sections && data.sections.length > 0) {
           const dbContent = data.sections[0].content;
           setLastUpdated(data.sections[0].updated_at);
           
           if (dbContent && Object.keys(dbContent).length > 0) {
+            // ✅ BACKWARD COMPATIBILITY: Convert old format to new format
+            let slides = dbContent.slides || defaultFormData.slides;
+            
+            console.log('📋 [Hero] Raw slides from DB:', slides);
+            
+            // ✅ Convert each slide
+            slides = slides.map((slide: any) => ({
+              eyebrow: slide.eyebrow || '',
+              title: slide.title || '',
+              desc: slide.desc || '',
+              cta: slide.cta || '',
+              ctaLink: slide.ctaLink || '',
+              // ✅ If desktopImage doesn't exist, use old 'image' field
+              desktopImage: slide.desktopImage || slide.image || '',
+              // ✅ If mobileImage doesn't exist, use old 'mobileImage' or empty
+              mobileImage: slide.mobileImage || ''
+            }));
+            
+            console.log('✅ [Hero] Converted slides:', slides);
+            
             setFormData({
               ...defaultFormData,
               ...dbContent,
-              slides: dbContent.slides || defaultFormData.slides
+              slides: slides
             });
           }
         }
@@ -168,7 +196,8 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
         desc: 'Description here...',
         cta: 'Learn More',
         ctaLink: '#',
-        image: ''
+        desktopImage: '',
+        mobileImage: ''
       }]
     }));
   };
@@ -186,17 +215,16 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
     }));
   };
 
-  const handleImageChange = (index: number, fileOrString: File | string) => {
+  // ✅ Image handlers - only upload, no URL paste
+  const handleImageChange = (index: number, key: 'desktopImage' | 'mobileImage', fileOrString: File | string) => {
+    // If it's a string (URL), ignore it - we only allow upload
     if (typeof fileOrString === 'string') {
-      const newSlides = [...formData.slides];
-      newSlides[index].image = fileOrString;
-      setFormData(prev => ({ ...prev, slides: newSlides }));
       return;
     }
     const reader = new FileReader();
     reader.onloadend = () => {
       const newSlides = [...formData.slides];
-      newSlides[index].image = reader.result as string;
+      newSlides[index] = { ...newSlides[index], [key]: reader.result as string };
       setFormData(prev => ({ ...prev, slides: newSlides }));
     };
     reader.readAsDataURL(fileOrString);
@@ -247,19 +275,23 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 cursor-pointer"
+              onClick={() => loadFromDatabase(true)}
+            >
               <FiRefreshCw className="w-4 h-4" /> Refresh
             </Button>
             {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
+              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
                 <FiEdit2 className="w-4 h-4 mr-2" /> Edit Slides
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="cursor-pointer">
                   <FiX className="w-4 h-4 mr-2" /> Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700 cursor-pointer disabled:cursor-not-allowed">
                   <FiSave className="w-4 h-4 mr-2" />
                   {isSaving ? 'Saving...' : 'Save All Changes'}
                 </Button>
@@ -275,7 +307,7 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  You can modify all hero slides content. Changes will be saved to database.
+                  Upload images directly from your computer. URL paste is not allowed.
                 </p>
               </div>
             </div>
@@ -289,79 +321,193 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Slide {index + 1}</h3>
                 {isEditing && formData.slides.length > 1 && (
-                  <Button variant="ghost" size="sm" onClick={() => removeSlide(index)} className="text-red-500">
+                  <Button variant="ghost" size="sm" onClick={() => removeSlide(index)} className="text-red-500 cursor-pointer">
                     <FiTrash2 />
                   </Button>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Eyebrow */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Eyebrow</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Eyebrow</label>
                   <input
                     type="text"
                     value={slide.eyebrow}
                     onChange={(e) => updateSlide(index, 'eyebrow', e.target.value)}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                   />
                 </div>
+                
+                {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Title</label>
                   <input
                     type="text"
                     value={slide.title}
                     onChange={(e) => updateSlide(index, 'title', e.target.value)}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                   />
                 </div>
+                
+                {/* CTA Text */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CTA Button Text</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">CTA Button Text</label>
                   <input
                     type="text"
                     value={slide.cta}
                     onChange={(e) => updateSlide(index, 'cta', e.target.value)}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                   />
                 </div>
+                
+                {/* CTA Link */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CTA Link</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">CTA Link</label>
                   <input
                     type="text"
                     value={slide.ctaLink}
                     onChange={(e) => updateSlide(index, 'ctaLink', e.target.value)}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                   />
                 </div>
+                
+                {/* Description */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Description</label>
                   <textarea
                     value={slide.desc}
                     onChange={(e) => updateSlide(index, 'desc', e.target.value)}
                     disabled={!isEditing}
                     rows={3}
-                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                    className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                   />
                 </div>
+                
+                {/* Desktop Image - Laptop */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slide Image</label>
+                  <div className="flex items-center gap-2 mb-1">
+                    <FiMonitor className="w-4 h-4 text-blue-600" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                      Desktop / Laptop Image <span className="text-xs text-gray-400">(Upload only)</span>
+                    </label>
+                  </div>
                   <UploadImage
-                    value={slide.image}
-                    onChange={(file) => handleImageChange(index, file)}
-                    onRemove={() => handleImageChange(index, '')}
+                    value={slide.desktopImage || ''}
+                    onChange={(file) => handleImageChange(index, 'desktopImage', file)}
+                    onRemove={() => {
+                      const newSlides = [...formData.slides];
+                      newSlides[index] = { ...newSlides[index], desktopImage: '' };
+                      setFormData(prev => ({ ...prev, slides: newSlides }));
+                    }}
                     aspectRatio="banner"
                     disabled={!isEditing}
                   />
+                  {slide.desktopImage && (
+                    <div className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                      <FiCheck className="w-3 h-3" /> Desktop image uploaded
+                    </div>
+                  )}
+                </div>
+
+                {/* Mobile Image */}
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FiSmartphone className="w-4 h-4 text-green-600" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                      Mobile Image <span className="text-xs text-gray-400">(Upload only)</span>
+                    </label>
+                  </div>
+                  <UploadImage
+                    value={slide.mobileImage || ''}
+                    onChange={(file) => handleImageChange(index, 'mobileImage', file)}
+                    onRemove={() => {
+                      const newSlides = [...formData.slides];
+                      newSlides[index] = { ...newSlides[index], mobileImage: '' };
+                      setFormData(prev => ({ ...prev, slides: newSlides }));
+                    }}
+                    aspectRatio="banner"
+                    disabled={!isEditing}
+                  />
+                  {slide.mobileImage && (
+                    <div className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                      <FiCheck className="w-3 h-3" /> Mobile image uploaded
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Device-styled preview: laptop frame + mobile frame shown together for every slide */}
+              <div className="mt-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
+                  <FiImage className="w-4 h-4" /> Live Preview
+                </h4>
+                <div className="flex flex-wrap items-start gap-8">
+                  {/* Desktop / laptop frame - always visible */}
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-xs font-medium text-blue-600 flex items-center gap-1">
+                      <FiMonitor className="w-3 h-3" /> Desktop / Laptop
+                    </span>
+                    <div className="w-64 rounded-t-lg border-4 border-gray-800 bg-gray-800 overflow-hidden shadow-md">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-gray-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                      </div>
+                      {slide.desktopImage ? (
+                        <img
+                          src={slide.desktopImage}
+                          alt="Desktop preview"
+                          className="w-full h-32 object-cover bg-gray-100"
+                        />
+                      ) : (
+                        <div className="w-full h-32 flex flex-col items-center justify-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                          <FiMonitor className="w-6 h-6" />
+                          <span className="text-[10px]">No desktop image yet</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-20 h-2 bg-gray-700 rounded-b-md"></div>
+                    <div className="w-32 h-1.5 bg-gray-400 rounded-full"></div>
+                  </div>
+
+                  {/* Mobile / phone frame - always visible */}
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+                      <FiSmartphone className="w-3 h-3" /> Mobile
+                    </span>
+                    <div className="w-24 rounded-2xl border-4 border-gray-800 bg-gray-800 overflow-hidden shadow-md">
+                      <div className="flex justify-center py-1 bg-gray-800">
+                        <span className="w-6 h-1 rounded-full bg-gray-600"></span>
+                      </div>
+                      {slide.mobileImage ? (
+                        <img
+                          src={slide.mobileImage}
+                          alt="Mobile preview"
+                          className="w-full h-40 object-cover bg-gray-100"
+                        />
+                      ) : (
+                        <div className="w-full h-40 flex flex-col items-center justify-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                          <FiSmartphone className="w-5 h-5" />
+                          <span className="text-[10px] text-center px-1">No mobile image yet</span>
+                        </div>
+                      )}
+                      <div className="flex justify-center py-1.5 bg-gray-800">
+                        <span className="w-6 h-6 rounded-full border-2 border-gray-600"></span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
 
           {isEditing && (
-            <Button onClick={addSlide} className="w-full bg-teal-600 hover:bg-teal-700">
+            <Button onClick={addSlide} className="w-full bg-teal-600 hover:bg-teal-700 cursor-pointer">
               <FiPlus className="w-4 h-4 mr-2" /> Add New Slide
             </Button>
           )}
@@ -371,23 +517,23 @@ export function HeroSection({ college, templateId }: HeroSectionProps) {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Settings</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Background Color</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Background Color</label>
                 <input
                   type="text"
                   value={formData.bgColor}
                   onChange={(e) => setFormData(prev => ({ ...prev, bgColor: e.target.value }))}
                   disabled={!isEditing}
-                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accent Color</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Accent Color</label>
                 <input
                   type="text"
                   value={formData.accentColor}
                   onChange={(e) => setFormData(prev => ({ ...prev, accentColor: e.target.value }))}
                   disabled={!isEditing}
-                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text disabled:cursor-not-allowed"
                 />
               </div>
             </div>

@@ -1,74 +1,54 @@
-/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/components/sections/ScholarshipStatsHandler.tsx
+// app/components/sections/AboutStatsHandler.tsx
 
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { College } from '@/app/lib/gsap';
 import { Button } from '@/components/ui/button';
+import { UploadImage } from '@/components/ui/UploadImage';
 import { 
-  FiEdit2, FiSave, FiX, FiInfo, FiPlus, FiTrash2, FiCheck,
-  FiRefreshCw
+  FiEdit2, FiSave, FiX, FiInfo, FiCheck,
+  FiRefreshCw, FiImage, FiAward, FiTarget, FiEye
 } from 'react-icons/fi';
 
-interface ScholarshipStatsHandlerProps {
+interface AboutStatsHandlerProps {
   college: College;
   templateId?: number;
 }
 
-interface StatCard {
-  id: string;
-  num: string;
-  title: string;
-  description: string;
-}
-
-interface ScholarshipStatsFormData {
+interface AboutStatsFormData {
   badgeText: string;
-  title: string;
-  subtitle: string;
-  cards: StatCard[];
+  headingFirst: string;
+  headingHighlight: string;
+  headingLast: string;
+  description: string;
   buttonText: string;
   buttonLink: string;
+  desktopImage: string;
+  mobileImage: string;
+  quoteText: string;
 }
 
-const defaultCards: StatCard[] = [
-  {
-    id: 'card1',
-    num: '01',
-    title: 'Merit Scholarships',
-    description: 'Recognizing excellence and academic achievements.'
-  },
-  {
-    id: 'card2',
-    num: '02',
-    title: 'Need-Based Aid',
-    description: 'Supporting students who need it the most.'
-  },
-  {
-    id: 'card3',
-    num: '03',
-    title: 'Affordable Education',
-    description: 'Making quality education accessible for all.'
-  }
-];
-
-const defaultFormData: ScholarshipStatsFormData = {
-  badgeText: 'SCHOLARSHIPS',
-  title: 'Scholarships &',
-  subtitle: 'We believe that financial constraints should never be a barrier to quality education. Nestick College offers a range of merit-based and need-based scholarships to help talented students achieve their academic dreams.',
-  cards: defaultCards,
-  buttonText: 'Explore Scholarships',
-  buttonLink: '/Scholarships'
+const defaultFormData: AboutStatsFormData = {
+  badgeText: 'About Our Institution',
+  headingFirst: 'Our',
+  headingHighlight: 'Mission.',
+  headingLast: 'Our Vision.',
+  description: 'Discover the driving force behind our institution\'s commitment to excellence, innovation, and student success in a rapidly evolving world. We believe in nurturing talent, fostering creativity, and building a community where every individual can thrive and make a meaningful impact on society.',
+  buttonText: 'Explore Our Story',
+  buttonLink: '/About',
+  desktopImage: '',
+  mobileImage: '',
+  quoteText: 'Education is the foundation of every great achievement.'
 };
 
-export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStatsHandlerProps) {
+export function AboutStatsHandler({ college, templateId }: AboutStatsHandlerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [formData, setFormData] = useState<ScholarshipStatsFormData>(defaultFormData);
+  const [formData, setFormData] = useState<AboutStatsFormData>(defaultFormData);
   const [lastUpdated, setLastUpdated] = useState('');
 
   const getActiveTemplateId = () => {
@@ -87,7 +67,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
       const activeTemplateId = getActiveTemplateId();
       const collegeId = getCollegeId();
       const timestamp = Date.now();
-      const url = `/api/sections?template_id=${activeTemplateId}&section_name=ScholarshipStats&college_id=${collegeId}&_=${timestamp}`;
+      const url = `/api/sections?template_id=${activeTemplateId}&section_name=AboutStats&college_id=${collegeId}&_=${timestamp}`;
       
       const response = await fetch(url, {
         cache: 'no-store',
@@ -106,14 +86,13 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
           if (dbContent && Object.keys(dbContent).length > 0) {
             setFormData({
               ...defaultFormData,
-              ...dbContent,
-              cards: dbContent.cards || defaultFormData.cards
+              ...dbContent
             });
           }
         }
       }
     } catch (error) {
-      console.error('Failed to load scholarship stats data:', error);
+      console.error('Failed to load about stats data:', error);
     } finally {
       if (showLoading) setIsLoading(false);
     }
@@ -132,7 +111,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           template_id: activeTemplateId,
-          section_name: "ScholarshipStats",
+          section_name: "AboutStats",
           college_id: collegeId,
           content: formData
         })
@@ -154,31 +133,16 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
     }
   };
 
-  // ✅ Card handlers
-  const addCard = () => {
-    const newId = `card${Date.now()}`;
-    setFormData(prev => ({
-      ...prev,
-      cards: [...prev.cards, {
-        id: newId,
-        num: String(prev.cards.length + 1).padStart(2, '0'),
-        title: 'New Scholarship',
-        description: 'Description here...'
-      }]
-    }));
-  };
-
-  const updateCard = (index: number, field: string, value: string) => {
-    const newCards = [...formData.cards];
-    newCards[index] = { ...newCards[index], [field]: value };
-    setFormData(prev => ({ ...prev, cards: newCards }));
-  };
-
-  const removeCard = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      cards: prev.cards.filter((_, i) => i !== index)
-    }));
+  // ✅ Image handlers - only upload, no URL paste
+  const handleImageChange = (key: 'desktopImage' | 'mobileImage', fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, [key]: reader.result as string }));
+    };
+    reader.readAsDataURL(fileOrString);
   };
 
   useEffect(() => {
@@ -190,7 +154,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
       <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading scholarship stats data...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading about stats data...</p>
         </div>
       </div>
     );
@@ -204,7 +168,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
           <div className="bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3">
             <FiCheck className="w-5 h-5" />
             <div>
-              <p className="font-medium">Scholarship Stats Saved Successfully!</p>
+              <p className="font-medium">About Stats Saved Successfully!</p>
               <p className="text-sm text-green-100">Data refreshed from database.</p>
             </div>
           </div>
@@ -215,8 +179,8 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Scholarship Stats Section</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage scholarship stats content</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">About Stats Section</h2>
+            <p className="text-gray-600 dark:text-gray-400">Manage about section content</p>
             <div className="flex items-center gap-3 mt-1">
               <p className="text-xs text-teal-600 dark:text-teal-400">Template ID: {getActiveTemplateId()}</p>
               <p className="text-xs text-blue-600 dark:text-blue-400">College ID: {getCollegeId()}</p>
@@ -235,7 +199,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
             </Button>
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
-                <FiEdit2 className="w-4 h-4 mr-2" /> Edit Stats
+                <FiEdit2 className="w-4 h-4 mr-2" /> Edit Content
               </Button>
             ) : (
               <>
@@ -258,7 +222,7 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Modify scholarship stats content. Changes will be saved to database.
+                  Upload images directly from your computer. URL paste is not allowed.
                 </p>
               </div>
             </div>
@@ -280,22 +244,42 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Title</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Heading First</label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                value={formData.headingFirst}
+                onChange={(e) => setFormData(prev => ({ ...prev, headingFirst: e.target.value }))}
                 disabled={!isEditing}
                 className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Subtitle</label>
-              <textarea
-                value={formData.subtitle}
-                onChange={(e) => setFormData(prev => ({ ...prev, subtitle: e.target.value }))}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Heading Highlight</label>
+              <input
+                type="text"
+                value={formData.headingHighlight}
+                onChange={(e) => setFormData(prev => ({ ...prev, headingHighlight: e.target.value }))}
                 disabled={!isEditing}
-                rows={3}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Heading Last</label>
+              <input
+                type="text"
+                value={formData.headingLast}
+                onChange={(e) => setFormData(prev => ({ ...prev, headingLast: e.target.value }))}
+                disabled={!isEditing}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                disabled={!isEditing}
+                rows={4}
                 className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
               />
             </div>
@@ -319,77 +303,87 @@ export function ScholarshipStatsHandler({ college, templateId }: ScholarshipStat
                 className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
               />
             </div>
-          </div>
-        </div>
-
-        {/* Cards */}
-        <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Stat Cards</h3>
-            {isEditing && (
-              <Button size="sm" onClick={addCard} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
-                <FiPlus className="w-3 h-3 mr-1" /> Add Card
-              </Button>
-            )}
-          </div>
-
-          <div className="space-y-6">
-            {formData.cards.map((card, index) => (
-              <div key={card.id} className="p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">Card #{index + 1}</span>
-                  {isEditing && (
-                    <Button variant="ghost" size="sm" onClick={() => removeCard(index)} className="text-red-500 cursor-pointer">
-                      <FiTrash2 />
-                    </Button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Number</label>
-                    <input
-                      type="text"
-                      value={card.num}
-                      onChange={(e) => updateCard(index, 'num', e.target.value)}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Title</label>
-                    <input
-                      type="text"
-                      value={card.title}
-                      onChange={(e) => updateCard(index, 'title', e.target.value)}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">Description</label>
-                    <input
-                      type="text"
-                      value={card.description}
-                      onChange={(e) => updateCard(index, 'description', e.target.value)}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-1.5 border rounded-lg text-sm disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 cursor-text"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {formData.cards.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p>No cards added yet. Click "Add Card" to get started.</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">Quote Text</label>
+              <input
+                type="text"
+                value={formData.quoteText}
+                onChange={(e) => setFormData(prev => ({ ...prev, quoteText: e.target.value }))}
+                disabled={!isEditing}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 dark:disabled:bg-gray-700 dark:bg-gray-900 dark:text-white dark:border-gray-600 cursor-text"
+              />
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Images */}
+        <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Images</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <FiImage className="w-4 h-4 text-blue-600" />
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Desktop Image <span className="text-xs text-gray-400">(Upload only)</span>
+                </label>
+              </div>
+              <UploadImage
+                value={formData.desktopImage || ''}
+                onChange={(file) => handleImageChange('desktopImage', file)}
+                onRemove={() => setFormData(prev => ({ ...prev, desktopImage: '' }))}
+                aspectRatio="square"
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <FiImage className="w-4 h-4 text-green-600" />
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Mobile Image <span className="text-xs text-gray-400">(Upload only)</span>
+                </label>
+              </div>
+              <UploadImage
+                value={formData.mobileImage || ''}
+                onChange={(file) => handleImageChange('mobileImage', file)}
+                onRemove={() => setFormData(prev => ({ ...prev, mobileImage: '' }))}
+                aspectRatio="square"
+                disabled={!isEditing}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Preview */}
+        {(formData.desktopImage || formData.mobileImage) && (
+          <div className="mt-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {formData.desktopImage && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Desktop</p>
+                  <img 
+                    src={formData.desktopImage} 
+                    alt="Desktop preview" 
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                </div>
+              )}
+              {formData.mobileImage && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-1">Mobile</p>
+                  <img 
+                    src={formData.mobileImage} 
+                    alt="Mobile preview" 
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
-export default ScholarshipStatsHandler;
+export default AboutStatsHandler;

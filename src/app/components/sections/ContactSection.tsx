@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { College } from '@/app/lib/gsap';
-import { Button } from '@/components/ui/button'; 
+import { Button } from '@/components/ui/button';
+import { UploadImage } from '@/components/ui/UploadImage';
 import { 
   FiEdit2, 
   FiSave, 
@@ -22,7 +24,10 @@ import {
   FiMap,
   FiMessageSquare,
   FiCheck,
-  FiRefreshCw
+  FiRefreshCw,
+  FiImage,
+  FiUpload,
+  FiSmartphone
 } from 'react-icons/fi';
 import { validateEmail, validateUrl } from '@/lib/utils';
 
@@ -59,6 +64,9 @@ interface ContactInfo {
   website: string;
   mapLink: string;
   appointmentLink: string;
+  // ✅ New image fields
+  contactImage: string;
+  contactMobileImage: string;
   socialMedia: SocialMedia;
   workingHours: WorkingHours;
   contactNumbers: ContactNumbers;
@@ -71,6 +79,9 @@ const defaultContactInfo: ContactInfo = {
   website: '',
   mapLink: '',
   appointmentLink: '',
+  // ✅ Default image values
+  contactImage: '',
+  contactMobileImage: '',
   socialMedia: {
     facebook: '',
     twitter: '',
@@ -98,6 +109,8 @@ export function ContactSection({ college, templateId }: ContactSectionProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copySuccess, setCopySuccess] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  // ✅ Track pending image changes
+  const [pendingImages, setPendingImages] = useState<Set<string>>(new Set());
 
   const getActiveTemplateId = () => {
     return templateId || college.template_id || 1;
@@ -142,6 +155,9 @@ export function ContactSection({ college, templateId }: ContactSectionProps) {
               website: dbContent.website || defaultContactInfo.website,
               mapLink: dbContent.mapLink || defaultContactInfo.mapLink,
               appointmentLink: dbContent.appointmentLink || defaultContactInfo.appointmentLink,
+              // ✅ Load images from database
+              contactImage: dbContent.contactImage || '',
+              contactMobileImage: dbContent.contactMobileImage || '',
               socialMedia: {
                 facebook: dbContent.socialMedia?.facebook || '',
                 twitter: dbContent.socialMedia?.twitter || '',
@@ -174,6 +190,51 @@ export function ContactSection({ college, templateId }: ContactSectionProps) {
     loadFromDatabase(true);
   }, [loadFromDatabase]);
 
+  // ✅ Image handler
+  const handleImageChange = (key: 'contactImage' | 'contactMobileImage', fileOrString: File | string) => {
+    if (typeof fileOrString === 'string') {
+      // Reject external URLs, accept data URLs
+      if (!fileOrString.startsWith('data:')) {
+        return;
+      }
+      setContactInfo(prev => ({ ...prev, [key]: fileOrString }));
+      setPendingImages(prev => new Set(prev).add(key));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setContactInfo(prev => ({ ...prev, [key]: reader.result as string }));
+      setPendingImages(prev => new Set(prev).add(key));
+    };
+    reader.readAsDataURL(fileOrString);
+  };
+
+  // ✅ Image preview with frame
+  const renderImagePreview = (image: string, label: string, key: string) => {
+    if (!image) return null;
+    return (
+      <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+            <FiImage className="w-3.5 h-3.5" /> {label}
+          </p>
+          {pendingImages.has(key) && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-0.5 rounded-full">
+              <FiUpload className="w-3 h-3" /> Not saved yet
+            </span>
+          )}
+        </div>
+        <div className="relative rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 shadow-md">
+          <img 
+            src={image} 
+            alt={label} 
+            className="w-full aspect-[16/9] object-cover"
+          />
+        </div>
+      </div>
+    );
+  };
+
   // Save to database
   const handleSave = async () => {
     setIsSaving(true);
@@ -196,6 +257,7 @@ export function ContactSection({ college, templateId }: ContactSectionProps) {
       if (response.ok) {
         setShowSuccessPopup(true);
         setIsEditing(false);
+        setPendingImages(new Set()); // ✅ Clear pending images
         await loadFromDatabase(false);
         setTimeout(() => setShowSuccessPopup(false), 3000);
       } else {
@@ -339,7 +401,7 @@ Working Hours:
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Update your contact information. Changes will be saved to database.
+                  Update your contact information and images. Changes will be saved to database.
                 </p>
               </div>
             </div>
@@ -351,6 +413,50 @@ Working Hours:
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
+              {/* ✅ Contact Images Section */}
+              <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <FiImage className="text-teal-500" /> Contact Images
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">Upload images for the contact page hero section</p>
+                
+                {/* Desktop Image */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FiGlobe className="w-4 h-4 text-blue-600" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                      Contact Desktop Image <span className="text-xs text-gray-400">(Upload only)</span>
+                    </label>
+                  </div>
+                  <UploadImage
+                    value={contactInfo.contactImage || ''}
+                    onChange={(file) => handleImageChange('contactImage', file)}
+                    onRemove={() => setContactInfo(prev => ({ ...prev, contactImage: '' }))}
+                    aspectRatio="banner"
+                    disabled={!isEditing}
+                  />
+                  {renderImagePreview(contactInfo.contactImage, 'Contact Desktop', 'contactImage')}
+                </div>
+
+                {/* Mobile Image */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <FiSmartphone className="w-4 h-4 text-green-600" />
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                      Contact Mobile Image <span className="text-xs text-gray-400">(Upload only)</span>
+                    </label>
+                  </div>
+                  <UploadImage
+                    value={contactInfo.contactMobileImage || ''}
+                    onChange={(file) => handleImageChange('contactMobileImage', file)}
+                    onRemove={() => setContactInfo(prev => ({ ...prev, contactMobileImage: '' }))}
+                    aspectRatio="banner"
+                    disabled={!isEditing}
+                  />
+                  {renderImagePreview(contactInfo.contactMobileImage, 'Contact Mobile', 'contactMobileImage')}
+                </div>
+              </div>
+
               {/* Address */}
               <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -516,6 +622,37 @@ Working Hours:
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
+              {/* ✅ Display Images in View Mode */}
+              {(contactInfo.contactImage || contactInfo.contactMobileImage) && (
+                <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <FiImage className="text-teal-500" /> Contact Images
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {contactInfo.contactImage && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Desktop</p>
+                        <img 
+                          src={contactInfo.contactImage} 
+                          alt="Contact Desktop" 
+                          className="w-full aspect-video object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                    {contactInfo.contactMobileImage && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Mobile</p>
+                        <img 
+                          src={contactInfo.contactMobileImage} 
+                          alt="Contact Mobile" 
+                          className="w-full aspect-video object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <FiMapPin className="text-teal-500" /> Our Campus

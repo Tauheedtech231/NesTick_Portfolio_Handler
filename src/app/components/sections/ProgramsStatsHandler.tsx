@@ -26,7 +26,6 @@ interface FeatureCard {
   icon: string;
   color: string;
   clipPath: string;
-  mobileImage: string;
   desktopImage: string;
   position: 'left-up' | 'left-down' | 'right-up' | 'right-down';
 }
@@ -50,7 +49,6 @@ const defaultFeatures: FeatureCard[] = [
     icon: 'BookOpen',
     color: 'blue',
     clipPath: "path('M5,5 L140,25 Q155,30 155,45 L155,230 Q155,245 140,245 L15,245 Q5,245 5,230 Z')",
-    mobileImage: '',
     desktopImage: '',
     position: 'left-up'
   },
@@ -62,7 +60,6 @@ const defaultFeatures: FeatureCard[] = [
     icon: 'Target',
     color: 'indigo',
     clipPath: "path('M5,5 L140,25 Q155,30 155,45 L155,240 Q155,255 140,255 L15,255 Q5,255 5,240 Z')",
-    mobileImage: '',
     desktopImage: '',
     position: 'left-down'
   },
@@ -74,7 +71,6 @@ const defaultFeatures: FeatureCard[] = [
     icon: 'Users',
     color: 'purple',
     clipPath: "path('M150,5 L15,25 Q0,30 0,45 L0,240 Q0,255 15,255 L140,255 Q150,255 150,240 Z')",
-    mobileImage: '',
     desktopImage: '',
     position: 'right-up'
   },
@@ -86,7 +82,6 @@ const defaultFeatures: FeatureCard[] = [
     icon: 'Award',
     color: 'teal',
     clipPath: "path('M150,5 L15,25 Q0,30 0,45 L0,230 Q0,245 15,245 L140,245 Q150,245 150,230 Z')",
-    mobileImage: '',
     desktopImage: '',
     position: 'right-down'
   }
@@ -220,7 +215,6 @@ export function ProgramsStatsHandler({ college, templateId }: ProgramsStatsHandl
         icon: 'BookOpen',
         color: 'blue',
         clipPath: "path('M5,5 L140,25 Q155,30 155,45 L155,230 Q155,245 140,245 L15,245 Q5,245 5,230 Z')",
-        mobileImage: '',
         desktopImage: '',
         position: 'left-up'
       }]
@@ -252,14 +246,14 @@ export function ProgramsStatsHandler({ college, templateId }: ProgramsStatsHandl
     reader.readAsDataURL(fileOrString);
   };
 
-  const handleFeatureImageChange = (index: number, key: 'mobileImage' | 'desktopImage', fileOrString: File | string) => {
+  const handleFeatureImageChange = (index: number, fileOrString: File | string) => {
     if (typeof fileOrString === 'string') {
       return;
     }
     const reader = new FileReader();
     reader.onloadend = () => {
       const newFeatures = [...formData.features];
-      newFeatures[index] = { ...newFeatures[index], [key]: reader.result as string };
+      newFeatures[index] = { ...newFeatures[index], desktopImage: reader.result as string };
       setFormData(prev => ({ ...prev, features: newFeatures }));
     };
     reader.readAsDataURL(fileOrString);
@@ -524,32 +518,14 @@ export function ProgramsStatsHandler({ college, templateId }: ProgramsStatsHandl
                     </div>
                   </div>
 
-                  {/* Mobile Image */}
-                  <div className="mt-3">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">
-                      Mobile Image <span className="text-xs text-gray-400">(Upload only)</span>
-                    </label>
-                    <UploadImage
-                      value={feature.mobileImage || ''}
-                      onChange={(file) => handleFeatureImageChange(index, 'mobileImage', file)}
-                      onRemove={() => {
-                        const newFeatures = [...formData.features];
-                        newFeatures[index] = { ...newFeatures[index], mobileImage: '' };
-                        setFormData(prev => ({ ...prev, features: newFeatures }));
-                      }}
-                      aspectRatio="square"
-                      disabled={!isEditing}
-                    />
-                  </div>
-
-                  {/* Desktop Image */}
+                  {/* Desktop Image Only */}
                   <div className="mt-3">
                     <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 cursor-pointer">
                       Desktop Image <span className="text-xs text-gray-400">(Upload only)</span>
                     </label>
                     <UploadImage
                       value={feature.desktopImage || ''}
-                      onChange={(file) => handleFeatureImageChange(index, 'desktopImage', file)}
+                      onChange={(file) => handleFeatureImageChange(index, file)}
                       onRemove={() => {
                         const newFeatures = [...formData.features];
                         newFeatures[index] = { ...newFeatures[index], desktopImage: '' };

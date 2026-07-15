@@ -25,6 +25,8 @@ import { FormManagerSection } from '@/app/components/sections/FormManagerSection
 import { AboutCoursesHandler } from '@/app/components/sections/AboutCoursesHandler';
 import { ScholarshipStatsHandler } from '@/app/components/sections/ScholarshipStatsHandler';
 import { ProgramsStatsHandler } from '@/app/components/sections/ProgramsStatsHandler';
+import { AboutStatsHandler } from '@/app/components/sections/AboutStatsHandler';
+import { FacultyStatsHandler } from '@/app/components/sections/FacultyStatsHandler';
 /* eslint-disable */
 
 import { 
@@ -459,6 +461,8 @@ const sectionComponents: Record<SectionType, React.ComponentType<any>> = {
   aboutcourses: AboutCoursesHandler,
   scholarshipstats: ScholarshipStatsHandler,
   programsstats: ProgramsStatsHandler,
+  aboutstats: AboutStatsHandler,
+  facultystats: FacultyStatsHandler,
   flexible: () => (
     <div className="text-gray-500 dark:text-gray-500 text-center py-16">
       <Grid3X3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -508,6 +512,12 @@ const normalizeSectionKey = (section: string): SectionType => {
     programsstats: 'programsstats',
     program_stats: 'programsstats',
     programs_stat: 'programsstats',
+    aboutstats: 'aboutstats',
+    about_stat: 'aboutstats',
+    about_stats: 'aboutstats',
+    facultystats: 'facultystats',
+    faculty_stats: 'facultystats',
+    facultystat: 'facultystats',
     flexible: 'flexible',
   };
 
@@ -772,6 +782,10 @@ function DashboardContent({ initialData }: DashboardProps) {
         <ScholarshipStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
       ) : activeSection === 'programsstats' ? (
         <ProgramsStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'aboutstats' ? (
+        <AboutStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
+      ) : activeSection === 'facultystats' ? (
+        <FacultyStatsHandler college={collegeData.college} templateId={collegeDetails?.template_id} />
       ) : ActiveComponent ? (
         <ActiveComponent 
           data={sectionData} 

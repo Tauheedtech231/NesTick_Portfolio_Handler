@@ -8,7 +8,8 @@ import { UploadImage } from '@/components/ui/UploadImage';
 import { 
   FiEdit2, FiSave, FiX, FiInfo, FiPlus, FiTrash2, FiCheck,
   FiRefreshCw, FiFileText, FiUser, FiCalendar, FiMail, FiPhone,
-  FiMapPin, FiBook, FiClock, FiDollarSign, FiUpload, FiImage
+  FiMapPin, FiBook, FiClock, FiDollarSign, FiUpload, FiImage,
+  FiMonitor, FiSmartphone
 } from 'react-icons/fi';
 
 interface AdmissionSectionProps {
@@ -278,6 +279,37 @@ export function AdmissionSection({ college, templateId }: AdmissionSectionProps)
     reader.readAsDataURL(fileOrString);
   };
 
+  // ✅ Render Image Preview with Frame
+  const renderImagePreview = (image: string, label: string) => {
+    if (!image) return null;
+    return (
+      <div className="mt-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
+        <div className="flex items-center gap-2 mb-2">
+          <FiImage className="w-3.5 h-3.5 text-teal-500" />
+          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 cursor-pointer">
+            {label} - Preview
+          </p>
+          <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full cursor-pointer">
+            ✓ Uploaded
+          </span>
+        </div>
+        <div className="relative rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 shadow-md">
+          <img 
+            src={image} 
+            alt={label} 
+            className="w-full aspect-[16/9] object-cover"
+          />
+          <div className="absolute top-0 left-0 right-0 h-6 bg-gray-800/80 flex items-center px-3 gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <span className="text-[8px] text-white/60 ml-2">Image Preview</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     loadFromDatabase(true);
   }, [loadFromDatabase]);
@@ -390,6 +422,8 @@ export function AdmissionSection({ college, templateId }: AdmissionSectionProps)
                 aspectRatio="banner"
                 disabled={!isEditing}
               />
+              {/* ✅ Show preview if image exists */}
+              {formData.heroImage && renderImagePreview(formData.heroImage, 'Hero Image')}
             </div>
           </div>
         </div>

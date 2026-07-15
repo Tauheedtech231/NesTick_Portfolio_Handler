@@ -270,22 +270,35 @@ export default function ModulesPage() {
     }
   }, [selectedCollegeId, colleges]);
 
-  const commonSections = [
-    'About Us',
-    'Faculty',
-    'Events',
-    'Gallery',
-    'Achievements',
-    'Contact',
-    'Courses',
-    'Admissions',
-    'Departments',
-    'Research',
-    'Library',
-    'Placements',
-    'Alumni',
-    'News'
-  ];
+ const commonSections = [
+  'About Us',
+  'Faculty',
+  'Events',
+  'Gallery',
+  'Achievements',
+  'Contact',
+  'Courses',
+  'Admissions',
+ 
+ 
+  'History',
+ 
+  
+
+  'Scholarships',
+  'Programs',
+  'Hero',
+  'Footer',
+  'Navbar',
+  'Stats',
+  'Affiliations',
+  'Aboutcourses',
+  'Aboutstats',
+  'Facultystats',
+  'Programsstats',
+  'Scholarshipstats',
+  'Formmanager'
+];
 
   const bgColor = isDarkMode ? 'bg-[#0B0F19]' : 'bg-gray-50';
   const cardBg = isDarkMode ? 'bg-[#0F172A]' : 'bg-white';

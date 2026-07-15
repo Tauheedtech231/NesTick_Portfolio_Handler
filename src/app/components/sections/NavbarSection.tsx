@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { UploadImage } from '@/components/ui/UploadImage';
 import { 
   FiEdit2, FiSave, FiX, FiCheck, FiRefreshCw,
-  FiInfo
+  FiInfo, FiTrash2, FiUpload
 } from 'react-icons/fi';
 
 interface NavbarSectionProps {
@@ -112,16 +112,26 @@ export function NavbarSection({ college, templateId }: NavbarSectionProps) {
     }
   };
 
+  // ✅ Handle logo change (upload new)
   const handleLogoChange = (fileOrString: File | string) => {
     if (typeof fileOrString === 'string') {
+      // If it's a string, it means remove was called
       setFormData(prev => ({ ...prev, logo: fileOrString }));
       return;
     }
+    // New file upload
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData(prev => ({ ...prev, logo: reader.result as string }));
     };
     reader.readAsDataURL(fileOrString);
+  };
+
+  // ✅ Manual remove logo with confirmation
+  const handleRemoveLogo = () => {
+    if (confirm('Are you sure you want to remove the logo?')) {
+      setFormData(prev => ({ ...prev, logo: '' }));
+    }
   };
 
   useEffect(() => {
@@ -169,19 +179,23 @@ export function NavbarSection({ college, templateId }: NavbarSectionProps) {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" onClick={() => loadFromDatabase(true)}>
+            <Button 
+              variant="outline" 
+              className="gap-2 cursor-pointer" 
+              onClick={() => loadFromDatabase(true)}
+            >
               <FiRefreshCw className="w-4 h-4" /> Refresh
             </Button>
             {!isEditing ? (
-              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700">
+              <Button onClick={() => setIsEditing(true)} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
                 <FiEdit2 className="w-4 h-4 mr-2" /> Edit Logo
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="cursor-pointer">
                   <FiX className="w-4 h-4 mr-2" /> Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
                   <FiSave className="w-4 h-4 mr-2" />
                   {isSaving ? 'Saving...' : 'Save Logo'}
                 </Button>
@@ -197,33 +211,82 @@ export function NavbarSection({ college, templateId }: NavbarSectionProps) {
               <div>
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">Edit Mode Active</h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Upload a new logo. It will be saved to database and reflected on live template.
+                  Upload a new logo or remove existing one.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Logo Upload */}
+        {/* Logo Upload Section */}
         <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Logo Image</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Logo Image</h3>
+            {isEditing && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">
+                  {formData.logo ? 'Current logo set' : 'No logo set'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Current Logo Display */}
+          {formData.logo && (
+            <div className="mb-4 flex items-center gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200">
+              <img 
+                src={formData.logo} 
+                alt="Current Logo" 
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+              />
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Current Logo</p>
+                <p className="text-xs text-gray-400">Click "Edit Logo" to change</p>
+              </div>
+            </div>
+          )}
+
+          {!formData.logo && (
+            <div className="mb-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-dashed border-gray-300 text-center">
+              <p className="text-sm text-gray-400">No logo uploaded yet</p>
+            </div>
+          )}
+
+          {/* Upload Section */}
           <div className="flex flex-col items-center justify-center">
             <UploadImage
               value={formData.logo}
               onChange={handleLogoChange}
-              onRemove={() => handleLogoChange('')}
+              onRemove={() => {
+                if (confirm('Are you sure you want to remove the logo?')) {
+                  setFormData(prev => ({ ...prev, logo: '' }));
+                }
+              }}
               aspectRatio="square"
               disabled={!isEditing}
             />
-            {!isEditing && formData.logo && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Logo is set</p>
-              </div>
+            
+            {/* ✅ Manual Remove Button - Shows when logo exists and in edit mode */}
+            {isEditing && formData.logo && (
+              <button
+                onClick={handleRemoveLogo}
+                className="mt-3 flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium shadow-md hover:shadow-lg"
+              >
+                <FiTrash2 className="w-4 h-4" />
+                Remove Logo
+              </button>
+            )}
+
+            {/* Upload hint when in edit mode */}
+            {isEditing && (
+              <p className="mt-2 text-xs text-gray-400">
+                Click on the upload area above to select a new logo
+              </p>
             )}
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Preview Section */}
         {formData.logo && (
           <div className="mt-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview</h3>
