@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // lib/db.ts
 import mysql from 'mysql2/promise';
 
