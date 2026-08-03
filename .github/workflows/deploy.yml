@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:latest
+      # ✅ Lowercase image name (GHCR requirement)
+      IMAGE_NAME: ghcr.io/neezamiya-insti/nestick_portfolio_handler:latest
 
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
