@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 
 export function PurposeSection() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -13,15 +14,25 @@ export function PurposeSection() {
       setTheme(isDark ? 'dark' : 'light');
     };
 
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
     checkTheme();
+    checkMobile();
 
     const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
       setTheme(isDark ? 'dark' : 'light');
     });
 
+    window.addEventListener('resize', checkMobile);
     observer.observe(document.documentElement, { attributes: true });
-    return () => observer.disconnect();
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      observer.disconnect();
+    };
   }, []);
 
   const isDark = theme === 'dark';
@@ -57,6 +68,146 @@ export function PurposeSection() {
   const cardShadow = isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 4px 24px rgba(20,30,60,0.06)';
   const cardBorder = isDark ? `1px solid rgba(232,202,94,0.15)` : 'none';
 
+  // If on mobile, show simple stacked cards
+  if (isMobile) {
+    return (
+      <section
+        className="w-full overflow-hidden py-8"
+        style={{
+          background: bgGradient,
+          fontFamily: "'Segoe UI', Arial, sans-serif",
+          minHeight: '100vh',
+        }}
+      >
+        <div className="max-w-[1280px] mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mt-3">
+            <p
+              className="text-xs font-bold tracking-[0.2em]"
+              style={{ color: isDark ? '#9CA3AF' : '#5b6b8c' }}
+            >
+              OUR PURPOSE
+            </p>
+            <h1
+              className="text-2xl font-extrabold mt-1"
+              style={{ color: textColor }}
+            >
+              Purpose &amp; <span style={{ color: accentColor }}>Impact</span>
+            </h1>
+            <div className="flex items-center justify-center gap-1.5 mt-3">
+              <div className="h-0.5 w-8" style={{ background: accentColor }} />
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: centerDotColor }}
+              />
+              <div className="h-0.5 w-8" style={{ background: accentBlue }} />
+            </div>
+            <p
+              className="text-sm max-w-md mx-auto mt-2"
+              style={{ color: textMuted }}
+            >
+              We exist to transform education through innovation, connection, and meaningful impact.
+            </p>
+          </div>
+
+          {/* Simple Cards - Mobile */}
+          <div className="mt-8 space-y-6">
+            {/* Mission Card */}
+            <motion.div
+              className="w-full rounded-lg p-6 cursor-pointer"
+              style={{
+                background: cardBgLeft,
+                boxShadow: cardShadow,
+                border: cardBorder,
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-4 mb-3">
+                <div
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    width: 50,
+                    height: 50,
+                    background: iconBg,
+                    boxShadow: isDark ? `0 10px 30px rgba(0,0,0,0.5), 0 0 20px ${GOLD}20` : '0 10px 30px rgba(20,30,60,0.12)',
+                    border: isDark ? `2px solid ${GOLD}` : 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg viewBox="0 0 64 64" fill="none" className="w-6 h-6">
+                    <circle cx="32" cy="32" r="22" stroke={accentColor} strokeWidth={isDark ? '3' : '2.5'} />
+                    <circle cx="32" cy="32" r="13" stroke={accentColor} strokeWidth={isDark ? '3' : '2.5'} />
+                    <circle cx="32" cy="32" r="4" fill={accentColor} />
+                    <line x1="32" y1="32" x2="48" y2="16" stroke={accentColor} strokeWidth={isDark ? '3' : '2.5'} strokeLinecap="round" />
+                    <path d="M42 12 L50 10 L48 18 Z" fill={accentColor} />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-extrabold tracking-[0.15em]" style={{ color: accentColor }}>
+                    OUR MISSION
+                  </p>
+                  <h2 className="text-lg font-extrabold" style={{ color: textColor }}>
+                    Empowering Education
+                  </h2>
+                </div>
+              </div>
+              <div className="w-8 h-0.5 my-2" style={{ background: accentColor }} />
+              <p className="text-sm leading-relaxed" style={{ color: textMuted }}>
+                To empower educational institutions with cutting-edge portfolio management technology that simplifies administration, enhances student visibility, and creates lasting digital legacies.
+              </p>
+            </motion.div>
+
+            {/* Vision Card */}
+            <motion.div
+              className="w-full rounded-lg p-6 cursor-pointer"
+              style={{
+                background: cardBgRight,
+                boxShadow: cardShadow,
+                border: cardBorder,
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center gap-4 mb-3">
+                <div
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    width: 50,
+                    height: 50,
+                    background: iconBg,
+                    boxShadow: isDark ? `0 10px 30px rgba(0,0,0,0.5), 0 0 20px ${GOLD}20` : '0 10px 30px rgba(20,30,60,0.12)',
+                    border: isDark ? `2px solid ${GOLD}` : 'none',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg viewBox="0 0 64 64" fill="none" className="w-6 h-6">
+                    <ellipse cx="32" cy="32" rx="24" ry="14" stroke={accentBlue} strokeWidth={isDark ? '3' : '2.5'} />
+                    <circle cx="32" cy="32" r="8" stroke={accentBlue} strokeWidth={isDark ? '3' : '2.5'} />
+                    <circle cx="32" cy="32" r="3" fill={accentBlue} />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-extrabold tracking-[0.15em]" style={{ color: accentBlue }}>
+                    OUR VISION
+                  </p>
+                  <h2 className="text-lg font-extrabold" style={{ color: textColor }}>
+                    Shaping the Future
+                  </h2>
+                </div>
+              </div>
+              <div className="w-8 h-0.5 my-2" style={{ background: accentBlue }} />
+              <p className="text-sm leading-relaxed" style={{ color: textMuted }}>
+                To become the global standard for educational portfolio management, connecting institutions, students, and opportunities through innovative technology that showcases potential.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Desktop/Laptop view - Keep exactly as original
   return (
     <section
       className="relative w-full overflow-hidden py-8 sm:py-15"
@@ -330,65 +481,6 @@ export function PurposeSection() {
           </motion.div>
         </div>
       </div>
-
-      {/* Responsive styles */}
-      <style>{`
-        @media (max-width: 768px) {
-          .max-w-\\[1280px\\] {
-            height: auto !important;
-            min-height: 750px;
-          }
-          .w-\\[520px\\] {
-            width: 100% !important;
-          }
-          .h-\\[360px\\] {
-            height: auto !important;
-            min-height: 320px;
-          }
-          .absolute.-left-10, .absolute.-right-10 {
-            position: relative !important;
-            left: auto !important;
-            right: auto !important;
-            top: -35px !important;
-            transform: none !important;
-            margin: 0 auto !important;
-            width: 60px !important;
-            height: 60px !important;
-          }
-          .pl-28, .pl-32, .pr-28, .pr-32 {
-            padding: 14px !important;
-          }
-          .text-right {
-            text-align: center !important;
-          }
-          .ml-auto {
-            margin: 0 auto !important;
-          }
-        }
-        @media (max-width: 480px) {
-          .text-4xl {
-            font-size: 26px !important;
-          }
-          .text-sm {
-            font-size: 11px !important;
-          }
-          .w-\\[100px\\] {
-            width: 55px !important;
-            height: 55px !important;
-          }
-          .w-11 {
-            width: 26px !important;
-            height: 26px !important;
-          }
-          .w-28 {
-            width: 24px !important;
-            height: 24px !important;
-          }
-          .h-\\[360px\\] {
-            min-height: 280px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
