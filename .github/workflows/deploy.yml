@@ -41,7 +41,7 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker.push $IMAGE_NAME
+          docker push $IMAGE_NAME
 
       - name: Connect to VPS via SSH
         uses: appleboy/ssh-action@v1.2.0
