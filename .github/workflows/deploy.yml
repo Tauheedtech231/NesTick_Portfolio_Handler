@@ -54,3 +54,15 @@ jobs:
             hostname
             whoami
             pwd
+
+            echo "🔐 Logging into GHCR..."
+
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io \
+              -u "${{ secrets.GHCR_USERNAME }}" \
+              --password-stdin
+
+            echo "✅ GHCR Login Successful"
+
+            docker logout ghcr.io
+
+            echo "👋 Logged out from GHCR"
