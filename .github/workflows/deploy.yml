@@ -41,7 +41,7 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker push $IMAGE_NAME
+          docker.push $IMAGE_NAME
 
       - name: Connect to VPS via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -49,6 +49,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+
           script: |
             echo "✅ Connected to VPS"
             hostname
@@ -72,3 +73,28 @@ jobs:
             docker logout ghcr.io
 
             echo "👋 Logged out from GHCR"
+
+
+            echo "🛑 Stopping old container..."
+
+            docker stop PSM_neezamiya || true
+
+
+            echo "🗑 Removing old container..."
+
+            docker rm PSM_neezamiya || true
+
+
+            echo "🚀 Running new container..."
+
+            docker run -d \
+              --name PSM_neezamiya \
+              -p 3000:3000 \
+              ghcr.io/neezamiya-insti/nestick_portfolio_handler:latest
+
+
+            echo "✅ Deployment completed"
+
+            echo "📦 Running containers..."
+
+            docker ps
