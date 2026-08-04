@@ -63,6 +63,12 @@ jobs:
 
             echo "✅ GHCR Login Successful"
 
+            echo "📥 Pulling latest Docker image..."
+
+            docker pull ghcr.io/neezamiya-insti/nestick_portfolio_handler:latest
+
+            echo "✅ Docker image pulled successfully"
+
             docker logout ghcr.io
 
             echo "👋 Logged out from GHCR"
