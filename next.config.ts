@@ -1,14 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone", // ✅ Add this
+
   images: {
     domains: [
-      'images.unsplash.com', 
-      'ui-avatars.com', 
-      'plus.unsplash.com', 
+      'images.unsplash.com',
+      'ui-avatars.com',
+      'plus.unsplash.com',
       'res.cloudinary.com',
       'images.openai.com',
-      'media.istockphoto.com' // ✅ Add this
+      'media.istockphoto.com'
     ],
 
     remotePatterns: [
@@ -39,7 +41,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'media.istockphoto.com', // ✅ Add this too
+        hostname: 'media.istockphoto.com',
         pathname: '/**',
       },
     ],
