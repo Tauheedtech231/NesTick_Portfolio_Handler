@@ -555,7 +555,7 @@ export default function HowItWorks() {
               fontFamily: "'Calibri Light', sans-serif",
             }}
           >
-            From template selection to live publication — a seamless journey
+            From choosing a template to launching your portfolio — everything in one seamless flow.
           </p>
         </div>
 
